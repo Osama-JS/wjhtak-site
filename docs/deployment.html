@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النشر والتشغيل - My Trip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-plane-departure"></i>
+            <h2>My Trip</h2>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>نظرة عامة</span></a>
+            <a href="tech-stack.html" class="nav-item"><i class="fas fa-layer-group"></i><span>التقنيات
+                    المستخدمة</span></a>
+            <a href="database.html" class="nav-item"><i class="fas fa-database"></i><span>قاعدة البيانات</span></a>
+            <a href="api.html" class="nav-item"><i class="fas fa-code"></i><span>واجهات API</span></a>
+            <a href="services.html" class="nav-item"><i class="fas fa-cogs"></i><span>الخدمات</span></a>
+            <a href="admin.html" class="nav-item"><i class="fas fa-user-shield"></i><span>لوحة الإدارة</span></a>
+            <a href="deployment.html" class="nav-item active"><i class="fas fa-rocket"></i><span>النشر
+                    والتشغيل</span></a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="page-header">
+            <h1>النشر والتشغيل</h1>
+            <p class="subtitle">دليل شامل لتثبيت ونشر المشروع</p>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- Requirements -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-list-check"></i> المتطلبات</h2>
+                <div class="card">
+                    <h3>متطلبات الخادم:</h3>
+                    <ul class="requirements-list">
+                        <li><i class="fas fa-check"></i> PHP 8.2 أو أحدث</li>
+                        <li><i class="fas fa-check"></i> MySQL 8.0 أو أحدث</li>
+                        <li><i class="fas fa-check"></i> Composer 2.x</li>
+                        <li><i class="fas fa-check"></i> Node.js 18+ & NPM</li>
+                        <li><i class="fas fa-check"></i> Apache/Nginx</li>
+                    </ul>
+
+                    <h3 class="mt-4">امتدادات PHP المطلوبة:</h3>
+                    <ul class="requirements-list">
+                        <li><i class="fas fa-check"></i> BCMath</li>
+                        <li><i class="fas fa-check"></i> Ctype</li>
+                        <li><i class="fas fa-check"></i> Fileinfo</li>
+                        <li><i class="fas fa-check"></i> JSON</li>
+                        <li><i class="fas fa-check"></i> Mbstring</li>
+                        <li><i class="fas fa-check"></i> OpenSSL</li>
+                        <li><i class="fas fa-check"></i> PDO</li>
+                        <li><i class="fas fa-check"></i> Tokenizer</li>
+                        <li><i class="fas fa-check"></i> XML</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Local Installation -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-laptop-code"></i> التثبيت المحلي</h2>
+                <div class="card">
+                    <h3>1. استنساخ المشروع</h3>
+                    <div class="code-block">
+                        <code>git clone https://github.com/your-repo/my-trip.git
+cd my-trip</code>
+                    </div>
+
+                    <h3 class="mt-4">2. تثبيت الحزم</h3>
+                    <div class="code-block">
+                        <code># تثبيت حزم PHP
+composer install
+
+# تثبيت حزم JavaScript
+npm install</code>
+                    </div>
+
+                    <h3 class="mt-4">3. إعداد ملف البيئة</h3>
+                    <div class="code-block">
+                        <code># نسخ ملف البيئة
+cp .env.example .env
+
+# توليد مفتاح التطبيق
+php artisan key:generate</code>
+                    </div>
+
+                    <h3 class="mt-4">4. إعداد قاعدة البيانات</h3>
+                    <p>قم بتعديل ملف <code>.env</code>:</p>
+                    <div class="code-block">
+                        <code>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=my_trip
+DB_USERNAME=root
+DB_PASSWORD=</code>
+                    </div>
+
+                    <p class="mt-4">ثم قم بتشغيل الهجرات:</p>
+                    <div class="code-block">
+                        <code># إنشاء الجداول
+php artisan migrate
+
+# إضافة البيانات الأولية
+php artisan db:seed</code>
+                    </div>
+
+                    <h3 class="mt-4">5. بناء الأصول</h3>
+                    <div class="code-block">
+                        <code># للتطوير
+npm run dev
+
+# للإنتاج
+npm run build</code>
+                    </div>
+
+                    <h3 class="mt-4">6. تشغيل المشروع</h3>
+                    <div class="code-block">
+                        <code>php artisan serve</code>
+                    </div>
+                    <p>سيعمل المشروع على: <code>http://localhost:8000</code></p>
+                </div>
+            </section>
+
+            <!-- Environment Configuration -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-cog"></i> إعدادات البيئة</h2>
+                <div class="card">
+                    <h3>ملف .env الكامل:</h3>
+                    <div class="code-block">
+                        <code># التطبيق
+APP_NAME="My Trip"
+APP_ENV=production
+APP_KEY=base64:...
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+# قاعدة البيانات
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=my_trip
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+# البريد الإلكتروني
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@mytrip.com
+MAIL_FROM_NAME="${APP_NAME}"
+
+# الطوابير
+QUEUE_CONNECTION=database
+
+# Firebase
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_CREDENTIALS_PATH=storage/app/firebase/service-account.json
+
+# HyperPay
+HYPERPAY_BASE_URL=https://oppwa.com/v1/
+HYPERPAY_ACCESS_TOKEN=your-access-token
+HYPERPAY_ENTITY_ID_MADA=entity-id
+HYPERPAY_ENTITY_ID_VISA_MASTER=entity-id
+HYPERPAY_ENTITY_ID_APPLE=entity-id
+HYPERPAY_CURRENCY=SAR</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Production Deployment -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-server"></i> النشر على الإنتاج</h2>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>1. رفع الملفات</h3>
+                        <div class="code-block">
+                            <code># عبر Git
+git pull origin main
+
+# أو عبر FTP
+# رفع جميع الملفات ماعدا:
+# - .env
+# - storage/
+# - vendor/
+# - node_modules/</code>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>2. تثبيت الحزم</h3>
+                        <div class="code-block">
+                            <code>composer install --optimize-autoloader --no-dev
+
+npm install --production
+npm run build</code>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>3. الصلاحيات</h3>
+                        <div class="code-block">
+                            <code>chmod -R 755 storage
+chmod -R 755 bootstrap/cache
+
+chown -R www-data:www-data storage
+chown -R www-data:www-data bootstrap/cache</code>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>4. التحسينات</h3>
+                        <div class="code-block">
+                            <code>php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan optimize</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Web Server Configuration -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-globe"></i> إعدادات الخادم</h2>
+
+                <div class="card">
+                    <h3>Apache (.htaccess)</h3>
+                    <p>تأكد من تفعيل mod_rewrite:</p>
+                    <div class="code-block">
+                        <code>&lt;IfModule mod_rewrite.c&gt;
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+&lt;/IfModule&gt;</code>
+                    </div>
+
+                    <h3 class="mt-4">Nginx</h3>
+                    <div class="code-block">
+                        <code>server {
+    listen 80;
+    server_name your-domain.com;
+    root /var/www/my-trip/public;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+
+    index index.php;
+
+    charset utf-8;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cron Jobs -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-clock"></i> Cron Jobs</h2>
+                <div class="card">
+                    <h3>إعداد Scheduler:</h3>
+                    <div class="code-block">
+                        <code>* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1</code>
+                    </div>
+
+                    <h3 class="mt-4">تشغيل Queue Worker:</h3>
+                    <div class="code-block">
+                        <code>* * * * * cd /path-to-your-project && php artisan queue:work --stop-when-empty >> /dev/null 2>&1</code>
+                    </div>
+
+                    <p class="mt-4" style="color: var(--text-secondary);">
+                        <i class="fas fa-info-circle"></i>
+                        استبدل <code>/path-to-your-project</code> بالمسار الفعلي للمشروع
+                    </p>
+                </div>
+            </section>
+
+            <!-- SSL Certificate -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-lock"></i> شهادة SSL</h2>
+                <div class="card">
+                    <h3>باستخدام Let's Encrypt (مجاني):</h3>
+                    <div class="code-block">
+                        <code># تثبيت Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# الحصول على الشهادة
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+
+# التجديد التلقائي
+sudo certbot renew --dry-run</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Maintenance -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-tools"></i> الصيانة</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>وضع الصيانة</h3>
+                        <div class="code-block">
+                            <code># تفعيل
+php artisan down
+
+# تعطيل
+php artisan up</code>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>النسخ الاحتياطي</h3>
+                        <div class="code-block">
+                            <code># قاعدة البيانات
+mysqldump -u root -p my_trip > backup.sql
+
+# الملفات
+tar -czf backup.tar.gz storage/</code>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>تحديث المشروع</h3>
+                        <div class="code-block">
+                            <code>git pull origin main
+composer install
+php artisan migrate
+php artisan optimize:clear
+php artisan optimize</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Troubleshooting -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-bug"></i> حل المشاكل الشائعة</h2>
+                <div class="card">
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>المشكلة</th>
+                                <th>الحل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>خطأ 500</td>
+                                <td>
+                                    <code>php artisan config:clear</code><br>
+                                    <code>php artisan cache:clear</code><br>
+                                    تحقق من صلاحيات storage/
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>خطأ قاعدة البيانات</td>
+                                <td>
+                                    تحقق من إعدادات .env<br>
+                                    <code>php artisan migrate:fresh</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>الأصول لا تعمل</td>
+                                <td>
+                                    <code>npm run build</code><br>
+                                    <code>php artisan storage:link</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>البريد لا يُرسل</td>
+                                <td>
+                                    تحقق من إعدادات MAIL في .env<br>
+                                    تحقق من Queue Worker
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Performance -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> تحسين الأداء</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>التخزين المؤقت</h3>
+                        <ul>
+                            <li>استخدم Redis للـ Cache</li>
+                            <li>فعّل OPcache</li>
+                            <li>استخدم CDN للأصول</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3>قاعدة البيانات</h3>
+                        <ul>
+                            <li>أضف Indexes مناسبة</li>
+                            <li>استخدم Eager Loading</li>
+                            <li>فعّل Query Caching</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3>الخادم</h3>
+                        <ul>
+                            <li>استخدم HTTP/2</li>
+                            <li>فعّل Gzip Compression</li>
+                            <li>استخدم Load Balancer</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="doc-footer">
+            <p>© 2026 My Trip - جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

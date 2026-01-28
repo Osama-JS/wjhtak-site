@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير قاعدة بيانات WH - نظرة عامة</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 تقرير تحليل قاعدة بيانات WJHTAK</h1>
+            <p>تحليل شامل ومفصل لبنية قاعدة البيانات والعلاقات والتوصيات</p>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html" class="active">نظرة عامة</a>
+            <a href="tables-fields.html">الجداول والحقول</a>
+            <a href="relationships.html">العلاقات</a>
+            <a href="indexes.html">الفهارس والمفاتيح</a>
+            <a href="workflow.html">آلية العمل</a>
+            <a href="performance.html">تحسين الأداء</a>
+            <a href="security.html">الأمان</a>
+            <a href="recommendations.html">التوصيات</a>
+        </nav>
+
+        <div class="content">
+            <!-- إحصائيات عامة -->
+            <div class="section">
+                <h2 class="section-title">📈 إحصائيات قاعدة البيانات</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">24</div>
+                        <div class="stat-label">إجمالي الجداول</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">46</div>
+                        <div class="stat-label">عدد الهجرات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">35+</div>
+                        <div class="stat-label">العلاقات الخارجية</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">الفهارس</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نبذة عن المشروع -->
+            <div class="section">
+                <h2 class="section-title">🎯 نبذة عن المشروع</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="icon">📱</span>
+                        منصة WJHTAK
+                    </div>
+                    <p style="line-height: 1.8; color: #4b5563;">
+                        <strong>WJHTAK</strong> هي منصة سياحية متكاملة تربط بين شركات السياحة والعملاء، وتوفر حلولاً سياحية مميزة وسهلة الاستخدام.
+                        تم بناء المنصة باستخدام إطار عمل <span class="badge badge-primary">Laravel</span> وتعتمد على قاعدة بيانات
+                        <span class="badge badge-info">MySQL/MariaDB</span>.
+                    </p>
+                    <div class="alert alert-info" style="margin-top: 20px;">
+                        <div class="alert-title">معلومات الاتصال</div>
+                        <ul style="list-style: none; padding: 10px 0;">
+                            <li>📧 البريد الإلكتروني: contact@wjhtak.com</li>
+                            <li>📱 الهاتف: +971 50 192 7944</li>
+                            <li>🌐 الموقع: https://www.wjhtak.com</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الوحدات الرئيسية -->
+            <div class="section">
+                <h2 class="section-title">🧩 الوحدات الرئيسية للنظام</h2>
+                <div class="grid">
+                    <div class="grid-item">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">👥 إدارة المستخدمين</h3>
+                        <ul class="custom-list">
+                            <li>نظام المستخدمين (users)</li>
+                            <li>المسؤولين (admin_users)</li>
+                            <li>الأدوار والصلاحيات</li>
+                            <li>المصادقة والجلسات</li>
+                        </ul>
+                    </div>
+
+                    <div class="grid-item">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">✈️ إدارة الرحلات</h3>
+                        <ul class="custom-list">
+                            <li>الرحلات السياحية (trips)</li>
+                            <li>صور الرحلات (trip_images)</li>
+                            <li>تقييمات الرحلات (trip_rates)</li>
+                            <li>زيارات الصفحات (trip_page_visits)</li>
+                        </ul>
+                    </div>
+
+                    <div class="grid-item">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">📝 إدارة الحجوزات</h3>
+                        <ul class="custom-list">
+                            <li>حجوزات الرحلات (trip_bookings)</li>
+                            <li>رسوم الحجز (booking_fees)</li>
+                            <li>أكواد الشركات (company_codes)</li>
+                            <li>معالجة الدفع</li>
+                        </ul>
+                    </div>
+
+                    <div class="grid-item">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">🏢 إدارة الشركات</h3>
+                        <ul class="custom-list">
+                            <li>بيانات الشركات (companies)</li>
+                            <li>أكواد الخصم (company_codes)</li>
+                            <li>حسابات الأرباح</li>
+                            <li>إدارة العمولات</li>
+                        </ul>
+                    </div>
+
+                    <div class="grid-item">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">🌍 البيانات الجغرافية</h3>
+                        <ul class="custom-list">
+                            <li>الدول (countries)</li>
+                            <li>المدن (cities)</li>
+                            <li>معلومات الرحلات الجغرافية</li>
+                        </ul>
+                    </div>
+
+                    <div class="grid-item">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">⚙️ النظام والإعدادات</h3>
+                        <ul class="custom-list">
+                            <li>الإعدادات العامة (settings)</li>
+                            <li>معلومات التطبيق (app_information)</li>
+                            <li>الإشعارات (notifications)</li>
+                            <li>الأسئلة الشائعة (questions)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- التقنيات المستخدمة -->
+            <div class="section">
+                <h2 class="section-title">🛠️ التقنيات والأدوات المستخدمة</h2>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التقنية</th>
+                                    <th>الإصدار</th>
+                                    <th>الوصف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-primary">MariaDB</span></td>
+                                    <td>10.4.32</td>
+                                    <td>نظام إدارة قواعد البيانات</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-primary">PHP</span></td>
+                                    <td>8.2.12</td>
+                                    <td>لغة البرمجة الخلفية</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-primary">Laravel</span></td>
+                                    <td>-</td>
+                                    <td>إطار عمل PHP (يتضح من استخدام Migrations)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-primary">phpMyAdmin</span></td>
+                                    <td>5.2.1</td>
+                                    <td>أداة إدارة قواعد البيانات</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">UTF8MB4</span></td>
+                                    <td>-</td>
+                                    <td>ترميز الأحرف (يدعم Emoji والعربية)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">InnoDB</span></td>
+                                    <td>-</td>
+                                    <td>محرك قاعدة البيانات</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نقاط القوة -->
+            <div class="section">
+                <h2 class="section-title">✅ نقاط القوة في التصميم</h2>
+                <div class="grid">
+                    <div class="alert alert-success">
+                        <div class="alert-title">استخدام Foreign Keys</div>
+                        <p>تم تطبيق قيود المفاتيح الخارجية بشكل صحيح لضمان سلامة البيانات والعلاقات بين الجداول.</p>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <div class="alert-title">Soft Delete</div>
+                        <p>استخدام deleted_at في جدول trips يسمح بالحذف الآمن واستعادة البيانات عند الحاجة.</p>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <div class="alert-title">Timestamps</div>
+                        <p>جميع الجداول تحتوي على created_at و updated_at لتتبع التغييرات.</p>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <div class="alert-title">الفهرسة الجيدة</div>
+                        <p>تم إنشاء فهارس على المفاتيح الخارجية والحقول المستخدمة في البحث.</p>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <div class="alert-title">نظام الصلاحيات</div>
+                        <p>نظام صلاحيات متقدم يستخدم RBAC (Role-Based Access Control).</p>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <div class="alert-title">دعم متعدد اللغات</div>
+                        <p>استخدام UTF8MB4 يدعم جميع اللغات بما فيها العربية والرموز التعبيرية.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- التحديات والملاحظات -->
+            <div class="section">
+                <h2 class="section-title">⚠️ ملاحظات وتحديات</h2>
+
+                <div class="alert alert-warning">
+                    <div class="alert-title">تكرار القيود الخارجية</div>
+                    <p>في جدول trips، هناك تكرار في تعريف القيود الخارجية (trips_from_country_fk و trips_from_country_id_foreign)
+                    مما قد يسبب مشاكل في بعض الحالات.</p>
+                </div>
+
+                <div class="alert alert-warning">
+                    <div class="alert-title">عدم وجود فهارس على بعض الحقول</div>
+                    <p>بعض الحقول المستخدمة بكثرة في الاستعلامات (مثل status في trip_bookings) تحتاج إلى فهارس.</p>
+                </div>
+
+                <div class="alert alert-info">
+                    <div class="alert-title">استخدام LONGTEXT</div>
+                    <p>استخدام LONGTEXT في بعض الحقول (مثل passport، nationality) قد يكون مبالغاً فيه ويؤثر على الأداء.</p>
+                </div>
+
+                <div class="alert alert-info">
+                    <div class="alert-title">جدول sessions</div>
+                    <p>يحتوي على بيانات جلسات نشطة، يُنصح بتنظيفه دورياً لتحسين الأداء.</p>
+                </div>
+            </div>
+
+            <!-- الخطوات التالية -->
+            <div class="section">
+                <h2 class="section-title">📋 محتويات التقرير</h2>
+                <div class="card">
+                    <p style="margin-bottom: 20px; color: #6b7280;">
+                        يحتوي هذا التقرير على تحليل شامل لقاعدة البيانات موزع على الصفحات التالية:
+                    </p>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الصفحة</th>
+                                    <th>المحتوى</th>
+                                    <th>الرابط</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>الجداول والحقول</strong></td>
+                                    <td>تفاصيل كاملة عن جميع الجداول والحقول وأنواع البيانات</td>
+                                    <td><a href="tables-fields.html" class="badge badge-primary">عرض</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>العلاقات</strong></td>
+                                    <td>مخططات توضيحية للعلاقات بين الجداول والمفاتيح الخارجية</td>
+                                    <td><a href="relationships.html" class="badge badge-primary">عرض</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>الفهارس والمفاتيح</strong></td>
+                                    <td>قائمة بجميع الفهارس والمفاتيح الأساسية والفريدة</td>
+                                    <td><a href="indexes.html" class="badge badge-primary">عرض</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>آلية العمل</strong></td>
+                                    <td>شرح تدفق البيانات وآلية عمل النظام</td>
+                                    <td><a href="workflow.html" class="badge badge-primary">عرض</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>تحسين الأداء</strong></td>
+                                    <td>توصيات لتحسين سرعة الاستعلامات والأداء العام</td>
+                                    <td><a href="performance.html" class="badge badge-primary">عرض</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>الأمان</strong></td>
+                                    <td>توصيات أمنية لحماية قاعدة البيانات</td>
+                                    <td><a href="security.html" class="badge badge-primary">عرض</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>التوصيات</strong></td>
+                                    <td>ملخص شامل لجميع التوصيات والتحسينات المقترحة</td>
+                                    <td><a href="recommendations.html" class="badge badge-primary">عرض</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <p>📊 تقرير تحليل قاعدة بيانات WJHTAK | تم الإنشاء في 2026-01-28</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">جميع الحقوق محفوظة © WJHTAK Platform</p>
+        </div>
+    </div>
+</body>
+</html>

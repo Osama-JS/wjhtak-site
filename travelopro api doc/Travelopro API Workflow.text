@@ -1,0 +1,86 @@
+Travelopro API Workflow
+1. Introduction
+1.1 Purpose
+The aim of this application is to develop a systematic analysis of the procedure involved in the reservation of ticket for air travel .This should be used in an effective way so that various advantages are obtained from the website. The introduction maybe divided into various steps based on the developer and also depending upon the operation to be performed using the particular software. The “AIRLINE RESERVATION SYSTEM” under takes as a project based on relevant technologies .The main aim of this project is to develop the software for the process of reserving airway ticket should lead to increased efficiency. The website should be, error controlled both logically as well as in syntactic manner. The features deal with the different operations involved in the process of AIRLINE RESERVATION.
+
+1.2 Scope
+This project designs and implements Airline reservation system to fulfill all the vision statements. Supported by a well-designed database, all available air flight information is integrated together and can be accessed easily through a single point. API responses provided in simple JSON format so that various combinations of search criteria can be fetched from user and generates corresponding database search statements. Airline reservation system provided Agent interfaces used for administration purposes.
+
+2. System Overview
+2.1 Requirement Analysis
+Requirements are prone to issues of the ambiguity, incompleteness and inconsistency Techniques such as rigorous inspection have been shown to help deal with these issues. Ambiguity, incompleteness and inconsistencies that can be resolved in the requirement phase typically cost orders of the magnitude less to correct than when these same issues are found in later stages of product development. The purpose of developing the specified software is to describe the analysis involved in the reservation of air ticket.
+
+2.2 Functional Analysis
+Input: Collecting the information of the person who is going to travel.
+
+Output: The issue of ticket on the particular date specified by the traveler.
+
+2.3 Process
+Enter the details of the Search. (Home Page Flights Module)
+Check for availability of Airlines. (Flight Availability Search)
+Confirming the Price (Flight Details)
+Reservation form: Passenger details.(Pre Booking Page)
+Air Booking: Request to store an itinerary. Air booking includes the pricing information in the reservation. Air booking creates a reservation based on results captured from the Air Pricing Response.(PNR Generation)
+Air Ticketing: Once the Air Booking successfully done, Ticketing will follow to issue the Ticket Number. (Ticket Generation)
+2.4 Flow of the system
+Search Engine
+Search Results
+Flight Availability Search
+Flight Details
+Pre Booking
+PNR Generation
+Ticket Generation
+Confirm & Voucher
+MODULE 1: SEARCH ENGINE
+This module is used to search the airlines by giving the airport codes, departure and return dates (Round trip) and with traveler information.
+
+Field Name	Input Element	Required
+One Way, Round Trip, Multicity	Radio Button	Yes
+From	Drop Down	Yes
+To	Drop Down	Yes
+Departure Date	Drop Down	Yes
+Return Date	Drop Down	Yes
+Adults	Drop Down	Yes
+Children	Drop Down	Yes
+Infant	Drop Down	Yes
+Class	Drop Down	Yes
+Search	Tab	Yes
+MODULE 2: SEARCH RESULTS
+The available airlines will display here with all the details
+
+MODULE 3: AVAILABILITY SEARCH
+Availability Search provides the lowest available price for an itinerary specified in the request, taking into account all cabin classes (class of service) that are currently available on the flights that make up the itinerary.
+
+An Availability Search request is required to obtain fare information for an Air Itinerary selected for a LFS.
+MODULE 4: PRE BOOKING
+This module is used to collect the passenger details required for the Reservation.
+
+Field Name	Input Element	Required
+First Name	Text Box	Yes
+Last Name	Text Box	Yes
+DOB	Select Date Box	Yes
+Passport Number	Text Box	Yes
+Passport Expiry Date	Select Date Box	Yes
+Email	Text Box	Yes
+Alternate Email	Text Box	No
+Mobile Number	Text Box	Yes
+Landline Number(Country Code, Area Code, Phone No.)	Text Box	No
+Address	Text Box	Yes
+City	Text Box	Yes
+State	Text Box	Yes
+Country	Text Box	Yes
+Zip Code	Text Box	Yes
+Terms and Conditions	Check Box	Yes
+MODULE 5: PNR GENERATION
+PNR Generation is a request to store an air itinerary. Air booking can include pricing information in the reservation. This method creates a reservation based on the results captured from the response
+
+MODULE 6: AIR TICKET
+Once the PNR is successfully done, Ticketing will follow to issue the Ticket Number.
+
+MODULE 7: CONFIRM & VOUCHER
+Confirmation and getting the voucher with ticket number and PNR.
+
+3. System Architecture
+
+4. Cancellation
+Cancel API web service is used to request to cancel the booking identified by the UniqueID element.

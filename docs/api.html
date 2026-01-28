@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>واجهات API - My Trip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-plane-departure"></i>
+            <h2>My Trip</h2>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>نظرة عامة</span>
+            </a>
+            <a href="tech-stack.html" class="nav-item">
+                <i class="fas fa-layer-group"></i>
+                <span>التقنيات المستخدمة</span>
+            </a>
+            <a href="database.html" class="nav-item">
+                <i class="fas fa-database"></i>
+                <span>قاعدة البيانات</span>
+            </a>
+            <a href="api.html" class="nav-item active">
+                <i class="fas fa-code"></i>
+                <span>واجهات API</span>
+            </a>
+            <a href="services.html" class="nav-item">
+                <i class="fas fa-cogs"></i>
+                <span>الخدمات</span>
+            </a>
+            <a href="admin.html" class="nav-item">
+                <i class="fas fa-user-shield"></i>
+                <span>لوحة الإدارة</span>
+            </a>
+            <a href="deployment.html" class="nav-item">
+                <i class="fas fa-rocket"></i>
+                <span>النشر والتشغيل</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="page-header">
+            <h1>واجهات API</h1>
+            <p class="subtitle">توثيق شامل لجميع نقاط النهاية (Endpoints)</p>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- API Overview -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    نظرة عامة
+                </h2>
+                <div class="card">
+                    <p class="lead">
+                        يوفر المشروع API RESTful كامل للتطبيقات المحمولة مع مصادقة Sanctum ودعم متعدد اللغات.
+                    </p>
+                    <h3 class="mt-4">المعلومات الأساسية</h3>
+                    <ul>
+                        <li><strong>Base URL:</strong> <code>https://your-domain.com/api</code></li>
+                        <li><strong>المصادقة:</strong> Bearer Token (Laravel Sanctum)</li>
+                        <li><strong>Content-Type:</strong> application/json</li>
+                        <li><strong>اللغة:</strong> Header: Accept-Language (ar/en)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Authentication APIs -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-user-lock"></i>
+                    المصادقة والتسجيل
+                </h2>
+
+                <!-- Register -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/register</span>
+                    </div>
+                    <p class="api-description">تسجيل مستخدم جديد وإرسال OTP للتحقق</p>
+
+                    <div class="api-params">
+                        <h4>المعاملات المطلوبة:</h4>
+                        <div class="param-item">
+                            <span class="param-name">first_name</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">last_name</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">email</span>
+                            <span class="param-type">string (email)</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">phone</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">password</span>
+                            <span class="param-type">string (min:8)</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">password_confirmation</span>
+                            <span class="param-type">string</span>
+                        </div>
+                    </div>
+
+                    <div class="api-params">
+                        <h4>الاستجابة (200):</h4>
+                        <div class="code-block">
+                            <code>{
+  "error": false,
+  "message": "Registration successful...",
+  "data": {
+    "access_token": "1|abc123...",
+    "otp_code": "123456"
+  }
+}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Login -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/login</span>
+                    </div>
+                    <p class="api-description">تسجيل الدخول والحصول على رمز المصادقة</p>
+
+                    <div class="api-params">
+                        <h4>المعاملات:</h4>
+                        <div class="param-item">
+                            <span class="param-name">email</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">password</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">fcm_token</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">device_type</span>
+                            <span class="param-type">enum (ios, android)</span>
+                        </div>
+                    </div>
+
+                    <div class="api-params">
+                        <h4>الاستجابة (200):</h4>
+                        <div class="code-block">
+                            <code>{
+  "error": false,
+  "message": "Login successful.",
+  "data": {
+    "access_token": "2|xyz789...",
+    "token_type": "Bearer",
+    "user": { ... }
+  }
+}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verify OTP -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/verify-otp</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">التحقق من حساب المستخدم باستخدام OTP</p>
+
+                    <div class="api-params">
+                        <h4>Headers:</h4>
+                        <div class="param-item">
+                            <span class="param-name">Authorization</span>
+                            <span class="param-type">Bearer {token}</span>
+                        </div>
+                    </div>
+
+                    <div class="api-params">
+                        <h4>المعاملات:</h4>
+                        <div class="param-item">
+                            <span class="param-name">otp_code</span>
+                            <span class="param-type">string (6 digits)</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">fcm_token</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">device_type</span>
+                            <span class="param-type">enum (ios, android)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resend OTP -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/resend-otp</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">إعادة إرسال رمز OTP</p>
+
+                    <div class="api-params">
+                        <h4>Headers:</h4>
+                        <div class="param-item">
+                            <span class="param-name">Authorization</span>
+                            <span class="param-type">Bearer {token}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forgot Password -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/forgot-password</span>
+                    </div>
+                    <p class="api-description">طلب إعادة تعيين كلمة المرور</p>
+
+                    <div class="api-params">
+                        <h4>المعاملات:</h4>
+                        <div class="param-item">
+                            <span class="param-name">email</span>
+                            <span class="param-type">string</span>
+                        </div>
+                    </div>
+
+                    <div class="api-params">
+                        <h4>الاستجابة (200):</h4>
+                        <div class="code-block">
+                            <code>{
+  "error": false,
+  "message": "Password reset code sent to your email.",
+  "data": {
+    "access_token": "3|tuv456...",
+    "otp_code": "123456"
+  }
+}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reset Password -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/reset-password</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">إعادة تعيين كلمة المرور باستخدام التوكن والـ OTP</p>
+
+                    <div class="api-params">
+                        <h4>Headers:</h4>
+                        <div class="param-item">
+                            <span class="param-name">Authorization</span>
+                            <span class="param-type">Bearer {token_from_forgot}</span>
+                        </div>
+                    </div>
+
+                    <div class="api-params">
+                        <h4>المعاملات:</h4>
+                        <div class="param-item">
+                            <span class="param-name">otp_code</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">password</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">password_confirmation</span>
+                            <span class="param-type">string</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Profile APIs -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-user"></i>
+                    الملف الشخصي
+                </h2>
+
+                <!-- Get Profile -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-get">GET</span>
+                        <span class="api-path">/api/profile</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">الحصول على بيانات الملف الشخصي</p>
+                </div>
+
+                <!-- Update Profile -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/profile/update</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">تحديث بيانات الملف الشخصي</p>
+
+                    <div class="api-params">
+                        <h4>المعاملات الاختيارية:</h4>
+                        <div class="param-item">
+                            <span class="param-name">first_name</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">last_name</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">city</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">gender</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">date_of_birth</span>
+                            <span class="param-type">date</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">address</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">profile_photo</span>
+                            <span class="param-type">file (image)</span>
+                            <span class="badge badge-info">اختياري</span>
+                        </div>
+                    </div>
+
+                    <div class="api-params">
+                        <h4>الاستجابة (200):</h4>
+                        <div class="code-block">
+                            <code>{
+  "error": false,
+  "message": "Profile updated successfully.",
+  "data": {
+    "user": { ... }
+  }
+}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/profile/change-password</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">تغيير كلمة المرور من داخل الملف الشخصي</p>
+
+                    <div class="api-params">
+                        <h4>المعاملات:</h4>
+                        <div class="param-item">
+                            <span class="param-name">old_password</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">new_password</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">new_password_confirmation</span>
+                            <span class="param-type">string</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update FCM Token -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/update-fcm-token</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">تحديث رمز Firebase للإشعارات</p>
+
+                    <div class="api-params">
+                        <h4>المعاملات:</h4>
+                        <div class="param-item">
+                            <span class="param-name">fcm_token</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">device_type</span>
+                            <span class="param-type">enum (ios, android)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logout -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/logout</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">تسجيل الخروج وإلغاء الرمز</p>
+                </div>
+            </section>
+
+            <!-- Payment APIs -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card"></i>
+                    الدفع (HyperPay)
+                </h2>
+
+                <!-- Initiate Payment -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/payment/initiate</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">بدء عملية الدفع والحصول على Checkout ID</p>
+
+                    <div class="api-params">
+                        <h4>المعاملات:</h4>
+                        <div class="param-item">
+                            <span class="param-name">amount</span>
+                            <span class="param-type">number (float)</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">payment_type</span>
+                            <span class="param-type">enum (mada, visa_master, apple_pay)</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">order_id</span>
+                            <span class="param-type">string (optional)</span>
+                        </div>
+                    </div>
+
+                    <div class="api-params">
+                        <h4>الاستجابة:</h4>
+                        <div class="code-block">
+                            <code>{
+  "error": false,
+  "message": "Checkout initialized successfully.",
+  "data": {
+    "id": "8AC7A4CA728C...",
+    "result": { ... }
+  }
+}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verify Payment -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-post">POST</span>
+                        <span class="api-path">/api/payment/verify</span>
+                        <span class="badge badge-warning">Protected</span>
+                    </div>
+                    <p class="api-description">التحقق من حالة الدفع</p>
+
+                    <div class="api-params">
+                        <h4>المعاملات:</h4>
+                        <div class="param-item">
+                            <span class="param-name">checkout_id</span>
+                            <span class="param-type">string</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">payment_type</span>
+                            <span class="param-type">enum</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings API -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-cog"></i>
+                    الإعدادات
+                </h2>
+
+                <!-- Get App Settings -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="api-method method-get">GET</span>
+                        <span class="api-path">/api/app-settings</span>
+                    </div>
+                    <p class="api-description">الحصول على إعدادات التطبيق العامة</p>
+
+                    <div class="api-params">
+                        <h4>الاستجابة:</h4>
+                        <div class="code-block">
+                            <code>{
+  "error": false,
+  "message": "App settings retrieved successfully.",
+  "data": {
+    "site_name": "My Trip",
+    "support_email": "support@mytrip.com",
+    "social_links": { ... }
+  }
+}</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Response Codes -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-list-ol"></i>
+                    أكواد الاستجابة
+                </h2>
+                <div class="card">
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الكود</th>
+                                <th>الحالة</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>200</code></td>
+                                <td><span class="badge badge-success">OK</span></td>
+                                <td>العملية نجحت</td>
+                            </tr>
+                            <tr>
+                                <td><code>400</code></td>
+                                <td><span class="badge badge-danger">Bad Request</span></td>
+                                <td>طلب غير صحيح</td>
+                            </tr>
+                            <tr>
+                                <td><code>401</code></td>
+                                <td><span class="badge badge-warning">Unauthorized</span></td>
+                                <td>غير مصرح</td>
+                            </tr>
+                            <tr>
+                                <td><code>403</code></td>
+                                <td><span class="badge badge-warning">Forbidden</span></td>
+                                <td>ممنوع</td>
+                            </tr>
+                            <tr>
+                                <td><code>422</code></td>
+                                <td><span class="badge badge-danger">Validation Error</span></td>
+                                <td>خطأ في التحقق من البيانات</td>
+                            </tr>
+                            <tr>
+                                <td><code>500</code></td>
+                                <td><span class="badge badge-danger">Server Error</span></td>
+                                <td>خطأ في الخادم</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Swagger Link -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-book"></i>
+                    توثيق Swagger التفاعلي
+                </h2>
+                <div class="card">
+                    <p class="lead">
+                        للحصول على توثيق تفاعلي كامل واختبار النقاط مباشرة، قم بزيارة:
+                    </p>
+                    <div class="code-block">
+                        <code>https://your-domain.com/api/documentation</code>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="doc-footer">
+            <p>© 2026 My Trip - جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

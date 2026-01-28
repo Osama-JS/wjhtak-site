@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Design Replica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #8e77e8, #9b86ea);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            width: 420px;
+            position: relative;
+        }
+
+        /* الجزء العلوي */
+        .card-top {
+            background: #6f7df6;
+            padding: 25px;
+            border-radius: 18px 18px 0 0;
+            position: relative;
+        }
+
+        .top-inner {
+            border: 2px solid #ffffff;
+            height: 140px;
+            border-radius: 12px;
+        }
+
+        /* الجزء السفلي */
+        .card-bottom {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 0 0 18px 18px;
+            position: relative;
+        }
+
+        /* مستطيل المحتوى */
+        .content-box {
+            border: 2px solid #6f7df6;
+            height: 90px;
+            border-radius: 14px;
+        }
+
+        /* النقاط الجانبية */
+        .dots {
+            position: absolute;
+            right: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dots span {
+            width: 14px;
+            height: 14px;
+            background: #5cc7f2;
+            border-radius: 50%;
+        }
+
+        /* تأثير الحواف المتموجة */
+        .card::before,
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 18px;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 60%, #8e77e8 61%);
+            background-size: 18px 36px;
+        }
+
+        .card::before {
+            left: -18px;
+        }
+
+        .card::after {
+            right: -18px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="page">
+
+        <div class="card">
+
+            <div class="card-top">
+                <div class="top-inner"></div>
+            </div>
+
+            <div class="card-bottom">
+                <div class="content-box"></div>
+
+                <div class="dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

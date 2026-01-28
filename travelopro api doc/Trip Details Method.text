@@ -1,0 +1,525 @@
+Trip Details Method
+TripDetail web service is used to request trip details for the giving booking reference number after OrderTicket. This method return Ticket numbers, PNR & all other fares, flight itinerary details.
+
+Trip Details Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/trip_details
+Request Parameters
+
+Parameter	Data Type	Required	Description	Example
+user_id	string	Yes	It is used to specify the user name.
+user_password	string	Yes	It is used to specify the password.
+access	string	Yes	It is used to specify the access type. Possible values : Test, Production.	Test/Production
+ip_address	string	Yes	It is used to get ip_address of the system from which IP, the API is accessed.	Authorized by Travelopro
+UniqueID	string	Yes	To specify the API booking reference unique ID	TR31072022
+Response Parameters
+
+Parameter	Data Type	Required	Description
+TripDetailsResult	Nested JSON	Yes
+success	Boolean	Yes	It specifies whether Trip_details process is successful or not(True / False)
+TravelItinerary	Nested JSON	Yes	It contains the travel details
+UniqueID	string	Yes	Unique Reference Id
+ReissueUniqueID	string	No	Unique Reference Id of the reissued Itinerary (Display only if reissued.)
+ItineraryInfo	Nested JSON	Yes	Contains itinerary info
+ReservationItems	Nested JSON	Yes	Contains itinerary segments
+ReservationItem	Nested JSON	Yes	Specifies segment information
+ItemRPH	Int	Yes	It specifies the segment serial number
+DepartureDateTime	Date Time	Yes	It specifies the departure date and time
+ArrivalDateTime	Date Time	Yes	It specifies the departure date and time
+StopQuantity	Int	Yes	It specifies the number of hidden stop involved in the journey. Sample:(0, 1, 2)
+FlightNumber	Int	Yes	It specifies the operating flight number
+ResBookDesignCode	string	No	It specifies the booking class code. Sample:(E, V, S, Q)
+JourneyDuration	Int	YesIt specifies the total journey duration in minutes	It specifies the total journey duration in minutes
+AirlinePNR	string	Yes	It specifies the Airline PNR Retrieved
+NumberInParty	Int	Yes	It specifies the number of Passengers
+DepartureAirportLocationCode	string	Yes	Three letter code to specify
+DepartureTerminal	string	Yes	It specifies the departure terminal name
+ArrivalAirportLocationCode	string	Yes	Three letter code to specify the arrival airport code
+ArrivalTerminal	string	Yes	It specifies the arrival terminal name
+OperatingAirlineCode	string	Yes	Two letter code to specify the operating airline code
+AirEquipmentType	Int	Yes	It specifies the operating airline equipment number
+MarketingAirlineCode	string	Yes	Two letter code to specify the marketing airline code
+Baggage	string	Yes	It specifies the baggage allowance. (Sample: PC – Number of Pieces allocated, KG – Kilograms, SB – Standard Baggage).
+CustomerInfos	Nested JSON	Yes	It contains customer information’s
+CustomerInfo	Nested JSON	Yes
+PassengerType	string	Yes	It specifies the passenger type. Sample: (ADT-Adult/ CHD-Child/INF-Infant)
+PaxName	Nested JSON	Yes
+PassengerTitle	string	Yes	It specifies the passenger title.
+PassengerFirstName	string	Yes	It specifies the passenger first name
+PassengerLastName	string	Yes	It specifies the passenger last Name
+PassportNumber	string	Yes	It specifies the passport Number
+ItemRPH	Int	Yes	It specifies the e-ticket serial Number
+eTicketNumber	string	Yes	It specifies the e-ticket Number
+SSRs	Nested JSON	No
+SSR	Nested JSON	Yes
+ItemRPH	Int	Yes	It specifies the SSR serial number. Sample: 1, 2
+SeatPreference	string	No	It specifies the seat preference. Sample: (WWindow, A-Aisle).
+MealPreference	string	No
+ItineraryPricing	Nested JSON	Yes
+EquivFare	Nested JSON	Yes	It contains information of itinerary total fare in client currency
+Amount	Float	Yes	It specifies itinerary equi fare Amount
+CurrencyCode	string	Yes	Three letter currency code which specifies the client currency code.
+DecimalPlaces	Int	Yes	It specifies the number of decimal places
+Tax	Nested JSON	Yes	It specifies itinerary total tax in client currency
+TotalFare	Nested JSON	Yes	It specifies itinerary total fare in client currency
+Amount	Float	Yes	It specifies the itinerary total Amount
+TripDetailsPTC_FareBreakd Own	Nested JSON	Yes	It contains passenger fare break downs
+PassengerTypeQuantity	Nested JSON	Yes	It contains the passenger type and information
+code	string	Yes	It specifies the passenger type code. Sample:(ADTAdult, CHD-Child,INF-Infant)
+Quantity	Int	Yes	It specifies the number of Passengers
+TripDetailsPassengerFare	Nested JSON	Yes
+EquivFare	Nested JSON	Yes	It contains information of itinerary total fare in client currency
+Amount	Float	Yes	It specifies itinerary equi fare Amount
+CurrencyCode	string	Yes	Three letter currency code which specifies the client currency code
+Tax	Nested JSON	Yes	It specifies itinerary total tax in client currency
+Amount	Float	Yes	It specifies itinerary equi fare Amount
+TotalFare	Nested JSON	Yes	It specifies itinerary total fare in client currency
+Amount	Flaot	Yes	It specifies the itinerary total Amount
+Target	string	Yes	Target of Server
+Errors	Nested JSON	No	Contains the list of errors if exists.
+Error	Nested JSON	Yes	Contains the error details
+ErrorCode	string	Yes	Error Code
+ErrorMessage	string	Yes	Error Message
+Important Notes
+
+Indian Domestic RoundTrip - In case of Indian domestic round trip, the Outbound & Inbound trip details will be available separately. The Outbound results will be available in the TripDetailsResult parameter and the Inbound results will be available in the TripDetailsResultInbound parameter.
+Sample Request
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "UniqueID": "TR31072022"
+}
+
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLERAUTH006",
+        "ErrorMessage": "Invalid UniqueID."
+    }
+}
+
+Sample Success Response
+{
+    "TripDetailsResponse": {
+        "TripDetailsResult": {
+            "Success": true,
+            "Target": "Test",
+            "TravelItinerary": {
+                "BookingStatus": "Booked",
+                "CrossBorderIndicator": false,
+                "Destination": "DEL",
+                "FareType": "Private",
+                "IsCommissionable": false,
+                "IsMOFare": false,
+                "ItineraryInfo": {
+                    "CustomerInfos": [
+                        {
+                            "CustomerInfo": {
+                                "PassengerType": "ADT",
+                                "PassportNumber": "",
+                                "PassengerFirstName": "John",
+                                "PassengerLastName": "Doe",
+                                "PassengerTitle": "MR",
+                                "ItemRPH": 329892,
+                                "eTicketNumber": "",
+                                "DateOfBirth": "1991-12-11T00:00:00",
+                                "EmailAddress": "test@gmail.com",
+                                "Gender": "M",
+                                "PassengerNationality": "",
+                                "PhoneNumber": "9847012345",
+                                "PostCode": "231778"
+                            }
+                        },
+                        {
+                            "CustomerInfo": {
+                                "PassengerType": "ADT",
+                                "PassportNumber": "",
+                                "PassengerFirstName": "Ivy",
+                                "PassengerLastName": "John",
+                                "PassengerTitle": "MRS",
+                                "ItemRPH": 329893,
+                                "eTicketNumber": "",
+                                "DateOfBirth": "1991-12-11T00:00:00",
+                                "EmailAddress": "test@gmail.com",
+                                "Gender": "F",
+                                "PassengerNationality": "",
+                                "PhoneNumber": "9847012345",
+                                "PostCode": "231778"
+                            }
+                        },
+                        {
+                            "CustomerInfo": {
+                                "PassengerType": "CHD",
+                                "PassportNumber": "",
+                                "PassengerFirstName": "Julie",
+                                "PassengerLastName": "John",
+                                "PassengerTitle": "MISS",
+                                "ItemRPH": 329894,
+                                "eTicketNumber": "",
+                                "DateOfBirth": "2011-12-15T00:00:00",
+                                "EmailAddress": "test@gmail.com",
+                                "Gender": "F",
+                                "PassengerNationality": "",
+                                "PhoneNumber": "9847012345",
+                                "PostCode": "231778"
+                            }
+                        },
+                        {
+                            "CustomerInfo": {
+                                "PassengerType": "INF",
+                                "PassportNumber": "",
+                                "PassengerFirstName": "Tony",
+                                "PassengerLastName": "John",
+                                "PassengerTitle": "MSTR",
+                                "ItemRPH": 329895,
+                                "eTicketNumber": "",
+                                "DateOfBirth": "2021-12-25T00:00:00",
+                                "EmailAddress": "test@gmail.com",
+                                "Gender": "M",
+                                "PassengerNationality": "Indian",
+                                "PhoneNumber": "9847012345",
+                                "PostCode": "231778"
+                            }
+                        }
+                    ],
+                    "ItineraryPricing": {
+                        "EquiFare": {
+                            "Amount": "290.18",
+                            "CurrencyCode": "USD",
+                            "DecimalPlaces": 2
+                        },
+                        "ServiceTax": {
+                            "Amount": "1.72",
+                            "CurrencyCode": "USD",
+                            "DecimalPlaces": 2
+                        },
+                        "Tax": {
+                            "Amount": "103.93",
+                            "CurrencyCode": "USD",
+                            "DecimalPlaces": 2
+                        },
+                        "TotalFare": {
+                            "Amount": "394.11",
+                            "CurrencyCode": "USD",
+                            "DecimalPlaces": 2
+                        }
+                    },
+                    "ReservationItems": [
+                        {
+                            "ReservationItem": {
+                                "AirEquipmentType": "320",
+                                "AirlinePNR": "MKZNHA",
+                                "ArrivalAirportLocationCode": "BOM",
+                                "ArrivalDateTime": "2023-02-20T01:51:00",
+                                "ArrivalTerminal": "",
+                                "Baggage": "",
+                                "CabinClassText": "Y",
+                                "DepartureAirportLocationCode": "DEL",
+                                "DepartureDateTime": "2023-02-19T23:36:00",
+                                "DepartureTerminal": "",
+                                "FlightNumber": "2519",
+                                "ItemRPH": 1,
+                                "JourneyDuration": "135",
+                                "MarketingAirlineCode": "6E",
+                                "NumberInParty": 4,
+                                "OperatingAirlineCode": "6E",
+                                "ResBookDesigCode": "X",
+                                "StopQuantity": 0
+                            }
+                        },
+                        {
+                            "ReservationItem": {
+                                "AirEquipmentType": "320",
+                                "AirlinePNR": "MKZNHA",
+                                "ArrivalAirportLocationCode": "DEL",
+                                "ArrivalDateTime": "2023-02-22T13:51:00",
+                                "ArrivalTerminal": "",
+                                "Baggage": "",
+                                "CabinClassText": "Y",
+                                "DepartureAirportLocationCode": "BOM",
+                                "DepartureDateTime": "2023-02-22T11:41:00",
+                                "DepartureTerminal": "",
+                                "FlightNumber": "168",
+                                "ItemRPH": 2,
+                                "JourneyDuration": "130",
+                                "MarketingAirlineCode": "6E",
+                                "NumberInParty": 4,
+                                "OperatingAirlineCode": "6E",
+                                "ResBookDesigCode": "X",
+                                "StopQuantity": 0
+                            }
+                        }
+                    ],
+                    "TripDetailsPTC_FareBreakdowns": [
+                        {
+                            "TripDetailsPTC_FareBreakdown": {
+                                "PassengerTypeQuantity": {
+                                    "Code": "ADT",
+                                    "Quantity": 2
+                                },
+                                "TripDetailsPassengerFare": {
+                                    "EquiFare": {
+                                        "Amount": "91.77",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceTax": {
+                                        "Amount": "0.83",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Tax": {
+                                        "Amount": "30.21",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "TotalFare": {
+                                        "Amount": "121.98",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "TripDetailsPTC_FareBreakdown": {
+                                "PassengerTypeQuantity": {
+                                    "Code": "CHD",
+                                    "Quantity": 1
+                                },
+                                "TripDetailsPassengerFare": {
+                                    "EquiFare": {
+                                        "Amount": "91.77",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceTax": {
+                                        "Amount": "0.83",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Tax": {
+                                        "Amount": "30.21",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "TotalFare": {
+                                        "Amount": "121.98",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "TripDetailsPTC_FareBreakdown": {
+                                "PassengerTypeQuantity": {
+                                    "Code": "INF",
+                                    "Quantity": 1
+                                },
+                                "TripDetailsPassengerFare": {
+                                    "EquiFare": {
+                                        "Amount": "6.64",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceTax": {
+                                        "Amount": "0.06",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Tax": {
+                                        "Amount": "43.51",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "TotalFare": {
+                                        "Amount": "50.15",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "ExtraServices": {
+                        "Services": [
+                            {
+                                "Service": {
+                                    "NameNumber": 329892,
+                                    "Behavior": "PER_PAX_INBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Check-in baggage - up to 20kg",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "124.15",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "10",
+                                    "Type": "BAGGAGE"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329892,
+                                    "Behavior": "PER_PAX_OUTBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Non-Vegetarian Meal",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "4.35",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "19",
+                                    "Type": "OTHERS"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329892,
+                                    "Behavior": "PER_PAX_INBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Tomato Cucumber Cheese Lettuce Sandwich Combo",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "4.97",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "33",
+                                    "Type": "OTHERS"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329893,
+                                    "Behavior": "PER_PAX_INBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Check-in baggage - up to 20kg",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "124.15",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "10",
+                                    "Type": "BAGGAGE"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329893,
+                                    "Behavior": "PER_PAX_OUTBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Non-Vegetarian Meal",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "4.35",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "19",
+                                    "Type": "OTHERS"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329893,
+                                    "Behavior": "PER_PAX_INBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Tomato Cucumber Cheese Lettuce Sandwich Combo",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "4.97",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "33",
+                                    "Type": "OTHERS"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329894,
+                                    "Behavior": "PER_PAX_OUTBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Check-in baggage - up to 3kg",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "18.62",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "2",
+                                    "Type": "BAGGAGE"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329894,
+                                    "Behavior": "PER_PAX_INBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Check-in baggage - up to 5kg",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "31.04",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "3",
+                                    "Type": "BAGGAGE"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329894,
+                                    "Behavior": "PER_PAX_OUTBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "Vegetarian Meal",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "3.72",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "32",
+                                    "Type": "OTHERS"
+                                }
+                            },
+                            {
+                                "Service": {
+                                    "NameNumber": 329894,
+                                    "Behavior": "PER_PAX_INBOUND",
+                                    "CheckInType": "AIRPORT",
+                                    "Description": "CASHEW (SALTED)",
+                                    "IsMandatory": false,
+                                    "ServiceCost": {
+                                        "Amount": "5.34",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceId": "46",
+                                    "Type": "OTHERS"
+                                }
+                            }
+                        ]
+                    },
+                    "BookingNotes": [
+                        {
+                            "NoteDetails": "Test Booking note : Wheel chair needed at airport.",
+                            "CreatedOn": "2022-11-12T13:02:01.24"
+                        }
+                    ]
+                },
+                "UniqueID": "TR21502822",
+                "Origin": "DEL",
+                "TicketStatus": "TktInProcess"
+            }
+        }
+    }
+}

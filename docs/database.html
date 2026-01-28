@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قاعدة البيانات - My Trip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-plane-departure"></i>
+            <h2>My Trip</h2>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>نظرة عامة</span>
+            </a>
+            <a href="tech-stack.html" class="nav-item">
+                <i class="fas fa-layer-group"></i>
+                <span>التقنيات المستخدمة</span>
+            </a>
+            <a href="database.html" class="nav-item active">
+                <i class="fas fa-database"></i>
+                <span>قاعدة البيانات</span>
+            </a>
+            <a href="api.html" class="nav-item">
+                <i class="fas fa-code"></i>
+                <span>واجهات API</span>
+            </a>
+            <a href="services.html" class="nav-item">
+                <i class="fas fa-cogs"></i>
+                <span>الخدمات</span>
+            </a>
+            <a href="admin.html" class="nav-item">
+                <i class="fas fa-user-shield"></i>
+                <span>لوحة الإدارة</span>
+            </a>
+            <a href="deployment.html" class="nav-item">
+                <i class="fas fa-rocket"></i>
+                <span>النشر والتشغيل</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="page-header">
+            <h1>قاعدة البيانات</h1>
+            <p class="subtitle">هيكل قاعدة البيانات والعلاقات بين الجداول</p>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- Database Overview -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    نظرة عامة
+                </h2>
+                <div class="card">
+                    <p class="lead">
+                        يستخدم المشروع قاعدة بيانات MySQL مع 12 جدولاً رئيسياً تغطي جميع جوانب النظام من المستخدمين
+                        والأدوار إلى الإعدادات والطوابير.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Users Table -->
+            <section class="doc-section">
+                <div class="schema-table">
+                    <h3><i class="fas fa-table"></i> جدول المستخدمين (users)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        يحتوي على بيانات جميع مستخدمي النظام (المشرفين والعملاء)
+                    </p>
+
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الحقل</th>
+                                <th>النوع</th>
+                                <th>الوصف</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>id</code></td>
+                                <td>BIGINT</td>
+                                <td>المعرف الفريد</td>
+                                <td><span class="badge badge-primary">Primary Key</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>first_name</code></td>
+                                <td>VARCHAR(100)</td>
+                                <td>الاسم الأول</td>
+                                <td><span class="badge badge-danger">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>last_name</code></td>
+                                <td>VARCHAR(100)</td>
+                                <td>اسم العائلة</td>
+                                <td><span class="badge badge-danger">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>email</code></td>
+                                <td>VARCHAR(255)</td>
+                                <td>البريد الإلكتروني</td>
+                                <td><span class="badge badge-warning">Unique</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>password</code></td>
+                                <td>VARCHAR(255)</td>
+                                <td>كلمة المرور (مشفرة)</td>
+                                <td><span class="badge badge-success">Hashed</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>user_type</code></td>
+                                <td>ENUM</td>
+                                <td>نوع المستخدم</td>
+                                <td>admin, customer</td>
+                            </tr>
+                            <tr>
+                                <td><code>phone</code></td>
+                                <td>VARCHAR(20)</td>
+                                <td>رقم الهاتف</td>
+                                <td><span class="badge badge-warning">Unique</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>country_code</code></td>
+                                <td>VARCHAR(10)</td>
+                                <td>كود الدولة</td>
+                                <td>مثال: +966</td>
+                            </tr>
+                            <tr>
+                                <td><code>city</code></td>
+                                <td>VARCHAR(100)</td>
+                                <td>المدينة</td>
+                                <td><span class="badge badge-primary">Nullable</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>country</code></td>
+                                <td>VARCHAR(100)</td>
+                                <td>الدولة</td>
+                                <td><span class="badge badge-primary">Nullable</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>gender</code></td>
+                                <td>ENUM</td>
+                                <td>الجنس</td>
+                                <td>male, female, other</td>
+                            </tr>
+                            <tr>
+                                <td><code>date_of_birth</code></td>
+                                <td>DATE</td>
+                                <td>تاريخ الميلاد</td>
+                                <td><span class="badge badge-primary">Nullable</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>profile_photo</code></td>
+                                <td>VARCHAR(255)</td>
+                                <td>صورة الملف الشخصي</td>
+                                <td>مسار الملف</td>
+                            </tr>
+                            <tr>
+                                <td><code>status</code></td>
+                                <td>ENUM</td>
+                                <td>حالة الحساب</td>
+                                <td>active, inactive</td>
+                            </tr>
+                            <tr>
+                                <td><code>otp_code</code></td>
+                                <td>VARCHAR(6)</td>
+                                <td>رمز التحقق</td>
+                                <td>6 أرقام</td>
+                            </tr>
+                            <tr>
+                                <td><code>otp_expires_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>وقت انتهاء OTP</td>
+                                <td>10 دقائق من الإنشاء</td>
+                            </tr>
+                            <tr>
+                                <td><code>fcm_token</code></td>
+                                <td>TEXT</td>
+                                <td>رمز Firebase</td>
+                                <td>للإشعارات Push</td>
+                            </tr>
+                            <tr>
+                                <td><code>device_type</code></td>
+                                <td>ENUM</td>
+                                <td>نوع الجهاز</td>
+                                <td>ios, android</td>
+                            </tr>
+                            <tr>
+                                <td><code>email_verified_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>وقت تفعيل البريد</td>
+                                <td><span class="badge badge-primary">Nullable</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>phone_verified_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>وقت تفعيل الهاتف</td>
+                                <td><span class="badge badge-primary">Nullable</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>created_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>تاريخ الإنشاء</td>
+                                <td>تلقائي</td>
+                            </tr>
+                            <tr>
+                                <td><code>updated_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>تاريخ التحديث</td>
+                                <td>تلقائي</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 1rem;">
+                        <h4>العلاقات:</h4>
+                        <div class="relationship-badge">
+                            <i class="fas fa-link"></i>
+                            <span>Has Many → personal_access_tokens</span>
+                        </div>
+                        <div class="relationship-badge">
+                            <i class="fas fa-link"></i>
+                            <span>Belongs To Many → roles (via model_has_roles)</span>
+                        </div>
+                        <div class="relationship-badge">
+                            <i class="fas fa-link"></i>
+                            <span>Belongs To Many → permissions (via model_has_permissions)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Table -->
+            <section class="doc-section">
+                <div class="schema-table">
+                    <h3><i class="fas fa-table"></i> جدول الإعدادات (settings)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        يحتوي على إعدادات النظام العامة
+                    </p>
+
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الحقل</th>
+                                <th>النوع</th>
+                                <th>الوصف</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>id</code></td>
+                                <td>BIGINT</td>
+                                <td>المعرف الفريد</td>
+                                <td><span class="badge badge-primary">Primary Key</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>key</code></td>
+                                <td>VARCHAR(255)</td>
+                                <td>مفتاح الإعداد</td>
+                                <td><span class="badge badge-warning">Unique</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>value</code></td>
+                                <td>TEXT</td>
+                                <td>قيمة الإعداد</td>
+                                <td>JSON أو نص</td>
+                            </tr>
+                            <tr>
+                                <td><code>type</code></td>
+                                <td>VARCHAR(50)</td>
+                                <td>نوع البيانات</td>
+                                <td>string, boolean, json</td>
+                            </tr>
+                            <tr>
+                                <td><code>created_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>تاريخ الإنشاء</td>
+                                <td>تلقائي</td>
+                            </tr>
+                            <tr>
+                                <td><code>updated_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>تاريخ التحديث</td>
+                                <td>تلقائي</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 1rem;">
+                        <h4>أمثلة على الإعدادات:</h4>
+                        <ul>
+                            <li><code>site_name_ar</code> - اسم الموقع بالعربية</li>
+                            <li><code>site_name_en</code> - اسم الموقع بالإنجليزية</li>
+                            <li><code>maintenance_mode</code> - وضع الصيانة</li>
+                            <li><code>support_email</code> - بريد الدعم</li>
+                            <li><code>social_links</code> - روابط وسائل التواصل (JSON)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Personal Access Tokens -->
+            <section class="doc-section">
+                <div class="schema-table">
+                    <h3><i class="fas fa-table"></i> جدول رموز الوصول (personal_access_tokens)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        يحتوي على رموز المصادقة للـ API (Laravel Sanctum)
+                    </p>
+
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الحقل</th>
+                                <th>النوع</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>id</code></td>
+                                <td>BIGINT</td>
+                                <td>المعرف الفريد</td>
+                            </tr>
+                            <tr>
+                                <td><code>tokenable_type</code></td>
+                                <td>VARCHAR(255)</td>
+                                <td>نوع النموذج (User)</td>
+                            </tr>
+                            <tr>
+                                <td><code>tokenable_id</code></td>
+                                <td>BIGINT</td>
+                                <td>معرف المستخدم</td>
+                            </tr>
+                            <tr>
+                                <td><code>name</code></td>
+                                <td>VARCHAR(255)</td>
+                                <td>اسم الرمز</td>
+                            </tr>
+                            <tr>
+                                <td><code>token</code></td>
+                                <td>VARCHAR(64)</td>
+                                <td>الرمز المشفر</td>
+                            </tr>
+                            <tr>
+                                <td><code>abilities</code></td>
+                                <td>TEXT</td>
+                                <td>الصلاحيات</td>
+                            </tr>
+                            <tr>
+                                <td><code>last_used_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>آخر استخدام</td>
+                            </tr>
+                            <tr>
+                                <td><code>expires_at</code></td>
+                                <td>TIMESTAMP</td>
+                                <td>تاريخ الانتهاء</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Roles & Permissions Tables -->
+            <section class="doc-section">
+                <div class="schema-table">
+                    <h3><i class="fas fa-table"></i> جداول الأدوار والصلاحيات (Spatie Permission)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        نظام إدارة الأدوار والصلاحيات باستخدام حزمة Spatie
+                    </p>
+
+                    <h4 style="margin-top: 1.5rem;">roles - الأدوار</h4>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الحقل</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>id</code></td>
+                                <td>المعرف الفريد</td>
+                            </tr>
+                            <tr>
+                                <td><code>name</code></td>
+                                <td>اسم الدور (admin, customer)</td>
+                            </tr>
+                            <tr>
+                                <td><code>guard_name</code></td>
+                                <td>اسم الحارس (web, api)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 1.5rem;">permissions - الصلاحيات</h4>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الحقل</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>id</code></td>
+                                <td>المعرف الفريد</td>
+                            </tr>
+                            <tr>
+                                <td><code>name</code></td>
+                                <td>اسم الصلاحية</td>
+                            </tr>
+                            <tr>
+                                <td><code>guard_name</code></td>
+                                <td>اسم الحارس</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 1.5rem;">الجداول الوسيطة</h4>
+                    <ul>
+                        <li><code>model_has_roles</code> - ربط المستخدمين بالأدوار</li>
+                        <li><code>model_has_permissions</code> - ربط المستخدمين بالصلاحيات</li>
+                        <li><code>role_has_permissions</code> - ربط الأدوار بالصلاحيات</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Jobs & Cache Tables -->
+            <section class="doc-section">
+                <div class="schema-table">
+                    <h3><i class="fas fa-table"></i> جداول النظام</h3>
+
+                    <h4>jobs - طابور المهام</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        يحتوي على المهام المؤجلة (مثل إرسال البريد الإلكتروني)
+                    </p>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الحقل</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>id</code></td>
+                                <td>المعرف الفريد</td>
+                            </tr>
+                            <tr>
+                                <td><code>queue</code></td>
+                                <td>اسم الطابور</td>
+                            </tr>
+                            <tr>
+                                <td><code>payload</code></td>
+                                <td>بيانات المهمة</td>
+                            </tr>
+                            <tr>
+                                <td><code>attempts</code></td>
+                                <td>عدد المحاولات</td>
+                            </tr>
+                            <tr>
+                                <td><code>available_at</code></td>
+                                <td>وقت التنفيذ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 1.5rem;">cache - التخزين المؤقت</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        يحتوي على البيانات المخزنة مؤقتاً لتحسين الأداء
+                    </p>
+                </div>
+            </section>
+
+            <!-- Database Diagram -->
+            <section class="doc-section">
+                <h2 class="section-title">
+                    <i class="fas fa-project-diagram"></i>
+                    مخطط العلاقات
+                </h2>
+                <div class="card">
+                    <div class="code-block">
+                        <code>users
+├── personal_access_tokens (1:N)
+├── model_has_roles (N:M) → roles
+└── model_has_permissions (N:M) → permissions
+
+roles
+├── role_has_permissions (N:M) → permissions
+└── model_has_roles (N:M) → users
+
+permissions
+├── role_has_permissions (N:M) → roles
+└── model_has_permissions (N:M) → users
+
+settings (مستقل)
+
+jobs (مستقل)
+
+cache (مستقل)</code>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="doc-footer">
+            <p>© 2026 My Trip - جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

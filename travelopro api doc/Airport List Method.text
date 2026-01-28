@@ -1,0 +1,65 @@
+Airport List Method
+This method is used to get list of airports which are supported by the API.
+
+Airport List Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/airport_list
+Request Parameters
+
+Parameter	Data Type	Required	Description	Example
+user_id	string	Yes	It is used to specify the user name.
+user_password	string	Yes	It is used to specify the password.
+access	string	Yes	It is used to specify the access type. Possible values : Test, Production.	Test/Production
+ip_address	string	Yes	It is used to get ip_address of the system from which IP, the API is accessed.	Authorized by Travelopro
+Response Parameters
+
+Parameter	Data Type	Required	Description	Example
+AirportCode	string	Yes	It specifies the IATA airport code.	BLR
+AirportName	string	Yes	It specifies the airport name.	Bengaluru International Airport
+City	string	Yes	It specifies the airport city.	Bangalore
+Country	string	Yes	It specifies the airport country.	India
+Sample Request
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "UniqueID": "TR31072022"
+}
+
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLSEARCHVAL",
+        "ErrorMessage": "Invalid user_id/user_password"
+    }
+}
+
+Sample Success Response
+[
+    {
+        "AirportCode": "AAA",
+        "AirportName": "Anaa Airport",
+        "City": "Anaa",
+        "Country": "French Polynesia"
+    },
+    {
+        "AirportCode": "AAB",
+        "AirportName": "Arrabury Airport",
+        "City": "Arrabury",
+        "Country": "Australia"
+    },
+    {
+        "AirportCode": "AAC",
+        "AirportName": "Al Arish Airport",
+        "City": "Al Arish",
+        "Country": "Egypt"
+    },
+    {
+        "AirportCode": "AAD",
+        "AirportName": "Ad-Dabbah Airport",
+        "City": "Ad-Dabbah",
+        "Country": "Sudan"
+    }
+]

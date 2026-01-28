@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التقنيات المستخدمة - My Trip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-plane-departure"></i>
+            <h2>My Trip</h2>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>نظرة عامة</span></a>
+            <a href="tech-stack.html" class="nav-item active"><i class="fas fa-layer-group"></i><span>التقنيات
+                    المستخدمة</span></a>
+            <a href="database.html" class="nav-item"><i class="fas fa-database"></i><span>قاعدة البيانات</span></a>
+            <a href="api.html" class="nav-item"><i class="fas fa-code"></i><span>واجهات API</span></a>
+            <a href="services.html" class="nav-item"><i class="fas fa-cogs"></i><span>الخدمات</span></a>
+            <a href="admin.html" class="nav-item"><i class="fas fa-user-shield"></i><span>لوحة الإدارة</span></a>
+            <a href="deployment.html" class="nav-item"><i class="fas fa-rocket"></i><span>النشر والتشغيل</span></a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="page-header">
+            <h1>التقنيات المستخدمة</h1>
+            <p class="subtitle">مجموعة التقنيات والأدوات المستخدمة في المشروع</p>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- Backend -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-server"></i> Backend</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fab fa-laravel"></i></div>
+                        <h3>Laravel 12</h3>
+                        <p>إطار عمل PHP الحديث والقوي</p>
+                        <ul>
+                            <li>MVC Architecture</li>
+                            <li>Eloquent ORM</li>
+                            <li>Blade Templating</li>
+                            <li>Artisan CLI</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-database"></i></div>
+                        <h3>MySQL 8.0</h3>
+                        <p>قاعدة بيانات علائقية قوية</p>
+                        <ul>
+                            <li>ACID Compliance</li>
+                            <li>Foreign Keys</li>
+                            <li>Indexing</li>
+                            <li>Transactions</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Laravel Sanctum</h3>
+                        <p>نظام مصادقة API</p>
+                        <ul>
+                            <li>Token Authentication</li>
+                            <li>SPA Support</li>
+                            <li>Mobile Apps</li>
+                            <li>Secure & Simple</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Frontend -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-palette"></i> Frontend</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fab fa-html5"></i></div>
+                        <h3>HTML5 & CSS3</h3>
+                        <p>تقنيات الويب الحديثة</p>
+                        <ul>
+                            <li>Semantic HTML</li>
+                            <li>Responsive Design</li>
+                            <li>CSS Grid & Flexbox</li>
+                            <li>Animations</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fab fa-js"></i></div>
+                        <h3>JavaScript ES6+</h3>
+                        <p>لغة البرمجة للتفاعل</p>
+                        <ul>
+                            <li>Modern Syntax</li>
+                            <li>AJAX Requests</li>
+                            <li>DOM Manipulation</li>
+                            <li>Event Handling</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-wind"></i></div>
+                        <h3>Vite</h3>
+                        <p>أداة بناء سريعة</p>
+                        <ul>
+                            <li>Fast HMR</li>
+                            <li>Asset Bundling</li>
+                            <li>CSS Processing</li>
+                            <li>Optimization</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Packages -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-box"></i> الحزم الرئيسية</h2>
+                <div class="card">
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الحزمة</th>
+                                <th>الإصدار</th>
+                                <th>الاستخدام</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>laravel/framework</code></td>
+                                <td>^12.0</td>
+                                <td>إطار العمل الأساسي</td>
+                            </tr>
+                            <tr>
+                                <td><code>laravel/sanctum</code></td>
+                                <td>^4.0</td>
+                                <td>مصادقة API</td>
+                            </tr>
+                            <tr>
+                                <td><code>spatie/laravel-permission</code></td>
+                                <td>^6.24</td>
+                                <td>إدارة الأدوار والصلاحيات</td>
+                            </tr>
+                            <tr>
+                                <td><code>darkaonline/l5-swagger</code></td>
+                                <td>^10.0</td>
+                                <td>توثيق API</td>
+                            </tr>
+                            <tr>
+                                <td><code>laravel/breeze</code></td>
+                                <td>^2.3</td>
+                                <td>مصادقة الويب</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- External Services -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-cloud"></i> الخدمات الخارجية</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fab fa-google"></i></div>
+                        <h3>Firebase Cloud Messaging</h3>
+                        <p>إشعارات Push للجوال</p>
+                        <ul>
+                            <li>FCM HTTP v1 API</li>
+                            <li>iOS & Android</li>
+                            <li>OAuth2 Authentication</li>
+                            <li>Service Account</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-credit-card"></i></div>
+                        <h3>HyperPay</h3>
+                        <p>بوابة الدفع الإلكتروني</p>
+                        <ul>
+                            <li>Mada Support</li>
+                            <li>Visa/Mastercard</li>
+                            <li>Apple Pay Ready</li>
+                            <li>Secure Checkout</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-envelope"></i></div>
+                        <h3>SMTP Email</h3>
+                        <p>خدمة البريد الإلكتروني</p>
+                        <ul>
+                            <li>Professional Templates</li>
+                            <li>OTP Delivery</li>
+                            <li>Welcome Emails</li>
+                            <li>Notifications</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Development Tools -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-tools"></i> أدوات التطوير</h2>
+                <div class="card">
+                    <ul class="requirements-list">
+                        <li><i class="fas fa-check"></i> <strong>Composer</strong> - إدارة حزم PHP</li>
+                        <li><i class="fas fa-check"></i> <strong>NPM</strong> - إدارة حزم JavaScript</li>
+                        <li><i class="fas fa-check"></i> <strong>Git</strong> - نظام التحكم في الإصدارات</li>
+                        <li><i class="fas fa-check"></i> <strong>Artisan</strong> - أداة سطر أوامر Laravel</li>
+                        <li><i class="fas fa-check"></i> <strong>PHPUnit</strong> - اختبارات الوحدة</li>
+                        <li><i class="fas fa-check"></i> <strong>Laravel Pint</strong> - تنسيق الكود</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Architecture -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-sitemap"></i> البنية المعمارية</h2>
+                <div class="card">
+                    <h3>MVC Pattern</h3>
+                    <p>يتبع المشروع نمط MVC (Model-View-Controller):</p>
+                    <ul>
+                        <li><strong>Models:</strong> تمثيل البيانات والعلاقات (Eloquent ORM)</li>
+                        <li><strong>Views:</strong> واجهات المستخدم (Blade Templates)</li>
+                        <li><strong>Controllers:</strong> منطق التطبيق وإدارة الطلبات</li>
+                    </ul>
+
+                    <h3 class="mt-4">Service Layer</h3>
+                    <p>طبقة خدمات منفصلة لمنطق الأعمال:</p>
+                    <ul>
+                        <li><code>MailService</code> - إدارة البريد الإلكتروني</li>
+                        <li><code>FirebaseService</code> - إدارة الإشعارات</li>
+                        <li><code>HyperPayService</code> - إدارة المدفوعات</li>
+                    </ul>
+
+                    <h3 class="mt-4">Repository Pattern</h3>
+                    <p>استخدام Eloquent كطبقة تجريد لقاعدة البيانات</p>
+                </div>
+            </section>
+
+            <!-- Security -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-lock"></i> الأمان</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>التشفير</h3>
+                        <ul>
+                            <li>Bcrypt للكلمات السرية</li>
+                            <li>HTTPS/SSL</li>
+                            <li>Encrypted Tokens</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3>الحماية</h3>
+                        <ul>
+                            <li>CSRF Protection</li>
+                            <li>XSS Prevention</li>
+                            <li>SQL Injection Prevention</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3>التحقق</h3>
+                        <ul>
+                            <li>Input Validation</li>
+                            <li>OTP Verification</li>
+                            <li>Rate Limiting</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="doc-footer">
+            <p>© 2026 My Trip - جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

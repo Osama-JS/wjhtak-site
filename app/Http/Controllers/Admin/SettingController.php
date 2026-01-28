@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Setting;
+use Illuminate\Support\Facades\Storage;
+
+class SettingController extends Controller
+{
+    public function index()
+    {
+        return view('admin.settings.index');
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            // Validate request data
+            $request->validate([
+                'site_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'site_favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,ico|max:1024',
+                'contact_email' => 'nullable|email',
+                'facebook_url' => 'nullable|url',
+                'twitter_url' => 'nullable|url',
+                'instagram_url' => 'nullable|url',
+                'android_url' => 'nullable|url',
+                'ios_url' => 'nullable|url',
+                'maintenance_mode' => 'nullable|in:0,1',
+            ]);
+
+            $data = $request->except(['_token', 'site_logo', 'site_favicon']);
+
+            // Update text settings
+            foreach ($data as $key => $value) {
+                Setting::set($key, $value);
+            }
+
+            // Handle File Uploads
+            $logoPath = $this->handleFileUpload($request, 'site_logo');
+            $faviconPath = $this->handleFileUpload($request, 'site_favicon');
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('Settings updated successfully!'),
+                    'logo_url' => $logoPath ? asset($logoPath) : null,
+                    'favicon_url' => $faviconPath ? asset($faviconPath) : null,
+                ]);
+            }
+
+            return redirect()->back()->with('success', __('Settings updated successfully!'));
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('An error occurred while updating settings: ') . $e->getMessage(),
+                ], 500);
+            }
+            return redirect()->back()->with('error', __('An error occurred while updating settings.'));
+        }
+    }
+
+    private function handleFileUpload($request, $key)
+    {
+        if ($request->hasFile($key)) {
+            // Delete old file if exists
+            $oldFile = Setting::get($key);
+            if ($oldFile && file_exists(public_path($oldFile))) {
+                @unlink(public_path($oldFile));
+            }
+
+            // Upload new file
+            $file = $request->file($key);
+            $fileName = time() . '_' . $key . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images/settings'), $fileName);
+
+            // Save path to DB
+            $path = 'images/settings/' . $fileName;
+            Setting::set($key, $path);
+            return $path;
+        }
+        return null;
+    }
+}

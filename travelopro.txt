@@ -1,0 +1,903 @@
+Flight Availability Search
+
+Flight Availability Search web service is used to request the lowest fares for various trip types such as One-way, Round Trip and Multi-City air travel from anywhere to anywhere across 70 countries and 900+ airlines. This method provides availability information with the cheapest fare option available. The request includes single query. In case of round trip, this field should be filled with the date of return. When properly submitted, the Search Response returns the available option. Once the requested query is parsed and validated, the booking engine start searching for the best option in all possible sources. If the search is successful it will return Results.
+
+
+Search Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/availability
+
+
+Request Parameters
+
+#	Parameter	            Data Type	Required	Description	Example
+1	user_id	                String	    Yes	        It is used to specify the user name.
+2	user_password	        String	    Yes	        It is used to specify the password
+3	access	                String	    Yes	        It is used to specify the access type. Possible values : Test, Production.
+4	ip_address	            String	    Yes	        It is used to get ip_address of the system from which IP, the API is accessed.
+5	requiredCurrency	    String	    No	        3-character ISO code that indicates the currency in which the rate is returned.	USD
+6	journeyType	            string	    Yes	        It is used to specify the trip type.Possible values :(OneWay, Return, Circle).	OneWay
+7	OriginDestinationInfo	Array	    Yes	        Array of Origin & Destination Informations. For Circle journeyType, more than one sub array will be there.	-
+7.1	departureDate	        date	    Yes	        It is used to specify the date of flight departure. Syntax: YYYY-MM-DD.	2014-02-01
+7.2	returnDate	            date	    No	        It is used to specify the date of flight return. Syntax: YYYY-MM-DD. It is Mandatory for Return journeyType.	2014-02-01
+7.3	airportOriginCode	    string	    Yes	        It is used to specify departure airport code.	GLA
+7.4	airportDestinationCode	string	    Yes	        It is used to specify arrival airport code.	STN
+8	class	                String	    Yes	        It is used to specify the class. Possible values : First, Business, Economy, PremiumEconomy	Economy
+9	adults	                integer	    Yes	        It is used to specify the number of adult.	2
+10	childs	                integer	    Yes	        It is used to specify the number of childs.	1
+11	infants	                integer	    Yes	        It is used to specify the number of infants.	1
+12	airlineCode	            String	    No	        Two letter code of the airline.	BA
+13	directFlight	        Int	        No	        Specify the type of flights in the search response. Possible values are 0,1. 1 = only direct flights will load & 0 = airlines with single and multiple stops will load.	0 / 1
+
+Sample Search Request
+
+Flight Availability ( Oneway )
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "requiredCurrency": "USD",
+    "journeyType": "OneWay",
+    "OriginDestinationInfo":
+    [
+        {
+            "departureDate": "2023-02-19",
+            "airportOriginCode": "DEL",
+            "airportDestinationCode": "BOM"
+        }
+    ],
+    "class": "Economy",
+    "airlineCode": "6E",
+    "adults": 1,
+    "childs": 1,
+    "infants": 1
+}
+
+Flight Availability ( Return )
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "requiredCurrency": "USD",
+    "journeyType": "Return",
+    "OriginDestinationInfo":
+    [
+        {
+            "departureDate": "2023-02-19",
+            "returnDate": "2023-02-22",
+            "airportOriginCode": "DEL",
+            "airportDestinationCode": "BOM"
+        }
+    ],
+    "class": "Economy",
+    "airlineCode": "6E",
+    "adults": 1,
+    "childs": 1,
+    "infants": 1
+}
+
+Flight Availability ( MultiCity/Circle )
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "requiredCurrency": "USD",
+    "journeyType": "Circle",
+    "OriginDestinationInfo":
+    [
+        {
+            "departureDate": "2023-02-19",
+            "airportOriginCode": "DEL",
+            "airportDestinationCode": "BOM"
+        },
+        {
+            "departureDate": "2023-02-23",
+            "airportOriginCode": "BOM",
+            "airportDestinationCode": "DXB"
+        },
+        {
+            "departureDate": "2023-03-01",
+            "airportOriginCode": "DXB",
+            "airportDestinationCode": "DEL"
+        }
+    ],
+    "class": "Economy",
+    "airlineCode": "6E",
+    "adults": 1,
+    "childs": 1,
+    "infants": 1
+}
+
+
+
+
+
+
+Flight Availability Response
+
+Response Parameters
+#	        Parameter	                    Data Type	    Required	Description	Example
+1	        DirectionInd	                string	        Yes	        It specifies the type of travel.	OneWay
+2	        IsPassportMandatory	            Boolean	        No	        It specifies whether the passport details are needed when a booking is made	True / False
+3	        SequenceNumber	                string	        No	        It specifies the Sequence Number.
+4	        TicketType	                    string	        Yes	        It specifies that the ticket can be e- ticketable	eTicket
+5	        OriginDestinationOptions	    Nested Array	Yes	        Contains the origin and Destination Itinerary wise details details.
+5.1	        TotalStops	                    Int	            Yes	        It specifies the total number of stops of the itinerary.	1
+5.2	        OriginDestinationOption	        Nested Array	Yes	        Contains the origin and Destination Segment wise details details.
+5.2.1	    FlightSegment	                Sub Array	    Yes	        Contains the basic details of Flighs.
+5.2.1.1	    ArrivalAirportLocationCode	    string	        Yes	        Arrival Airport code.	BOM
+5.2.1.2	    ArrivalDateTime	                DateTime	    Yes	        It specific the arrival date & time.	2023-02-19T10:56:00
+5.2.1.3	    CabinClassCode	                string	        Yes	        It specifies the selected cabin class. (Y-Economy, S-Premium Economy, C-Business, F- First).	Y
+5.2.1.4	    CabinClassText	                string	        No	        It returns the cabin class type only in case of LCC / WebFares.	REGULAR FARE
+5.2.1.5	    DepartureAirportLocationCode	string	        Yes	        Departure Airport code.	DEL
+5.2.1.6	    DepartureDateTime	            DateTime	    Yes	        It specifies flight departure date & time.	2023-02-19T08:46:00
+5.2.1.7	    Eticket	                        Boolean	        Yes	        It specifies whether the flight segment is e-ticketable or not.	True / False
+5.2.1.8	    JourneyDuration	                Int	            Yes	        It specifies the total journey duration in minutes.	400
+5.2.1.9	    FlightNumber	                string	        Yes	        It specifies the flight number.	6278
+5.2.1.10	MarketingAirlineCode	        string	        Yes	        It specifies the Marketing Airline Code.	6E
+5.2.1.11	MarriageGroup	                string	        No	        It specifies the marriage group indicator	O
+5.2.1.12	MealCode	                    string	        No	        It specifies the meal preference selected.	S
+5.2.1.13	OperatingAirline	            Sub Array	    Yes	        Contain the Operating airline details.	-
+5.2.1.13.1	Code	                        string	        Yes	        OperatingOperating airline code.	6E
+5.2.1.13.2	Equipment	                    string	        Yes	        It specifies the Operating aircraft equipment number	M90
+5.2.1.13.3	FlightNumber	                string	        Yes	        It specifies the Operating flight number.	6278
+5.2.2	    ResBookDesigCode	            string	        No	        It specifies the booking class.	E
+5.2.3	    ResBookDesigText	            string	        No	        It returns the fare type only in case of LCC / WebFares.	Lowest Fare
+5.2.4	    StopQuantity	                Int	            Yes	        It specifies the number of stops.	1
+5.2.5	    StopQuantityInfo	            Sub Array	    Yes
+5.2.6	    SeatsRemaining	                Sub Array	    Yes
+5.2.6.1	    Number	                        string	        Yes	        It specifies the number of seats remaining.	8
+5.2.6.2	    BelowMinimum	                Boolean	        Yes	        It is used to specify if the seats are < or = zero	True / False
+6	        AirItineraryFareInfo	        Sub Array	    Yes	        Contains the fare details.
+6.1	        DivideInPartyIndicator	        Boolean	        Yes	        It is used to alert if passenger types have different booking code	True / False
+6.2	        FareSourceCode	                string	        Yes	        It specifies the unique code provided for the itinerary selected	MzAwMiYzN 1MyJjF
+6.3	        FareType	                    string	        Yes	        It specifies the type of fare selected, ((Private-Private Fares, Public- Public fares, WebFare- LCC)	Private
+6.4	        IsRefundable	                Boolean	        Yes	        It specifies whether the selected fare is valid or not.	True / False
+6.5	        ItinTotalFares	                Sub Array	    Yes
+6.5.1	    BaseFare	                    Sub Array	    Yes	        Contain the base fare details.
+6.5.2	    EquivFare	                    Sub Array	    Yes	        Contain the base fare details.
+6.5.3	    ServiceTax	                    Sub Array	    Yes	        Contain the base service tax details.
+6.5.4	    TotalTax	                    Sub Array	    Yes	        Contain the base total tax details.
+6.5.5	    TotalFare	                    Sub Array	    Yes	        Contain the total fare details.
+6.6	        FareBreakdown	                Nested Array	Yes	        Contain the passenger wise fare and baggage details.
+6.6.1	    PassengerTypeQuantity	        Sub Array	    Yes
+6.6.1.1	    Code	                        String	        Yes	        It specifies the passenger type. (ADT-Adult, CHD-Child, INF-Infant).	ADT
+6.6.1.2	    Quantity	                    Int	            Yes	        It specifies the number of passengers.	2
+6.6.2	    PassengerFare	                Sub Array	    Yes
+6.6.2.1	    BaseFare	                    Sub Array	    Yes	        Contain the base fare details.
+6.6.2.2	    EquivFare	                    Sub Array	    Yes	        Contain the base fare details.
+6.6.2.3	    ServiceTax	                    Sub Array	    Yes	        Contain the base service tax details.
+6.6.2.4	    Surcharges	                    Sub Array	    Yes	        Contain the base Surcharges details.
+6.6.2.5	    Taxes	                        Nested Array	Yes	        Contain the base tax details.
+6.6.2.6	    TotalFare	                    Sub Array	    Yes	        Contain the total fare details.
+6.6.3	    Baggage	                        Sub Array	    Yes	        Contain the airline wise Cabbage details.
+6.6.4	    CabinBaggage	                Sub Array	    Yes	        Contain the airline wise Cabin Cabbage details.
+7	        ValidatingAirlineCode	        string	        Yes	        It specifies the validating airline.	BA
+
+
+Important Notes
+Indian Domestic RoundTrip Search - In case of Indian domestic round trip search, the Outbound & Inbound itinerary details will be available separately. The Outbound results will be available in the AirSearchResult parameter and the Inbound results will be available in the AirSearchResultInbound parameter.
+
+ResBookDesigCode - Denotes RBD (Reservation Booking Designator). RBD is the code used in reservation transactions to identify the booking class. RBD is used in reservations transactions to identify a compartment on an aircraft and/or a special inventory control. We advise you to read the booking class returned in the ResBookDesigCode Json and show it in the flight result page.
+
+ResBookDesigText - This is returned only in case of LCC (WebFares). In case of LCC fares there is no RBD. By default Travelopro API returns economy class in the search results. We advise you to read ResBookDesigText which denotes the booking class / type in case of LCC fares. Also we suggest you to read CabinClassText & ResBookDesignCode Json returned.
+
+IsPassportMandatory - It specifies whether the passport details are needed when a booking is made. The value may be different in the revalidate API and that should consider while booking.
+
+
+Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLSEARCHVAL",
+        "ErrorMessage": "Invalid ip_address supplied"
+    }
+}
+
+Success Response
+{
+    "AirSearchResponse": {
+        "session_id": "MTY2ODE1NzgyMl8yNjA4NDg=",
+        "supplier": "supplier1",
+        "AirSearchResult": {
+            "FareItineraries": [
+                {
+                    "FareItinerary": {
+                        "DirectionInd": "Return",
+                        "AirItineraryFareInfo": {
+                            "DivideInPartyIndicator": false,
+                            "FareSourceCode": "aklPR2dlWXIwcHlQMDRjYTY5ZnRYSGxlYjI3WEo2QlV6U29NRU0vZjBnZHNYVFhLd1FMT0xXVkZzSzk5YkRBZjNiMXJFUHNSbE5ST2pMSi9rQmtveGJWY2x5VG1qMnZicEN2SWl0ODBDcVNDQkt3QXFmcjRTQ3pCQ0R5UG5qa1o4c0JhVm5ocHovTkdGWkxzZEtmSHp3PT0=",
+                            "FareInfos": [],
+                            "FareType": "Private",
+                            "ResultIndex": "",
+                            "IsRefundable": false,
+                            "ItinTotalFares": {
+                                "BaseFare": {
+                                    "Amount": "399.15",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "EquivFare": {
+                                    "Amount": "399.15",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "ServiceTax": {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalTax": {
+                                    "Amount": "133.79",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalFare": {
+                                    "Amount": "532.92",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                }
+                            },
+                            "FareBreakdown": [
+                                {
+                                    "FareBasisCode": [],
+                                    "Baggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "CabinBaggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "242.02",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "242.02",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "IN",
+                                                "Amount": "29.32",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "IN",
+                                                "Amount": "29.29",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "GST",
+                                                "Amount": "1.65",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "302.27",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "PassengerTypeQuantity": {
+                                        "Code": "ADT",
+                                        "Quantity": 2
+                                    },
+                                    "PenaltyDetails": [
+                                        {
+                                            "Currency": "USD",
+                                            "RefundAllowed": false,
+                                            "RefundPenaltyAmount": "0.00",
+                                            "ChangeAllowed": false,
+                                            "ChangePenaltyAmount": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "FareBasisCode": [],
+                                    "Baggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "CabinBaggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "121.01",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "121.01",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "IN",
+                                                "Amount": "14.66",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "IN",
+                                                "Amount": "14.65",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "GST",
+                                                "Amount": "0.82",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "151.14",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "PassengerTypeQuantity": {
+                                        "Code": "CHD",
+                                        "Quantity": 1
+                                    },
+                                    "PenaltyDetails": [
+                                        {
+                                            "Currency": "USD",
+                                            "RefundAllowed": false,
+                                            "RefundPenaltyAmount": "0.00",
+                                            "ChangeAllowed": false,
+                                            "ChangePenaltyAmount": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "FareBasisCode": [],
+                                    "Baggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "CabinBaggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "36.12",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "36.12",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "XT",
+                                                "Amount": "21.67",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "XT",
+                                                "Amount": "21.67",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "GST",
+                                                "Amount": "0.06",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "79.51",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "PassengerTypeQuantity": {
+                                        "Code": "INF",
+                                        "Quantity": 1
+                                    },
+                                    "PenaltyDetails": [
+                                        {
+                                            "Currency": "USD",
+                                            "RefundAllowed": false,
+                                            "RefundPenaltyAmount": "0.00",
+                                            "ChangeAllowed": false,
+                                            "ChangePenaltyAmount": "0.00"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "SplitItinerary": false
+                        },
+                        "OriginDestinationOptions": [
+                            {
+                                "OriginDestinationOption": [
+                                    {
+                                        "FlightSegment": {
+                                            "ArrivalAirportLocationCode": "BOM",
+                                            "ArrivalDateTime": "2023-02-19T10:56:00",
+                                            "CabinClassCode": "Y",
+                                            "CabinClassText": "REGULAR FARE",
+                                            "DepartureAirportLocationCode": "DEL",
+                                            "DepartureDateTime": "2023-02-19T08:46:00",
+                                            "Eticket": true,
+                                            "JourneyDuration": 130,
+                                            "FlightNumber": "6278",
+                                            "MarketingAirlineCode": "6E",
+                                            "MarketingAirlineName": "Indigo Airlines",
+                                            "MarriageGroup": "",
+                                            "MealCode": "",
+                                            "OperatingAirline": {
+                                                "Code": "6E",
+                                                "Name": "Indigo Airlines",
+                                                "Equipment": "320",
+                                                "FlightNumber": "6278"
+                                            }
+                                        },
+                                        "ResBookDesigCode": "",
+                                        "ResBookDesigText": "",
+                                        "SeatsRemaining": {
+                                            "BelowMinimum": false,
+                                            "Number": 4
+                                        },
+                                        "StopQuantity": 0,
+                                        "StopQuantityInfo": {
+                                            "ArrivalDateTime": "",
+                                            "DepartureDateTime": "",
+                                            "Duration": "",
+                                            "LocationCode": ""
+                                        }
+                                    }
+                                ],
+                                "TotalStops": 0
+                            },
+                            {
+                                "OriginDestinationOption": [
+                                    {
+                                        "FlightSegment": {
+                                            "ArrivalAirportLocationCode": "DEL",
+                                            "ArrivalDateTime": "2023-02-22T13:51:00",
+                                            "CabinClassCode": "Y",
+                                            "CabinClassText": "REGULAR FARE",
+                                            "DepartureAirportLocationCode": "BOM",
+                                            "DepartureDateTime": "2023-02-22T11:41:00",
+                                            "Eticket": true,
+                                            "JourneyDuration": 130,
+                                            "FlightNumber": "168",
+                                            "MarketingAirlineCode": "6E",
+                                            "MarketingAirlineName": "Indigo Airlines",
+                                            "MarriageGroup": "",
+                                            "MealCode": "",
+                                            "OperatingAirline": {
+                                                "Code": "6E",
+                                                "Name": "Indigo Airlines",
+                                                "Equipment": "320",
+                                                "FlightNumber": "168"
+                                            }
+                                        },
+                                        "ResBookDesigCode": "",
+                                        "ResBookDesigText": "",
+                                        "SeatsRemaining": {
+                                            "BelowMinimum": false,
+                                            "Number": 4
+                                        },
+                                        "StopQuantity": 0,
+                                        "StopQuantityInfo": {
+                                            "ArrivalDateTime": "",
+                                            "DepartureDateTime": "",
+                                            "Duration": "",
+                                            "LocationCode": ""
+                                        }
+                                    }
+                                ],
+                                "TotalStops": 0
+                            }
+                        ],
+                        "IsPassportMandatory": "",
+                        "SequenceNumber": "",
+                        "TicketType": "",
+                        "ValidatingAirlineCode": "6E"
+                    }
+                },
+                {
+                    "FareItinerary": {
+                        "DirectionInd": "Return",
+                        "AirItineraryFareInfo": {
+                            "DivideInPartyIndicator": false,
+                            "FareSourceCode": "bXBqNWJNdjBPMStaamJpNldLY1hVUzNCM3k0cnN0YlNhREdVUi9kaGtvSSs1WUMwZW9XR3E4dUx0alBkM25PTm92emRwSGpnMTNidmxrR0twdXFCeDFPdC9heENqcWlDVmwybFFTeVNNOVNyczFDbkVJT0VSZXZLbjFDMG5MOXVYUkxGVTFubENWZE9RMFVPMUt5YUVnPT0=",
+                            "FareInfos": [],
+                            "FareType": "Private",
+                            "ResultIndex": "",
+                            "IsRefundable": false,
+                            "ItinTotalFares": {
+                                "BaseFare": {
+                                    "Amount": "399.15",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "EquivFare": {
+                                    "Amount": "399.15",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "ServiceTax": {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalTax": {
+                                    "Amount": "133.79",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalFare": {
+                                    "Amount": "532.92",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                }
+                            },
+                            "FareBreakdown": [
+                                {
+                                    "FareBasisCode": [],
+                                    "Baggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "CabinBaggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "242.02",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "242.02",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "IN",
+                                                "Amount": "29.32",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "IN",
+                                                "Amount": "29.29",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "GST",
+                                                "Amount": "1.65",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "302.27",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "PassengerTypeQuantity": {
+                                        "Code": "ADT",
+                                        "Quantity": 2
+                                    },
+                                    "PenaltyDetails": [
+                                        {
+                                            "Currency": "USD",
+                                            "RefundAllowed": false,
+                                            "RefundPenaltyAmount": "0.00",
+                                            "ChangeAllowed": false,
+                                            "ChangePenaltyAmount": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "FareBasisCode": [],
+                                    "Baggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "CabinBaggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "121.01",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "121.01",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "IN",
+                                                "Amount": "14.66",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "IN",
+                                                "Amount": "14.65",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "GST",
+                                                "Amount": "0.82",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "151.14",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "PassengerTypeQuantity": {
+                                        "Code": "CHD",
+                                        "Quantity": 1
+                                    },
+                                    "PenaltyDetails": [
+                                        {
+                                            "Currency": "USD",
+                                            "RefundAllowed": false,
+                                            "RefundPenaltyAmount": "0.00",
+                                            "ChangeAllowed": false,
+                                            "ChangePenaltyAmount": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "FareBasisCode": [],
+                                    "Baggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "CabinBaggage": [
+                                        "SB",
+                                        "SB"
+                                    ],
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "36.12",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "36.12",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "XT",
+                                                "Amount": "21.67",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "XT",
+                                                "Amount": "21.67",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            },
+                                            {
+                                                "TaxCode": "GST",
+                                                "Amount": "0.06",
+                                                "CurrencyCode": "USD",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "79.51",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "PassengerTypeQuantity": {
+                                        "Code": "INF",
+                                        "Quantity": 1
+                                    },
+                                    "PenaltyDetails": [
+                                        {
+                                            "Currency": "USD",
+                                            "RefundAllowed": false,
+                                            "RefundPenaltyAmount": "0.00",
+                                            "ChangeAllowed": false,
+                                            "ChangePenaltyAmount": "0.00"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "SplitItinerary": false
+                        },
+                        "OriginDestinationOptions": [
+                            {
+                                "OriginDestinationOption": [
+                                    {
+                                        "FlightSegment": {
+                                            "ArrivalAirportLocationCode": "BOM",
+                                            "ArrivalDateTime": "2023-02-19T16:31:00",
+                                            "CabinClassCode": "Y",
+                                            "CabinClassText": "REGULAR FARE",
+                                            "DepartureAirportLocationCode": "DEL",
+                                            "DepartureDateTime": "2023-02-19T14:16:00",
+                                            "Eticket": true,
+                                            "JourneyDuration": 135,
+                                            "FlightNumber": "2176",
+                                            "MarketingAirlineCode": "6E",
+                                            "MarketingAirlineName": "Indigo Airlines",
+                                            "MarriageGroup": "",
+                                            "MealCode": "",
+                                            "OperatingAirline": {
+                                                "Code": "6E",
+                                                "Name": "Indigo Airlines",
+                                                "Equipment": "320",
+                                                "FlightNumber": "2176"
+                                            }
+                                        },
+                                        "ResBookDesigCode": "",
+                                        "ResBookDesigText": "",
+                                        "SeatsRemaining": {
+                                            "BelowMinimum": false,
+                                            "Number": 4
+                                        },
+                                        "StopQuantity": 0,
+                                        "StopQuantityInfo": {
+                                            "ArrivalDateTime": "",
+                                            "DepartureDateTime": "",
+                                            "Duration": "",
+                                            "LocationCode": ""
+                                        }
+                                    }
+                                ],
+                                "TotalStops": 0
+                            },
+                            {
+                                "OriginDestinationOption": [
+                                    {
+                                        "FlightSegment": {
+                                            "ArrivalAirportLocationCode": "DEL",
+                                            "ArrivalDateTime": "2023-02-22T11:26:00",
+                                            "CabinClassCode": "Y",
+                                            "CabinClassText": "REGULAR FARE",
+                                            "DepartureAirportLocationCode": "BOM",
+                                            "DepartureDateTime": "2023-02-22T09:16:00",
+                                            "Eticket": true,
+                                            "JourneyDuration": 130,
+                                            "FlightNumber": "2172",
+                                            "MarketingAirlineCode": "6E",
+                                            "MarketingAirlineName": "Indigo Airlines",
+                                            "MarriageGroup": "",
+                                            "MealCode": "",
+                                            "OperatingAirline": {
+                                                "Code": "6E",
+                                                "Name": "Indigo Airlines",
+                                                "Equipment": "320",
+                                                "FlightNumber": "2172"
+                                            }
+                                        },
+                                        "ResBookDesigCode": "",
+                                        "ResBookDesigText": "",
+                                        "SeatsRemaining": {
+                                            "BelowMinimum": false,
+                                            "Number": 4
+                                        },
+                                        "StopQuantity": 0,
+                                        "StopQuantityInfo": {
+                                            "ArrivalDateTime": "",
+                                            "DepartureDateTime": "",
+                                            "Duration": "",
+                                            "LocationCode": ""
+                                        }
+                                    }
+                                ],
+                                "TotalStops": 0
+                            }
+                        ],
+                        "IsPassportMandatory": "",
+                        "SequenceNumber": "",
+                        "TicketType": "",
+                        "ValidatingAirlineCode": "6E"
+                    }
+                }
+            ]
+        }
+    }
+}
+
+
+
+
+

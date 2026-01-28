@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>العلاقات - قاعدة بيانات WH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 العلاقات بين الجداول</h1>
+            <p>مخططات توضيحية للعلاقات والمفاتيح الخارجية</p>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html">نظرة عامة</a>
+            <a href="tables-fields.html">الجداول والحقول</a>
+            <a href="relationships.html" class="active">العلاقات</a>
+            <a href="indexes.html">الفهارس والمفاتيح</a>
+            <a href="workflow.html">آلية العمل</a>
+            <a href="performance.html">تحسين الأداء</a>
+            <a href="security.html">الأمان</a>
+            <a href="recommendations.html">التوصيات</a>
+        </nav>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">📊 العلاقات الرئيسية</h2>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">🔗</span>علاقات جدول trips (الرحلات)</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الحقل</th>
+                                    <th>يشير إلى</th>
+                                    <th>نوع العلاقة</th>
+                                    <th>عند الحذف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>company_id</td>
+                                    <td>admin_users(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>CASCADE</td>
+                                </tr>
+                                <tr>
+                                    <td>admin_id</td>
+                                    <td>admin_users(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>SET NULL</td>
+                                </tr>
+                                <tr>
+                                    <td>from_country_id</td>
+                                    <td>countries(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>CASCADE</td>
+                                </tr>
+                                <tr>
+                                    <td>to_country_id</td>
+                                    <td>countries(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>CASCADE</td>
+                                </tr>
+                                <tr>
+                                    <td>from_city_id</td>
+                                    <td>cities(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>CASCADE</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">🔗</span>علاقات جدول trip_bookings (الحجوزات)</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الحقل</th>
+                                    <th>يشير إلى</th>
+                                    <th>نوع العلاقة</th>
+                                    <th>عند الحذف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>user_id</td>
+                                    <td>users(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>CASCADE</td>
+                                </tr>
+                                <tr>
+                                    <td>trip_id</td>
+                                    <td>trips(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>CASCADE</td>
+                                </tr>
+                                <tr>
+                                    <td>company_id</td>
+                                    <td>companies(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>CASCADE</td>
+                                </tr>
+                                <tr>
+                                    <td>company_code_id</td>
+                                    <td>company_codes(id)</td>
+                                    <td>Many-to-One</td>
+                                    <td>CASCADE</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">🔗</span>علاقات أخرى</div>
+                    <ul class="custom-list">
+                        <li>favorites: user_id → users(id), trip_id → trips(id)</li>
+                        <li>trip_images: trip_id → trips(id) CASCADE</li>
+                        <li>trip_rates: trip_id → trips(id) CASCADE</li>
+                        <li>trip_page_visits: user_id → users(id), trip_id → trips(id)</li>
+                        <li>booking_fees: trip_booking_id → trip_bookings(id) CASCADE</li>
+                        <li>cities: country_id → countries(id) CASCADE</li>
+                        <li>company_codes: company_id → companies(id) CASCADE</li>
+                        <li>notifications: user_id → users(id) CASCADE</li>
+                        <li>banners: admin_id → admin_users(id), trip_id → trips(id)</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-warning">
+                    <div class="alert-title">⚠️ تحذير: تكرار القيود</div>
+                    <p>في جدول trips، هناك تكرار في تعريف القيود الخارجية للدول (trips_from_country_fk و
+                        trips_from_country_id_foreign).
+                        يُنصح بحذف أحدهما لتجنب التعقيدات.</p>
+                </div>
+
+                <div class="alert alert-success">
+                    <div class="alert-title">✅ نقاط قوة</div>
+                    <p>استخدام CASCADE في معظم العلاقات يضمن سلامة البيانات عند الحذف. استخدام SET NULL في بعض الحالات
+                        يحافظ على البيانات التاريخية.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📊 تقرير تحليل قاعدة بيانات WJHTAK</p>
+        </div>
+    </div>
+</body>
+
+</html>

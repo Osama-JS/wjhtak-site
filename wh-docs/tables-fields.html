@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الجداول والحقول - قاعدة بيانات WH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 الجداول والحقول</h1>
+            <p>تفاصيل كاملة عن جميع الجداول والحقول في قاعدة البيانات</p>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html">نظرة عامة</a>
+            <a href="tables-fields.html" class="active">الجداول والحقول</a>
+            <a href="relationships.html">العلاقات</a>
+            <a href="indexes.html">الفهارس والمفاتيح</a>
+            <a href="workflow.html">آلية العمل</a>
+            <a href="performance.html">تحسين الأداء</a>
+            <a href="security.html">الأمان</a>
+            <a href="recommendations.html">التوصيات</a>
+        </nav>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">📊 قائمة الجداول الرئيسية</h2>
+
+                <!-- جدول المستخدمين -->
+                <div class="card">
+                    <div class="card-header"><span class="icon">👥</span>users - جدول المستخدمين</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الحقل</th>
+                                    <th>النوع</th>
+                                    <th>الوصف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>المعرف الفريد</td>
+                                </tr>
+                                <tr>
+                                    <td>name</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>اسم المستخدم</td>
+                                </tr>
+                                <tr>
+                                    <td>email</td>
+                                    <td>VARCHAR(255) UNIQUE</td>
+                                    <td>البريد الإلكتروني</td>
+                                </tr>
+                                <tr>
+                                    <td>phone_number</td>
+                                    <td>VARCHAR(255) UNIQUE</td>
+                                    <td>رقم الهاتف</td>
+                                </tr>
+                                <tr>
+                                    <td>password</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>كلمة المرور المشفرة</td>
+                                </tr>
+                                <tr>
+                                    <td>balance</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>الرصيد</td>
+                                </tr>
+                                <tr>
+                                    <td>fcm</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>رمز Firebase للإشعارات</td>
+                                </tr>
+                                <tr>
+                                    <td>birthday</td>
+                                    <td>DATE</td>
+                                    <td>تاريخ الميلاد</td>
+                                </tr>
+                                <tr>
+                                    <td>gender</td>
+                                    <td>ENUM('male','female')</td>
+                                    <td>الجنس</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- جدول الرحلات -->
+                <div class="card">
+                    <div class="card-header"><span class="icon">✈️</span>trips - جدول الرحلات</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الحقل</th>
+                                    <th>النوع</th>
+                                    <th>الوصف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>المعرف الفريد</td>
+                                </tr>
+                                <tr>
+                                    <td>title</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>عنوان الرحلة</td>
+                                </tr>
+                                <tr>
+                                    <td>description</td>
+                                    <td>TEXT</td>
+                                    <td>وصف الرحلة</td>
+                                </tr>
+                                <tr>
+                                    <td>price</td>
+                                    <td>DECIMAL(8,2)</td>
+                                    <td>السعر</td>
+                                </tr>
+                                <tr>
+                                    <td>price_before_discount</td>
+                                    <td>DECIMAL(8,2)</td>
+                                    <td>السعر قبل الخصم</td>
+                                </tr>
+                                <tr>
+                                    <td>profit</td>
+                                    <td>DOUBLE(8,2)</td>
+                                    <td>الربح</td>
+                                </tr>
+                                <tr>
+                                    <td>percentage_profit_margin</td>
+                                    <td>DOUBLE(8,2)</td>
+                                    <td>نسبة هامش الربح</td>
+                                </tr>
+                                <tr>
+                                    <td>personnel_capacity</td>
+                                    <td>INT(11)</td>
+                                    <td>السعة (عدد الأشخاص)</td>
+                                </tr>
+                                <tr>
+                                    <td>expiry_date</td>
+                                    <td>DATE</td>
+                                    <td>تاريخ انتهاء العرض</td>
+                                </tr>
+                                <tr>
+                                    <td>deleted_at</td>
+                                    <td>TIMESTAMP</td>
+                                    <td>تاريخ الحذف (Soft Delete)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- جدول الحجوزات -->
+                <div class="card">
+                    <div class="card-header"><span class="icon">📝</span>trip_bookings - جدول الحجوزات</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الحقل</th>
+                                    <th>النوع</th>
+                                    <th>الوصف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>المعرف الفريد</td>
+                                </tr>
+                                <tr>
+                                    <td>user_id</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>معرف المستخدم</td>
+                                </tr>
+                                <tr>
+                                    <td>trip_id</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>معرف الرحلة</td>
+                                </tr>
+                                <tr>
+                                    <td>total_paid</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>المبلغ المدفوع</td>
+                                </tr>
+                                <tr>
+                                    <td>trip_price</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>سعر الرحلة</td>
+                                </tr>
+                                <tr>
+                                    <td>vat</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>ضريبة القيمة المضافة</td>
+                                </tr>
+                                <tr>
+                                    <td>app_profit</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>ربح التطبيق</td>
+                                </tr>
+                                <tr>
+                                    <td>company_profit</td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>ربح الشركة</td>
+                                </tr>
+                                <tr>
+                                    <td>status</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>حالة الحجز</td>
+                                </tr>
+                                <tr>
+                                    <td>payment_method</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>طريقة الدفع</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- جدول الشركات -->
+                <div class="card">
+                    <div class="card-header"><span class="icon">🏢</span>companies - جدول الشركات</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الحقل</th>
+                                    <th>النوع</th>
+                                    <th>الوصف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>المعرف الفريد</td>
+                                </tr>
+                                <tr>
+                                    <td>name</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>اسم الشركة</td>
+                                </tr>
+                                <tr>
+                                    <td>email</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>البريد الإلكتروني</td>
+                                </tr>
+                                <tr>
+                                    <td>phone</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>رقم الهاتف</td>
+                                </tr>
+                                <tr>
+                                    <td>notes</td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>ملاحظات</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- جدول أكواد الشركات -->
+                <div class="card">
+                    <div class="card-header"><span class="icon">🎫</span>company_codes - أكواد الخصم</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الحقل</th>
+                                    <th>النوع</th>
+                                    <th>الوصف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>المعرف الفريد</td>
+                                </tr>
+                                <tr>
+                                    <td>company_id</td>
+                                    <td>BIGINT(20) UNSIGNED</td>
+                                    <td>معرف الشركة</td>
+                                </tr>
+                                <tr>
+                                    <td>code</td>
+                                    <td>VARCHAR(255) UNIQUE</td>
+                                    <td>كود الخصم</td>
+                                </tr>
+                                <tr>
+                                    <td>type</td>
+                                    <td>ENUM('fixed','percentage')</td>
+                                    <td>نوع الخصم</td>
+                                </tr>
+                                <tr>
+                                    <td>value</td>
+                                    <td>DECIMAL(8,2)</td>
+                                    <td>قيمة الخصم</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <div class="alert-title">ملاحظة</div>
+                    <p>تم عرض الجداول الرئيسية فقط. يحتوي النظام على 24 جدول إجمالاً تشمل جداول النظام والصلاحيات
+                        والإعدادات.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📊 تقرير تحليل قاعدة بيانات WJHTAK</p>
+        </div>
+    </div>
+</body>
+
+</html>

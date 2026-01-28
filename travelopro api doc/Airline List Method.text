@@ -1,0 +1,60 @@
+Airline List Method
+This method is used to get list of airlines which are supported by the API.
+
+Airline List Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/airline_list
+Request Parameters
+
+Parameter	Data Type	Required	Description	Example
+user_id	string	Yes	It is used to specify the user name.
+user_password	string	Yes	It is used to specify the password.
+access	string	Yes	It is used to specify the access type. Possible values : Test, Production.	Test/Production
+ip_address	string	Yes	It is used to get ip_address of the system from which IP, the API is accessed.	Authorized by Travelopro
+Response Parameters
+
+Parameter	Data Type	Required	Description	Example
+AirLineCode	string	Yes	It specifies the airline code.	UK
+AirLineName	string	Yes	It specifies the airline name.	Vistara
+AirLineLogo	string	Yes	It specifies the airline logo url.	https://travelnext.works/api/airlines/UK.gif
+Sample Request
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "UniqueID": "TR31072022"
+}
+
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLSEARCHVAL",
+        "ErrorMessage": "Invalid user_id/user_password"
+    }
+}
+
+Sample Success Response
+[
+    {
+        "AirLineCode": "00",
+        "AirLineName": "Janet",
+        "Logo": "https://travelnext.works/api/airlines/00.gif"
+    },
+    {
+        "AirLineCode": "02",
+        "AirLineName": "Viva Aerobus",
+        "Logo": "https://travelnext.works/api/airlines/02.gif"
+    },
+    {
+        "AirLineCode": "0B",
+        "AirLineName": "Blue Air",
+        "Logo": "https://travelnext.works/api/airlines/0B.gif"
+    },
+    {
+        "AirLineCode": "0V",
+        "AirLineName": "Vietnam Air Service",
+        "Logo": "https://travelnext.works/api/airlines/0V.gif"
+    }
+]

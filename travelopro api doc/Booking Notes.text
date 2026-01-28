@@ -1,0 +1,50 @@
+Booking Notes
+Booking Notes method Add Remarks to Booking.
+
+Fare Rule Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/booking_notes
+Request Parameters
+
+#	Parameter	Data Type	Required	Description	Example
+1	user_id	String	Yes	It is used to specify the user name.
+2	user_password	String	Yes	It is used to specify the password
+3	access	String	Yes	It is used to specify the access type. Possible values : Test, Production.
+4	ip_address	String	Yes	It is used to get ip_address of the system from which IP, the API is accessed.
+5	uniqueID	string	Yes	To specify the API booking reference unique ID.	TR31072022
+6	notes	string	Yes	Remarks to Booking.	Wheel chair needed at airport.
+Sample Request
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "UniqueID": "TR31072022",
+    "notes": "Test Booking note : Wheel chair needed at airport."
+}
+
+Sample Error Response
+{
+    "BookingNotesResponse": {
+        "BookingNotesResult": {
+            "Errors": {
+                "ErrorCode": "ERGEN002",
+                "ErrorMessage": "Invalid UniqueID"
+            },
+            "Success": false,
+            "Target": "Test"
+        }
+    }
+}
+
+Sample Success Response
+{
+    "BookingNotesResponse": {
+        "BookingNotesResult": {
+            "Errors": [],
+            "Success": true,
+            "Target": "Test"
+        }
+    }
+}

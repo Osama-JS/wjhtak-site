@@ -1,0 +1,1774 @@
+Validate Fare Method
+Flight validate method is used to determine the availability of the selected fare by re-pricing. If the selected fare is not available, this service will return as false, then booking for the selected airline need to terminate. This method required to execute before the booking method as well.
+
+Revalidate Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/revalidate
+Request Parameters
+
+Parameter	Data Type	Required	Description	Example
+session_id	string	Yes	Session_id is a token granted on flight availablity search and is available in the success Availability search response.	7906efba-09db-4481-8c60-0d7f5b5e6c44
+fare_source_code	string	Yes	Unique fare/flight Option identification code	MTY2ODE2Njg2Ml8yNjA5Mzk
+fare_source_code_inbound	string	No	Unique fare/flight Option identification code of Inbound segment, from Indian Domestic RoundTrip Search.	7906efba-09db-4481-8c60-0d7f5b5e6c44
+Response Parameters
+
+#	Parameter	Data Type	Required	Description	Example
+AirRevalidateResult	Sub Array	Yes	The relvalidated details of Selected itinerary are available here.
+IsValid	Boolean	Yes	It specifies whether the fare is valid or not	True / False
+FareItineraries	Nested Array	Yes
+FareItinerary	Nested Array	Yes
+0	SequenceNumber	string	Yes
+1	DirectionInd	string	Yes	It specifies the type of travel (OneWay, Return, Circle)	OneWay
+2	IsPassportMandatory	Boolean	Yes	It specifies whether the passport details are needed when a booking is made (passportNo, passportIssueCountry, passportExpiryDate).	True / False
+3	IsPassportFullDetailsMandatory	Boolean	Yes	It specifies whether the PassportIssueDate is needed along with passportNo, passportIssueCountry & passportExpiryDate when a booking is made.	True / False
+4	OriginDestinationOptions	Nested Array	Yes
+4.1	TotalStops	Int	Yes	It specifies the total number of stops of the itinerary.	1
+4.2	OriginDestinationOption	Nested Array	Yes
+4.2.1	FlightSegment	Nested Array	Yes
+4.2.1.1	ArrivalAirportLocationCode	string	Yes	Arrival Airport code.	BOM
+4.2.1.2	ArrivalDateTime	DateTime	Yes	It specific the arrival date & time.	2023-02-19T10:56:00
+4.2.1.3	CabinClassCode	string	Yes	It specifies the selected cabin class. (Y-Economy, S-Premium Economy, C-Business, F- First).	Y
+4.2.1.4	CabinClassText	string	No	It returns the cabin class type only in case of LCC / WebFares.	REGULAR FARE
+4.2.1.5	DepartureAirportLocationCode	string	Yes	Departure Airport code.	DEL
+4.2.1.6	DepartureDateTime	DateTime	Yes	It specifies flight departure date & time.	2023-02-19T08:46:00
+4.2.1.7	Eticket	Boolean	Yes	It specifies whether the flight segment is e-ticketable or not.	True / False
+4.2.1.8	JourneyDuration	Int	Yes	It specifies the total journey duration in minutes.	400
+4.2.1.9	FlightNumber	string	Yes	It specifies the flight number.	6278
+4.2.1.10	MarketingAirlineCode	string	Yes	It specifies the Marketing Airline Code.	6E
+4.2.1.11	MarriageGroup	string	No	It specifies the marriage group indicator	O
+4.2.1.12	MealCode	string	No	It specifies the meal preference selected.	S
+4.2.1.13	OperatingAirline	Sub Array	Yes	Contain the Operating airline details.	-
+4.2.1.13.1	Code	string	Yes	OperatingOperating airline code.	6E
+4.2.1.13.2	Equipment	string	Yes	It specifies the Operating aircraft equipment number	M90
+4.2.1.13.3	FlightNumber	string	Yes	It specifies the Operating flight number.	6278
+4.2.2	ResBookDesigCode	string	No	It specifies the booking class.	E
+4.2.3	ResBookDesigText	string	No	It returns the fare type only in case of LCC / WebFares.	Lowest Fare
+4.2.4	StopQuantity	Int	Yes	It specifies the number of stops.	1
+4.2.5	StopQuantityInfo	Sub Array	Yes
+4.2.6	SeatsRemaining	Sub Array	Yes
+4.2.6.1	Number	string	Yes	It specifies the number of seats remaining.	8
+4.2.6.2	BelowMinimum	Boolean	Yes	It is used to specify if the seats are < or = zero	True / False
+5	AirItineraryFareInfo	Sub Array	Yes	Contains the fare details.
+5.1	DivideInPartyIndicator	Boolean	Yes	It is used to alert if passenger types have different booking code	True / False
+5.2	FareSourceCode	string	Yes	It specifies the unique code provided for the itinerary selected	MzAwMiYzN 1MyJjF
+5.3	FareType	string	Yes	It specifies the type of fare selected, ((Private-Private Fares, Public- Public fares, WebFare- LCC)	Private
+5.4	IsRefundable	Boolean	Yes	It specifies whether the selected fare is valid or not.	True / False
+5.5	ItinTotalFares	Sub Array	Yes
+5.5.1	BaseFare	Sub Array	Yes	Contain the base fare details.
+5.5.2	EquivFare	Sub Array	Yes	Contain the base fare details.
+5.5.3	ServiceTax	Sub Array	Yes	Contain the base service tax details.
+5.5.4	TotalTax	Sub Array	Yes	Contain the base total tax details.
+5.5.5	TotalFare	Sub Array	Yes	Contain the total fare details.
+5.6	FareBreakdown	Nested Array	Yes	Contain the passenger wise fare and baggage details.
+5.6.1	PassengerTypeQuantity	Sub Array	Yes
+5.6.1.1	Code	String	Yes	It specifies the passenger type. (ADT-Adult, CHD-Child, INF-Infant).	ADT
+5.6.1.2	Quantity	Int	Yes	It specifies the number of passengers.	2
+5.6.2	PassengerFare	Sub Array	Yes
+5.6.2.1	BaseFare	Sub Array	Yes	Contain the base fare details.
+5.6.2.2	EquivFare	Sub Array	Yes	Contain the base fare details.
+5.6.2.3	ServiceTax	Sub Array	Yes	Contain the base service tax details.
+5.6.2.4	Surcharges	Sub Array	Yes	Contain the base Surcharges details.
+5.6.2.5	Taxes	Nested Array	Yes	Contain the base tax details.
+5.6.2.6	TotalFare	Sub Array	Yes	Contain the total fare details.
+5.6.3	Baggage	Sub Array	Yes	Contain the airline wise Cabbage details.
+5.6.4	CabinBaggage	Sub Array	Yes	Contain the airline wise Cabin Cabbage details.
+6	ValidatingAirlineCode	string	Yes	It specifies the validating airline.	BA
+7	RequiredFieldsToBook	JSON Array	Yes	It specifies the information passenger needs to pass during the book call. Sample: Passport / DOB	Passport
+8	ExtraServices	Nested Array	Yes	It holds the list of services available for the selected flight option.
+8.1	Services	Nested Array	Yes
+8.1.1	Service	Nested Array	Yes	It indicates an individual service which holds details of the specific extra service.
+8.1.1.1	Type	String	Yes	It indicates the type of the respective service and holds one of these values (BAGGAGE, MEAL, SPEEDY_BOARDING or CHECKIN_CHARGE).	BAGGAGE
+8.1.1.2	IsMandatory	Boolean	Yes	It specifies whether the service is mandatory or not.	True / False
+8.1.1.3	Relation	Int	Yes	This is a comma separated values of the extra service ID’s with which the selected service has a relation with. In the above example, <Relation> tag returned as 2, 3 which indicate that the specific extra service is related with the two extra service ID’s 2 & 3. Along with the current service, these 2 & 3 extra service ID can be selected depending on whether they are mandatory or not.	13
+8.1.1.4	Description	String	Yes	Brief description of the specific service.	1 bags(s) || Total Weight: 32Kg
+8.1.1.5	Behavior	String	Yes	This element determines the eligibility / restrictions on the selected service. Possible values (GROUP_PAX, PER_PAX, GROUP_PAX_INBOUND,GROUP_PAX_OUTBOUND, PER_PAX_INBOUND, PER_PAX_OUTBOUND)
+GROUP_PAX: It indicates that the service is applicable for the entire group.
+GROUP_PAX: It indicates that the service is applicable for the entire group.
+PER_PAX: It indicates that the service is applicable for each passenger.
+GROUP_PAX_INBOUND: It indicates that the service is applicable for the entire group only on the return trip.
+GROUP_PAX_OUTBOUND: It indicates that the service is applicable for the entire group only on for the onward travel.
+PER_PAX_INBOUND: It indicates that the service is applicable for each passenger only on the return trip.
+PER_PAX_OUTBOUND: It indicates that the service is applicable for each passenger only on for the onward travel.
+PER_PAX
+8.1.1.6	ServiceId	Int	Yes	It specifies the unique identification number for the extra service.	1
+8.1.1.7	CheckInType	String	Yes	It determines the check-in type of the flight whether it is Online or Airport check-in.	Airport
+8.1.1.8	ServiceCost	Nested Array	Yes	It holds the information of the extra service.
+8.1.1.8.1	Amount	Float	Yes	It specifies the service cost.	10.23
+8.1.1.8.2	CurrencyCode	String	Yes	It indicates the currency code of the service cost.	USD
+8.1.1.8.3	DecimalPlaces	Int	Yes	It specifies the number of decimal places	2
+Important Notes
+
+Indian Domestic RoundTrip - In case of Indian domestic round trip, the revalidated Outbound & Inbound itinerary details will be available separately. The Outbound results will be available in the AirRevalidateResult parameter and the Inbound results will be available in the AirRevalidateResultInbound parameter.
+IsPassportMandatory – It specifies whether the passport details are needed when a booking is made.
+RequiredFieldsToBook – This parameter is mandatory to be checked properly before initiating booking method. If any of the field from RequiredFieldsToBook parameter is missing in the booking request, that may cause booking error.
+Sample Request
+{
+    "session_id": "MTY2ODE2Njg2Ml8yNjA5Mzk=",
+    "fare_source_code": "Sk5BUjhNem5ZMTJJMkNqY0g5VUtONWwzVjBaMTl2YkNYNURIbXp0NEQ4RVpRbWx1NkJiazl1WFcra2ppSzhsVHlreWU0ZHlQV1M2dTVwdnFYaDZYaThRWmNJR3Y4NDhYRWo1U2IzT3lLcS9LVWFUOU4zNklhc0pBM01pK1c3dWRoeXpQUXBlVStrTFFuRXlCUXQyaW50c0s3aEV5K0NkdGhNTjIrU0RlcFh3PQ=="
+}
+
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLFLHOTSEARCHVAL",
+        "ErrorMessage": "session_id required"
+    }
+}
+
+Sample Failed Response
+{
+    "AirRevalidateResponse": {
+        "AirRevalidateResult": {
+            "IsValid": "false",
+            "FareItineraries": [],
+            "ExtraServices": {
+                "Services": []
+            }
+        }
+    }
+}
+
+Sample Success Response
+{
+    "AirRevalidateResponse": {
+        "AirRevalidateResult": {
+            "IsValid": true,
+            "FareItineraries": {
+                "FareItinerary": {
+                    "AirItineraryFareInfo": {
+                        "DivideInPartyIndicator": false,
+                        "FareSourceCode": "Sk5BUjhNem5ZMTJJMkNqY0g5VUtONWwzVjBaMTl2YkNYNURIbXp0NEQ4RVpRbWx1NkJiazl1WFcra2ppSzhsVHlreWU0ZHlQV1M2dTVwdnFYaDZYaThRWmNJR3Y4NDhYRWo1U2IzT3lLcS9LVWFUOU4zNklhc0pBM01pK1c3dWRoeXpQUXBlVStrTFFuRXlCUXQyaW50c0s3aEV5K0NkdGhNTjIrU0RlcFh3PQ==",
+                        "FareInfos": [
+                            {
+                                "FareReference": "X"
+                            },
+                            {
+                                "FareReference": "X"
+                            }
+                        ],
+                        "FareType": "Private",
+                        "ResultIndex": "",
+                        "IsRefundable": "No",
+                        "ItinTotalFares": {
+                            "BaseFare": {
+                                "Amount": "399.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "EquivFare": {
+                                "Amount": "399.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceTax": {
+                                "Amount": "2.53",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "TotalTax": {
+                                "Amount": "137.39",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "TotalFare": {
+                                "Amount": "536.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            }
+                        },
+                        "FareBreakdown": [
+                            {
+                                "FareBasisCode": [],
+                                "Baggage": [
+                                    "SB",
+                                    "SB"
+                                ],
+                                "CabinBaggage": [
+                                    "SB",
+                                    "SB"
+                                ],
+                                "PassengerFare": {
+                                    "BaseFare": {
+                                        "Amount": "242.02",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "EquivFare": {
+                                        "Amount": "242.02",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceTax": {
+                                        "Amount": "1.65",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Surcharges": {
+                                        "Amount": "0.00",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Taxes": [
+                                        {
+                                            "Amount": "11.69",
+                                            "TaxCode": "ASF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "2.48",
+                                            "TaxCode": "PHF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "1.54",
+                                            "TaxCode": "UDF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "24.76",
+                                            "TaxCode": "TTF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "4.83",
+                                            "TaxCode": "07GST",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "5.08",
+                                            "TaxCode": "27GST",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "2.25",
+                                            "TaxCode": "PSF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "3.52",
+                                            "TaxCode": null,
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "2.48",
+                                            "TaxCode": "RCF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "1.65",
+                                            "TaxCode": "GST",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        }
+                                    ],
+                                    "TotalFare": {
+                                        "Amount": "302.27",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    }
+                                },
+                                "PassengerTypeQuantity": {
+                                    "Code": "ADT",
+                                    "Quantity": 2
+                                }
+                            },
+                            {
+                                "FareBasisCode": [],
+                                "Baggage": [
+                                    "SB",
+                                    "SB"
+                                ],
+                                "CabinBaggage": [
+                                    "SB",
+                                    "SB"
+                                ],
+                                "PassengerFare": {
+                                    "BaseFare": {
+                                        "Amount": "121.01",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "EquivFare": {
+                                        "Amount": "121.01",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceTax": {
+                                        "Amount": "0.82",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Surcharges": {
+                                        "Amount": "0.00",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Taxes": [
+                                        {
+                                            "Amount": "5.84",
+                                            "TaxCode": "ASF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "1.24",
+                                            "TaxCode": "PHF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "0.77",
+                                            "TaxCode": "UDF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "12.38",
+                                            "TaxCode": "TTF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "2.41",
+                                            "TaxCode": "07GST",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "2.54",
+                                            "TaxCode": "27GST",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "1.13",
+                                            "TaxCode": "PSF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "1.76",
+                                            "TaxCode": null,
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "1.24",
+                                            "TaxCode": "RCF",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "0.82",
+                                            "TaxCode": "GST",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        }
+                                    ],
+                                    "TotalFare": {
+                                        "Amount": "151.14",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    }
+                                },
+                                "PassengerTypeQuantity": {
+                                    "Code": "CHD",
+                                    "Quantity": 1
+                                }
+                            },
+                            {
+                                "FareBasisCode": [],
+                                "Baggage": [
+                                    "SB",
+                                    "SB"
+                                ],
+                                "CabinBaggage": [
+                                    "SB",
+                                    "SB"
+                                ],
+                                "PassengerFare": {
+                                    "BaseFare": {
+                                        "Amount": "36.16",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "EquivFare": {
+                                        "Amount": "36.16",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "ServiceTax": {
+                                        "Amount": "0.06",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Surcharges": {
+                                        "Amount": "0.00",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    },
+                                    "Taxes": [
+                                        {
+                                            "Amount": "46.94",
+                                            "TaxCode": "XT",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        },
+                                        {
+                                            "Amount": "0.06",
+                                            "TaxCode": "GST",
+                                            "CurrencyCode": "USD",
+                                            "DecimalPlaces": 2
+                                        }
+                                    ],
+                                    "TotalFare": {
+                                        "Amount": "83.16",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": 2
+                                    }
+                                },
+                                "PassengerTypeQuantity": {
+                                    "Code": "INF",
+                                    "Quantity": 1
+                                }
+                            }
+                        ],
+                        "SplitItinerary": ""
+                    },
+                    "DirectionInd": "Return",
+                    "IsPassportMandatory": false,
+                    "IsPassportFullDetailsMandatory": false,
+                    "FirstNameCharacterLimit": 58,
+                    "LastNameCharacterLimit": 58,
+                    "PaxNameCharacterLimit": 60,
+                    "OriginDestinationOptions": [
+                        {
+                            "TotalStops": 0,
+                            "OriginDestinationOption": [
+                                {
+                                    "FlightSegment": {
+                                        "ArrivalAirportLocationCode": "BOM",
+                                        "ArrivalDateTime": "2023-02-19T13:01:00",
+                                        "CabinClassCode": "Y",
+                                        "CabinClassText": "REGULAR FARE",
+                                        "DepartureAirportLocationCode": "DEL",
+                                        "DepartureDateTime": "2023-02-19T10:46:00",
+                                        "Eticket": true,
+                                        "FlightNumber": "5342",
+                                        "JourneyDuration": 135,
+                                        "MarketingAirlineCode": "6E",
+                                        "MarketingAirlineName": "Indigo Airlines",
+                                        "MarriageGroup": "",
+                                        "MealCode": "",
+                                        "OperatingAirline": {
+                                            "Code": "6E",
+                                            "Name": "Indigo Airlines",
+                                            "Equipment": "320",
+                                            "FlightNumber": "5342"
+                                        }
+                                    },
+                                    "ResBookDesigCode": "X",
+                                    "ResBookDesigText": "REGULAR FARE",
+                                    "SeatsRemaining": {
+                                        "BelowMinimum": false,
+                                        "Number": 4
+                                    },
+                                    "StopQuantity": 0,
+                                    "StopQuantityInfo": {
+                                        "ArrivalDateTime": "0001-01-01T00:00:00",
+                                        "DepartureDateTime": "0001-01-01T00:00:00",
+                                        "Duration": 0,
+                                        "LocationCode": ""
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "TotalStops": 0,
+                            "OriginDestinationOption": [
+                                {
+                                    "FlightSegment": {
+                                        "ArrivalAirportLocationCode": "DEL",
+                                        "ArrivalDateTime": "2023-02-22T21:36:00",
+                                        "CabinClassCode": "Y",
+                                        "CabinClassText": "REGULAR FARE",
+                                        "DepartureAirportLocationCode": "BOM",
+                                        "DepartureDateTime": "2023-02-22T19:31:00",
+                                        "Eticket": true,
+                                        "FlightNumber": "439",
+                                        "JourneyDuration": 125,
+                                        "MarketingAirlineCode": "6E",
+                                        "MarketingAirlineName": "Indigo Airlines",
+                                        "MarriageGroup": "",
+                                        "MealCode": "",
+                                        "OperatingAirline": {
+                                            "Code": "6E",
+                                            "Name": "Indigo Airlines",
+                                            "Equipment": "320",
+                                            "FlightNumber": "439"
+                                        }
+                                    },
+                                    "ResBookDesigCode": "X",
+                                    "ResBookDesigText": "REGULAR FARE",
+                                    "SeatsRemaining": {
+                                        "BelowMinimum": false,
+                                        "Number": 4
+                                    },
+                                    "StopQuantity": 0,
+                                    "StopQuantityInfo": {
+                                        "ArrivalDateTime": "0001-01-01T00:00:00",
+                                        "DepartureDateTime": "0001-01-01T00:00:00",
+                                        "Duration": 0,
+                                        "LocationCode": ""
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "RequiredFieldsToBook": [],
+                    "SequenceNumber": 1,
+                    "TicketType": "eTicket",
+                    "ValidatingAirlineCode": "6E"
+                }
+            },
+            "ExtraServices": {
+                "Services": [
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 3kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "18.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "1",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 3kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "18.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "2",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 5kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "30.95",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "3",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 5kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "30.95",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "4",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 10kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "61.90",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "5",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 10kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "61.90",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "6",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 15kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "92.85",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "7",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 15kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "92.85",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "8",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 20kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "123.80",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "9",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 20kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "123.80",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "10",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 30kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "185.70",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "11",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Check-in baggage - up to 30kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "185.70",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "12",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "International Connections baggage - up to 8kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "19.81",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "13",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "International Connections baggage - up to 8kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "19.81",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "14",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "International Connections baggage - up to 15kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "37.14",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "15",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "International Connections baggage - up to 15kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "37.14",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "16",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "International Connections baggage - up to 30kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "74.28",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "17",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "International Connections baggage - up to 30kg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "74.28",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "18",
+                            "Type": "BAGGAGE"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Muesli with yogurt (NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.40",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "19",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "2 Dips with Baked Pita(NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "20",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Samosa ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "2.48",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "21",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Banana chips ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "22",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "CASHEW (SALTED) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.32",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "23",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "UNIBIC CHOCOLATE CHIPS COOKIES - 50 GM ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "1.86",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "24",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Veg Trio Sandwich(NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "25",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Tomato Cucumber Cheese Lettuce Sandwich Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "4.95",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "26",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Paneer Tikka Sandwich Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "4.95",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "27",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Non veg trio sandwich (NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "28",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "RAVA UPMA Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.40",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "29",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "POHA Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "2.79",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "30",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Jain Meal ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.10",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "31",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chinese Fried Rice ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "32",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "DAL CHAWAL Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.40",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "33",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "VEG BIRYANI Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.40",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "34",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Vegetarian Meal ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.71",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "35",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Non-Vegetarian Meal ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "4.33",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "36",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Glutten free Non veg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "37",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chicken Junglee Sandwich Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.26",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "38",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chicken cucumber tomato sandwich (NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.26",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "39",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chicken Supreme Salad(NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "40",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Diabetic NonÂ Veg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "41",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Fasting meal ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "42",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chicken Tikka Sandwich Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.26",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "43",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Child meal Veg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "4.95",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "44",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_OUTBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Child meal Non Veg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.26",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "45",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Child meal Veg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "4.95",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "46",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Child meal Non Veg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.26",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "47",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "CASHEW (SALTED) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.32",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "48",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Fasting meal ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "49",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Diabetic NonÂ Veg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "50",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Glutten free Non veg ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "51",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chicken cucumber tomato sandwich (NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.26",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "52",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chicken Supreme Salad(NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "53",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chicken Junglee Sandwich Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.26",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "54",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chicken Tikka Sandwich Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.26",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "55",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Vegetarian Meal ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.71",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "56",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "POHA Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "2.79",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "57",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "RAVA UPMA Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.40",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "58",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Non veg trio sandwich (NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "59",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Tomato Cucumber Cheese Lettuce Sandwich Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "4.95",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "60",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Paneer Tikka Sandwich Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "4.95",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "61",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Non-Vegetarian Meal ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "4.33",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "62",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Veg Trio Sandwich(NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "63",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "UNIBIC CHOCOLATE CHIPS COOKIES - 50 GM ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "1.86",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "64",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Samosa ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "2.48",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "65",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Banana chips ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "66",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "2 Dips with Baked Pita(NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "6.19",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "67",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Muesli with yogurt (NEW) ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.40",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "68",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "DAL CHAWAL Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.40",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "69",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "VEG BIRYANI Combo ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.40",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "70",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Chinese Fried Rice ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "5.57",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "71",
+                            "Type": "Meal"
+                        }
+                    },
+                    {
+                        "Service": {
+                            "Behavior": "PER_PAX_INBOUND",
+                            "CheckInType": "AIRPORT",
+                            "Description": "Jain Meal ",
+                            "FlightDesignator": "",
+                            "IsMandatory": false,
+                            "Relation": "",
+                            "ServiceCost": {
+                                "Amount": "3.10",
+                                "CurrencyCode": "USD",
+                                "DecimalPlaces": 2
+                            },
+                            "ServiceId": "72",
+                            "Type": "Meal"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

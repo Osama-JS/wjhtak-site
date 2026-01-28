@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة - My Trip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-plane-departure"></i>
+            <h2>My Trip</h2>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>نظرة عامة</span></a>
+            <a href="tech-stack.html" class="nav-item"><i class="fas fa-layer-group"></i><span>التقنيات
+                    المستخدمة</span></a>
+            <a href="database.html" class="nav-item"><i class="fas fa-database"></i><span>قاعدة البيانات</span></a>
+            <a href="api.html" class="nav-item"><i class="fas fa-code"></i><span>واجهات API</span></a>
+            <a href="services.html" class="nav-item"><i class="fas fa-cogs"></i><span>الخدمات</span></a>
+            <a href="admin.html" class="nav-item active"><i class="fas fa-user-shield"></i><span>لوحة الإدارة</span></a>
+            <a href="deployment.html" class="nav-item"><i class="fas fa-rocket"></i><span>النشر والتشغيل</span></a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="page-header">
+            <h1>لوحة الإدارة</h1>
+            <p class="subtitle">دليل استخدام لوحة التحكم الإدارية</p>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- Access -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-sign-in-alt"></i> الوصول</h2>
+                <div class="card">
+                    <h3>رابط لوحة الإدارة:</h3>
+                    <div class="code-block">
+                        <code>https://your-domain.com/admin/login</code>
+                    </div>
+
+                    <h3 class="mt-4">بيانات الدخول الافتراضية:</h3>
+                    <ul>
+                        <li><strong>البريد:</strong> admin@mytrip.com</li>
+                        <li><strong>كلمة المرور:</strong> password</li>
+                    </ul>
+                    <p style="color: var(--danger-color); margin-top: 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>تحذير:</strong> يجب تغيير كلمة المرور فوراً بعد أول تسجيل دخول!
+                    </p>
+                </div>
+            </section>
+
+            <!-- Dashboard -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> لوحة المعلومات</h2>
+                <div class="card">
+                    <p>الصفحة الرئيسية تعرض:</p>
+                    <ul>
+                        <li>إجمالي عدد المستخدمين</li>
+                        <li>عدد الأدوار النشطة</li>
+                        <li>الحجوزات الجديدة</li>
+                        <li>إحصائيات سريعة</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- User Management -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-users"></i> إدارة المستخدمين</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>عرض المستخدمين</h3>
+                        <p>المسار: <code>/admin/users</code></p>
+                        <ul>
+                            <li>قائمة جميع المستخدمين</li>
+                            <li>البحث والتصفية</li>
+                            <li>عرض التفاصيل</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3>إضافة مستخدم</h3>
+                        <p>المسار: <code>/admin/users/create</code></p>
+                        <ul>
+                            <li>إدخال البيانات الأساسية</li>
+                            <li>تحديد النوع (Admin/Customer)</li>
+                            <li>تعيين الأدوار</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3>تعديل مستخدم</h3>
+                        <p>المسار: <code>/admin/users/{id}/edit</code></p>
+                        <ul>
+                            <li>تحديث البيانات</li>
+                            <li>تغيير الحالة</li>
+                            <li>إدارة الأدوار</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Roles & Permissions -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-user-tag"></i> الأدوار والصلاحيات</h2>
+                <div class="card">
+                    <h3>إدارة الأدوار</h3>
+                    <p>المسار: <code>/admin/roles</code></p>
+                    <ul>
+                        <li>إنشاء أدوار جديدة</li>
+                        <li>تعديل الأدوار الموجودة</li>
+                        <li>تعيين الصلاحيات للأدوار</li>
+                        <li>حذف الأدوار غير المستخدمة</li>
+                    </ul>
+
+                    <h3 class="mt-4">إدارة الصلاحيات</h3>
+                    <p>المسار: <code>/admin/permissions</code></p>
+                    <ul>
+                        <li>إنشاء صلاحيات جديدة</li>
+                        <li>تعديل الصلاحيات</li>
+                        <li>ربط الصلاحيات بالأدوار</li>
+                    </ul>
+
+                    <h3 class="mt-4">الأدوار الافتراضية:</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الدور</th>
+                                <th>الوصف</th>
+                                <th>الصلاحيات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-danger">Admin</span></td>
+                                <td>مدير النظام</td>
+                                <td>جميع الصلاحيات</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-primary">Customer</span></td>
+                                <td>عميل</td>
+                                <td>الوصول للتطبيق فقط</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Settings -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-cog"></i> الإعدادات</h2>
+                <div class="card">
+                    <p>المسار: <code>/admin/settings</code></p>
+
+                    <h3>الإعدادات المتاحة:</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الإعداد</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>اسم الموقع (عربي/إنجليزي)</td>
+                                <td>يظهر في التطبيق والبريد</td>
+                            </tr>
+                            <tr>
+                                <td>الوصف (عربي/إنجليزي)</td>
+                                <td>وصف المنصة</td>
+                            </tr>
+                            <tr>
+                                <td>اللون الأساسي</td>
+                                <td>لون العلامة التجارية</td>
+                            </tr>
+                            <tr>
+                                <td>وضع الصيانة</td>
+                                <td>تفعيل/تعطيل الموقع</td>
+                            </tr>
+                            <tr>
+                                <td>شعار المنصة</td>
+                                <td>رفع الشعار</td>
+                            </tr>
+                            <tr>
+                                <td>أيقونة المتصفح</td>
+                                <td>Favicon</td>
+                            </tr>
+                            <tr>
+                                <td>بريد الدعم</td>
+                                <td>للتواصل</td>
+                            </tr>
+                            <tr>
+                                <td>روابط التواصل الاجتماعي</td>
+                                <td>Facebook, Twitter, Instagram</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Bookings -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-calendar-check"></i> إدارة الحجوزات</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>حجوزات الفنادق</h3>
+                        <p>المسار: <code>/admin/bookings/hotels</code></p>
+                        <ul>
+                            <li>عرض جميع الحجوزات</li>
+                            <li>تفاصيل الحجز</li>
+                            <li>تحديث الحالة</li>
+                            <li>إلغاء الحجز</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3>حجوزات الطيران</h3>
+                        <p>المسار: <code>/admin/bookings/flights</code></p>
+                        <ul>
+                            <li>قائمة الحجوزات</li>
+                            <li>معلومات الرحلة</li>
+                            <li>بيانات الراكب</li>
+                            <li>حالة الدفع</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-star"></i> المميزات</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-language"></i></div>
+                        <h3>متعدد اللغات</h3>
+                        <p>دعم كامل للعربية والإنجليزية</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <h3>تصميم متجاوب</h3>
+                        <p>يعمل على جميع الأجهزة</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-search"></i></div>
+                        <h3>بحث متقدم</h3>
+                        <p>بحث وتصفية سريعة</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-file-export"></i></div>
+                        <h3>تصدير البيانات</h3>
+                        <p>Excel, PDF, CSV</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                        <h3>تقارير مفصلة</h3>
+                        <p>إحصائيات ورسوم بيانية</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-history"></i></div>
+                        <h3>سجل الأنشطة</h3>
+                        <p>تتبع جميع العمليات</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="doc-footer">
+            <p>© 2026 My Trip - جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

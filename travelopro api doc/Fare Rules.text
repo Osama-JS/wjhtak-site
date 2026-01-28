@@ -1,0 +1,92 @@
+Fare Rules
+Fare Rules method is used to request the rules and conditions of a particular fare result per unique fare-basis code retrieved from the flight availability search. It contains the fare basis code and the relevant details associated with it, such as restrictions and penalties.
+
+Fare Rule Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/fare_rules
+Request Parameters
+
+Parameter	Data Type	Required	Description	Example
+session_id	string	Yes	Session_id is a token granted on flight availablity search and is available in the success Availability search response.	7906efba-09db-4481-8c60-0d7f5b5e6c44
+fare_source_code	string	Yes	Unique fare/flight Option identification code	MTY2ODE2Njg2Ml8yNjA5Mzk
+fare_source_code_inbound	string	No	Unique fare/flight Option identification code of Inbound segment, from Indian Domestic RoundTrip Search.	7906efba-09db-4481-8c60-0d7f5b5e6c44
+Response Parameters
+
+#	Parameter	Data Type	Required	Description	Example
+1	BaggageInfos	Nested Array	Yes
+1.1	BaggageInfo	Sub Array	Yes	Information of the baggage.
+1.1.1	Arrival	string	Yes	Three letter IATA code which specifies the arrival airport code	DXB
+1.1.2	Baggage	string	Yes	It specifies the baggage quantity. Sample: 1P, 30K. P-Piece, KKilogram and SB-Standard Baggage	1P
+1.1.3	Departure	string	Yes	Three letter IATA code whichspecifies the departure airport code.	DEL
+1.1.4	Flight No	string	Yes	Operating flight Number.	BA729
+2	FareRules	Nested Array	Yes
+2.1	FareRule	Nested Array	Yes
+2.1.1	Airline	string	Yes	It specifies the operating airline Code	BA
+2.1.2	CityPair	string		It specifies the origin and destination airport codes	DELDXB
+2.1.3	category	string	No	It specifies the category of the rules and regulation	Day / Time
+2.1.4	Rules	string	No	It returns a detailed description of the rules under the specified category	NO DAY/TIME TRAVEL RESTRICTIONS APPLY.
+Important Notes
+
+Indian Domestic RoundTrip - In case of Indian domestic round trip, the Outbound & Inbound fare rules details will be available separately. The Outbound results will be available in the FareRules1_1Result parameter and the Inbound results will be available in the FareRules1_1ResultInbound parameter.
+Sample Request
+{
+    "session_id": "MTY2ODE2Njg2Ml8yNjA5Mzk=",
+    "fare_source_code": "Sk5BUjhNem5ZMTJJMkNqY0g5VUtONWwzVjBaMTl2YkNYNURIbXp0NEQ4RVpRbWx1NkJiazl1WFcra2ppSzhsVHlreWU0ZHlQV1M2dTVwdnFYaDZYaXg5elJmTktoZHZxdDJYVXNESjJicEhDYU01aU1zZlFpR3MxU3JsSnJDK3gxaGdkWUpqU0dMdFhVcjVkc3VFL3NnPT0="
+}
+
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "ERFRU003",
+        "ErrorMessage": "Invalid FareSourceCode"
+    }
+}
+
+Sample Success Response
+{
+    "FareRules1_1Response":
+    {
+        "FareRules1_1Result":
+        {
+            "BaggageInfos": [
+                {
+                    "BaggageInfo": {
+                        "Arrival": "BOM",
+                        "Baggage": "SB",
+                        "Departure": "DEL",
+                        "FlightNo": "6E5342"
+                    }
+                },
+                {
+                    "BaggageInfo": {
+                        "Arrival": "DEL",
+                        "Baggage": "SB",
+                        "Departure": "BOM",
+                        "FlightNo": "6E439"
+                    }
+                }
+            ],
+            "FareRules": [
+                {
+                    "FareRule":
+                    {
+                        "Airline": "6E",
+                        "CityPair": "DELBOM",
+                        "Category": "RULE APPLICATION AND OTHER CONDITIONS",
+                        "Rules": "NOTE - THE FOLLOWING TEXT IS INFORMATIONAL AND NOT\nVALIDATED FOR AUTOPRICING.\nETIHAD AIRWAYS TACTICAL FARE - BOMT551\nAPPLICATION\nAREA\nTHESE FARES APPLY\nFROM INDIA.\nCLASS OF SERVICE\nTHESE FARES APPLY FOR FIRST/BUSINESS/ECONOMY CLASS\nSERVICE.\nTYPES OF TRANSPORTATION\nTHIS RULE GOVERNS ONE-WAY AND ROUND-TRIP FARES.\nFARES GOVERNED BY THIS RULE CAN BE USED TO CREATE\nONE-WAY/ROUND-TRIP/CIRCLE-TRIP/OPEN-JAW JOURNEYS.\nFULL AND SEQUENTIAL USE OF FLIGHT COUPONS-\nTHE TICKET /OR ELECTRONIC TICKET/ IS NOT VALID IF\nTHE FIRST COUPON HAS NOT BEEN USED AND WILL NOT\nBE HONORED IF ALL THE COUPONS ARE NOT USED IN THE\nSEQUENCE PROVIDED IN THE TICKET /OR ELECTRONIC\nTICKET/.\n-------------------------------------------------\nWHERE A ETIHAD TICKET OFFICE OR OUR CALL CENTER\nMAKE NEW BOOKING OR MAKE CHANGES TO TICKETS\nISSUED BY TRAVEL AGENCIES OR THROUGH OUR WEBSITE\nOR IN RESPECT OF ANY TICKET REFUND A GLOBAL\nSERVICE FEE GSF WILL BE APPLIED DEPENDING ON THE\nFARE CHOICE SELECTED AND ON THE COUNTRY OF\nDEPARTURE AND DESTINATION.\nCURRENTLY THE GSF FOR TICKETING RANGES FROM 25 TO\n100 USD FOR TICKET CHANGES IT RANGES FROM 20 TO\n60 USD AND FOR REFUND ADMINISTRATION THE FEE\nRANGE IS 20 TO 35 USD. THE GSF IS NON-REFUNDABLE\nAND THE EXACT GSF APPLICABLE TO YOUR TICKET IS\nAVAILABLE ON REQUEST.\nCAPACITY LIMITATIONS\nTHE CARRIER SHALL LIMIT THE NUMBER OF PASSENGERS\nCARRIED ON ANY ONE FLIGHT AT FARES GOVERNED BY\nTHIS RULE AND SUCH FARES WILL NOT NECESSARILY BE\nAVAILABLE ON ALL FLIGHTS. THE NUMBER OF SEATS,\nWHICH THE CARRIER SHALL MAKE AVAILABLE ON A GIVEN\nFLIGHT, WILL BE DETERMINED BY THE CARRIER'S BEST\nJUDGEMENT.\nOTHER CONDITIONS\nALL FARES ARE SUBJECT TO CHANGE OR WITHDRAWAL\nWITHOUT NOTICE.\nFARES ARE ONLY GUARANTEED IF AUTO-PRICED AND\nTICKETED IN GDS ON THE SAME DAY.\n--------------------------------------------------\nFOR J-/C-/D-/W- LIMO SERVICE AVAILABLE PLEASE\nCONTACT EY OFFICE FOR FURTHER INFORMATION."
+                    }
+                },
+                {
+                    "FareRule":
+                    {
+                        "Airline": "6E",
+                        "CityPair": "DELBOM",
+                        "Category": "ELIGIBILITY",
+                        "Rules": "NO ELIGIBILITY REQUIREMENTS APPLY."
+                    }
+                }
+            ]
+        }
+    }
+}

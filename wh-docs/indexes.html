@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الفهارس - قاعدة بيانات WH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 الفهارس والمفاتيح</h1>
+            <p>قائمة بجميع الفهارس والمفاتيح الأساسية والفريدة</p>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html">نظرة عامة</a>
+            <a href="tables-fields.html">الجداول والحقول</a>
+            <a href="relationships.html">العلاقات</a>
+            <a href="indexes.html" class="active">الفهارس والمفاتيح</a>
+            <a href="workflow.html">آلية العمل</a>
+            <a href="performance.html">تحسين الأداء</a>
+            <a href="security.html">الأمان</a>
+            <a href="recommendations.html">التوصيات</a>
+        </nav>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">🔑 المفاتيح الأساسية (Primary Keys)</h2>
+                <div class="card">
+                    <p>جميع الجداول تحتوي على مفتاح أساسي (id) من نوع BIGINT(20) UNSIGNED AUTO_INCREMENT</p>
+                    <div class="alert alert-success">
+                        <div class="alert-title">✅ ممتاز</div>
+                        <p>استخدام BIGINT يسمح بتخزين عدد كبير جداً من السجلات (حتى 18 كوينتليون سجل)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🎯 المفاتيح الفريدة (Unique Keys)</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الجدول</th>
+                                <th>الحقل</th>
+                                <th>الغرض</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>users</td>
+                                <td>email</td>
+                                <td>منع تكرار البريد الإلكتروني</td>
+                            </tr>
+                            <tr>
+                                <td>users</td>
+                                <td>phone_number</td>
+                                <td>منع تكرار رقم الهاتف</td>
+                            </tr>
+                            <tr>
+                                <td>admin_users</td>
+                                <td>username</td>
+                                <td>منع تكرار اسم المستخدم</td>
+                            </tr>
+                            <tr>
+                                <td>admin_permissions</td>
+                                <td>name, slug</td>
+                                <td>منع تكرار الصلاحيات</td>
+                            </tr>
+                            <tr>
+                                <td>admin_roles</td>
+                                <td>name, slug</td>
+                                <td>منع تكرار الأدوار</td>
+                            </tr>
+                            <tr>
+                                <td>company_codes</td>
+                                <td>code</td>
+                                <td>منع تكرار أكواد الخصم</td>
+                            </tr>
+                            <tr>
+                                <td>personal_access_tokens</td>
+                                <td>token</td>
+                                <td>منع تكرار التوكنات</td>
+                            </tr>
+                            <tr>
+                                <td>failed_jobs</td>
+                                <td>uuid</td>
+                                <td>منع تكرار المهام الفاشلة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📑 فهارس المفاتيح الخارجية</h2>
+                <div class="card">
+                    <p>تم إنشاء فهارس تلقائياً على جميع المفاتيح الخارجية لتحسين أداء عمليات JOIN</p>
+                    <ul class="custom-list">
+                        <li>trips: company_id, admin_id, from_country_id, to_country_id, from_city_id</li>
+                        <li>trip_bookings: user_id, trip_id, company_id, company_code_id</li>
+                        <li>favorites: user_id, trip_id</li>
+                        <li>notifications: user_id</li>
+                        <li>cities: country_id</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">⚡ فهارس إضافية</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الجدول</th>
+                                <th>الفهرس</th>
+                                <th>الغرض</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>sessions</td>
+                                <td>user_id, last_activity</td>
+                                <td>تحسين استعلامات الجلسات</td>
+                            </tr>
+                            <tr>
+                                <td>admin_operation_log</td>
+                                <td>user_id</td>
+                                <td>تتبع عمليات المستخدمين</td>
+                            </tr>
+                            <tr>
+                                <td>password_resets</td>
+                                <td>email</td>
+                                <td>البحث السريع عن طلبات إعادة التعيين</td>
+                            </tr>
+                            <tr>
+                                <td>personal_access_tokens</td>
+                                <td>tokenable_type, tokenable_id</td>
+                                <td>البحث عن التوكنات</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                <div class="alert-title">⚠️ فهارس مقترحة مفقودة</div>
+                <ul style="list-style: disc; padding-right: 20px; margin-top: 10px;">
+                    <li>trip_bookings.status - يُستخدم كثيراً في الفلترة</li>
+                    <li>trips.is_public - للبحث عن الرحلات العامة</li>
+                    <li>trips.expiry_date - للبحث عن الرحلات المنتهية</li>
+                    <li>users.login_method - للإحصائيات</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📊 تقرير تحليل قاعدة بيانات WJHTAK</p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آلية العمل - قاعدة بيانات WH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ آلية عمل النظام</h1>
+            <p>شرح تدفق البيانات وآلية عمل المنصة</p>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html">نظرة عامة</a>
+            <a href="tables-fields.html">الجداول والحقول</a>
+            <a href="relationships.html">العلاقات</a>
+            <a href="indexes.html">الفهارس والمفاتيح</a>
+            <a href="workflow.html" class="active">آلية العمل</a>
+            <a href="performance.html">تحسين الأداء</a>
+            <a href="security.html">الأمان</a>
+            <a href="recommendations.html">التوصيات</a>
+        </nav>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">🔄 دورة حياة الحجز</h2>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">1️⃣</span>المرحلة الأولى: تسجيل المستخدم</div>
+                    <ul class="custom-list">
+                        <li>المستخدم يسجل في النظام عبر جدول users</li>
+                        <li>يتم حفظ البيانات الأساسية (الاسم، البريد، الهاتف)</li>
+                        <li>يتم تشفير كلمة المرور</li>
+                        <li>يتم إنشاء رمز FCM للإشعارات</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">2️⃣</span>المرحلة الثانية: تصفح الرحلات</div>
+                    <ul class="custom-list">
+                        <li>المستخدم يتصفح الرحلات من جدول trips</li>
+                        <li>يتم تسجيل الزيارات في trip_page_visits</li>
+                        <li>يمكن إضافة الرحلة للمفضلة في favorites</li>
+                        <li>يمكن قراءة التقييمات من trip_rates</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">3️⃣</span>المرحلة الثالثة: الحجز والدفع</div>
+                    <ul class="custom-list">
+                        <li>المستخدم يختار الرحلة ويدخل بيانات الحجز</li>
+                        <li>يتم إنشاء سجل في trip_bookings</li>
+                        <li>يتم حساب الأرباح (app_profit, company_profit)</li>
+                        <li>إذا كان هناك كود خصم، يتم التحقق من company_codes</li>
+                        <li>يتم إنشاء سجل في booking_fees للرسوم</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">4️⃣</span>المرحلة الرابعة: الإشعارات</div>
+                    <ul class="custom-list">
+                        <li>يتم إرسال إشعار للمستخدم عبر notifications</li>
+                        <li>يتم إرسال إشعار للشركة المسؤولة</li>
+                        <li>يتم استخدام FCM token لإرسال Push Notifications</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">👨‍💼 نظام الصلاحيات (RBAC)</h2>
+
+                <div class="card">
+                    <h3 style="color: #2563eb; margin-bottom: 15px;">الجداول المستخدمة</h3>
+                    <ul class="custom-list">
+                        <li>admin_users: المستخدمون الإداريون</li>
+                        <li>admin_roles: الأدوار (Administrator, Company, Employee)</li>
+                        <li>admin_permissions: الصلاحيات المتاحة</li>
+                        <li>admin_role_users: ربط المستخدمين بالأدوار</li>
+                        <li>admin_role_permissions: ربط الأدوار بالصلاحيات</li>
+                        <li>admin_user_permissions: صلاحيات خاصة لمستخدمين محددين</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-info">
+                    <div class="alert-title">آلية العمل</div>
+                    <p>عند تسجيل دخول مستخدم إداري، يتم التحقق من دوره (Role) ثم جلب الصلاحيات المرتبطة بهذا الدور.
+                        يمكن أيضاً منح صلاحيات إضافية مباشرة للمستخدم عبر admin_user_permissions.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">💰 نظام الأرباح والعمولات</h2>
+
+                <div class="card">
+                    <div class="code-block">
+                        <code>السعر النهائي = سعر الرحلة + ضريبة القيمة المضافة (VAT)
+ربح التطبيق = السعر × نسبة هامش الربح
+ربح الشركة = السعر - ربح التطبيق
+
+إذا كان هناك كود خصم:
+- Fixed: يتم خصم قيمة ثابتة
+- Percentage: يتم خصم نسبة مئوية</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🎯 نظام البانرات والإعلانات</h2>
+
+                <div class="card">
+                    <ul class="custom-list">
+                        <li>جدول banners يحتوي على الإعلانات الترويجية</li>
+                        <li>يمكن ربط البانر برحلة محددة (trip_id)</li>
+                        <li>يتم التحكم بالظهور عبر حقل active</li>
+                        <li>دعم صور مختلفة للموبايل والويب</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📊 تقرير تحليل قاعدة بيانات WJHTAK</p>
+        </div>
+    </div>
+</body>
+
+</html>

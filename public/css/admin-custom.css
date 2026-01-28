@@ -1,0 +1,469 @@
+/**
+ * WJHTAK Admin Panel - Custom Styles
+ * Professional Travel & Tourism Admin Dashboard
+ *
+ * DO NOT write inline CSS in Blade templates - use this file instead
+ */
+
+:root {
+    /* Travel Theme Colors */
+    --wjhtak-primary: #135846;
+    --wjhtak-secondary: #0078aa;
+    --wjhtak-accent: #e74c3c;
+    --wjhtak-gold: #f4a261;
+    --wjhtak-success: #00b894;
+    --wjhtak-info: #0984e3;
+    --wjhtak-warning: #fdcb6e;
+    --wjhtak-danger: #d63031;
+    --wjhtak-dark: #2d3436;
+    --wjhtak-light: #f8f9fa;
+
+    /* Gradients */
+    --gradient-travel: linear-gradient(135deg, #135846 0%, #0078aa 100%);
+    --gradient-sunset: linear-gradient(135deg, #f4a261 0%, #e74c3c 100%);
+    --gradient-ocean: linear-gradient(135deg, #0078aa 0%, #00b894 100%);
+}
+
+/* ============================================
+   SIDEBAR ENHANCEMENTS
+   ============================================ */
+.dlabnav {
+    transition: all 0.3s ease;
+}
+
+.dlabnav .metismenu > li > a {
+    border-radius: 12px;
+    margin: 2px 15px;
+    transition: all 0.3s ease;
+}
+
+.dlabnav .metismenu > li > a:hover,
+.dlabnav .metismenu > li.mm-active > a {
+    background: var(--gradient-travel);
+    color: #fff !important;
+    box-shadow: 0 4px 15px rgba(19, 88, 70, 0.3);
+}
+
+.dlabnav .metismenu > li > a:hover i,
+.dlabnav .metismenu > li.mm-active > a i {
+    color: #fff !important;
+}
+
+.dlabnav .metismenu > li > a:hover .nav-text,
+.dlabnav .metismenu > li.mm-active > a .nav-text {
+    color: #fff !important;
+}
+
+/* Nav Labels */
+.nav-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--wjhtak-primary);
+    font-weight: 600;
+    opacity: 0.8;
+    margin-top: 1.5rem !important;
+}
+
+/* ============================================
+   HEADER ENHANCEMENTS
+   ============================================ */
+.header {
+    box-shadow: 0 2px 30px rgba(0, 0, 0, 0.05);
+}
+
+.header-content {
+    backdrop-filter: blur(10px);
+}
+
+.dashboard_bar {
+    font-weight: 600;
+    color: var(--wjhtak-dark);
+    font-size: 1.4rem;
+}
+
+/* Search Box */
+.search-area {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-area input {
+    border: none;
+    padding-left: 20px;
+}
+
+.search-area .input-group-text {
+    background: var(--wjhtak-primary);
+    border: none;
+    padding: 0 20px;
+}
+
+.search-area .input-group-text a {
+    color: #fff;
+}
+
+/* ============================================
+   CARDS & WIDGETS
+   ============================================ */
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 35px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+}
+
+.card-header .card-title {
+    font-weight: 600;
+    color: var(--wjhtak-dark);
+}
+
+/* Stats Cards */
+.stat-card {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.stat-card.travel {
+    background: var(--gradient-travel);
+}
+
+.stat-card.sunset {
+    background: var(--gradient-sunset);
+}
+
+.stat-card.ocean {
+    background: var(--gradient-ocean);
+}
+
+.stat-card .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+}
+
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.stat-card .stat-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-travel {
+    background: var(--gradient-travel);
+    border: none;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-travel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(19, 88, 70, 0.4);
+    color: #fff;
+}
+
+.btn-ocean {
+    background: var(--gradient-ocean);
+    border: none;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 25px;
+    font-weight: 500;
+}
+
+.btn-sunset {
+    background: var(--gradient-sunset);
+    border: none;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 25px;
+    font-weight: 500;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: var(--wjhtak-dark);
+    padding: 15px 20px;
+}
+
+.table thead th:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+.table thead th:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.table tbody tr {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.table tbody td {
+    border: none;
+    padding: 15px 20px;
+    vertical-align: middle;
+}
+
+.table tbody td:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+.table tbody td:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+/* ============================================
+   FORMS
+   ============================================ */
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--wjhtak-primary);
+    box-shadow: 0 0 0 4px rgba(19, 88, 70, 0.1);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--wjhtak-dark);
+    margin-bottom: 8px;
+}
+
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 12px 18px;
+}
+
+.form-select:focus {
+    border-color: var(--wjhtak-primary);
+    box-shadow: 0 0 0 4px rgba(19, 88, 70, 0.1);
+}
+
+/* Floating Labels */
+.form-floating > .form-control {
+    border-radius: 10px;
+}
+
+.form-floating > label {
+    color: #6c757d;
+}
+
+/* Custom Checkbox */
+.custom-checkbox .form-check-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 5px;
+}
+
+.custom-checkbox .form-check-input:checked {
+    background-color: var(--wjhtak-primary);
+    border-color: var(--wjhtak-primary);
+}
+
+/* File Upload */
+.file-upload-wrapper {
+    position: relative;
+    border: 2px dashed #e9ecef;
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.file-upload-wrapper:hover {
+    border-color: var(--wjhtak-primary);
+    background: rgba(19, 88, 70, 0.02);
+}
+
+.file-upload-wrapper input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-upload-icon {
+    font-size: 3rem;
+    color: var(--wjhtak-primary);
+    margin-bottom: 1rem;
+}
+
+/* ============================================
+   BADGES & STATUS
+   ============================================ */
+.badge-travel {
+    background: var(--gradient-travel);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-badge.confirmed {
+    background: rgba(0, 184, 148, 0.1);
+    color: var(--wjhtak-success);
+}
+
+.status-badge.confirmed::before {
+    background: var(--wjhtak-success);
+}
+
+.status-badge.pending {
+    background: rgba(253, 203, 110, 0.2);
+    color: #f39c12;
+}
+
+.status-badge.pending::before {
+    background: #f39c12;
+}
+
+.status-badge.cancelled {
+    background: rgba(214, 48, 49, 0.1);
+    color: var(--wjhtak-danger);
+}
+
+.status-badge.cancelled::before {
+    background: var(--wjhtak-danger);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 768px) {
+    .dashboard_bar {
+        font-size: 1.1rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+    .dlabnav,
+    .header,
+    .nav-header {
+        display: none !important;
+    }
+
+    .content-body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}

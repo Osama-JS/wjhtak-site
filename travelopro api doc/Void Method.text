@@ -1,0 +1,175 @@
+Void Method
+To request for void a ticket.
+
+Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/void_ticket
+Request Parameters
+
+#	Parameter	Data Type	Required	Description	Example
+1	user_id	String	Yes	It is used to specify the user name.
+2	user_password	String	Yes	It is used to specify the password
+3	access	String	Yes	It is used to specify the access type. Possible values : Test, Production.
+4	ip_address	String	Yes	It is used to get ip_address of the system from which IP, the API is accessed.
+5	uniqueID	string	Yes	To specify the API booking reference unique ID.	TR31072022
+6	paxDetails	Sub Array	Yes	Contain the basic details of the travellers.
+6.1	type	String	Yes	Contain the basic traveller type.	ADT
+6.2	title	String	Yes	To specify the titles of traveller. Possible Values : Mr/Mrs/Miss	Mr
+6.3	firstName	String	Yes	To specify the first Name of traveller.	Paul
+6.4	lastName	String	Yes	To specify the last Name of traveller.	Richard
+6.5	eTicket	String	Yes	It specifies the e-ticket Number of the traveller.	TKT333344
+7	remark	String	No	Remarks to Void the ticket.	Kindly void booking.
+Response Parameters
+
+Contain the basic traveller type.
+#	Parameter	Data Type	Required	Description	Example
+1	RefundResult	Nested Array	Yes
+1.1	Success	String	Yes	It is used to specify the request is success or not. Possible values are true & false	true
+1.2	UniqueID	String	Yes	Unique Reference Id	TR31072022
+1.3	Errors	Sub Array	No	Contain Error Details
+1.3.1	ErrorMessage	String	No	Error message if any.	Void request for the selected passengers is already in process.
+1.4	ptrUniqueID	String	No	Unique PTR Reference Id for the further API calls.	9154
+1.5	Status	String	No	Status of the PTR rquest.	Completed
+1.6	ProcessingTime	String	No	The time may taken to fullfill the current request (in second).	60
+1.7	VoidQuotes	Nested Array	No	Contain the quote details of each passenger.
+1.7.1	PassengerType	String	Yes	ADT
+1.7.2	Title	String	Yes	To specify the titles of traveller. Possible Values : Mr/Mrs/Miss	Mr
+1.7.3	FirstName	String	Yes	To specify the first Name of traveller.	Paul
+1.7.4	LastName	String	Yes	To specify the last Name of traveller.	Richard
+1.7.5	ETicket	String	Yes	It specifies the e-ticket Number of the traveller.	TKT333344
+1.7.6	AdminCharges	Sub Array	Yes	It specifies the Admin charges.
+1.7.6.1	Amount	String	Yes	Admin charge.	1.20
+1.7.6.2	CurrencyCode	String	Yes	It specifies the Admin charges currency.	USD
+1.7.6.3	DecimalPlaces	String	Yes	It specifies the number of Decimal Places.	2
+1.7.7	GSTCharges	Sub Array	Yes	It specifies the GST charges.
+1.7.7.1	Amount	String	Yes	GST charge.	1.20
+1.7.7.2	CurrencyCode	String	Yes	It specifies the GST charges currency.	USD
+1.7.7.3	DecimalPlaces	String	Yes	It specifies the number of Decimal Places.	2
+1.7.8	TotalVoidingFee	Sub Array	Yes	It specifies the Voiding charges.
+1.7.8.1	Amount	String	Yes	Voiding charge.	1.20
+1.7.8.2	CurrencyCode	String	Yes	It specifies the Voiding charges currency.	USD
+1.7.8.3	DecimalPlaces	String	Yes	It specifies the number of Decimal Places.	2
+1.7.9	TotalRefundAmount	Sub Array	Yes	It specifies the Refund charges.
+1.7.9.1	Amount	String	Yes	Refund charge.	1.20
+1.7.9.2	CurrencyCode	String	Yes	It specifies the Refund charges currency.	USD
+1.7.9.3	DecimalPlaces	String	Yes	It specifies the number of Decimal Places.	2
+Sample Request
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "UniqueID": "TR31072022",
+    "remark": "Kindly void booking.",
+    "paxDetails":
+    [
+        {
+            "type": "ADT",
+            "title": "Mr",
+            "firstName": "Paul",
+            "lastName": "Richard",
+            "eTicket": "TKT333344"
+        },{
+            "type": "CHD",
+            "title": "Miss",
+            "firstName": "Jane",
+            "lastName": "Paul",
+            "eTicket": "TKT333346"
+        }
+    ]
+}
+
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLERBUK106",
+        "ErrorMessage": "Booking may be already cancelled."
+    }
+}
+
+Sample Failed Response
+{
+    "VoidQuoteResponse": {
+        "VoidQuoteResult": {
+            "Success": "false",
+            "UniqueID": "TR31072022",
+            "Errors": {
+                "ErrorMessage": "Void request for the selected passengers is already in process."
+            },
+            "ptrUniqueID": "",
+            "Status": "",
+            "ProcessingTime": "",
+            "VoidQuotes": []
+        }
+    }
+}
+
+Sample Success Response
+{
+    "VoidQuoteResponse": {
+        "VoidQuoteResult": {
+            "Success": "true",
+            "UniqueID": "TR31072022",
+            "Errors": [],
+            "ptrUniqueID": "9154",
+            "Status": "Completed",
+            "ProcessingTime": "60",
+            "VoidQuotes": [
+                {
+                    "PassengerType": "ADT",
+                    "Title": "Mr",
+                    "FirstName": "Paul",
+                    "LastName": "Richard",
+                    "ETicket": "TKT333344",
+                    "AdminCharges": {
+                        "Amount": "1.20",
+                        "CurrencyCode": "USD",
+                        "DecimalPlaces": "2"
+                    },
+                    "GSTCharge": {
+                        "Amount": "1.20",
+                        "CurrencyCode": "USD",
+                        "DecimalPlaces": "2"
+                    },
+                    "TotalVoidingFee": {
+                        "Amount": "1.20",
+                        "CurrencyCode": "USD",
+                        "DecimalPlaces": "2"
+                    },
+                    "TotalRefundAmount": {
+                        "Amount": "1.20",
+                        "CurrencyCode": "USD",
+                        "DecimalPlaces": "2"
+                    }
+                },{
+                    "PassengerType": "CHD",
+                    "Title": "Miss",
+                    "FirstName": "Jane",
+                    "LastName": "Paul",
+                    "ETicket": "TKT333346",
+                    "AdminCharges": {
+                        "Amount": "1.20",
+                        "CurrencyCode": "USD",
+                        "DecimalPlaces": "2"
+                    },
+                    "GSTCharge": {
+                        "Amount": "1.20",
+                        "CurrencyCode": "USD",
+                        "DecimalPlaces": "2"
+                    },
+                    "TotalVoidingFee": {
+                        "Amount": "1.20",
+                        "CurrencyCode": "USD",
+                        "DecimalPlaces": "2"
+                    },
+                    "TotalRefundAmount": {
+                        "Amount": "1.20",
+                        "CurrencyCode": "USD",
+                        "DecimalPlaces": "2"
+                    }
+                }
+            ]
+        }
+    }
+}

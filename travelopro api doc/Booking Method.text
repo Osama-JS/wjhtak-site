@@ -1,0 +1,523 @@
+Booking Method
+Booking a selected flight is used immediately after revalidation to secure the fare by booking the seats in case of ‘Public’ and ‘Private’ fare types for a certain time limit, where as in case of ‘WebFare’ type, this service determines the purchase. Please make sure the flight segments and Fares are available before executing Book method by Validate API method.
+
+Booking Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/booking
+Request Parameters
+
+#	Parameter	Data Type	Required	Description	Example
+1	flightBookingInfo	Sub Array	Yes	Contain the basic details of the flight selected.
+1.1	flight_session_id	String	Yes	Session_id is a token granted on flight availablity search and is available in the success Availability search response.	7906efba-09db-4481-8c60-0d7f5b5e6c44
+1.2	fare_source_code	String	Yes	Unique fare/flight option identification code.	MzAwMiYzN1MyJjF CJjU2ZmJiZTNmLTl
+1.3	IsPassportMandatory	Boolean	Yes	It specifies whether the passport details are needed when a booking is made.	True / False
+1.4	areaCode	String	Yes	To specify the area code of passengers.	080
+1.5	countryCode	String	No	To specify the country code of passengers phone number.	91
+1.6	fareType	String	Yes	To specify the fare type of the selected airline.	Private
+1.7	fare_source_code_inbound	String	Yes	Unique fare/flight Option identification code of Inbound segment, from Indian Domestic RoundTrip Search.	MzAwMiYzN1MyJjF CJjU2ZmJiZTNmLTl
+2	paxInfo	Sub Array	Yes	Contain the basic details of the travelers.
+2.1	clientRef	String	No	To specify the Unique reference ID of the booking.	FLB95243658
+2.2	postCode	String	No	To specify the customer's postal Code. If Airline specified as Mandatory Field.	560012
+2.3	customerEmail	String	Yes	To specify the passenger email.	abc@xyz.com
+2.4	customerPhone	String	Yes	To specify the passenger contact number.	9847000000
+2.5	bookingNote	String	No	To specify the booking note if any.
+2.6	paxDetails	Nested Array	Yes	To specify the paxwise details. In the 0th index has 3 sub Arrays adult,child,infant which contain the details of each type of travelers
+2.6.1	adult	Sub Array	Yes	To specify the basic details of the adult travelers.
+2.6.1.1	title	Sub Array	Yes	To specify array of titles of adult travelers. Possible Values : Mr/Mrs/Miss	["Mr", "Mrs"]
+2.6.1.2	firstName	Sub Array	Yes	To specify array of first Name of adult travelers.	["Paul", "Richard"]
+2.6.1.3	lastName	Sub Array	Yes	To specify array of last Name of adult travelers.	["Paul", "Richard"]
+2.6.1.4	dob	Sub Array	Yes	To specify array of Date of Birth of adult travelers.	["1991-12-11", "1991-12-11"]
+2.6.1.5	nationality	Sub Array	Yes	To specify array of Alpha-2 Country Codes of nationality of adult travelers.	["IN", "IN"]
+2.6.1.6	passportNo	Sub Array	No	To specify array of passport Nunber of adult travelers.	["G8965777", "G8965777"]
+2.6.1.7	passportIssueCountry	Sub Array	No	To specify array of Alpha-2 Country Codes of passport issuance country of adult travelers.	["IN", "IN"]
+2.6.1.8	passportExpiryDate	Sub Array	No	To specify array of passport Expiry Date of adult travelers.	["2022-12-21", "2022-12-21"]
+2.6.1.9	passportIssueDate	Sub Array	No	To specify array of passport Issue Date of adult travelers. Is mandatory if "IsPassportFullDetailsMandatory" value is true in revalidate API response	["2022-12-21", "2022-12-21"]
+2.6.1.10	ExtraServiceOutbound	array of Sub Arrays	No	To specify array of service id of outbound extraservices selected for adult travelers. Each pax can select multiple extra services if needed.	["19","10"],["19","10"]
+2.6.1.11	ExtraServiceInbound	array of Sub Arrays	No	To specify array of service id of inbound extraservices selected for adult travelers. Each pax can select multiple extra services if needed.	["19","10"],["19","10"]
+2.6.1.12	frequentFlyrNum	Sub Array	No	Frequent Flyer Number provided by the airline.	["12345", "12345"]
+2.6.1.13	ExtraServiceOutbound_1	array of Objects	No	To specify outbound extraservices details selected for adult travelers. Each pax can select multiple extra services if needed with the number od quantity (Use either ExtraServiceOutbound OR ExtraServiceOutbound_1).
+2.6.1.13.1	serviceId	String	Yes	To specify service id of outbound extraservices selected for adult traveler.	XBPA
+2.6.1.13.2	quantity	String	Yes	To specify quantity of outbound extraservices selected for adult traveler.	1
+2.6.1.13.3	segment	String	Yes	To specify the segmant number of outbound extraservices selected for adult traveler. values can be from 0	0
+2.6.1.14	ExtraServiceInbound_1	array of Objects	No	To specify inbound extraservices details selected for adult travelers. Each pax can select multiple extra services if needed with the number od quantity (Use either ExtraServiceInbound OR ExtraServiceInbound_1).
+2.6.1.14.1	serviceId	String	Yes	To specify service id of inbound extraservices selected for adult traveler.	XBPA
+2.6.1.14.2	quantity	String	Yes	To specify quantity of inbound extraservices selected for adult traveler.	1
+2.6.1.14.3	segment	String	Yes	To specify the segmant number of inbound extraservices selected for adult traveler. values can be from 0	0
+2.6.1.15	SeatOutbound	array of Sub Arrays	No	To specify array of service id of outbound seat selected for adult travelers. Can be multiple for a single traveler incase of multiple stop.	["MF8wXzBfMA==","MF8xXzBfMA=="],["MF8wXzBfMA==","MF8xXzBfMA=="]
+2.6.1.11	SeatInbound	array of Sub Arrays	No	To specify array of service id of inbound seat selected for adult travelers. Can be multiple for a single traveler incase of multiple stop.	["MF8wXzBfMA==","MF8xXzBfMA=="],["MF8wXzBfMA==","MF8xXzBfMA=="]
+2.6.2	child	Sub Array	Yes	To specify the basic details of the child travelers.
+2.6.2.1	title	Sub Array	Yes	To specify array of titles of child travelers. Possible Values : Master/Mis	["Master", "Master"]
+2.6.2.2	firstName	Sub Array	Yes	To specify array of first Name of child travelers.	["Paul", "Richard"]
+2.6.2.3	lastName	Sub Array	Yes	To specify array of last Name of child travelers.	["Paul", "Richard"]
+2.6.2.4	dob	Sub Array	Yes	To specify array of Date of Birth of child travelers.	["1991-12-11", "1991-12-11"]
+2.6.2.5	nationality	Sub Array	Yes	To specify array of Alpha-2 Country Codes of nationality of child travelers.	["IN", "IN"]
+2.6.2.6	passportNo	Sub Array	No	To specify array of passport Nunber of child travelers.	["G8965777", "G8965777"]
+2.6.2.7	passportIssueCountry	Sub Array	No	To specify array of Alpha-2 Country Codes of passport issuance country of child travelers.	["IN", "IN"]
+2.6.2.8	passportExpiryDate	Sub Array	No	To specify array of passport Expiry Date of child travelers.	["2022-12-21", "2022-12-21"]
+2.6.2.9	passportIssueDate	Sub Array	No	To specify array of passport Issue Date of child travelers. Is mandatory if "IsPassportFullDetailsMandatory" value is true in revalidate API response	["2022-12-21", "2022-12-21"]
+2.6.2.10	ExtraServiceOutbound	array of Sub Arrays	No	To specify array of service id of outbound extraservices selected for child travelers. Each pax can select multiple extra services if needed.	["19","10"],["19","10"]
+2.6.2.11	ExtraServiceInbound	array of Sub Arrays	No	To specify array of service id of inbound extraservices selected for child travelers. Each pax can select multiple extra services if needed.	["19","10"],["19","10"]
+2.6.2.12	frequentFlyrNum	Sub Array	No	Frequent Flyer Number provided by the airline.	["12345", "12345"]
+2.6.2.13	ExtraServiceOutbound_1	array of Objects	No	To specify outbound extraservices details selected for child travelers. Each pax can select multiple extra services if needed with the number od quantity (Use either ExtraServiceOutbound OR ExtraServiceOutbound_1).
+2.6.2.13.1	serviceId	String	Yes	To specify service id of outbound extraservices selected for child traveler.	XBPA
+2.6.2.13.2	quantity	String	Yes	To specify quantity of outbound extraservices selected for child traveler.	1
+2.6.2.13.3	segment	String	Yes	To specify the segmant number of outbound extraservices selected for child traveler. values can be from 0	0
+2.6.2.14	ExtraServiceInbound_1	array of Objects	No	To specify inbound extraservices details selected for child travelers. Each pax can select multiple extra services if needed with the number od quantity (Use either ExtraServiceInbound OR ExtraServiceInbound_1).
+2.6.2.14.1	serviceId	String	Yes	To specify service id of inbound extraservices selected for child traveler.	XBPA
+2.6.2.14.2	quantity	String	Yes	To specify quantity of inbound extraservices selected for child traveler.	1
+2.6.2.14.3	segment	String	Yes	To specify the segmant number of inbound extraservices selected for child traveler. values can be from 0	0
+2.6.2.15	SeatOutbound	array of Sub Arrays	No	To specify array of service id of outbound seat selected for child travelers. Can be multiple for a single traveler incase of multiple stop.	["MF8wXzBfMA==","MF8xXzBfMA=="],["MF8wXzBfMA==","MF8xXzBfMA=="]
+2.6.2.11	SeatInbound	array of Sub Arrays	No	To specify array of service id of inbound seat selected for child travelers. Can be multiple for a single traveler incase of multiple stop.	["MF8wXzBfMA==","MF8xXzBfMA=="],["MF8wXzBfMA==","MF8xXzBfMA=="]
+2.6.3	infant	Sub Array	Yes	To specify the basic details of the infant travelers.
+2.6.3.1	title	Sub Array	Yes	To specify array of titles of infant travelers. Possible Values : Master/Mis	["Master", "Master"]
+2.6.3.2	firstName	Sub Array	Yes	To specify array of first Name of infant travelers.	["Paul", "Richard"]
+2.6.3.3	lastName	Sub Array	Yes	To specify array of last Name of infant travelers.	["Paul", "Richard"]
+2.6.3.4	dob	Sub Array	Yes	To specify array of Date of Birth of infant travelers.	["1991-12-11", "1991-12-11"]
+2.6.3.5	nationality	Sub Array	Yes	To specify array of Alpha-2 Country Codes of nationality of infant travelers.	["IN", "IN"]
+2.6.3.6	passportNo	Sub Array	No	To specify array of passport Nunber of infant travelers.	["G8965777", "G8965777"]
+2.6.3.7	passportIssueCountry	Sub Array	No	To specify array of Alpha-2 Country Codes of passport issuance country of infant travelers.	["IN", "IN"]
+2.6.3.8	passportExpiryDate	Sub Array	No	To specify array of passport Expiry Date of infant travelers.	["2022-12-21", "2022-12-21"]
+2.6.3.9	passportIssueDate	Sub Array	No	To specify array of passport Issue Date of infant travelers. Is mandatory if "IsPassportFullDetailsMandatory" value is true in revalidate API response	["2022-12-21", "2022-12-21"]
+2.6.3.10	frequentFlyrNum	Sub Array	No	Frequent Flyer Number provided by the airline.	["12345", "12345"]
+** Important Notes
+
+Texts marked with ** are the additional parameters required for requesting extra services.
+ExtraServices are application only on LCC flights.
+Please read the Behavior of each ExtraServices to identify weather the service is applicable to each passenger individually or to the group.
+If the Behavior is GROUP_PAX then the service is applicable to entire group and you have to pass that service in the ExtraServiceOutbound parameter with first adult passenger only and it will be applicable to entire group.
+If the Behavior is PER_PAX, then you are only required to send ExtraServiceOutbound for the adult passengers and ExtraServiceOutbound for child passengers.
+If the Behavior of the extra service is PER_PAX_OUTBOUND, PER_PAX_INBOUND or GROUP_PAX_OUTBOUND, GROUP_PAX_INBOUND, then you are required to send ExtraServiceOutbound for adult passenger’s outbound extra service and ExtraServiceInbound for passenger’s inbound extra service for the adult passengers and ExtraServiceOutbound for child passenger’s outbound extra service and ExtraServiceInbound for child passenger’s inbound extra service.
+If any of the parameters are not passed in the booking request that means no ExtraService is requested. However if you want to pass for any specific passenger, you can pass it by sending 0 for other passengers.
+Price that you would receive for the extra service is an addon cost that you would’ve to charge your end customer.
+For Eg: total fare for an itinerary is: $300
+Extra Service cost: $30
+So the total cost needed to charge will be $330 which cannot be shown to you as we have no idea which extra service is chosen by the passenger.
+In the book request you would need to add the service id so we know what is the service that we had to pass on to the airline.
+Response Parameters
+
+Parameter	Data Type	Required	Description	Example
+BookFlightResult	Nested Array	Yes
+status	string	Yes	It specifies the status of the booking made. (Confirmed, Pending)	CONFIRMED
+success	Boolean	Yes	It specifies the revalidation is successful or not	True / False
+uniqueID	string	Yes	It specifies the booking reference. Appears only if the booking is successful.	TR000341
+TktTimeLimit	DateTime	No	It specifies the validity of a fare of a booking under booked status	2015:04:12T00:00:00
+Errors	Nested Array	No	Contains the list of errors if exists.
+Error	Nested Array	Yes	Contains the error details
+ErrorCode	String	Yes	Error Code
+ErrorMessage	string	Yes	Error Message
+Target	string	Yes	Target of Server (Test / Production)	Test
+Sample Request 1
+{
+    "flightBookingInfo":
+    {
+        "flight_session_id": "MTY2ODE2Njg2Ml8yNjA5Mzk=",
+        "fare_source_code": "Sk5BUjhNem5ZMTJJMkNqY0g5VUtONWwzVjBaMTl2YkNYNURIbXp0NEQ4RVpRbWx1NkJiazl1WFcra2ppSzhsVHlreWU0ZHlQV1M2dTVwdnFYaDZYaThRWmNJR3Y4NDhYRWo1U2IzT3lLcS9LVWFUOU4zNklhc0pBM01pK1c3dWRoeXpQUXBlVStrTFFuRXlCUXQyaW50c0s3aEV5K0NkdGhNTjIrU0RlcFh3PQ==",
+        "IsPassportMandatory": "true",
+        "fareType": "Private",
+        "areaCode": "080",
+        "countryCode": "91"
+    },
+    "paxInfo":
+    {
+        "clientRef": "tr001",
+        "postCode": "99999",
+        "customerEmail": "test@gmail.com",
+        "customerPhone": "9847012345",
+        "bookingNote": "this is booking note",
+        "paxDetails":
+        [
+            {
+                "adult":
+                {
+                    "title": [
+                        "Mr", "Mrs"
+                    ],
+                    "firstName":
+                    [
+                        "John", "Ivy"
+                    ],
+                    "lastName":
+                    [
+                        "Doe", "John"
+                    ],
+                    "dob":
+                    [
+                        "1991-12-11", "1991-12-11"
+                    ],
+                    "nationality":
+                    [
+                        "IN", "IN"
+                    ],
+                    "passportNo":
+                    [
+                        "5467455", "5467455"
+                    ],
+                    "passportIssueCountry":
+                    [
+                        "IN", "IN"
+                    ],
+                    "passportExpiryDate":
+                    [
+                        "2022-12-21", "2022-12-21"
+                    ],
+                    "ExtraServiceOutbound":
+                    [
+                        [ "19", "10"], ["19", "10"]
+                    ],
+                    "ExtraServiceInbound":
+                    [
+                        ["33"], ["33"]
+                    ]
+                },
+                "child":
+                {
+                    "title":
+                    [
+                        "Miss"
+                    ],
+                    "firstName":
+                    [
+                        "Julie"
+                    ],
+                    "lastName":
+                    [
+                        "John"
+                    ],
+                    "dob":
+                    [
+                        "2011-12-15"
+                    ],
+                    "nationality":
+                    [
+                        "IN"
+                    ],
+                    "passportNo":
+                    [
+                        "5467455"
+                    ],
+                    "passportIssueCountry":
+                    [
+                        "IN"
+                    ],
+                    "passportExpiryDate":
+                    [
+                        "2022-12-14"
+                    ],
+                    "ExtraServiceOutbound":
+                    [
+                        ["2", "32"]
+                    ],
+                    "ExtraServiceInbound":
+                    [
+                        ["3", "46"]
+                    ]
+                },
+                "infant":
+                {
+                    "title":
+                    [
+                        "Master"
+                    ],
+                    "firstName":
+                    [
+                        "Tony"
+                    ],
+                    "lastName":
+                    [
+                        "John"
+                    ],
+                    "dob":
+                    [
+                        "2021-12-25"
+                    ],
+                    "nationality":
+                    [
+                        "IN"
+                    ],
+                    "passportNo":
+                    [
+                        "5467455"
+                    ],
+                    "passportIssueCountry":
+                    [
+                        "IN"
+                    ],
+                    "passportExpiryDate":
+                    [
+                        "2022-12-14"
+                    ]
+                }
+            }
+        ]
+    }
+}
+
+Sample Request 2
+{
+    "flightBookingInfo":
+    {
+        "flight_session_id": "MTY2ODE2Njg2Ml8yNjA5Mzk=",
+        "fare_source_code": "Sk5BUjhNem5ZMTJJMkNqY0g5VUtONWwzVjBaMTl2YkNYNURIbXp0NEQ4RVpRbWx1NkJiazl1WFcra2ppSzhsVHlreWU0ZHlQV1M2dTVwdnFYaDZYaThRWmNJR3Y4NDhYRWo1U2IzT3lLcS9LVWFUOU4zNklhc0pBM01pK1c3dWRoeXpQUXBlVStrTFFuRXlCUXQyaW50c0s3aEV5K0NkdGhNTjIrU0RlcFh3PQ==",
+        "IsPassportMandatory": "true",
+        "fareType": "Private",
+        "areaCode": "080",
+        "countryCode": "91"
+    },
+    "paxInfo":
+    {
+        "clientRef": "tr001",
+        "postCode": "99999",
+        "customerEmail": "test@gmail.com",
+        "customerPhone": "9847012345",
+        "bookingNote": "this is booking note",
+        "paxDetails":
+        [
+            {
+                "adult":
+                {
+                    "title":
+                    [
+                        "Mr",
+                        "Mrs"
+                    ],
+                    "firstName":
+                    [
+                        "John",
+                        "Ivy"
+                    ],
+                    "lastName":
+                    [
+                        "Doe",
+                        "John"
+                    ],
+                    "dob":
+                    [
+                        "1991-12-11",
+                        "1991-12-11"
+                    ],
+                    "nationality":
+                    [
+                        "IN",
+                        "IN"
+                    ],
+                    "passportNo":
+                    [
+                        "5467455",
+                        "5467455"
+                    ],
+                    "passportIssueCountry":
+                    [
+                        "IN",
+                        "IN"
+                    ],
+                    "passportExpiryDate":
+                    [
+                        "2022-12-21",
+                        "2022-12-21"
+                    ],
+                    "ExtraServiceOutbound_1":
+                    [
+                        [
+                            {
+                                "serviceId": "XBPA",
+                                "quantity": "1",
+                                "segment": "0"
+                            },
+                            {
+                                "serviceId": "WHSK",
+                                "quantity": "1",
+                                "segment": "0"
+                            },
+                            {
+                                "serviceId": "TCSW",
+                                "quantity": "1",
+                                "segment": "1"
+                            }
+                        ]
+                    ],
+                    "ExtraServiceInbound_1":
+                    [
+                        [
+                            {
+                                "serviceId": "XBPB",
+                                "quantity": "1",
+                                "segment": "0"
+                            },
+                            {
+                                "serviceId": "TCSW",
+                                "quantity": "1",
+                                "segment": "0"
+                            },
+                            {
+                                "serviceId": "WHSK",
+                                "quantity": "1",
+                                "segment": "1"
+                            }
+                        ],
+                        [
+                            {
+                                "serviceId": "XBPB",
+                                "quantity": "1",
+                                "segment": "0"
+                            },
+                            {
+                                "serviceId": "TCSW",
+                                "quantity": "1",
+                                "segment": "0"
+                            },
+                            {
+                                "serviceId": "WHSK",
+                                "quantity": "1",
+                                "segment": "1"
+                            }
+                        ]
+                    ],
+                    "SeatOutbound_1":
+                    [
+                        [
+                            "MF8wXzBfMA==",
+                            "MF8xXzBfMA=="
+                        ]
+                    ],
+                    "SeatInbound_1":
+                    [
+                        [
+                            "MV8wXzBfMA==",
+                            "MV8xXzMxXzQ=="
+                        ]
+                    ]
+                },
+                "child":
+                {
+                    "title":
+                    [
+                        "Miss"
+                    ],
+                    "firstName":
+                    [
+                        "Julie"
+                    ],
+                    "lastName":
+                    [
+                        "John"
+                    ],
+                    "dob":
+                    [
+                        "2011-12-15"
+                    ],
+                    "nationality":
+                    [
+                        "IN"
+                    ],
+                    "passportNo":
+                    [
+                        "5467455"
+                    ],
+                    "passportIssueCountry":
+                    [
+                        "IN"
+                    ],
+                    "passportExpiryDate":
+                    [
+                        "2022-12-14"
+                    ],
+                    "ExtraServiceOutbound":
+                    [
+                        [
+                            "2",
+                            "32"
+                        ]
+                    ],
+                    "ExtraServiceInbound":
+                    [
+                        [
+                            "3",
+                            "46"
+                        ]
+                    ]
+                },
+                "infant":
+                {
+                    "title":
+                    [
+                        "Master"
+                    ],
+                    "firstName":
+                    [
+                        "Tony"
+                    ],
+                    "lastName":
+                    [
+                        "John"
+                    ],
+                    "dob":
+                    [
+                        "2021-12-25"
+                    ],
+                    "nationality":
+                    [
+                        "IN"
+                    ],
+                    "passportNo":
+                    [
+                        "5467455"
+                    ],
+                    "passportIssueCountry":
+                    [
+                        "IN"
+                    ],
+                    "passportExpiryDate":
+                    [
+                        "2022-12-14"
+                    ]
+                }
+            }
+        ]
+    }
+}
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLTBOOKVAL",
+        "ErrorMessage": "flight_session_id required"
+    }
+}
+
+Sample Failed Response
+{
+    "BookFlightResponse":
+    {
+        "BookFlightResult":
+        {
+            "Errors": [
+                {
+                    "Errors":
+                    {
+                        "ErrorCode": "ERBUK108",
+                        "ErrorMessage": "PassengerNationality details is required for this airline."
+                    }
+                }
+            ],
+            "Status": "",
+            "Success": "false",
+            "Target": "Test",
+            "TktTimeLimit": "",
+            "UniqueID": ""
+        }
+    }
+}
+
+Sample Success Response
+{
+    "BookFlightResponse": {
+        "BookFlightResult": {
+            "Errors": "",
+            "Status": "CONFIRMED",
+            "Success": true,
+            "Target": "Test",
+            "TktTimeLimit": "2022-11-13T12:20:07",
+            "UniqueID": "TR31072022"
+        }
+    }
+}

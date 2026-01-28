@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التوصيات - قاعدة بيانات WH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 التوصيات والخلاصة</h1>
+            <p>ملخص شامل لجميع التوصيات والتحسينات المقترحة</p>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html">نظرة عامة</a>
+            <a href="tables-fields.html">الجداول والحقول</a>
+            <a href="relationships.html">العلاقات</a>
+            <a href="indexes.html">الفهارس والمفاتيح</a>
+            <a href="workflow.html">آلية العمل</a>
+            <a href="performance.html">تحسين الأداء</a>
+            <a href="security.html">الأمان</a>
+            <a href="recommendations.html" class="active">التوصيات</a>
+        </nav>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">🎯 التوصيات ذات الأولوية العالية</h2>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">🔴</span>عاجل - يجب تنفيذه فوراً</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>التوصية</th>
+                                    <th>السبب</th>
+                                    <th>الأولوية</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>تشفير البيانات الحساسة (جوازات السفر، أرقام الهواتف)</td>
+                                    <td>حماية خصوصية المستخدمين</td>
+                                    <td><span class="badge badge-danger">عاجل</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>إزالة تكرار القيود الخارجية في جدول trips</td>
+                                    <td>تجنب المشاكل المستقبلية</td>
+                                    <td><span class="badge badge-danger">عاجل</span></td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>إضافة فهرس على trip_bookings.status</td>
+                                    <td>تحسين أداء الاستعلامات</td>
+                                    <td><span class="badge badge-danger">عاجل</span></td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>تنظيف جدول sessions دورياً</td>
+                                    <td>تحسين الأداء وتقليل الحجم</td>
+                                    <td><span class="badge badge-warning">مهم</span></td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>تغيير نوع بيانات trip_bookings.status من BIGINT إلى ENUM</td>
+                                    <td>توفير المساحة وتحسين الأداء</td>
+                                    <td><span class="badge badge-warning">مهم</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">⚡ توصيات الأداء</h2>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">الفهارس المقترحة</h3>
+                        <div class="code-block">
+                            <code>CREATE INDEX idx_booking_status
+ON trip_bookings(status);
+
+CREATE INDEX idx_trips_public
+ON trips(is_public);
+
+CREATE INDEX idx_trips_expiry
+ON trips(expiry_date);
+
+CREATE INDEX idx_trips_search
+ON trips(from_country_id, to_country_id, expiry_date);</code>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">تحسينات أخرى</h3>
+                        <ul class="custom-list">
+                            <li>استخدام Redis للـ Cache</li>
+                            <li>استخدام Queue للعمليات الثقيلة</li>
+                            <li>تفعيل Query Caching</li>
+                            <li>استخدام Eager Loading</li>
+                            <li>تحسين أنواع البيانات</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔒 توصيات الأمان</h2>
+
+                <div class="stats">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">ثغرات أمنية محتملة</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">تحسينات أمنية مقترحة</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">ممارسات أمنية مطبقة</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">🛡️</span>قائمة التحقق الأمني</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>العنصر</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراء المطلوب</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>تشفير كلمات المرور</td>
+                                    <td><span class="badge badge-success">✓ مطبق</span></td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>تشفير البيانات الحساسة</td>
+                                    <td><span class="badge badge-danger">✗ غير مطبق</span></td>
+                                    <td>تطبيق Laravel Encryption</td>
+                                </tr>
+                                <tr>
+                                    <td>نظام الصلاحيات RBAC</td>
+                                    <td><span class="badge badge-success">✓ مطبق</span></td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Two-Factor Authentication</td>
+                                    <td><span class="badge badge-danger">✗ غير مطبق</span></td>
+                                    <td>إضافة 2FA</td>
+                                </tr>
+                                <tr>
+                                    <td>Audit Logging</td>
+                                    <td><span class="badge badge-warning">⚠ جزئي</span></td>
+                                    <td>توسيع نطاق التسجيل</td>
+                                </tr>
+                                <tr>
+                                    <td>Rate Limiting</td>
+                                    <td><span class="badge badge-warning">⚠ غير معروف</span></td>
+                                    <td>التحقق والتطبيق</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🏗️ توصيات البنية</h2>
+
+                <div class="alert alert-info">
+                    <div class="alert-title">تحسينات مقترحة على البنية</div>
+                    <ul style="list-style: disc; padding-right: 20px; margin-top: 10px;">
+                        <li>إضافة جدول لحالات الحجز (booking_statuses) بدلاً من استخدام BIGINT</li>
+                        <li>فصل بيانات الدفع في جدول منفصل (payments)</li>
+                        <li>إضافة جدول للعملات (currencies) لدعم عملات متعددة</li>
+                        <li>إضافة جدول للمراجعات والشكاوى (reviews_complaints)</li>
+                        <li>إنشاء جدول للإحصائيات (analytics) لتتبع الأداء</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📊 خطة التنفيذ المقترحة</h2>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">📅</span>المرحلة الأولى (الأسبوع 1-2)</div>
+                    <ul class="custom-list">
+                        <li>إزالة تكرار القيود الخارجية</li>
+                        <li>إضافة الفهارس المقترحة</li>
+                        <li>تنظيف جدول sessions</li>
+                        <li>إعداد Cron Job للتنظيف الدوري</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">📅</span>المرحلة الثانية (الأسبوع 3-4)</div>
+                    <ul class="custom-list">
+                        <li>تطبيق تشفير البيانات الحساسة</li>
+                        <li>تحسين أنواع البيانات</li>
+                        <li>توسيع نظام Audit Logging</li>
+                        <li>إضافة Rate Limiting</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="icon">📅</span>المرحلة الثالثة (الأسبوع 5-6)</div>
+                    <ul class="custom-list">
+                        <li>إضافة Two-Factor Authentication</li>
+                        <li>تطبيق توصيات الأمان المتقدمة</li>
+                        <li>إعداد نظام النسخ الاحتياطي المشفر</li>
+                        <li>اختبار الأداء والأمان</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">✅ الخلاصة</h2>
+
+                <div class="card">
+                    <h3 style="color: #10b981; margin-bottom: 15px;">نقاط القوة</h3>
+                    <ul class="custom-list">
+                        <li>بنية قاعدة بيانات منظمة وواضحة</li>
+                        <li>استخدام Foreign Keys بشكل صحيح</li>
+                        <li>نظام صلاحيات RBAC متقدم</li>
+                        <li>دعم Soft Delete للرحلات</li>
+                        <li>استخدام Timestamps في جميع الجداول</li>
+                        <li>فهرسة جيدة على المفاتيح الخارجية</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h3 style="color: #f59e0b; margin-bottom: 15px;">نقاط تحتاج تحسين</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li
+                            style="padding: 10px; background: #fef3c7; margin: 5px 0; border-radius: 8px; border-right: 4px solid #f59e0b;">
+                            ⚠️ تكرار القيود الخارجية في جدول trips
+                        </li>
+                        <li
+                            style="padding: 10px; background: #fef3c7; margin: 5px 0; border-radius: 8px; border-right: 4px solid #f59e0b;">
+                            ⚠️ عدم تشفير البيانات الحساسة
+                        </li>
+                        <li
+                            style="padding: 10px; background: #fef3c7; margin: 5px 0; border-radius: 8px; border-right: 4px solid #f59e0b;">
+                            ⚠️ استخدام LONGTEXT بشكل مبالغ فيه
+                        </li>
+                        <li
+                            style="padding: 10px; background: #fef3c7; margin: 5px 0; border-radius: 8px; border-right: 4px solid #f59e0b;">
+                            ⚠️ نقص بعض الفهارس المهمة
+                        </li>
+                        <li
+                            style="padding: 10px; background: #fef3c7; margin: 5px 0; border-radius: 8px; border-right: 4px solid #f59e0b;">
+                            ⚠️ عدم وجود نظام 2FA
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-success" style="margin-top: 30px;">
+                    <div class="alert-title">التقييم العام</div>
+                    <p style="font-size: 1.1rem; line-height: 1.8;">
+                        قاعدة البيانات مصممة بشكل جيد وتتبع أفضل الممارسات في معظم الجوانب.
+                        مع تطبيق التوصيات المذكورة، ستصبح المنصة أكثر أماناً وأداءً وقابلية للتوسع.
+                    </p>
+                    <div class="progress-bar" style="margin-top: 20px;">
+                        <div class="progress-fill" style="width: 75%;">75% جودة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📊 تقرير تحليل قاعدة بيانات WJHTAK | تم الإنشاء في 2026-01-28</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">جميع الحقوق محفوظة © WJHTAK Platform</p>
+        </div>
+    </div>
+</body>
+
+</html>

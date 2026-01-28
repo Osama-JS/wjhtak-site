@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الخدمات - My Trip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-plane-departure"></i>
+            <h2>My Trip</h2>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>نظرة عامة</span></a>
+            <a href="tech-stack.html" class="nav-item"><i class="fas fa-layer-group"></i><span>التقنيات
+                    المستخدمة</span></a>
+            <a href="database.html" class="nav-item"><i class="fas fa-database"></i><span>قاعدة البيانات</span></a>
+            <a href="api.html" class="nav-item"><i class="fas fa-code"></i><span>واجهات API</span></a>
+            <a href="services.html" class="nav-item active"><i class="fas fa-cogs"></i><span>الخدمات</span></a>
+            <a href="admin.html" class="nav-item"><i class="fas fa-user-shield"></i><span>لوحة الإدارة</span></a>
+            <a href="deployment.html" class="nav-item"><i class="fas fa-rocket"></i><span>النشر والتشغيل</span></a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="page-header">
+            <h1>الخدمات</h1>
+            <p class="subtitle">الخدمات المركزية لمنطق الأعمال</p>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- MailService -->
+            <section class="doc-section">
+                <div class="schema-table">
+                    <h3><i class="fas fa-envelope"></i> MailService</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        خدمة مركزية لإدارة جميع عمليات البريد الإلكتروني
+                    </p>
+
+                    <h4>الموقع:</h4>
+                    <div class="code-block">
+                        <code>app/Services/MailService.php</code>
+                    </div>
+
+                    <h4 class="mt-4">الدوال المتاحة:</h4>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الدالة</th>
+                                <th>المعاملات</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>sendVerificationOtp()</code></td>
+                                <td>User $user, int $otp</td>
+                                <td>إرسال رمز التحقق OTP</td>
+                            </tr>
+                            <tr>
+                                <td><code>sendPasswordResetOtp()</code></td>
+                                <td>User $user, int $otp</td>
+                                <td>إرسال رمز إعادة تعيين كلمة المرور</td>
+                            </tr>
+                            <tr>
+                                <td><code>sendWelcomeEmail()</code></td>
+                                <td>User $user</td>
+                                <td>إرسال بريد الترحيب</td>
+                            </tr>
+                            <tr>
+                                <td><code>sendAnnouncement()</code></td>
+                                <td>User $user, string $title, string $content, ...</td>
+                                <td>إرسال إعلان مخصص</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 class="mt-4">مثال الاستخدام:</h4>
+                    <div class="code-block">
+                        <code>// في Controller
+$mailService = app(MailService::class);
+$mailService->sendVerificationOtp($user, $otp);
+
+// أو عبر Dependency Injection
+public function __construct(MailService $mailService)
+{
+    $this->mailService = $mailService;
+}</code>
+                    </div>
+
+                    <h4 class="mt-4">المميزات:</h4>
+                    <ul>
+                        <li>إرسال فوري (Synchronous) للبريد</li>
+                        <li>معالجة الأخطاء وتسجيلها</li>
+                        <li>قوالب بريد احترافية</li>
+                        <li>دعم متعدد اللغات</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- FirebaseService -->
+            <section class="doc-section">
+                <div class="schema-table">
+                    <h3><i class="fab fa-google"></i> FirebaseService</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        خدمة إرسال الإشعارات عبر Firebase Cloud Messaging
+                    </p>
+
+                    <h4>الموقع:</h4>
+                    <div class="code-block">
+                        <code>app/Services/FirebaseService.php</code>
+                    </div>
+
+                    <h4 class="mt-4">الدوال المتاحة:</h4>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الدالة</th>
+                                <th>المعاملات</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>sendNotification()</code></td>
+                                <td>string $token, string $title, string $body, array $data</td>
+                                <td>إرسال إشعار لجهاز واحد</td>
+                            </tr>
+                            <tr>
+                                <td><code>getAccessToken()</code></td>
+                                <td>-</td>
+                                <td>الحصول على رمز OAuth2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 class="mt-4">الإعدادات المطلوبة (.env):</h4>
+                    <div class="code-block">
+                        <code>FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_CREDENTIALS_PATH=storage/app/firebase/service-account.json</code>
+                    </div>
+
+                    <h4 class="mt-4">مثال الاستخدام:</h4>
+                    <div class="code-block">
+                        <code>$firebaseService = app(FirebaseService::class);
+$firebaseService->sendNotification(
+    $user->fcm_token,
+    'عنوان الإشعار',
+    'محتوى الإشعار',
+    ['key' => 'value']
+);</code>
+                    </div>
+
+                    <h4 class="mt-4">المميزات:</h4>
+                    <ul>
+                        <li>FCM HTTP v1 API</li>
+                        <li>OAuth2 Authentication يدوي</li>
+                        <li>دعم iOS و Android</li>
+                        <li>إرسال بيانات مخصصة</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- HyperPayService -->
+            <section class="doc-section">
+                <div class="schema-table">
+                    <h3><i class="fas fa-credit-card"></i> HyperPayService</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        خدمة التكامل مع بوابة الدفع HyperPay
+                    </p>
+
+                    <h4>الموقع:</h4>
+                    <div class="code-block">
+                        <code>app/Services/HyperPayService.php</code>
+                    </div>
+
+                    <h4 class="mt-4">الدوال المتاحة:</h4>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>الدالة</th>
+                                <th>المعاملات</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>prepareCheckout()</code></td>
+                                <td>float $amount, string $paymentType, array $params</td>
+                                <td>إنشاء Checkout ID</td>
+                            </tr>
+                            <tr>
+                                <td><code>getPaymentStatus()</code></td>
+                                <td>string $checkoutId, string $paymentType</td>
+                                <td>التحقق من حالة الدفع</td>
+                            </tr>
+                            <tr>
+                                <td><code>isSuccessful()</code></td>
+                                <td>string $resultCode</td>
+                                <td>التحقق من نجاح العملية</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 class="mt-4">الإعدادات المطلوبة:</h4>
+                    <div class="code-block">
+                        <code>HYPERPAY_BASE_URL=https://test.oppwa.com/v1/
+HYPERPAY_ACCESS_TOKEN=your-access-token
+HYPERPAY_ENTITY_ID_MADA=entity-id-for-mada
+HYPERPAY_ENTITY_ID_VISA_MASTER=entity-id-for-visa
+HYPERPAY_ENTITY_ID_APPLE=entity-id-for-apple-pay
+HYPERPAY_CURRENCY=SAR</code>
+                    </div>
+
+                    <h4 class="mt-4">مثال الاستخدام:</h4>
+                    <div class="code-block">
+                        <code>// إنشاء Checkout
+$result = $hyperPayService->prepareCheckout(
+    100.50,
+    'visa_master',
+    ['merchantTransactionId' => 'ORDER-123']
+);
+
+// التحقق من الدفع
+$status = $hyperPayService->getPaymentStatus(
+    $checkoutId,
+    'visa_master'
+);
+
+if ($hyperPayService->isSuccessful($status['result']['code'])) {
+    // الدفع نجح
+}</code>
+                    </div>
+
+                    <h4 class="mt-4">أنواع الدفع المدعومة:</h4>
+                    <ul>
+                        <li><code>mada</code> - بطاقات مدى</li>
+                        <li><code>visa_master</code> - Visa/Mastercard</li>
+                        <li><code>apple_pay</code> - Apple Pay</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Service Configuration -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-cog"></i> ملفات الإعدادات</h2>
+                <div class="card">
+                    <h3>config/hyperpay.php</h3>
+                    <p>إعدادات HyperPay:</p>
+                    <div class="code-block">
+                        <code>return [
+    'base_url' => env('HYPERPAY_BASE_URL'),
+    'access_token' => env('HYPERPAY_ACCESS_TOKEN'),
+    'entity_ids' => [
+        'mada' => env('HYPERPAY_ENTITY_ID_MADA'),
+        'visa_master' => env('HYPERPAY_ENTITY_ID_VISA_MASTER'),
+        'apple_pay' => env('HYPERPAY_ENTITY_ID_APPLE'),
+    ],
+    'currency' => env('HYPERPAY_CURRENCY', 'SAR'),
+];</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Best Practices -->
+            <section class="doc-section">
+                <h2 class="section-title"><i class="fas fa-lightbulb"></i> أفضل الممارسات</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>Dependency Injection</h3>
+                        <p>استخدم DI في Controllers:</p>
+                        <div class="code-block">
+                            <code>public function __construct(
+    MailService $mailService,
+    FirebaseService $firebase
+) {
+    $this->mailService = $mailService;
+    $this->firebase = $firebase;
+}</code>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Error Handling</h3>
+                        <p>جميع الخدمات تحتوي على معالجة أخطاء:</p>
+                        <div class="code-block">
+                            <code>try {
+    $service->method();
+} catch (\Exception $e) {
+    Log::error($e->getMessage());
+}</code>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Logging</h3>
+                        <p>تسجيل جميع العمليات المهمة:</p>
+                        <div class="code-block">
+                            <code>Log::info('Payment initiated', [
+    'amount' => $amount,
+    'user_id' => $userId
+]);</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="doc-footer">
+            <p>© 2026 My Trip - جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

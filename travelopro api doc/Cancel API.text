@@ -1,0 +1,65 @@
+Cancel API
+Cancel API web service is used to request to cancel the booking identified by the UniqueID element
+
+Cancel API Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/cancel
+Request Parameters
+
+Parameter	Data Type	Required	Description	Example
+user_id	string	Yes	It is used to specify the user name.
+user_password	string	Yes	It is used to specify the password.
+access	string	Yes	It is used to specify the access type. Possible values : Test, Production.	Test/Production
+ip_address	string	Yes	It is used to get ip_address of the system from which IP, the API is accessed.	Authorized by Travelopro
+UniqueID	string	Yes	To specify the API booking reference unique ID	TR31072022
+Response Parameters
+
+Parameter	Data Type	Required	Description	Example
+success	Boolean	Yes	It specifies whether the cancelation is successful or not (True / False)	True
+UniqueID	string	Yes	It specifies the booking reference unique ID. Appears only if the booking is successful	e.g. TR0000341
+Errors	Nested JSON	No	Contains the list of errors if exists.
+Error	Nested JSON	Yes	Contains the error details
+code	string	Error code
+Message	string	Error Message
+Target	Enum	Yes	Target of Server (Test / Production)	Test
+Sample Request
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "UniqueID": "TR31072022"
+}
+
+Sample Error Response
+{
+    "CancelBookingResponse":
+    {
+        "CancelBookingResult":
+        {
+            "Errors":
+            {
+                "ErrorCode": "EROTK007",
+                "ErrorMessage": "Booking may be already ordered for ticket or ticketed or cancelled."
+            },
+            "Success": "false",
+            "Target": "Test",
+            "UniqueID": ""
+        }
+    }
+}
+
+Sample Success Response
+{
+    "CancelBookingResponse":
+    {
+        "CancelBookingResult":
+        {
+            "Errors": "",
+            "Success": "true",
+            "Target": "Test",
+            "UniqueID": "TR04316618"
+        }
+    }
+}

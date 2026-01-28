@@ -1,0 +1,368 @@
+Search Post Ticket Status Method
+Get the Post Ticketing Request's status & details based on the Unique ID.
+
+Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/search_post_ticket_status
+Request Parameters
+
+#	Parameter	Data Type	Required	Description	Example
+1	user_id	String	Yes	It is used to specify the user name.
+2	user_password	String	Yes	It is used to specify the password
+3	access	String	Yes	It is used to specify the access type. Possible values : Test, Production.
+4	ip_address	String	Yes	It is used to get ip_address of the system from which IP, the API is accessed.
+5	uniqueID	string	Yes	To specify the API booking reference unique ID.	TR31072022
+6	ptrUniqueID	string	Yes	To specify the API PTR request reference ID.	9154
+Sample Request
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "UniqueID": "TR31072022",
+    "ptrUniqueID": "9154"
+}
+
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLERBUK106",
+        "ErrorMessage": "Booking may be already cancelled."
+    }
+}
+
+Sample Failed Response
+{
+    "PtrResponse": {
+        "PtrResult": {
+            "Success": "false",
+            "Errors": {
+                "ErrorMessage": "Your Request is InProcess."
+            },
+            "PtrDetails": []
+        }
+    }
+}
+
+Sample Success Response of
+Void Search
+{
+    "PtrResponse":
+    {
+        "PtrResult":
+        {
+            "Success": "true",
+            "Errors":
+            [],
+            "PtrDetails":
+            [
+                {
+                    "UniqueID": "TR75162023",
+                    "PtrUniqueID": 31124,
+                    "PtrType": "Void",
+                    "PtrStatus": "Completed",
+                    "Resolution": "Voided",
+                    "PaxDetails":
+                    [
+                        {
+                            "PassengerType": "ADT",
+                            "Title": "Mrs",
+                            "FirstName": "jenny",
+                            "LastName": "Tylor",
+                            "ETicket": "Test-4712050031"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+
+Refund Quote Search
+{
+    "PtrResponse":
+    {
+        "PtrResult":
+        {
+            "Success": "true",
+            "Errors":
+            [],
+            "PtrDetails":
+            [
+                {
+                    "UniqueID": "TR75162023",
+                    "PtrUniqueID": 24059,
+                    "PtrType": "RefundQuote",
+                    "PtrStatus": "Completed",
+                    "Resolution": "",
+                    "PaxDetails":
+                    [
+                        {
+                            "PassengerType": "ADT",
+                            "Title": "Mrs",
+                            "FirstName": "jenny",
+                            "LastName": "Tylor",
+                            "ETicket": "Test-4712050031",
+                            "QuotedFares":
+                            {
+                                "TotalFare":
+                                {
+                                    "Amount": "291.65",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "UnusedFare":
+                                {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "CancellationCharge":
+                                {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "NoShowCharge":
+                                {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "Tax":
+                                {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "GSTCharge":
+                                {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalRefundCharges":
+                                {
+                                    "Amount": "291.65",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalRefundAmount":
+                                {
+                                    "Amount": "92.10",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "YQ_Tax":
+                                {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "YR_Tax":
+                                {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                },
+                                "ExtraServiceCharge":
+                                {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "USD",
+                                    "DecimalPlaces": "2"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+
+Refund Search
+{
+    "PtrResponse":
+    {
+        "PtrResult":
+        {
+            "Success": "true",
+            "Errors":
+            [],
+            "PtrDetails":
+            [
+                {
+                    "UniqueID": "TR75162023",
+                    "PtrUniqueID": 82799,
+                    "PtrType": "Refund",
+                    "PtrStatus": "Completed",
+                    "Resolution": "Refunded",
+                    "PaxDetails":
+                    [
+                        {
+                            "PassengerType": "ADT",
+                            "Title": "Mrs",
+                            "FirstName": "jenny",
+                            "LastName": "Tylor",
+                            "ETicket": "Test-4712050031"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+
+Reissue Quote Search
+{
+    "PtrResponse":
+    {
+        "PtrResult":
+        {
+            "Success": "true",
+            "Errors":
+            [],
+            "PtrDetails":
+            [
+                {
+                    "UniqueID": "TR75162023",
+                    "PtrUniqueID": 24873,
+                    "PtrType": "ReIssueQuote",
+                    "PtrStatus": "Completed",
+                    "Resolution": "QuoteUpdated",
+                    "PaxDetails":
+                    [
+                        {
+                            "PassengerType": "ADT",
+                            "Title": "Mrs",
+                            "FirstName": "jenny",
+                            "LastName": "Tylor",
+                            "ETicket": "Test-4712050031"
+                        }
+                    ],
+                    "RequestedPreferences":
+                    [
+                        {
+                            "PreferenceOption": "1",
+                            "QuotedSegments":
+                            [
+                                {
+                                    "DepartureAirportLocationCode": "JFK",
+                                    "ArrivalAirportLocationCode": "LIS",
+                                    "CabinClass": "Y",
+                                    "DepartureDateTime": "2023-05-01T16:33:38",
+                                    "ArrivalDateTime": "2023-05-01T22:33:38",
+                                    "AirlineCode": "TP",
+                                    "FlightNumber": "210",
+                                    "JourneyDuration": "360",
+                                    "StopQuantity": "0",
+                                    "BookingClass": "S",
+                                    "isReturn": false
+                                },
+                                {
+                                    "DepartureAirportLocationCode": "LIS",
+                                    "ArrivalAirportLocationCode": "AMS",
+                                    "CabinClass": "Y",
+                                    "DepartureDateTime": "2023-05-02T14:33:38",
+                                    "ArrivalDateTime": "2023-05-02T16:33:38",
+                                    "AirlineCode": "TP",
+                                    "FlightNumber": "672",
+                                    "JourneyDuration": "120",
+                                    "StopQuantity": "0",
+                                    "BookingClass": "S",
+                                    "isReturn": false
+                                }
+                            ],
+                            "QuotedFares":
+                            [
+                                {
+                                    "PassengerTypeQuantity":
+                                    {
+                                        "Code": 2,
+                                        "Quantity": "ADT"
+                                    },
+                                    "BaseFareDifference":
+                                    {
+                                        "Amount": "428.27",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": "2"
+                                    },
+                                    "TaxDifference":
+                                    {
+                                        "Amount": "71.38",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": "2"
+                                    },
+                                    "GST":
+                                    {
+                                        "Amount": "0.00",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": "2"
+                                    },
+                                    "NoShowPenalty":
+                                    {
+                                        "Amount": "0.00",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": "2"
+                                    },
+                                    "Penalty":
+                                    {
+                                        "Amount": "214.13",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": "2"
+                                    },
+                                    "OtherTaxesK3":
+                                    {
+                                        "Amount": "0.00",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": "2"
+                                    },
+                                    "TotalFareDifference":
+                                    {
+                                        "Amount": "713.78",
+                                        "CurrencyCode": "USD",
+                                        "DecimalPlaces": "2"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+
+Reissue Search
+{
+    "PtrResponse":
+    {
+        "PtrResult":
+        {
+            "Success": "true",
+            "Errors":
+            [],
+            "PtrDetails":
+            [
+                {
+                    "UniqueID": "TR75162023",
+                    "PtrUniqueID": "24873",
+                    "PtrType": "ReIssue",
+                    "PtrStatus": "Completed",
+                    "Resolution": "Reissued",
+                    "PaxDetails":
+                    [
+                        {
+                            "PassengerType": "ADT",
+                            "Title": "Mrs",
+                            "FirstName": "jenny",
+                            "LastName": "Tylor",
+                            "ETicket": "TEST-9569564065"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

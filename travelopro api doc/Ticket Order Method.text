@@ -1,0 +1,70 @@
+Ticket Order Method
+This method is to be called to generate ticket Non LCCs (already booked itinerary - Public and Private Fare types only). For LCCs instant confirmation will get from Book method itself.
+
+Ticket Order Request
+
+Method	URL
+POST	https://travelnext.works/api/aeroVE5/ticket_order
+Request Parameters
+
+Parameter	Data Type	Required	Description	Example
+user_id	string	Yes	It is used to specify the user name.
+user_password	string	Yes	It is used to specify the password.
+access	string	Yes	It is used to specify the access type. Possible values : Test, Production.	Test/Production
+ip_address	string	Yes	It is used to get ip_address of the system from which IP, the API is accessed.	Authorized by Trawex
+UniqueID	string	Yes	To specify the API booking reference unique ID	TR31072022
+Response Parameters
+
+Parameter	Data Type	Required	Description	Example
+success	string	Yes		True / False
+UniqueID	string	No	It specifies the booking reference unique ID.	TR0000341
+Target	string	Yes	Target of Server(Test / Production)	Test
+Errors	Nested JSON	No	Contains the list of errors if any exist.
+Error	Nested JSON	Yes	Contains the error details
+ErrorCode	string	Yes	Error Code	EROTK007
+ErrorMessage	string	Yes	Error Message	Booking may be already ordered for ticket or ticketed or cancelled.
+Sample Request
+{
+    "user_id": "*********",
+    "user_password": "*********",
+    "access": "*********",
+    "ip_address": "*********",
+    "UniqueID": "TR31072022"
+}
+
+Sample Error Response
+{
+    "Errors": {
+        "ErrorCode": "FLFLHOTSEARCHVAL",
+        "ErrorMessage": "UserId required"
+    }
+}
+
+Sample Failed Response
+{
+    "AirOrderTicketRS": {
+        "TicketOrderResult": {
+            "Errors": {
+                "Error": {
+                    "ErrorCode": "EROTK007",
+                    "ErrorMessage": "Booking may be already ordered for ticket or ticketed or cancelled."
+                }
+            },
+            "Success": "false",
+            "UniqueID": "TR31072022",
+            "Target": "Test"
+        }
+    }
+}
+
+Sample Success Response
+{
+    "AirOrderTicketRS": {
+        "TicketOrderResult": {
+            "Errors": "",
+            "Success": "true",
+            "UniqueID": "TR31072022",
+            "Target": "Test"
+        }
+    }
+}
