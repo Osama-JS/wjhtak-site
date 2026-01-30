@@ -32,14 +32,14 @@
         <input
             type="{{ $type }}"
             name="{{ $name }}"
-            id="{{ $name }}"
+            id="{{ $attributes->get('id') ?? $name }}"
             class="form-control {{ $icon ? 'ps-5' : '' }} {{ $errors->has($name) || $error ? 'is-invalid' : '' }} {{ $attributes->get('class') }}"
             value="{{ old($name, $value) }}"
             placeholder="{{ $placeholder }}"
             {{ $required ? 'required' : '' }}
             {{ $disabled ? 'disabled' : '' }}
             {{ $readonly ? 'readonly' : '' }}
-            {{ $attributes->except('class') }}
+            {{ $attributes->except(['class','id']) }}
         >
 
         @if($type === 'password')

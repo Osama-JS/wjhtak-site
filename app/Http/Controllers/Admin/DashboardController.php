@@ -14,9 +14,9 @@ class DashboardController extends Controller
     {
         $stats = [
             'users' => \App\Models\User::count(),
-            'countries' => \App\Models\Country::count(),
-            'cities' => \App\Models\City::count(),
-            'banners' => \App\Models\Banner::active()->count(),
+            // 'countries' => \App\Models\Country::count(),
+            // 'cities' => \App\Models\City::count(),
+            // 'banners' => \App\Models\Banner::active()->count(),
         ];
 
         // Chart Data: Monthly Users (Current Year)
@@ -42,6 +42,6 @@ class DashboardController extends Controller
 
         $latestUsers = \App\Models\User::latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('stats', 'chartLabels', 'chartData', 'latestUsers'));
+        return view('admin.dashboard', compact('stats','chartLabels', 'chartData', 'latestUsers'));
     }
 }

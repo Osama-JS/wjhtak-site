@@ -31,7 +31,6 @@
                         </div>
                         <div class="stat-content d-inline-block">
                             <div class="stat-text text-muted">{{ __('Countries') }}</div>
-                            <div class="stat-digit fs-24 font-w600">{{ $stats['countries'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -46,7 +45,6 @@
                         </div>
                         <div class="stat-content d-inline-block">
                             <div class="stat-text text-muted">{{ __('Cities') }}</div>
-                            <div class="stat-digit fs-24 font-w600">{{ $stats['cities'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -61,7 +59,7 @@
                         </div>
                         <div class="stat-content d-inline-block">
                             <div class="stat-text text-muted">{{ __('Active Banners') }}</div>
-                            <div class="stat-digit fs-24 font-w600">{{ $stats['banners'] }}</div>
+                           
                         </div>
                     </div>
                 </div>

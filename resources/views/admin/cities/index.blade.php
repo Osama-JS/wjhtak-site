@@ -35,7 +35,6 @@
                                 <tr>
                                     <th>{{ __('ID') }}</th>
                                     <th>{{ __('Name (Ar)') }}</th>
-                                    <th>{{ __('Name (En)') }}</th>
                                     <th>{{ __('Country') }}</th>
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Actions') }}</th>
@@ -61,8 +60,7 @@
                 @csrf
                 <div class="modal-body">
                     <x-forms.select name="country_id" :label="__('Select Country')" :options="$countries" searchable required />
-                    <x-forms.input-text name="name_ar" :label="__('Name (Arabic)')" required />
-                    <x-forms.input-text name="name_en" :label="__('Name (English)')" required />
+                    <x-forms.input-text name="title" :label="__('Name (Arabic)')" required />
                     <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
                 </div>
                 <div class="modal-footer">
@@ -85,11 +83,10 @@
             <form id="editCityForm">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="id" id="edit_city_id">
+                <input type="hidden" id="edit_city_id">
                 <div class="modal-body">
                     <x-forms.select name="country_id" id="edit_country_id" :label="__('Select Country')" :options="$countries" searchable required />
-                    <x-forms.input-text name="name_ar" id="edit_name_ar" :label="__('Name (Arabic)')" required />
-                    <x-forms.input-text name="name_en" id="edit_name_en" :label="__('Name (English)')" required />
+                    <x-forms.input-text name="title" id="edit_title" :label="__('Name (Arabic)')" required />
                     <x-forms.checkbox name="active" id="edit_active" :label="__('Active status')" type="switch" />
                 </div>
                 <div class="modal-footer">
@@ -101,9 +98,6 @@
     </div>
 </div>
 
-@endsection
-
-@section('scripts')
 <script>
     let citiesTable;
     const citiesDataUrl = "{{ route('admin.cities.data') }}";
@@ -121,8 +115,7 @@
             },
             columns: [
                 { data: 'id' },
-                { data: 'name_ar' },
-                { data: 'name_en' },
+                { data: 'title' },
                 { data: 'country' },
                 { data: 'status' },
                 { data: 'actions', orderable: false, searchable: false }
@@ -132,6 +125,10 @@
             }
         });
 
+            $.get(citiesDataUrl, { country_id: $('#country-filter').val() }, function(response) {
+                console.log(response);
+            });
+
         // Filter change
         $('#country-filter').on('change', function() {
             citiesTable.ajax.reload();
@@ -140,7 +137,7 @@
         // Add City Form Submit
         $('#addCityForm').on('submit', function(e) {
             e.preventDefault();
-
+    
             $.ajax({
                 url: "{{ route('admin.cities.store') }}",
                 type: "POST",
@@ -149,7 +146,7 @@
                     if (response.success) {
                         $('#addCityModal').modal('hide');
                         $('#addCityForm')[0].reset();
-                        citiesTable.ajax.reload();
+                        citiesTable.ajax.reload(null,false);
                         toastr.success(response.message);
                     }
                 },
@@ -200,8 +197,7 @@
             if (response.success) {
                 const city = response.city;
                 $('#edit_city_id').val(city.id);
-                $('#edit_name_ar').val(city.name_ar);
-                $('#edit_name_en').val(city.name_en);
+                $('#edit_title').val(city.name_ar);
                 $('#edit_country_id').val(city.country_id).trigger('change');
                 $('#edit_active').prop('checked', city.active);
 
@@ -212,38 +208,76 @@
 
     function toggleCityStatus(id) {
         let url = "{{ route('admin.cities.toggle-status', ':id') }}".replace(':id', id);
-
-        WJHTAKAdmin.confirm('{{ __("Do you want to toggle this city status?") }}', function() {
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: { _token: "{{ csrf_token() }}" },
-                success: function(response) {
-                    if (response.success) {
-                        citiesTable.ajax.reload();
-                        toastr.success(response.message);
+         Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to toggle this city status?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, toggle it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: { _token: "{{ csrf_token() }}" },
+                    success: function(response) {
+                        if (response.success) {
+                            if (typeof countriesTable !== 'undefined') {
+                                citiesTable.ajax.reload(null, false);
+                            }
+                            Swal.fire('Updated!', response.message, 'success'); // عرض رسالة نجاح
+                        } else {
+                            Swal.fire('Error!', response.message || 'Something went wrong', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error!', xhr.responseJSON?.message || 'Something went wrong', 'error');
                     }
-                }
-            });
+                });
+            }
         });
     }
 
     function deleteCity(id) {
         let url = "{{ route('admin.cities.destroy', ':id') }}".replace(':id', id);
 
-        WJHTAKAdmin.confirm('{{ __("Are you sure you want to delete this city?") }}', function() {
-            $.ajax({
-                url: url,
-                type: "DELETE",
-                data: { _token: "{{ csrf_token() }}" },
-                success: function(response) {
-                    if (response.success) {
-                        citiesTable.ajax.reload();
-                        toastr.success(response.message);
+        Swal.fire({
+            title: '{{ __("Are you sure?") }}',
+            text: '{{ __("This will delete the city and related data!") }}',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '{{ __("Yes, delete it!") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: url,
+                    type: "DELETE",
+                    data: { _token: "{{ csrf_token() }}" },
+                    success: function(response) {
+                        if (response.success) {
+                            if (typeof countriesTable !== 'undefined') {
+                                countriesTable.ajax.reload();
+                            }
+                            toastr.success(response.message);
+                        } else {
+                            toastr.error(response.message || '{{ __("Something went wrong") }}');
+                        }
+                    },
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || '{{ __("Something went wrong") }}');
                     }
-                }
-            });
+                });
+            }
         });
     }
 </script>
+
+@endsection
+
+@section('scripts')
+
 @endsection

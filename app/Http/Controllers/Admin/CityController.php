@@ -15,7 +15,9 @@ class CityController extends Controller
      */
     public function index()
     {
-        $countries = Country::active()->orderBy('name_' . app()->getLocale())->get();
+        $column = app()->getLocale() === 'ar' ? 'name' : 'nicename';
+        $countries = Country::active()->orderBy($column)->get();
+        // $countries = Country::active()->orderBy('name' . app()->getLocale())->get();
         return view('admin.cities.index', compact('countries'));
     }
 
@@ -36,8 +38,7 @@ class CityController extends Controller
         $data = $cities->map(function ($city) {
             return [
                 'id' => $city->id,
-                'name_ar' => $city->name_ar,
-                'name_en' => $city->name_en,
+                'title' => $city->title,
                 'country' => $city->country ?
                     '<span class="d-flex align-items-center"><img src="' . $city->country->flag_url . '" width="20" height="20" class="rounded-circle me-2">' . $city->country->name . '</span>'
                     : '---',
@@ -70,8 +71,7 @@ class CityController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'country_id' => 'required|exists:countries,id',
-            'name_ar' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'active' => 'boolean',
         ]);
 
@@ -79,11 +79,11 @@ class CityController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['country_id', 'name_ar', 'name_en']);
+        $data = $request->only(['country_id', 'title']);
         $data['active'] = $request->boolean('active', true);
 
-        City::create($data);
-
+        $cities = City::create($data);
+        // dd($cities);
         return response()->json([
             'success' => true,
             'message' => __('City added successfully'),
@@ -111,8 +111,7 @@ class CityController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'country_id' => 'required|exists:countries,id',
-            'name_ar' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'active' => 'boolean',
         ]);
 
@@ -120,7 +119,7 @@ class CityController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['country_id', 'name_ar', 'name_en']);
+        $data = $request->only(['country_id', 'name_ar']);
         $data['active'] = $request->boolean('active', true);
 
         $city->update($data);
