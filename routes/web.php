@@ -93,6 +93,11 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::post('companies/{companie}/toggle-status', [App\Http\Controllers\Admin\CompanyController::class, 'toggleStatus'])->name('companies.toggle-status');
     Route::resource('companies', App\Http\Controllers\Admin\CompanyController::class);
 
+    
+    Route::get('company-codes/data', [App\Http\Controllers\Admin\Company_CodesController::class, 'getData'])->name('company-codes.data');
+    Route::post('company-codes/{company_code}/toggle-status', [App\Http\Controllers\Admin\Company_CodesController::class, 'toggleStatus'])->name('company-codes.toggle-status');
+    Route::resource('company-codes', App\Http\Controllers\Admin\Company_CodesController::class);
+
 
     // Banners Management
     Route::get('banners/data', [App\Http\Controllers\Admin\BannerController::class, 'getData'])->name('banners.data');

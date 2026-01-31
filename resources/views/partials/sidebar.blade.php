@@ -64,7 +64,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="{{ route('admin.companies.index') }}">{{ __('companies') }}</a></li>
-                    <li><a href="{{ route('admin.cities.index') }}">{{ __('Cities') }}</a></li>
+                    <li><a href="{{ route('admin.company-codes.index') }}">{{ __('Company Codes') }}</a></li>
                 </ul>
             </li>
             <li>
