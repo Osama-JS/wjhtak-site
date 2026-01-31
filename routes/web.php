@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\ProfileController;
+
+
 use Illuminate\Support\Facades\Route;
 
 // Language switcher
@@ -83,6 +85,19 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::get('cities/by-country/{country}', [App\Http\Controllers\Admin\CityController::class, 'byCountry'])->name('cities.by-country');
     Route::post('cities/{city}/toggle-status', [App\Http\Controllers\Admin\CityController::class, 'toggleStatus'])->name('cities.toggle-status');
     Route::resource('cities', App\Http\Controllers\Admin\CityController::class);
+
+
+    // companies Management
+    Route::get('companies/data', [App\Http\Controllers\Admin\CompanyController::class, 'getData'])->name('companies.data');
+    Route::get('companies/active', [App\Http\Controllers\Admin\CompanyController::class, 'getActivecompanies'])->name('companies.active');
+    Route::post('companies/{companie}/toggle-status', [App\Http\Controllers\Admin\CompanyController::class, 'toggleStatus'])->name('companies.toggle-status');
+    Route::resource('companies', App\Http\Controllers\Admin\CompanyController::class);
+
+    
+    Route::get('company-codes/data', [App\Http\Controllers\Admin\Company_CodesController::class, 'getData'])->name('company-codes.data');
+    Route::post('company-codes/{company_code}/toggle-status', [App\Http\Controllers\Admin\Company_CodesController::class, 'toggleStatus'])->name('company-codes.toggle-status');
+    Route::resource('company-codes', App\Http\Controllers\Admin\Company_CodesController::class);
+
 
     // Banners Management
     Route::get('banners/data', [App\Http\Controllers\Admin\BannerController::class, 'getData'])->name('banners.data');

@@ -21,27 +21,58 @@ class CountryController extends Controller
     /**
      * Get countries data for DataTable.
      */
+    // public function getData()
+    // {
+    //     try{
+    //         $countries = Country::withCount('cities')->get();
+
+    //         $data = $countries->map(function ($country) {
+    //             return [
+    //                 'id' => $country->id,
+    //                 'flag' => '<img src="' . $country->flag_url . '" alt="' . $country->nicename . '" class="rounded-circle" width="40" height="40" style="object-fit: cover;">',
+    //                 'name' => $country->name,
+    //                 'nicename' => $country->nicename,
+    //                 'numcode' => '<span class="badge badge-light">' . $country->numcode . '</span>',
+    //                 'phonecode' => $country->phonecode ?? '---',
+    //                 'cities_count' => '<span class="badge badge-primary">' . $country->cities_count . '</span>',
+    //                 'status' => $country->active
+    //                     ? '<span class="badge badge-success">' . __('Active') . '</span>'
+    //                     : '<span class="badge badge-danger">' . __('Inactive') . '</span>',
+    //                 'actions' => $this->getActionButtons($country),
+    //             ];
+    //         });
+
+    //         return response()->json(['data' => $data]);
+    //     }catch (\Exception $e) {
+    //     return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
+
     public function getData()
     {
-        $countries = Country::withCount('cities')->get();
+        try {
+            $countries = Country::withCount('cities')->get();
 
-        $data = $countries->map(function ($country) {
-            return [
-                'id' => $country->id,
-                'flag' => '<img src="' . $country->flag_url . '" alt="' . $country->name_en . '" class="rounded-circle" width="40" height="40" style="object-fit: cover;">',
-                'name_ar' => $country->name_ar,
-                'name_en' => $country->name_en,
-                'code' => '<span class="badge badge-light">' . $country->code . '</span>',
-                'phone_code' => $country->phone_code ?? '---',
-                'cities_count' => '<span class="badge badge-primary">' . $country->cities_count . '</span>',
-                'status' => $country->active
-                    ? '<span class="badge badge-success">' . __('Active') . '</span>'
-                    : '<span class="badge badge-danger">' . __('Inactive') . '</span>',
-                'actions' => $this->getActionButtons($country),
-            ];
-        });
+            $data = $countries->map(function ($country) {
+                return [
+                    'id' => $country->id,
+                    'flag' => '<img src="' . $country->flag_url . '" alt="' . $country->nicename . '" class="rounded-circle" width="40" height="40" style="object-fit: cover;">',
+                    'name' => $country->name,
+                    'nicename' => $country->nicename,
+                    'numcode' => '<span class="badge badge-light">' . $country->numcode . '</span>',
+                    'phonecode' => $country->phonecode ?? '---',
+                    'cities_count' => '<span class="badge badge-primary">' . $country->cities_count . '</span>',
+                    'status' => $country->active
+                        ? '<span class="badge badge-success">' . __('Active') . '</span>'
+                        : '<span class="badge badge-danger">' . __('Inactive') . '</span>',
+                    'actions' => $this->getActionButtons($country),
+                ];  
+            });
 
-        return response()->json(['data' => $data]);
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -62,19 +93,19 @@ class CountryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name_ar' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
-            'code' => 'required|string|max:10|unique:countries,code',
-            'phone_code' => 'nullable|string|max:10',
+            'name' => 'required|string|max:255',
+            'nicename' => 'required|string|max:255',
+            'numcode' => 'required|string|max:10|unique:countries,numcode',
+            'phonecode' => 'nullable|string|max:10',
             'flag' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'active' => 'boolean',
+            'active' => 'sometimes|boolean',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['name_ar', 'name_en', 'code', 'phone_code']);
+        $data = $request->only(['name', 'nicename', 'numcode', 'phonecode']);
         $data['active'] = $request->boolean('active', true);
 
         // Handle flag upload
@@ -82,7 +113,9 @@ class CountryController extends Controller
             $data['flag'] = $request->file('flag')->store('flags', 'public');
         }
 
-        Country::create($data);
+        $countrie = Country::create($data);
+
+        // dd($countrie);
 
         return response()->json([
             'success' => true,
@@ -108,10 +141,10 @@ class CountryController extends Controller
     public function update(Request $request, Country $country)
     {
         $validator = Validator::make($request->all(), [
-            'name_ar' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
-            'code' => 'required|string|max:10|unique:countries,code,' . $country->id,
-            'phone_code' => 'nullable|string|max:10',
+            'name' => 'required|string|max:255',
+            'nicename' => 'required|string|max:255',
+            'numcode' => 'required|string|max:10|unique:countries,numcode,' . $country->id,
+            'phonecode' => 'nullable|string|max:10',
             'flag' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'active' => 'boolean',
         ]);
@@ -120,7 +153,7 @@ class CountryController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['name_ar', 'name_en', 'code', 'phone_code']);
+        $data = $request->only(['name', 'nicename', 'numcode', 'phonecode']);
         $data['active'] = $request->boolean('active', true);
 
         // Handle flag upload
@@ -176,7 +209,7 @@ class CountryController extends Controller
      */
     public function getActiveCountries()
     {
-        $countries = Country::active()->orderBy('name_' . app()->getLocale())->get(['id', 'name_ar', 'name_en']);
+        $countries = Country::active()->orderBy('name_' . app()->getLocale())->get(['id', 'name', 'nicename']);
 
         return response()->json($countries);
     }

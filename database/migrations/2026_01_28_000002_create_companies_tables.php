@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('notes')->nullable();
+            $table->boolean('active')->default(false);
             $table->timestamps();
         $table->softDeletes();
 
@@ -33,6 +34,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->enum('type', ['fixed', 'percentage'])->default('fixed');
             $table->decimal('value', 8, 2)->default(0.00);
+            $table->boolean('active')->default(false);
         $table->softDeletes();
 
             $table->timestamps();
