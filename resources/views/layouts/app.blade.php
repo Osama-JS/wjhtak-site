@@ -25,23 +25,7 @@
     <script src="{{ asset('vendor/toastr/js/toastr.min.js') }}"></script>
 
 
-    <!-- Global Variables for Template -->
-    <script>
-        window.bootstrap = bootstrap;
-        var dlabConfig = {
-            typography: "poppins",
-            version: "light",
-            layout: "horizontal",
-            primary: "color_1",
-            headerBg: "color_1",
-            navheaderBg: "color_1",
-            sidebarBg: "color_1",
-            sidebarStyle: "full",
-            sidebarPosition: "fixed",
-            headerPosition: "fixed",
-            containerLayout: "full",
-        };
-    </script>
+
 
     <!-- Custom Stylesheet -->
     <link href="{{ asset('vendor/jquery-nice-select/css/nice-select.css') }}" rel="stylesheet">
@@ -74,30 +58,9 @@
 
     @stack('styles')
 </head>
-@php
-    $theme_version = $_COOKIE['version'] ?? 'light';
-    $typography = $_COOKIE['typography'] ?? 'poppins';
-    $layout = $_COOKIE['layout'] ?? 'vertical';
-    $nav_headerbg = $_COOKIE['navheaderBg'] ?? 'color_1';
-    $headerbg = $_COOKIE['headerBg'] ?? 'color_1';
-    $sidebarStyle = $_COOKIE['sidebarStyle'] ?? 'full';
-    $sidebarPosition = $_COOKIE['sidebarPosition'] ?? 'fixed';
-    $headerPosition = $_COOKIE['headerPosition'] ?? 'fixed';
-    $containerLayout = $_COOKIE['containerLayout'] ?? 'full';
-    $primary = $_COOKIE['primary'] ?? 'color_1';
-@endphp
-<body
-    data-typography="{{ $typography }}"
-    data-theme-version="{{ $theme_version }}"
-    data-layout="{{ $layout }}"
-    data-nav-headerbg="{{ $nav_headerbg }}"
-    data-headerbg="{{ $headerbg }}"
-    data-sidebar-style="{{ $sidebarStyle }}"
-    data-sidebar-position="{{ $sidebarPosition }}"
-    data-header-position="{{ $headerPosition }}"
-    data-container-layout="{{ $containerLayout }}"
-    data-primary="{{ $primary }}"
->
+
+<body data-typography="poppins" data-theme-version="dark" data-sidebar-style="full" data-layout="vertical" data-nav-headerbg="color_1" data-headerbg="color_1" data-sibebarbg="color_1" data-sidebar-position="fixed" data-header-position="fixed" data-container="wide" direction="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}" data-primary="color_1">
+
 
     <!-- Preloader -->
     @include('partials.preloader')
@@ -148,6 +111,7 @@
     <!-- Custom Admin JS -->
     <script src="{{ asset('js/admin-custom.js') }}"></script>
 
+    @yield('scripts')
     @stack('scripts')
 </body>
 </html>

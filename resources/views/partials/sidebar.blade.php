@@ -2,7 +2,6 @@
 <div class="dlabnav">
     <div class="dlabnav-scroll">
         <ul class="metismenu" id="menu">
-            <li class="nav-label">{{ __('Main Menu') }}</li>
             <li>
                 <a href="{{ route('admin.dashboard') }}" aria-expanded="false">
                     <i class="flaticon-025-dashboard"></i>
@@ -10,14 +9,12 @@
                 </a>
             </li>
 
-            <li class="nav-label">{{ __('Settings') }}</li>
             <li>
                 <a href="{{ route('admin.settings.index') }}" aria-expanded="false">
                     <i class="flaticon-381-settings-2"></i>
                     <span class="nav-text">{{ __('Platform Settings') }}</span>
                 </a>
             </li>
-            <li class="nav-label">{{ __('Security & Access') }}</li>
             @can('view users')
             <li>
                 <a href="{{ route('admin.users.index') }}" aria-expanded="false">
@@ -46,7 +43,6 @@
             @endcan
 
             {{-- Content Management --}}
-            <li class="nav-label">{{ __('Content Management') }}</li>
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-globe"></i>
@@ -65,7 +61,6 @@
             </li>
 
             {{-- Hotel & Flight Categories --}}
-            <li class="nav-label">{{ __('Booking Management') }}</li>
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">
                     <i class="flaticon-045-heart"></i>

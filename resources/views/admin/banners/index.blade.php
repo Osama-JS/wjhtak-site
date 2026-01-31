@@ -212,6 +212,9 @@
         // Add Banner Form Submit
         $('#addBannerForm').on('submit', function(e) {
             e.preventDefault();
+            const btn = $(this).find('button[type="submit"]');
+            WJHTAKAdmin.btnLoading(btn, true);
+
             let formData = new FormData(this);
 
             $.ajax({
@@ -235,6 +238,9 @@
                     } else {
                         toastr.error('{{ __("Something went wrong") }}');
                     }
+                },
+                complete: function() {
+                    WJHTAKAdmin.btnLoading(btn, false);
                 }
             });
         });
@@ -242,6 +248,9 @@
         // Edit Banner Form Submit
         $('#editBannerForm').on('submit', function(e) {
             e.preventDefault();
+            const btn = $(this).find('button[type="submit"]');
+            WJHTAKAdmin.btnLoading(btn, true);
+
             const id = $('#edit_banner_id').val();
             let url = "{{ route('admin.banners.update', ':id') }}".replace(':id', id);
             let formData = new FormData(this);
@@ -266,6 +275,9 @@
                     } else {
                         toastr.error('{{ __("Something went wrong") }}');
                     }
+                },
+                complete: function() {
+                    WJHTAKAdmin.btnLoading(btn, false);
                 }
             });
         });

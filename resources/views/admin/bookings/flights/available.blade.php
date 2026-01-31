@@ -258,8 +258,8 @@ $(document).ready(function() {
         const $list = $('#flights-list');
         const formData = $(this).serialize();
 
-        $btn.prop('disabled', true).find('.search-btn-text').addClass('d-none');
-        $btn.find('.spinner-border').removeClass('d-none');
+        WJHTAKAdmin.btnLoading($btn, true, '{{ __("Searching...") }}');
+
         $list.empty();
         $('#no-results').addClass('d-none');
 
@@ -278,8 +278,7 @@ $(document).ready(function() {
                 Swal.fire('Error', err.responseJSON.message || 'Error occurred', 'error');
             },
             complete: function() {
-                $btn.prop('disabled', false).find('.search-btn-text').removeClass('d-none');
-                $btn.find('.spinner-border').addClass('d-none');
+                WJHTAKAdmin.btnLoading($btn, false);
             }
         });
     });
@@ -390,7 +389,7 @@ $(document).ready(function() {
             fare_source_code: $btn.data('fare-source')
         };
 
-        $btn.html('<span class="spinner-border spinner-border-sm"></span>').prop('disabled', true);
+        WJHTAKAdmin.btnLoading($btn, true, '{{ __("Validating...") }}');
 
         $.ajax({
             url: '{{ route("admin.bookings.flights.validate") }}',
@@ -403,7 +402,7 @@ $(document).ready(function() {
                 Swal.fire('Error', err.responseJSON.message || 'Fare no longer available', 'error');
             },
             complete: function() {
-                $btn.html('{{ __("Book Now") }}').prop('disabled', false);
+                WJHTAKAdmin.btnLoading($btn, false);
             }
         });
     });
@@ -485,7 +484,7 @@ $(document).ready(function() {
         const $btn = $(this).find('button[type="submit"]');
         const formData = $(this).serialize();
 
-        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Processing...');
+        WJHTAKAdmin.btnLoading($btn, true, '{{ __("Processing...") }}');
 
         $.ajax({
             url: '{{ route("admin.bookings.flights.book") }}',
@@ -505,7 +504,7 @@ $(document).ready(function() {
                  Swal.fire('Error', err.responseJSON.message || 'Error occurred during booking', 'error');
             },
             complete: function() {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-circle me-2"></i>{{ __("Confirm Booking") }}');
+                WJHTAKAdmin.btnLoading($btn, false);
             }
         });
     });

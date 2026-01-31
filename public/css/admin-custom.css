@@ -326,9 +326,10 @@
     background: #f8f9fa;
 }
 
-.file-upload-wrapper:hover {
+.file-upload-wrapper:hover,
+.file-upload-wrapper.dragover {
     border-color: var(--wjhtak-primary);
-    background: rgba(19, 88, 70, 0.02);
+    background: rgba(19, 88, 70, 0.05);
 }
 
 .file-upload-wrapper input[type="file"] {

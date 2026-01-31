@@ -121,6 +121,9 @@
 
     $('#roleForm').on('submit', function(e) {
         e.preventDefault();
+        const btn = $('#saveBtn');
+        WJHTAKAdmin.btnLoading(btn, true);
+
         const id = $('#role_id').val();
         const updateId = updateRoleUrl.replace(':id', id);
         const url = id ? updateId : addRoleUrl;
@@ -144,6 +147,9 @@
                     errorMsg += value[0] + '\n';
                 });
                 Swal.fire('{{ __('Error') }}', errorMsg || '{{ __('Something went wrong') }}', 'error');
+            },
+            complete: function() {
+                WJHTAKAdmin.btnLoading(btn, false);
             }
         });
     });

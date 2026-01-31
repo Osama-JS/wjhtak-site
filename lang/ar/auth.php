@@ -25,7 +25,8 @@ return [
     'sign_in' => 'تسجيل الدخول',
     'no_account' => 'ليس لديك حساب؟',
     'sign_up' => 'إنشاء حساب',
+    'welcome_back' => 'مرحباً بك مجدداً',
+    'login_subtitle' => 'لوحة الإدارة - وجهتك للسياحة',
     'english' => 'English',
     'arabic' => 'العربية',
-
 ];

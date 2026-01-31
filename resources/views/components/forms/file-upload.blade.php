@@ -52,11 +52,11 @@
         </div>
     </div>
 
-    @if($preview && $currentImage)
-        <div class="current-image-preview mt-3">
+    @if($preview)
+        <div class="current-image-preview mt-3" style="{{ !$currentImage ? 'display: none;' : '' }}">
             <label class="form-label text-muted">{{ __('الصورة الحالية') }}:</label>
             <div class="position-relative d-inline-block">
-                <img src="{{ asset($currentImage) }}" alt="Current Image" class="img-thumbnail" style="max-width: 200px;">
+                <img src="{{ $currentImage ? asset($currentImage) : '' }}" alt="Current Image" class="img-thumbnail" style="max-width: 200px;">
             </div>
         </div>
     @endif
@@ -93,6 +93,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewList = previewContainer?.querySelector('.file-preview-list');
 
     if (input && previewContainer && previewList) {
+        const wrapper = input.closest('.file-upload-wrapper');
+
+        // Drag and drop visual feedback
+        if (wrapper) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                wrapper.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    wrapper.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                wrapper.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    wrapper.classList.remove('dragover');
+                }, false);
+            });
+        }
+
         input.addEventListener('change', function(e) {
             previewList.innerHTML = '';
 

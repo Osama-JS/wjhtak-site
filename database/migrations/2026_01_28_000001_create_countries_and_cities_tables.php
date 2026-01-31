@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('numcode')->nullable();
             $table->string('phonecode')->nullable();
             $table->string('flag')->nullable();
+        $table->softDeletes();
             $table->timestamps();
 
             // Indexes for performance
@@ -34,6 +35,7 @@ return new class extends Migration
             $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
             $table->string('title');
             $table->timestamps();
+        $table->softDeletes();
 
             // Index for performance
             $table->index('country_id');

@@ -20,6 +20,14 @@
         initAnimations();
     });
 
+    // Use jQuery for delegation to be consistent with template scripts
+    jQuery(document).on("click", ".nav-control", function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        jQuery("#main-wrapper").toggleClass("menu-toggle");
+        jQuery(".hamburger").toggleClass("is-active");
+    });
+
     // ============================================
     // SIDEBAR FUNCTIONALITY
     // ============================================
@@ -43,16 +51,6 @@
                 }
             }
         });
-
-        // Sidebar toggle for mobile
-        const toggleBtn = document.querySelector(".nav-control");
-        if (toggleBtn) {
-            toggleBtn.addEventListener("click", function () {
-                document
-                    .querySelector("#main-wrapper")
-                    .classList.toggle("menu-toggle");
-            });
-        }
     }
 
     // ============================================
@@ -305,6 +303,31 @@
                 month: "long",
                 day: "numeric",
             }).format(new Date(date));
+        },
+
+        /**
+         * Set button loading state
+         * @param {jQuery|HTMLElement} btn
+         * @param {boolean} isLoading
+         * @param {string} loadingText
+         */
+        btnLoading: function (btn, isLoading, loadingText) {
+            const $btn = jQuery(btn);
+            if (isLoading) {
+                const originalContent = $btn.html();
+                $btn.data("original-content", originalContent);
+                $btn.prop("disabled", true);
+                const text = loadingText || "جاري ...";
+                $btn.html(
+                    `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> ${text}`,
+                );
+            } else {
+                const originalContent = $btn.data("original-content");
+                if (originalContent) {
+                    $btn.html(originalContent);
+                }
+                $btn.prop("disabled", false);
+            }
         },
     };
 })();

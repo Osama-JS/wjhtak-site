@@ -50,7 +50,7 @@
             </div>
             <div class="modal-body" id="viewUserBody">
                 <!-- Data loaded via AJAX -->
-              
+
             </div>
         </div>
     </div>
@@ -229,13 +229,15 @@ $(document).ready(function() {
 
         $('#addUserForm').on('submit', function (e) {
             e.preventDefault();
+            const btn = $(this).find('button[type="submit"]');
+            WJHTAKAdmin.btnLoading(btn, true);
+
             $.ajax({
                 url: "{{ route('admin.users.store') }}",
                 type: "POST",
                 data: $(this).serialize(),
                 success: function (response) {
                     if (response.success) {
-                        console.log(response);
                         $('#addUserModal').modal('hide');
                         $('#addUserForm')[0].reset();
                         usersTable.ajax.reload(null, false);
@@ -251,12 +253,18 @@ $(document).ready(function() {
                     } else {
                         toastr.error('Something went wrong');
                     }
+                },
+                complete: function() {
+                    WJHTAKAdmin.btnLoading(btn, false);
                 }
             });
         });
      // Handle Edit Form Submit
         $('#editUserForm').on('submit', function(e) {
             e.preventDefault();
+            const btn = $(this).find('button[type="submit"]');
+            WJHTAKAdmin.btnLoading(btn, true);
+
             const id = $('#edit_user_id').val();
             const url = updateUserUrl.replace(':id', id);
             const formData = $(this).serialize() + '&_method=PUT';
@@ -281,10 +289,13 @@ $(document).ready(function() {
                     } else {
                         toastr.error('Something went wrong');
                     }
+                },
+                complete: function() {
+                    WJHTAKAdmin.btnLoading(btn, false);
                 }
             });
         });
-    
+
 });
 
 
@@ -321,7 +332,7 @@ function viewUser(id) {
         });
     }
 
-    
+
 
     function editUser(id) {
         let url = "{{ route('admin.users.show', ':id') }}";
@@ -409,11 +420,11 @@ function viewUser(id) {
 @endsection
 
 @section('scripts')
-    
- 
+
+
 <script>
-   
-    
-    
+
+
+
 </script>
 @endsection

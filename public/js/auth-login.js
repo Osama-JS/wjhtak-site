@@ -75,9 +75,13 @@
         form.addEventListener("submit", function (e) {
             const submitBtn = this.querySelector(".auth-submit-btn");
             if (submitBtn) {
-                submitBtn.innerHTML =
-                    '<i class="fas fa-spinner fa-spin me-2"></i> جاري تسجيل الدخول...';
-                submitBtn.disabled = true;
+                const isAr = document.documentElement.dir === "rtl";
+                submitBtn.innerHTML = `
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>${isAr ? "جاري التحميل..." : "Loading..."}</span>
+                `;
+                submitBtn.style.opacity = "0.8";
+                submitBtn.style.pointerEvents = "none";
             }
         });
     }

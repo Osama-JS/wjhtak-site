@@ -32,18 +32,18 @@ var Travl = (function () {
         $("#checkAll").on("change", function () {
             $("td input, .email-list .custom-checkbox input").prop(
                 "checked",
-                $(this).prop("checked")
+                $(this).prop("checked"),
             );
         });
     };
 
-    var handleNavigation = function () {
+    /* var handleNavigation = function () {
         $(".nav-control").on("click", function () {
             $("#main-wrapper").toggleClass("menu-toggle");
 
             $(".hamburger").toggleClass("is-active");
         });
-    };
+    }; */
 
     var handleCurrentActive = function () {
         for (
@@ -56,7 +56,6 @@ var Travl = (function () {
                     .parent()
                     .addClass("mm-active");
             ;
-
         ) {
             if (!o.is("li")) break;
 
@@ -84,7 +83,7 @@ var Travl = (function () {
 
     var handleDataAction = function () {
         $('a[data-action="collapse"]').on("click", function (i) {
-            i.preventDefault(),
+            (i.preventDefault(),
                 $(this)
                     .closest(".card")
                     .find('[data-action="collapse"] i')
@@ -92,16 +91,16 @@ var Travl = (function () {
                 $(this)
                     .closest(".card")
                     .children(".card-body")
-                    .collapse("toggle");
+                    .collapse("toggle"));
         });
 
         $('a[data-action="expand"]').on("click", function (i) {
-            i.preventDefault(),
+            (i.preventDefault(),
                 $(this)
                     .closest(".card")
                     .find('[data-action="expand"] i')
                     .toggleClass("icon-size-actual icon-size-fullscreen"),
-                $(this).closest(".card").toggleClass("card-fullscreen");
+                $(this).closest(".card").toggleClass("card-fullscreen"));
         });
 
         $('[data-action="close"]').on("click", function () {
@@ -110,16 +109,16 @@ var Travl = (function () {
 
         $('[data-action="reload"]').on("click", function () {
             var e = $(this);
-            e.parents(".card").addClass("card-load"),
+            (e.parents(".card").addClass("card-load"),
                 e
                     .parents(".card")
                     .append(
-                        '<div class="card-loader"><i class=" ti-reload rotate-refresh"></div>'
+                        '<div class="card-loader"><i class=" ti-reload rotate-refresh"></div>',
                     ),
                 setTimeout(function () {
-                    e.parents(".card").children(".card-loader").remove(),
-                        e.parents(".card").removeClass("card-load");
-                }, 2000);
+                    (e.parents(".card").children(".card-loader").remove(),
+                        e.parents(".card").removeClass("card-load"));
+                }, 2000));
         });
     };
 
@@ -398,7 +397,7 @@ var Travl = (function () {
         init: function () {
             handleMetisMenu();
             handleAllChecked();
-            handleNavigation();
+            // handleNavigation();
             handleCurrentActive();
             handleMiniSidebar();
             handleMinHeight();

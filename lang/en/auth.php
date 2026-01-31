@@ -25,6 +25,8 @@ return [
     'sign_in' => 'Sign Me In',
     'no_account' => "Don't have an account?",
     'sign_up' => 'Sign up',
+    'welcome_back' => 'Welcome Back',
+    'login_subtitle' => 'Admin Dashboard - Your Tourism Destination',
     'english' => 'English',
     'arabic' => 'العربية',
 ];

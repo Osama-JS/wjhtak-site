@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('notes')->nullable();
             $table->timestamps();
+        $table->softDeletes();
 
             // Indexes for performance
             $table->index('email');
@@ -32,6 +33,8 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->enum('type', ['fixed', 'percentage'])->default('fixed');
             $table->decimal('value', 8, 2)->default(0.00);
+        $table->softDeletes();
+
             $table->timestamps();
 
             // Indexes for performance

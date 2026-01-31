@@ -34,7 +34,7 @@ function getUrlParams(dParam) {
     dlabSettingsOptions = {
         typography: "poppins",
         version: "light",
-        layout: "horizontal",
+        layout: "vertical",
         primary: "color_1",
         headerBg: "color_1",
         navheaderBg: "color_1",

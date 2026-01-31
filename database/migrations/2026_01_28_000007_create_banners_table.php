@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->foreignId('trip_id')->nullable()->constrained('trips')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
 
             // Indexes for performance
             $table->index('active');
