@@ -64,6 +64,15 @@
                 </ul>
             </li>
             <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-globe"></i>
+                    <span class="nav-text">{{ __('Trips') }}</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="{{ route('admin.trips.index') }}">{{ __('Trips') }}</a></li>
+                </ul>
+            </li>
+            <li>
                 <a href="{{ route('admin.banners.index') }}" aria-expanded="false">
                     <i class="flaticon-381-picture"></i>
                     <span class="nav-text">{{ __('Banners') }}</span>

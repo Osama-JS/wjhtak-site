@@ -48,6 +48,11 @@ class Country extends Model
         return $this->hasMany(City::class);
     }
 
+    public function Trip()
+    {
+        return $this->hasMany(Trip::class);
+    }
+
     /**
      * Get active cities count.
      */

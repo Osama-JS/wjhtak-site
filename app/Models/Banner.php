@@ -22,10 +22,10 @@ class Banner extends Model
         'title_en',
         'description_ar',
         'description_en',
-        'image',
+        'image_path',
         'link',
         'trip_id',
-        'order',
+        'sort_order',
         'active',
     ];
 
@@ -34,7 +34,7 @@ class Banner extends Model
      */
     protected $casts = [
         'active' => 'boolean',
-        'order' => 'integer',
+        'sort_order' => 'integer',
     ];
 
     /**

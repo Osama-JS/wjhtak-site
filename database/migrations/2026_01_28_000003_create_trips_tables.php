@@ -34,7 +34,7 @@ return new class extends Migration
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->double('profit', 8, 2)->default(0.00);
             $table->double('percentage_profit_margin', 8, 2)->default(0.00);
-
+            $table->boolean('active')->default(false);
             $table->timestamps();
             $table->softDeletes(); // For soft delete support
 
@@ -66,6 +66,7 @@ return new class extends Migration
             $table->integer('user_id')->nullable();
             $table->integer('rate')->nullable();
             $table->text('review')->nullable();
+            $table->boolean('active')->default(false);
             $table->timestamps();
 
             // Indexes for performance
@@ -79,6 +80,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('trip_id')->constrained('trips')->onDelete('cascade');
             $table->string('ip');
+            $table->boolean('active')->default(false);
 
             // Indexes for analytics
             $table->index('trip_id');
