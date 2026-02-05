@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Country;
 use App\Models\Company;
 use App\Models\Trip;
+use App\Models\TripImage;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TripsController extends Controller
 {
@@ -15,10 +19,11 @@ class TripsController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
+    {   
+        $trips = Trip::all();
         $companies = Company::all();
         $countries = Country::all();
-        return view('admin.trips.index', compact('companies', 'countries'));
+        return view('admin.trips.index', compact('companies', 'countries','trips'));
     }
 
 
@@ -59,9 +64,13 @@ class TripsController extends Controller
                         <button class="btn btn-sm btn-warning" onclick="toggleTripStatus('.$trip->id.')">
                             <i class="fas fa-ban"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteTrip('.$trip->id.')">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn btn-sm btn-info" onclick="openImageUpload('.$trip->id.', \''.addslashes($trip->title).'\')" title="رفع صور">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="editTrip('.$trip->id.')">
+                            <i class="fas fa-edit"></i>
                         </button>';
+                        
                 if ($isExpired) {
                     $actionButtons .= '
                         <button class="btn btn-sm btn-success" onclick="renewTrip('.$trip->id.')" title="تجديد الرحلة">
@@ -261,4 +270,92 @@ class TripsController extends Controller
             'message' => __('Trip deleted successfully'),
         ]);
     }
+
+    public function imagestore(Request $request, $trip_id) // نمرر الـ ID مباشرة
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        try {
+            return DB::transaction(function () use ($request, $trip_id) {
+                
+                if (!$request->hasFile('file')) {
+                    throw new \Exception('File not found');
+                }
+
+                $file = $request->file('file');
+                $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                
+                // تخزين في مجلد خاص بكل رحلة
+                $path = $file->storeAs('trips/' . $trip_id, $fileName, 'public');
+
+                // حفظ السجل
+                $newImage = TripImage::create([
+                    'trip_id' => $trip_id,
+                    'image_path' => $path,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'id' => $newImage->id, // نرجع ID السجل الجديد
+                    'url' => asset('storage/' . $path),
+                    'message' => __('Trip created successfully'),
+                ], 201);
+            });
+
+        } catch (\Exception $e) {
+            Log::error("__('The trip photo upload failed'){$trip_id}: " . $e->getMessage());
+            return response()->json(['error' => __('An error occurred during processing')], 500);
+        }
+    }
+
+    public function imagedestroy(TripImage $image)
+    {
+        try {
+           
+
+            return DB::transaction(function () use ($image) {
+                
+                $path = $image->image_path;
+                $image->delete();
+
+                if (Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
+
+                return response()->json([
+                    'success' => true, 
+                    'message' => __('Trip deleted successfully'),
+                ]);
+            });
+
+        } catch (\Exception $e) {
+            Log::error("__('Error while deleting the image') ID {$image->id}: " . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => __('Sorry, an error occurred while trying to delete.'),
+            ], 500);
+        }
+    }
+
+   public function getImages($trip_id)
+    {
+       
+        $images = TripImage::where('trip_id', $trip_id)->get();
+
+        $data = $images->map(function ($image) {
+            $path = storage_path('app/public/' . $image->image_path);
+            return [
+                'id'   => $image->id,
+                'name' => basename($image->image_path),
+                'size' => file_exists($path) ? filesize($path) : 0,
+                'url'  => asset('storage/' . $image->image_path), 
+            ];
+        });
+
+        return response()->json($data);
+    }
+
 }

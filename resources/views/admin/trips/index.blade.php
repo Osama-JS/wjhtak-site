@@ -72,6 +72,20 @@
             </div>
         </div>
     </div>
+
+
+    <div class="row">
+       <div class="col-12">
+            <div id="upload-card" class="card mt-4" style="display: none;">
+                <div class="card-header bg-primary text-white">
+                    {{ __('Upload photos of the trip') }}: <span id="target-trip-name"></span>
+                </div>
+                <div class="card-body">
+                    <div id="trip-images-upload" class="dropzone"></div>
+                </div>
+            </div>
+       </div>
+    </div>
 </div>
 
 <!-- Add Modal -->
@@ -184,12 +198,15 @@
         </div>
     </div>
 </div>
-
+    
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
 <script>
     let tripsTable;
     const tripsDataUrl = "{{ route('admin.trips.data') }}";
     const updateUrl = "{{ route('admin.trips.update', ':id') }}";
 
+    
+     
     $(document).ready(function() {
         // Initialize DataTable
         tripsTable = $('#trips-table').DataTable({
@@ -292,10 +309,97 @@
                 }
             });
         });
-    
+
+
+            // بما أنك تستخدم AJAX لملء الجدول، سننتظر حتى يكتمل تحميل البيانات
+        // var checkDataTable = setInterval(function() {
+        //     // نبحث عن أول زر "تعديل" أو "رفع" يحتوي على الـ ID
+        //     let firstTripBtn = $('.btn-info[onclick^="openImageUpload"]').first();
+            
+        //     if (firstTripBtn.length > 0) {
+        //         // استخراج المعاملات من onclick="openImageUpload(ID, 'TITLE')"
+        //         let onClickAttr = firstTripBtn.attr('onclick');
+        //         // استخراج القيم باستخدام Regex أو ببساطة تشغيل الوظيفة
+        //         firstTripBtn.click(); 
+                
+        //         clearInterval(checkDataTable); // توقف عن البحث بمجرد التشغيل
+        //     }
+        // }, 500); // يفحص كل نصف ثانية حتى يظهر الجدول
+        
     });
 
-    
+    Dropzone.autoDiscover = false;
+    let myDropzone = null; // تعريف المتغير خارجاً
+
+    function openImageUpload(id, title) {
+        // 1. إظهار الكارد وتحديث العنوان
+        $('#upload-card').fadeIn();
+        $('#target-trip-name').text(title);
+        
+        // التمرير للكارد
+        $('html, body').animate({ scrollTop: $("#upload-card").offset().top }, 500);
+
+        let storeUrl = "{{ route('admin.trips.images-store', ':id') }}".replace(':id', id);
+        let getUrl   = "{{ route('admin.trips.get-images', ':id') }}".replace(':id', id);
+
+        // 2. تدمير النسخة السابقة تماماً إذا كانت موجودة لمنع التداخل
+        if (myDropzone !== null) {
+            myDropzone.destroy();
+        }
+
+        // 3. إنشاء نسخة جديدة مخصصة لهذه الرحلة فقط
+        myDropzone = new Dropzone("#trip-images-upload", {
+            url: storeUrl,
+            method: "post",
+            paramName: "file",
+            maxFilesize: 5,
+            acceptedFiles: ".jpeg,.jpg,.png,.gif",
+            addRemoveLinks: true,
+            dictRemoveFile: "{{ __('Delete') }}",
+            dictDefaultMessage: "{{ __('Drop files here or click to upload') }}",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            init: function() {
+                let dz = this;
+
+                // 4. جلب الصور الخاصة بهذه الرحلة من السيرفر
+                $.ajax({
+                    url: getUrl,
+                    type: 'GET',
+                    cache: false, // مهم جداً لمنع تكرار صور الرحلات السابقة
+                    success: function(data) {
+                        $.each(data, function(key, value) {
+                            let mockFile = { 
+                                name: value.name, 
+                                size: value.size, 
+                                serverId: value.id 
+                            };
+                            dz.displayExistingFile(mockFile, value.url);
+                            dz.emit("complete", mockFile);
+                        });
+                    }
+                });
+
+                // الأحداث
+                this.on("success", function(file, response) {
+                    file.serverId = response.id;
+                });
+
+                this.on("removedfile", function(file) {
+                    if (file.serverId) {
+                        let deleteUrl = "{{ route('admin.trips.images-destroy', ':id') }}".replace(':id', file.serverId);
+                        $.ajax({
+                            url: deleteUrl,
+                            type: 'DELETE',
+                            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
+                        });
+                    }
+                });
+            }
+        });
+    }
+     
 
 
     function editTrip(id) {
@@ -487,5 +591,7 @@
 
 
 </script>
+
+
 
 @endsection

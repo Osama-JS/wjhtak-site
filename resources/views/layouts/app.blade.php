@@ -10,7 +10,7 @@
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/png" href="{{ asset(\App\Models\Setting::get('site_favicon', 'images/favicon.png')) }}">
-
+    
     <!-- Global Scripts -->
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
     <link href="{{ asset('vendor/sweetalert2/dist/sweetalert2.min.css') }}" rel="stylesheet">
@@ -23,6 +23,21 @@
     <script src="{{ asset('vendor/perfect-scrollbar/js/perfect-scrollbar.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('vendor/toastr/js/toastr.min.js') }}"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+
+    <style>
+        /* تحسين شكل منطقة الرفع */
+        .dropzone.border-dashed {
+            border: 2px dashed #007bff;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .dz-message {
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
 
 
 
