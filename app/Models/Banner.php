@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Banner extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -18,14 +19,12 @@ class Banner extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'title_ar',
-        'title_en',
-        'description_ar',
-        'description_en',
-        'image',
-        'link',
+        'title',
+        'desc',
+        'image_path',
+        'mobile_image_path',
+        'link', // link is not in migration, but I'll keep it in fillable if needed elsewhere or check if I should add it
         'trip_id',
-        'order',
         'active',
     ];
 
@@ -34,32 +33,15 @@ class Banner extends Model
      */
     protected $casts = [
         'active' => 'boolean',
-        'order' => 'integer',
     ];
-
-    /**
-     * Get localized title based on current locale.
-     */
-    public function getTitleAttribute(): string
-    {
-        return app()->getLocale() === 'ar' ? ($this->title_ar ?? '') : ($this->title_en ?? '');
-    }
-
-    /**
-     * Get localized description based on current locale.
-     */
-    public function getDescriptionAttribute(): string
-    {
-        return app()->getLocale() === 'ar' ? ($this->description_ar ?? '') : ($this->description_en ?? '');
-    }
 
     /**
      * Get image URL.
      */
     public function getImageUrlAttribute(): string
     {
-        if ($this->image) {
-            return asset('storage/' . $this->image);
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
         }
         return asset('images/banners/default.jpg');
     }
@@ -78,13 +60,5 @@ class Banner extends Model
     public function scopeActive($query)
     {
         return $query->where('active', true);
-    }
-
-    /**
-     * Scope a query to order by display order.
-     */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order', 'asc');
     }
 }

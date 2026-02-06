@@ -2,13 +2,39 @@
 
 @section('title', __('Banners Management'))
 
+@section('page-header')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('Main Menu') }}</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Banners') }}</a></li>
+    </ol>
+</div>
+@endsection
+
 @section('content')
-<div class="container-fluid">
-    <div class="row page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Admin') }}</a></li>
-            <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('Banners') }}</a></li>
-        </ol>
+
+    <div class="row my-2">
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Total Banners')"
+                :value="$stats['total']"
+                icon="fas fa-images"
+            />
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Active')"
+                :value="$stats['active']"
+                icon="fas fa-check-circle"
+            />
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Inactive')"
+                :value="$stats['inactive']"
+                icon="fas fa-times-circle"
+            />
+        </div>
     </div>
 
     <div class="row">

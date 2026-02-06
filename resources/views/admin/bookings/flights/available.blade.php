@@ -4,6 +4,30 @@
 @section('page-title', __('Available Flights'))
 
 @section('content')
+<div class="row">
+    <div class="col-xl-4 col-sm-12">
+        <x-stats-card
+            :label="__('Total Routes')"
+            :value="$stats['total_routes']"
+            icon="fas fa-route"
+        />
+    </div>
+    <div class="col-xl-4 col-sm-12">
+        <x-stats-card
+            :label="__('Airlines')"
+            :value="$stats['airlines']"
+            icon="fas fa-plane"
+        />
+    </div>
+    <div class="col-xl-4 col-sm-12">
+        <x-stats-card
+            :label="__('Today\'s Searches')"
+            :value="$stats['today_searches']"
+            icon="fas fa-search"
+        />
+    </div>
+</div>
+
 <div class="container-fluid">
     <!-- Search Section -->
     <div class="row">

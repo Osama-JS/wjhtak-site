@@ -1,12 +1,45 @@
 @extends('layouts.app')
 
+@section('page-header')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('User Management') }}</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('All Users') }}</a></li>
+    </ol>
+</div>
+@endsection
+
 @section('content')
-<div class="container-fluid">
-    <div class="row page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="javascript:void(0)">Admin</a></li>
-            <li class="breadcrumb-item"><a href="javascript:void(0)">Users</a></li>
-        </ol>
+
+    <div class="row my-2">
+        <div class="col-xl-3 col-sm-6">
+            <x-stats-card
+                :label="__('Total Users')"
+                :value="$stats['total']"
+                icon="fas fa-users"
+            />
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <x-stats-card
+                :label="__('Active')"
+                :value="$stats['active']"
+                icon="fas fa-user-check"
+            />
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <x-stats-card
+                :label="__('Inactive')"
+                :value="$stats['inactive']"
+                icon="fas fa-user-slash"
+            />
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <x-stats-card
+                :label="__('Unverified')"
+                :value="$stats['unverified']"
+                icon="fas fa-user-clock"
+            />
+        </div>
     </div>
 
 
@@ -16,7 +49,7 @@
                 <div class="card-header">
                     <h4 class="card-title">{{ __('User Management') }}</h4>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal" onclick="resetForm()">
-                         <i class="fa fa-plus me-2"></i> Add User
+                         <i class="fa fa-plus me-2"></i> {{ __('Add User') }}
                      </button>
                 </div>
                 <div class="card-body">
@@ -60,7 +93,7 @@
     @csrf
 
     <button type="submit" class="btn btn-primary">
-        Add User
+        {{ __('Add User') }}
     </button>
 </form> -->
 
@@ -251,7 +284,7 @@ $(document).ready(function() {
                             toastr.error(err[0]);
                         });
                     } else {
-                        toastr.error('Something went wrong');
+                        toastr.error('{{ __("Something went wrong") }}');
                     }
                 },
                 complete: function() {
@@ -287,7 +320,7 @@ $(document).ready(function() {
                             toastr.error(errors[key][0]);
                         });
                     } else {
-                        toastr.error('Something went wrong');
+                        toastr.error('{{ __("Something went wrong") }}');
                     }
                 },
                 complete: function() {

@@ -1,16 +1,55 @@
 @extends('layouts.app')
 
-@section('title', 'Manage Roles')
-@section('page-title', 'Roles')
+@section('title', __('Manage Roles'))
+@section('page-title', __('Roles'))
 
+@section('page-header')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('Security & Access') }}</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Roles') }}</a></li>
+    </ol>
+</div>
+@endsection
 @section('content')
+<div class="row my-2">
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Total Roles')"
+            :value="$stats['total']"
+            icon="fas fa-user-tag"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('With Permissions')"
+            :value="$stats['with_permissions']"
+            icon="fas fa-lock-open"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Without Permissions')"
+            :value="$stats['without_permissions']"
+            icon="fas fa-lock"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Total Permissions')"
+            :value="$stats['total_permissions']"
+            icon="fas fa-key"
+        />
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h4 class="card-title">Roles List</h4>
+                <h4 class="card-title">{{ __('Roles List') }}</h4>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#roleModal" onclick="resetForm()">
-                    <i class="fa fa-plus me-2"></i> Add Role
+                    <i class="fa fa-plus me-2"></i> {{ __('Add Role') }}
                 </button>
             </div>
             <div class="card-body">

@@ -11,7 +11,11 @@ class SettingController extends Controller
 {
     public function index()
     {
-        return view('admin.settings.index');
+        $stats = [
+            'total_settings' => \App\Models\Setting::count(),
+            'last_updated' => \App\Models\Setting::latest('updated_at')->first()?->updated_at->diffForHumans() ?? __('Never'),
+        ];
+        return view('admin.settings.index', compact('stats'));
     }
 
     public function update(Request $request)

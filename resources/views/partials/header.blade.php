@@ -10,32 +10,24 @@
                 </div>
                 <div class="nav-item d-flex align-items-center">
                     <div class="input-group search-area">
-                        <input type="text" class="form-control" placeholder="">
+                        <input type="text" class="form-control" placeholder="{{ __('Search here...') }}">
                         <span class="input-group-text"><a href="javascript:void(0)"><i class="flaticon-381-search-2"></i></a></span>
                     </div>
                 </div>
                 <ul class="navbar-nav header-right">
-                    {{-- Language Switcher --}}
-                    <li class="nav-item dropdown notification_dropdown">
-                        <a class="nav-link" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
-                            @if(app()->getLocale() == 'ar')
-                                <img src="{{ asset('images/flags/sa.png') }}" width="20" alt=""/>
-                                <span class="ms-1 d-none d-sm-inline-block">العربية</span>
-                            @else
-                                <img src="{{ asset('images/flags/gb.png') }}" width="20" alt=""/>
-                                <span class="ms-1 d-none d-sm-inline-block">English</span>
-                            @endif
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <a href="{{ route('lang.switch', 'en') }}" class="dropdown-item ai-icon">
-                                <img src="{{ asset('images/flags/gb.png') }}" width="15" alt=""/>
-                                <span class="ms-2">{{ __('English') }}</span>
+                    {{-- Language Switcher Toggle --}}
+                    <li class="nav-item">
+                        @if(app()->getLocale() == 'ar')
+                            <a class="nav-link" href="{{ route('lang.switch', 'en') }}" title="{{ __('Switch to English') }}">
+                                <i class="fas fa-globe text-primary fs-20"></i>
+                                <span class="ms-1 d-none d-sm-inline-block">EN</span>
                             </a>
-                            <a href="{{ route('lang.switch', 'ar') }}" class="dropdown-item ai-icon">
-                                <img src="{{ asset('images/flags/sa.png') }}" width="15" alt=""/>
-                                <span class="ms-2">{{ __('Arabic') }}</span>
+                        @else
+                            <a class="nav-link" href="{{ route('lang.switch', 'ar') }}" title="{{ __('Switch to Arabic') }}">
+                                <i class="fas fa-globe text-primary fs-20"></i>
+                                <span class="ms-1 d-none d-sm-inline-block">AR</span>
                             </a>
-                        </div>
+                        @endif
                     </li>
 
                     <li class="nav-item dropdown notification_dropdown">
@@ -107,8 +99,8 @@
 														<img alt="image" width="50" src="images/avatar/1.jpg">
 													</div>
 													<div class="media-body">
-														<h6 class="mb-1">Dr sultads Send you Photo</h6>
-														<small class="d-block">29 July 2020 - 02:26 PM</small>
+														<h6 class="mb-1">{{ __('Notification Title Placeholder') }}</h6>
+														<small class="d-block">{{ date('d M Y - H:i A') }}</small>
 													</div>
 												</div>
 											</li>
@@ -136,7 +128,7 @@
 											</li>
 										</ul>
 									</div>
-									<a class="all-notification" href="javascript:void(0);">See all notifications <i class="ti-arrow-end"></i></a>
+									<a class="all-notification" href="javascript:void(0);">{{ __('See all notifications') }} <i class="ti-arrow-end"></i></a>
 								</div>
 							</li>
 							<li class="nav-item dropdown notification_dropdown">
@@ -209,7 +201,7 @@
                             <img src="{{ auth()->user()->avatar ?? asset('images/profile/pic1.jpg') }}" width="20" alt=""/>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a href="{{ route('profile.edit') }}" class="dropdown-item ai-icon">
+                            <a href="{{ route('admin.profile.index') }}" class="dropdown-item ai-icon">
                                 <svg id="icon-user2" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                 <span class="ms-2">{{ __('Profile') }} </span>
                             </a>

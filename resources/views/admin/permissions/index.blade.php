@@ -1,16 +1,48 @@
 @extends('layouts.app')
 
-@section('title', 'Manage Permissions')
-@section('page-title', 'Permissions')
+@section('title', __('Manage Permissions'))
+@section('page-title', __('Permissions'))
 
+@section('page-header')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('Security & Access') }}</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Permissions') }}</a></li>
+    </ol>
+</div>
+@endsection
 @section('content')
+<div class="row my-2">
+    <div class="col-xl-4 col-sm-6">
+        <x-stats-card
+            :label="__('Total Permissions')"
+            :value="$stats['total']"
+            icon="fas fa-key"
+        />
+    </div>
+    <div class="col-xl-4 col-sm-6">
+        <x-stats-card
+            :label="__('In Use')"
+            :value="$stats['in_use']"
+            icon="fas fa-check-double"
+        />
+    </div>
+    <div class="col-xl-4 col-sm-6">
+        <x-stats-card
+            :label="__('Not In Use')"
+            :value="$stats['not_in_use']"
+            icon="fas fa-exclamation-triangle"
+        />
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h4 class="card-title">Permissions List</h4>
+                <h4 class="card-title">{{ __('Permissions List') }}</h4>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#permissionModal" onclick="resetForm()">
-                    <i class="fa fa-plus me-2"></i> Add Permission
+                    <i class="fa fa-plus me-2"></i> {{ __('Add Permission') }}
                 </button>
             </div>
             <div class="card-body">

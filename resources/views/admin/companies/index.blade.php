@@ -1,14 +1,38 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="container-fluid">
-    <div class="row page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="javascript:void(0)">Admin</a></li>
-            <li class="breadcrumb-item"><a href="javascript:void(0)">Companys</a></li>
-        </ol>
-    </div>
+@section('page-header')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('Company') }}</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Companies') }}</a></li>
+    </ol>
+</div>
+@endsection
 
+@section('content')
+    <div class="row my-2">
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Total Companies')"
+                :value="$stats['total']"
+                icon="fas fa-building"
+            />
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Active')"
+                :value="$stats['active']"
+                icon="fas fa-check-circle"
+            />
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Inactive')"
+                :value="$stats['inactive']"
+                icon="fas fa-times-circle"
+            />
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-12">
@@ -16,7 +40,7 @@
                 <div class="card-header">
                     <h4 class="card-title">{{ __('Company Management') }}</h4>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCompanyModal" onclick="resetForm()">
-                         <i class="fa fa-plus me-2"></i> Add Company
+                         <i class="fa fa-plus me-2"></i> {{ __('Add Company') }}
                      </button>
                 </div>
                 <div class="card-body">
@@ -50,7 +74,7 @@
             </div>
             <div class="modal-body" id="viewCompanyBody">
                 <!-- Data loaded via AJAX -->
-              
+
             </div>
         </div>
     </div>
@@ -83,7 +107,7 @@
                             <label class="form-label">{{ __('Phone') }}</label>
                             <input type="text" name="phone"  class="form-control">
                         </div>
-                       
+
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('Status') }}</label>
@@ -221,7 +245,7 @@ $(document).ready(function() {
                             toastr.error(err[0]);
                         });
                     } else {
-                        toastr.error('Something went wrong');
+                        toastr.error("{{ __('Something went wrong') }}");
                     }
                 }
             });
@@ -256,7 +280,7 @@ $(document).ready(function() {
                 }
             });
         });
-    
+
 });
 
     function editCompany(id) {
@@ -344,11 +368,11 @@ $(document).ready(function() {
 @endsection
 
 @section('scripts')
-    
- 
+
+
 <script>
-   
-    
-    
+
+
+
 </script>
 @endsection

@@ -17,8 +17,15 @@ class CityController extends Controller
     {
         $column = app()->getLocale() === 'ar' ? 'name' : 'nicename';
         $countries = Country::active()->orderBy($column)->get();
-        // $countries = Country::active()->orderBy('name' . app()->getLocale())->get();
-        return view('admin.cities.index', compact('countries'));
+
+        $stats = [
+            'total' => City::count(),
+            'active' => City::where('active', true)->count(),
+            'inactive' => City::where('active', false)->count(),
+            'countries_count' => Country::has('cities')->count(),
+        ];
+
+        return view('admin.cities.index', compact('countries', 'stats'));
     }
 
     /**

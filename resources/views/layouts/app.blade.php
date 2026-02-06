@@ -108,6 +108,15 @@
     <!-- Vite JS -->
     @vite(['resources/js/app.js'])
 
+    <script>
+        window.Translations = {
+            confirm_title: "{{ __('Confirmation') }}",
+            confirm_yes: "{{ __('Yes') }}",
+            confirm_cancel: "{{ __('Cancel') }}",
+            loading_text: "{{ __('Loading...') }}",
+        };
+    </script>
+
     <!-- Custom Admin JS -->
     <script src="{{ asset('js/admin-custom.js') }}"></script>
 

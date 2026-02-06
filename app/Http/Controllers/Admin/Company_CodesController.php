@@ -15,7 +15,12 @@ class Company_CodesController extends Controller
     public function index()
     {
         $companies = Company::select('id', 'name')->get();
-         return view('admin.company-codes.index', compact('companies'));
+        $stats = [
+            'total' => Company_Codes::count(),
+            'active' => Company_Codes::where('active', true)->count(),
+            'inactive' => Company_Codes::where('active', false)->count(),
+        ];
+        return view('admin.company-codes.index', compact('companies', 'stats'));
     }
 
 
@@ -91,7 +96,7 @@ class Company_CodesController extends Controller
             'Company_Codes' => $company_code,
         ]);
 
-    
+
     }
 
     /**

@@ -13,7 +13,12 @@ class CompanyController extends Controller
      */
     public function index()
     {
-       return view('admin.companies.index');
+        $stats = [
+            'total' => Company::count(),
+            'active' => Company::where('active', true)->count(),
+            'inactive' => Company::where('active', false)->count(),
+        ];
+        return view('admin.companies.index', compact('stats'));
     }
 
     public function getData(Request $request)
@@ -146,7 +151,7 @@ class CompanyController extends Controller
     public function destroy(Company $company)
     {
        try {
-            
+
             $user->delete();
             return response()->json([
                 'success' => true,

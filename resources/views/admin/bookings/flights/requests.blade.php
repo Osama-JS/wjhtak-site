@@ -5,6 +5,37 @@
 
 @section('content')
 <div class="row">
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Total Requests')"
+            :value="$stats['total']"
+            icon="fas fa-ticket-alt"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Pending')"
+            :value="$stats['pending']"
+            icon="fas fa-clock"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Confirmed')"
+            :value="$stats['confirmed']"
+            icon="fas fa-check-circle"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Cancelled')"
+            :value="$stats['cancelled']"
+            icon="fas fa-times-circle"
+        />
+    </div>
+</div>
+
+<div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header">

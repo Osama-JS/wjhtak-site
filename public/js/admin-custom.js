@@ -269,14 +269,15 @@
         confirm: function (message, callback) {
             if (typeof Swal !== "undefined") {
                 Swal.fire({
-                    title: "تأكيد",
+                    title: window.Translations.confirm_title || "Confirmation",
                     text: message,
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#135846",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: "نعم",
-                    cancelButtonText: "إلغاء",
+                    confirmButtonText: window.Translations.confirm_yes || "Yes",
+                    cancelButtonText:
+                        window.Translations.confirm_cancel || "Cancel",
                 }).then(function (result) {
                     if (result.isConfirmed && callback) {
                         callback();
@@ -317,7 +318,10 @@
                 const originalContent = $btn.html();
                 $btn.data("original-content", originalContent);
                 $btn.prop("disabled", true);
-                const text = loadingText || "جاري ...";
+                const text =
+                    loadingText ||
+                    window.Translations.loading_text ||
+                    "Loading...";
                 $btn.html(
                     `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> ${text}`,
                 );

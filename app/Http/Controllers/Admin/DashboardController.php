@@ -14,9 +14,13 @@ class DashboardController extends Controller
     {
         $stats = [
             'users' => \App\Models\User::count(),
-            // 'countries' => \App\Models\Country::count(),
-            // 'cities' => \App\Models\City::count(),
-            // 'banners' => \App\Models\Banner::active()->count(),
+            'countries' => \App\Models\Country::count(),
+            'cities' => \App\Models\City::count(),
+            'banners' => \App\Models\Banner::count(),
+            'companies' => \App\Models\Company::count(),
+            'company_codes' => \App\Models\Company_Codes::count(),
+            'hotel_requests' => 0, // Placeholder if no model found yet
+            'flight_requests' => 0, // Placeholder
         ];
 
         // Chart Data: Monthly Users (Current Year)

@@ -15,7 +15,13 @@ class CountryController extends Controller
      */
     public function index()
     {
-        return view('admin.countries.index');
+        $stats = [
+            'total' => Country::count(),
+            'active' => Country::where('active', true)->count(),
+            'inactive' => Country::where('active', false)->count(),
+            'with_cities' => Country::has('cities')->count(),
+        ];
+        return view('admin.countries.index', compact('stats'));
     }
 
     /**
@@ -66,7 +72,7 @@ class CountryController extends Controller
                         ? '<span class="badge badge-success">' . __('Active') . '</span>'
                         : '<span class="badge badge-danger">' . __('Inactive') . '</span>',
                     'actions' => $this->getActionButtons($country),
-                ];  
+                ];
             });
 
             return response()->json(['data' => $data]);

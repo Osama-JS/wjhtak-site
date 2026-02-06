@@ -5,6 +5,37 @@
 
 @section('content')
 <div class="row">
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Total Hotels')"
+            :value="850"
+            icon="fas fa-hotel"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Active Bookings')"
+            :value="124"
+            icon="fas fa-bookmark"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Featured')"
+            :value="45"
+            icon="fas fa-star"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Cancelled')"
+            :value="8"
+            icon="fas fa-times-circle"
+        />
+    </div>
+</div>
+
+<div class="row">
     <div class="col-xl-4 col-lg-5">
         <div class="card">
             <div class="card-header">
@@ -65,11 +96,11 @@
                     <table class="table table-responsive-md">
                         <thead>
                             <tr>
-                                <th><strong>Guest</strong></th>
-                                <th><strong>Hotel</strong></th>
-                                <th><strong>Check In</strong></th>
-                                <th><strong>Check Out</strong></th>
-                                <th><strong>Status</strong></th>
+                                <th><strong>{{ __('Guest') }}</strong></th>
+                                <th><strong>{{ __('Hotel') }}</strong></th>
+                                <th><strong>{{ __('Check In') }}</strong></th>
+                                <th><strong>{{ __('Check Out') }}</strong></th>
+                                <th><strong>{{ __('Status') }}</strong></th>
                             </tr>
                         </thead>
                         <tbody>

@@ -1,0 +1,291 @@
+/*
+ * =============================================================================
+ * WJHTAK Tourism Platform - Theme Variables
+ * =============================================================================
+ *
+ * This file contains all themeable CSS custom properties.
+ * To change the theme, simply modify the values in :root
+ *
+ * Color Guide:
+ * - Primary: Main brand color (navigation, buttons)
+ * - Accent: Highlight color (CTAs, special elements)
+ * - Surface: Card backgrounds
+ * - Background: Page background
+ *
+ * =============================================================================
+ */
+
+:root {
+    /* =========================================================================
+     * 🎨 THEME COLORS - Easily customizable
+     * ========================================================================= */
+
+    /* Primary Colors */
+    --color-primary: #1e3a5f;
+    --color-primary-light: #2c5282;
+    --color-primary-dark: #152a45;
+    --color-primary-rgb: 30, 58, 95;
+
+    /* Accent Colors (Gold/Luxury) */
+    --color-accent: #d4af37;
+    --color-accent-light: #e5c158;
+    --color-accent-dark: #b8962f;
+    --color-accent-rgb: 212, 175, 55;
+
+    /* Secondary Colors */
+    --color-secondary: #4a6fa5;
+    --color-secondary-light: #6b8cbf;
+    --color-secondary-dark: #3a5a87;
+
+    /* Semantic Colors */
+    --color-success: #10b981;
+    --color-success-light: #34d399;
+    --color-warning: #f59e0b;
+    --color-warning-light: #fbbf24;
+    --color-error: #ef4444;
+    --color-error-light: #f87171;
+    --color-info: #3b82f6;
+    --color-info-light: #60a5fa;
+
+    /* Neutral Colors */
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+
+    /* Background & Surface */
+    --color-bg: #fafbfc;
+    --color-bg-alt: #f0f2f5;
+    --color-surface: #ffffff;
+    --color-surface-alt: #f8fafc;
+    --color-surface-hover: #f1f5f9;
+
+    /* Text Colors */
+    --color-text: #1a202c;
+    --color-text-secondary: #4a5568;
+    --color-text-muted: #718096;
+    --color-text-light: #a0aec0;
+    --color-text-inverse: #ffffff;
+
+    /* Border Colors */
+    --color-border: #e2e8f0;
+    --color-border-light: #edf2f7;
+    --color-border-dark: #cbd5e0;
+
+    /* =========================================================================
+     * 📐 SPACING SYSTEM
+     * ========================================================================= */
+    --space-0: 0;
+    --space-1: 0.25rem; /* 4px */
+    --space-2: 0.5rem; /* 8px */
+    --space-3: 0.75rem; /* 12px */
+    --space-4: 1rem; /* 16px */
+    --space-5: 1.25rem; /* 20px */
+    --space-6: 1.5rem; /* 24px */
+    --space-8: 2rem; /* 32px */
+    --space-10: 2.5rem; /* 40px */
+    --space-12: 3rem; /* 48px */
+    --space-16: 4rem; /* 64px */
+    --space-20: 5rem; /* 80px */
+    --space-24: 6rem; /* 96px */
+    --space-32: 8rem; /* 128px */
+
+    /* =========================================================================
+     * 📝 TYPOGRAPHY
+     * ========================================================================= */
+
+    /* Font Families */
+    --font-primary-en:
+        "Outfit", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-primary-ar: "Tajawal", "Noto Kufi Arabic", -apple-system, sans-serif;
+    --font-display: "Playfair Display", Georgia, serif;
+
+    /* Font Sizes */
+    --text-xs: 0.75rem; /* 12px */
+    --text-sm: 0.875rem; /* 14px */
+    --text-base: 1rem; /* 16px */
+    --text-lg: 1.125rem; /* 18px */
+    --text-xl: 1.25rem; /* 20px */
+    --text-2xl: 1.5rem; /* 24px */
+    --text-3xl: 1.875rem; /* 30px */
+    --text-4xl: 2.25rem; /* 36px */
+    --text-5xl: 3rem; /* 48px */
+    --text-6xl: 3.75rem; /* 60px */
+    --text-7xl: 4.5rem; /* 72px */
+
+    /* Font Weights */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    /* Line Heights */
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+
+    /* Letter Spacing */
+    --tracking-tight: -0.025em;
+    --tracking-normal: 0;
+    --tracking-wide: 0.025em;
+    --tracking-wider: 0.05em;
+
+    /* =========================================================================
+     * 🔲 BORDERS & RADIUS
+     * ========================================================================= */
+    --radius-none: 0;
+    --radius-sm: 0.25rem; /* 4px */
+    --radius-md: 0.5rem; /* 8px */
+    --radius-lg: 0.75rem; /* 12px */
+    --radius-xl: 1rem; /* 16px */
+    --radius-2xl: 1.5rem; /* 24px */
+    --radius-3xl: 2rem; /* 32px */
+    --radius-full: 9999px;
+
+    /* Border Widths */
+    --border-width: 1px;
+    --border-width-2: 2px;
+    --border-width-4: 4px;
+
+    /* =========================================================================
+     * 🌑 SHADOWS
+     * ========================================================================= */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm:
+        0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+    /* Colored Shadows */
+    --shadow-primary: 0 10px 40px -10px rgba(var(--color-primary-rgb), 0.4);
+    --shadow-accent: 0 10px 40px -10px rgba(var(--color-accent-rgb), 0.4);
+
+    /* Glass Effect Shadow */
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+
+    /* =========================================================================
+     * ⏱ TRANSITIONS & ANIMATIONS
+     * ========================================================================= */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+    --transition-slower: 500ms ease;
+
+    /* Easing Functions */
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* =========================================================================
+     * 📱 BREAKPOINTS (for reference in JS)
+     * ========================================================================= */
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+
+    /* =========================================================================
+     * 📦 CONTAINER
+     * ========================================================================= */
+    --container-sm: 640px;
+    --container-md: 768px;
+    --container-lg: 1024px;
+    --container-xl: 1280px;
+    --container-2xl: 1400px;
+
+    /* =========================================================================
+     * 🔝 Z-INDEX SCALE
+     * ========================================================================= */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    --z-toast: 1080;
+
+    /* =========================================================================
+     * 🖼 GLASS EFFECT (Glassmorphism)
+     * ========================================================================= */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-blur: blur(20px);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+
+    /* =========================================================================
+     * 🌈 GRADIENTS
+     * ========================================================================= */
+    --gradient-primary: linear-gradient(
+        135deg,
+        var(--color-primary) 0%,
+        var(--color-primary-light) 100%
+    );
+    --gradient-accent: linear-gradient(
+        135deg,
+        var(--color-accent) 0%,
+        var(--color-accent-light) 100%
+    );
+    --gradient-hero: linear-gradient(
+        135deg,
+        rgba(30, 58, 95, 0.95) 0%,
+        rgba(44, 82, 130, 0.85) 100%
+    );
+    --gradient-dark: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.7) 100%
+    );
+    --gradient-gold: linear-gradient(
+        135deg,
+        #d4af37 0%,
+        #f4e4ba 50%,
+        #d4af37 100%
+    );
+}
+
+/* Dark Theme Override */
+[data-theme="dark"] {
+    --color-bg: #0d1520;
+    --color-bg-alt: #111827;
+    --color-surface: #1a2332;
+    --color-surface-alt: #1f2937;
+    --color-surface-hover: #2d3748;
+
+    --color-text: #e2e8f0;
+    --color-text-secondary: #a0aec0;
+    --color-text-muted: #718096;
+    --color-text-light: #4a5568;
+
+    --color-border: #2d3748;
+    --color-border-light: #374151;
+    --color-border-dark: #4a5568;
+
+    --glass-bg: rgba(26, 35, 50, 0.8);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}

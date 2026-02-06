@@ -3,177 +3,249 @@
 @section('title', __('Platform Settings'))
 @section('page-title', __('Platform Settings'))
 
+@section('page-header')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">{{ __('Admin Dashboard') }}</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Platform Settings') }}</a></li>
+    </ol>
+</div>
+@endsection
+
 @section('content')
-<div class="row">
-    <div class="col-xl-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">{{ __('Manage Platform Settings') }}</h4>
+<div class="row my-2">
+    <div class="col-xl-6 col-sm-12">
+        <x-stats-card
+            :label="__('Total Config Keys')"
+            :value="$stats['total_settings']"
+            icon="fas fa-cog"
+        />
+    </div>
+    <div class="col-xl-6 col-sm-12">
+        <x-stats-card
+            :label="__('Last System Update')"
+            :value="$stats['last_updated']"
+            icon="fas fa-sync"
+        />
+    </div>
+</div>
+
+<form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+
+    <div class="row">
+        {{-- General Settings --}}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ __('General Settings') }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Site Name (English)') }}</label>
+                        <input type="text" class="form-control" name="site_name_en" value="{{ \App\Models\Setting::get('site_name_en') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Site Name (Arabic)') }}</label>
+                        <input type="text" class="form-control" name="site_name_ar" value="{{ \App\Models\Setting::get('site_name_ar') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Description (English)') }}</label>
+                        <textarea class="form-control" name="site_description_en" rows="3">{{ \App\Models\Setting::get('site_description_en') }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Description (Arabic)') }}</label>
+                        <textarea class="form-control" name="site_description_ar" rows="3">{{ \App\Models\Setting::get('site_description_ar') }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Primary Color') }}</label>
+                            <input type="color" class="form-control form-control-color w-100" name="primary_color" value="{{ \App\Models\Setting::get('primary_color') ?? '#3b4bd3' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('System Mode') }}</label>
+                            <select class="form-control default-select" name="maintenance_mode">
+                                <option value="0" {{ \App\Models\Setting::get('maintenance_mode') == '0' ? 'selected' : '' }}>{{ __('Live (Public Access)') }}</option>
+                                <option value="1" {{ \App\Models\Setting::get('maintenance_mode') == '1' ? 'selected' : '' }}>{{ __('Maintenance (Restricted)') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <!-- Session Status -->
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
+        </div>
+
+        {{-- Visual Identity --}}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ __('Visual Identity') }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4 text-center">
+                            <label class="form-label d-block">{{ __('Site Logo') }}</label>
+                            <div class="mb-3 p-3 bg-light rounded" style="min-height: 100px;">
+                                @if(\App\Models\Setting::get('site_logo'))
+                                    <img id="logo-preview" src="{{ asset(\App\Models\Setting::get('site_logo')) }}" class="img-fluid" style="max-height: 80px;">
+                                @else
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                @endif
+                            </div>
+                            <label class="btn btn-primary btn-sm">
+                                <i class="fa fa-upload me-2"></i>{{ __('Upload Logo') }}
+                                <input type="file" class="d-none" name="site_logo" onchange="previewImg(this, '#logo-preview')">
+                            </label>
+                            <p class="small text-muted mt-2 mb-0">{{ __('Recommended size: 200x50px') }}</p>
+                        </div>
+
+                        <div class="col-md-6 mb-4 text-center">
+                            <label class="form-label d-block">{{ __('Favicon') }}</label>
+                            <div class="mb-3 p-3 bg-light rounded d-flex align-items-center justify-content-center" style="min-height: 100px;">
+                                @if(\App\Models\Setting::get('site_favicon'))
+                                    <img id="favicon-preview" src="{{ asset(\App\Models\Setting::get('site_favicon')) }}" style="height: 48px;">
+                                @else
+                                    <i class="fas fa-globe fa-3x text-muted"></i>
+                                @endif
+                            </div>
+                            <label class="btn btn-primary btn-sm">
+                                <i class="fa fa-upload me-2"></i>{{ __('Upload Favicon') }}
+                                <input type="file" class="d-none" name="site_favicon" onchange="previewImg(this, '#favicon-preview')">
+                            </label>
+                            <p class="small text-muted mt-2 mb-0">{{ __('SVG or ICO preferred') }}</p>
+                        </div>
                     </div>
-                @endif
+                </div>
+            </div>
+        </div>
 
-                <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+        {{-- Contact Information --}}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ __('Contact Information') }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Support Email') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            <input type="email" class="form-control" name="contact_email" value="{{ \App\Models\Setting::get('contact_email') }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Contact Phone') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                            <input type="text" class="form-control" name="contact_phone" value="{{ \App\Models\Setting::get('contact_phone') }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Tabs Navigation -->
-                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">{{ __('General Settings') }}</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#media" type="button" role="tab">{{ __('Logo & Icons') }}</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">{{ __('Contact & Social') }}</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="app-settings-tab" data-bs-toggle="tab" data-bs-target="#app-settings" type="button" role="tab">{{ __('App Settings') }}</button>
-                        </li>
-                    </ul>
+        {{-- Social Media --}}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ __('Social Media') }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Facebook') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: #3b5998; color: #fff;"><i class="fab fa-facebook-f"></i></span>
+                            <input type="url" class="form-control" name="facebook_url" value="{{ \App\Models\Setting::get('facebook_url') }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Twitter (X)') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: #1da1f2; color: #fff;"><i class="fab fa-twitter"></i></span>
+                            <input type="url" class="form-control" name="twitter_url" value="{{ \App\Models\Setting::get('twitter_url') }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Instagram') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: #e1306c; color: #fff;"><i class="fab fa-instagram"></i></span>
+                            <input type="url" class="form-control" name="instagram_url" value="{{ \App\Models\Setting::get('instagram_url') }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="tab-content mt-4" id="myTabContent">
-                        <!-- General Settings Tab -->
-                        <div class="tab-pane fade show active" id="general" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Site Name (English)') }}</label>
-                                    <input type="text" class="form-control" name="site_name_en" value="{{ \App\Models\Setting::get('site_name_en') }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Site Name (Arabic)') }}</label>
-                                    <input type="text" class="form-control" name="site_name_ar" value="{{ \App\Models\Setting::get('site_name_ar') }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Description (English)') }}</label>
-                                    <textarea class="form-control" name="site_description_en" rows="3">{{ \App\Models\Setting::get('site_description_en') }}</textarea>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Description (Arabic)') }}</label>
-                                    <textarea class="form-control" name="site_description_ar" rows="3">{{ \App\Models\Setting::get('site_description_ar') }}</textarea>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Primary Color') }}</label>
-                                    <input type="color" class="form-control form-control-color" name="primary_color" value="{{ \App\Models\Setting::get('primary_color') ?? '#3b4bd3' }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Maintenance Mode') }}</label>
-                                    <select class="form-control default-select" name="maintenance_mode">
-                                        <option value="0" {{ \App\Models\Setting::get('maintenance_mode') == '0' ? 'selected' : '' }}>{{ __('Disabled (Live)') }}</option>
-                                        <option value="1" {{ \App\Models\Setting::get('maintenance_mode') == '1' ? 'selected' : '' }}>{{ __('Enabled (Maintenance)') }}</option>
-                                    </select>
-                                </div>
+        {{-- Mobile App Settings --}}
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ __('Mobile Application') }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ __('Minimum Version') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
+                                <input type="text" class="form-control" name="app_min_version" value="{{ \App\Models\Setting::get('app_min_version', '1.0.0') }}">
+                            </div>
+                            <small class="text-muted">{{ __('Force users to update if their version is lower than this.') }}</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ __('Play Store Link') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-google-play"></i></span>
+                                <input type="url" class="form-control" name="android_url" value="{{ \App\Models\Setting::get('android_url') }}">
                             </div>
                         </div>
-
-                        <!-- Media Tab -->
-                        <div class="tab-pane fade" id="media" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Platform Logo') }}</label>
-                                    <input type="file" class="form-control" name="site_logo">
-                                    @if(\App\Models\Setting::get('site_logo'))
-                                        <div class="mt-2">
-                                            <img id="logo-preview" src="{{ asset(\App\Models\Setting::get('site_logo')) }}" alt="Logo" height="50">
-                                        </div>
-                                    @else
-                                        <div class="mt-2">
-                                            <img id="logo-preview" src="" alt="Logo" height="50" style="display:none;">
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Favicon Icon') }}</label>
-                                    <input type="file" class="form-control" name="site_favicon">
-                                    @if(\App\Models\Setting::get('site_favicon'))
-                                        <div class="mt-2">
-                                            <img id="favicon-preview" src="{{ asset(\App\Models\Setting::get('site_favicon')) }}" alt="Favicon" height="32">
-                                        </div>
-                                    @else
-                                        <div class="mt-2">
-                                            <img id="favicon-preview" src="" alt="Favicon" height="32" style="display:none;">
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Contact Tab -->
-                        <div class="tab-pane fade" id="contact" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Support Email') }}</label>
-                                    <input type="email" class="form-control" name="contact_email" value="{{ \App\Models\Setting::get('contact_email') }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Contact Phone') }}</label>
-                                    <input type="text" class="form-control" name="contact_phone" value="{{ \App\Models\Setting::get('contact_phone') }}">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">{{ __('Facebook URL') }}</label>
-                                    <input type="url" class="form-control" name="facebook_url" value="{{ \App\Models\Setting::get('facebook_url') }}">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">{{ __('Twitter URL') }}</label>
-                                    <input type="url" class="form-control" name="twitter_url" value="{{ \App\Models\Setting::get('twitter_url') }}">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">{{ __('Instagram URL') }}</label>
-                                    <input type="url" class="form-control" name="instagram_url" value="{{ \App\Models\Setting::get('instagram_url') }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- App Settings Tab -->
-                        <div class="tab-pane fade" id="app-settings" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('Minimum App Version') }}</label>
-                                    <input type="text" class="form-control" name="app_min_version" value="{{ \App\Models\Setting::get('app_min_version', '1.0.0') }}" placeholder="e.g. 1.0.0">
-                                    <small class="text-muted">{{ __('Force users to update if their version is lower than this.') }}</small>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ __('System Status') }}</label>
-                                    <select class="form-control default-select" name="maintenance_mode">
-                                        <option value="0" {{ \App\Models\Setting::get('maintenance_mode') == '0' ? 'selected' : '' }}>{{ __('Active (Live)') }}</option>
-                                        <option value="1" {{ \App\Models\Setting::get('maintenance_mode') == '1' ? 'selected' : '' }}>{{ __('Maintenance (Offline)') }}</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">{{ __('Android Store URL') }}</label>
-                                    <input type="url" class="form-control" name="android_url" value="{{ \App\Models\Setting::get('android_url') }}" placeholder="https://play.google.com/store/...">
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">{{ __('iOS Store URL') }}</label>
-                                    <input type="url" class="form-control" name="ios_url" value="{{ \App\Models\Setting::get('ios_url') }}" placeholder="https://apps.apple.com/app/...">
-                                </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ __('App Store Link') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-apple"></i></span>
+                                <input type="url" class="form-control" name="ios_url" value="{{ \App\Models\Setting::get('ios_url') }}">
                             </div>
                         </div>
                     </div>
-
-                    <div class="card-footer text-end mt-4">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-save me-2"></i>{{ __('Save Settings') }}</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    {{-- Save Button --}}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-end">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fa fa-save me-2"></i>{{ __('Save All Settings') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 @endsection
 
 @section('scripts')
 <script>
+function previewImg(input, previewId) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $(previewId).attr('src', e.target.result).show();
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 $(document).ready(function() {
     $('#settings-form').on('submit', function(e) {
         e.preventDefault();
 
         var form = $(this);
         var formData = new FormData(this);
+        var saveBtn = form.find('button[type="submit"]');
+        var originalHtml = saveBtn.html();
 
         Swal.fire({
             title: "{{ __('Are you sure?') }}",
@@ -186,9 +258,6 @@ $(document).ready(function() {
             cancelButtonText: "{{ __('Cancel') }}"
         }).then((result) => {
             if (result.isConfirmed) {
-                // Show loading
-                var saveBtn = form.find('button[type="submit"]');
-                var originalHtml = saveBtn.html();
                 saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i>{{ __("Saving...") }}');
 
                 $.ajax({
@@ -199,26 +268,7 @@ $(document).ready(function() {
                     contentType: false,
                     success: function(response) {
                         if (response.success) {
-                            toastr.success(response.message, "{{ __('Success') }}", {
-                                positionClass: "toast-top-right",
-                                timeOut: 5e3,
-                                closeButton: !0,
-                                debug: !1,
-                                newestOnTop: !0,
-                                progressBar: !0,
-                                preventDuplicates: !0,
-                                onclick: null,
-                                showDuration: "300",
-                                hideDuration: "1000",
-                                extendedTimeOut: "1000",
-                                showEasing: "swing",
-                                hideEasing: "linear",
-                                showMethod: "fadeIn",
-                                hideMethod: "fadeOut",
-                                tapToDismiss: !1
-                            });
-
-                            // Update images if provided
+                            toastr.success(response.message);
                             if (response.logo_url) {
                                 $('#logo-preview').attr('src', response.logo_url).show();
                             }
@@ -226,21 +276,17 @@ $(document).ready(function() {
                                 $('#favicon-preview').attr('src', response.favicon_url).show();
                             }
                         } else {
-                            toastr.error(response.message, "{{ __('Error') }}");
+                            toastr.error(response.message);
                         }
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) {
                             var errors = xhr.responseJSON.errors;
                             $.each(errors, function(key, value) {
-                                toastr.error(value[0], "{{ __('Validation Error') }}");
+                                toastr.error(value[0]);
                             });
                         } else {
-                            var errorMsg = "{{ __('An error occurred while saving.') }}";
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMsg = xhr.responseJSON.message;
-                            }
-                            toastr.error(errorMsg, "{{ __('Error') }}");
+                            toastr.error("{{ __('An error occurred while saving.') }}");
                         }
                     },
                     complete: function() {

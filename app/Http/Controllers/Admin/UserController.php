@@ -16,7 +16,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view('admin.users.index');
+        $stats = [
+            'total' => User::count(),
+            'active' => User::where('status', 'active')->count(),
+            'inactive' => User::where('status', 'inactive')->count(),
+            'unverified' => User::whereNull('email_verified_at')->count(),
+        ];
+        return view('admin.users.index', compact('stats'));
     }
 
     /**
@@ -56,10 +62,10 @@ class UserController extends Controller
                 ];
             })
         ]);
-        
+
     }
 
-   
+
     /**
      * Display the specified resource.
      */

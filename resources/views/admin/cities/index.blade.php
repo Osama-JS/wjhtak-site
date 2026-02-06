@@ -2,13 +2,46 @@
 
 @section('title', __('Cities Management'))
 
+@section('page-header')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('Locations') }}</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Cities') }}</a></li>
+    </ol>
+</div>
+@endsection
+
 @section('content')
-<div class="container-fluid">
-    <div class="row page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Admin') }}</a></li>
-            <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('Cities') }}</a></li>
-        </ol>
+
+    <div class="row my-2">
+        <div class="col-xl-3 col-sm-6">
+            <x-stats-card
+                :label="__('Total Cities')"
+                :value="$stats['total']"
+                icon="fas fa-city"
+            />
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <x-stats-card
+                :label="__('Active')"
+                :value="$stats['active']"
+                icon="fas fa-check-circle"
+            />
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <x-stats-card
+                :label="__('Inactive')"
+                :value="$stats['inactive']"
+                icon="fas fa-times-circle"
+            />
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <x-stats-card
+                :label="__('In Use (Countries)')"
+                :value="$stats['countries_count']"
+                icon="fas fa-globe"
+            />
+        </div>
     </div>
 
     <div class="row">
@@ -137,7 +170,7 @@
         // Add City Form Submit
         $('#addCityForm').on('submit', function(e) {
             e.preventDefault();
-    
+
             $.ajax({
                 url: "{{ route('admin.cities.store') }}",
                 type: "POST",
@@ -209,12 +242,12 @@
     function toggleCityStatus(id) {
         let url = "{{ route('admin.cities.toggle-status', ':id') }}".replace(':id', id);
          Swal.fire({
-            title: 'Are you sure?',
-            text: 'Do you want to toggle this city status?',
+            title: '{{ __("Are you sure?") }}',
+            text: '{{ __("Do you want to toggle this city status?") }}',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Yes, toggle it!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: '{{ __("Yes, toggle it!") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
         }).then((result) => {
             if (result.value) {
                 $.ajax({
@@ -226,13 +259,13 @@
                             if (typeof countriesTable !== 'undefined') {
                                 citiesTable.ajax.reload(null, false);
                             }
-                            Swal.fire('Updated!', response.message, 'success'); // عرض رسالة نجاح
+                            Swal.fire('{{ __("Updated!") }}', response.message, 'success'); // عرض رسالة نجاح
                         } else {
-                            Swal.fire('Error!', response.message || 'Something went wrong', 'error');
+                            Swal.fire('{{ __("Error!") }}', response.message || '{{ __("Something went wrong") }}', 'error');
                         }
                     },
                     error: function(xhr) {
-                        Swal.fire('Error!', xhr.responseJSON?.message || 'Something went wrong', 'error');
+                        Swal.fire('{{ __("Error!") }}', xhr.responseJSON?.message || '{{ __("Something went wrong") }}', 'error');
                     }
                 });
             }

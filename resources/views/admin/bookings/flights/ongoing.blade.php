@@ -5,6 +5,37 @@
 
 @section('content')
 <div class="row">
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Active Flights')"
+            :value="$stats['active_flights']"
+            icon="fas fa-plane-departure"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('In Air')"
+            :value="$stats['in_air']"
+            icon="fas fa-cloud"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('On Ground')"
+            :value="$stats['on_ground']"
+            icon="fas fa-plane-arrival"
+        />
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <x-stats-card
+            :label="__('Delayed')"
+            :value="$stats['delayed']"
+            icon="fas fa-exclamation-circle"
+        />
+    </div>
+</div>
+
+<div class="row">
     <!-- Live Tracking Map -->
     <div class="col-xl-12">
         <div class="card overflow-hidden">

@@ -13,7 +13,13 @@ class RoleController extends Controller
     public function index()
     {
         $permissions = Permission::all();
-        return view('admin.roles.index', compact('permissions'));
+        $stats = [
+            'total' => Role::count(),
+            'with_permissions' => Role::has('permissions')->count(),
+            'without_permissions' => Role::doesntHave('permissions')->count(),
+            'total_permissions' => Permission::count()
+        ];
+        return view('admin.roles.index', compact('permissions', 'stats'));
     }
 
     public function getData()

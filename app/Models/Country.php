@@ -57,6 +57,14 @@ class Country extends Model
     }
 
     /**
+     * Get the trips to this country.
+     */
+    public function trips()
+    {
+        return $this->hasMany(Trip::class, 'to_country_id');
+    }
+
+    /**
      * Scope a query to only include active countries.
      */
     public function scopeActive($query)

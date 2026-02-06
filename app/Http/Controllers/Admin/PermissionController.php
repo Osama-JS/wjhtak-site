@@ -10,7 +10,12 @@ class PermissionController extends Controller
 {
     public function index()
     {
-        return view('admin.permissions.index');
+        $stats = [
+            'total' => Permission::count(),
+            'in_use' => Permission::has('roles')->count(),
+            'not_in_use' => Permission::doesntHave('roles')->count()
+        ];
+        return view('admin.permissions.index', compact('stats'));
     }
 
     public function getData()

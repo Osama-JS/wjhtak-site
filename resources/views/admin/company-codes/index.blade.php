@@ -1,13 +1,37 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="container-fluid">
+@section('page-header')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('Company') }}</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ __('Company Codes') }}</a></li>
+    </ol>
+</div>
+@endsection
 
-    <div class="row page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">{{ __('Admin')}}</li>
-            <li class="breadcrumb-item active">{{ __('Company Codes')}}</li>
-        </ol>
+@section('content')
+    <div class="row my-2">
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Total Company Codes')"
+                :value="$stats['total']"
+                icon="fas fa-ticket-alt"
+            />
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Active')"
+                :value="$stats['active']"
+                icon="fas fa-check-circle"
+            />
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <x-stats-card
+                :label="__('Inactive')"
+                :value="$stats['inactive']"
+                icon="fas fa-times-circle"
+            />
+        </div>
     </div>
 
     <div class="card">
@@ -61,7 +85,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label>{{' __(Type)'}}</label>
+                    <label>{{ __('Type') }}</label>
                     <select name="type" class="form-control">
                         <option value="fixed">{{ __('Fixed')}}</option>
                         <option value="percentage">{{ __('Percentage')}}</option>
@@ -94,7 +118,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{ __('Edit User') }}</h5>
+                <h5 class="modal-title">{{ __('Edit Company Code') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="editcodeForm">
@@ -144,7 +168,7 @@
     </div>
 </div>
 <script>
-    
+
     let updatecodesUrl  = "{{ route('admin.company-codes.update', ':id') }}";
     let toggleStatusUrlTemplate = "{{ route('admin.company-codes.toggle-status', ':id') }}";
     let companyCodesTable;
@@ -161,7 +185,7 @@
             },
             columns: [
                 { data: 'company' },
-                { data: 'code' },   
+                { data: 'code' },
                 { data: 'type' },
                 { data: 'value' },
                 { data: 'status' },
@@ -170,11 +194,11 @@
             language: {
                 "url": "{{ asset('vendor/datatables/i18n/' . app()->getLocale() . '.json') }}"
             }
-        });       
+        });
 
-        
 
-        
+
+
         $('#addCodeForm').on('submit', function (e) {
             e.preventDefault();
             $.ajax({
@@ -204,14 +228,14 @@
         });
 
 
-            
+
         // Handle Edit Form Submit
         $('#editcodeForm').on('submit', function(e) {
             e.preventDefault();
             const id = $('#edit_code_id').val();
             const url = updatecodesUrl.replace(':id', id);
             const formData = $(this).serialize() + '&_method=PUT';
-            
+
             $.ajax({
                 url:url,
                 method: 'POST',
@@ -235,8 +259,8 @@
                 }
             });
         });
-        
-           
+
+
     });
 
     // function editCode(id) {
@@ -375,7 +399,7 @@
     //         }
     //     });
     // }
-    
+
 
 </script>
 @endsection

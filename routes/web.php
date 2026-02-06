@@ -6,9 +6,13 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\ProfileController;
-
+use App\Http\Controllers\FrontendController;
 
 use Illuminate\Support\Facades\Route;
+
+// =============================================================================
+// FRONTEND ROUTES (Public)
+// =============================================================================
 
 // Language switcher
 Route::get('lang/{locale}', function ($locale) {
@@ -18,16 +22,28 @@ Route::get('lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('lang.switch');
 
-// Redirect root to login
-Route::get('/', function () {
-    if (auth()->check()) {
-        if (auth()->user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
-        }
-        return redirect()->route('customer.dashboard');
-    }
-    return redirect()->route('login');
-});
+// Homepage
+Route::get('/', [FrontendController::class, 'home'])->name('home');
+
+// Trips
+Route::get('/trips', [FrontendController::class, 'trips'])->name('trips.index');
+Route::get('/trips/{id}', [FrontendController::class, 'tripShow'])->name('trips.show');
+
+// Destinations
+Route::get('/destinations', [FrontendController::class, 'destinations'])->name('destinations');
+
+// About
+Route::get('/about', [FrontendController::class, 'about'])->name('about');
+
+// Contact
+Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
+Route::post('/contact', [FrontendController::class, 'contactSubmit'])->name('contact.submit');
+
+// FAQ
+Route::get('/faq', [FrontendController::class, 'faq'])->name('faq');
+
+// Search
+Route::get('/search', [FrontendController::class, 'search'])->name('search');
 
 // Default dashboard - redirect based on user type
 Route::get('/dashboard', function () {
@@ -93,7 +109,7 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::post('companies/{companie}/toggle-status', [App\Http\Controllers\Admin\CompanyController::class, 'toggleStatus'])->name('companies.toggle-status');
     Route::resource('companies', App\Http\Controllers\Admin\CompanyController::class);
 
-    
+
     Route::get('company-codes/data', [App\Http\Controllers\Admin\Company_CodesController::class, 'getData'])->name('company-codes.data');
     Route::post('company-codes/{company_code}/toggle-status', [App\Http\Controllers\Admin\Company_CodesController::class, 'toggleStatus'])->name('company-codes.toggle-status');
     Route::resource('company-codes', App\Http\Controllers\Admin\Company_CodesController::class);
@@ -108,6 +124,12 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     // Settings
     Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+
+    // Profile Management
+    Route::get('profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
+    Route::post('profile/update', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('profile/password', [App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::post('profile/photo', [App\Http\Controllers\Admin\ProfileController::class, 'updatePhoto'])->name('profile.photo');
 
     // Permission Management
     Route::get('permissions/data', [PermissionController::class, 'getData'])->name('permissions.data');

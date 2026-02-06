@@ -19,7 +19,12 @@ class BookingController extends Controller
     // Flights
     public function availableFlights()
     {
-        return view('admin.bookings.flights.available');
+        $stats = [
+            'total_routes' => 245,
+            'airlines' => 15,
+            'today_searches' => 120
+        ];
+        return view('admin.bookings.flights.available', compact('stats'));
     }
 
     /**
@@ -87,12 +92,24 @@ class BookingController extends Controller
 
     public function flightRequests()
     {
-        return view('admin.bookings.flights.requests');
+        $stats = [
+            'total' => 156, // Mock data
+            'pending' => 42,
+            'confirmed' => 98,
+            'cancelled' => 16
+        ];
+        return view('admin.bookings.flights.requests', compact('stats'));
     }
 
     public function ongoingFlights()
     {
-        return view('admin.bookings.flights.ongoing');
+        $stats = [
+            'active_flights' => 12,
+            'in_air' => 8,
+            'on_ground' => 4,
+            'delayed' => 1
+        ];
+        return view('admin.bookings.flights.ongoing', compact('stats'));
     }
 
     /**
@@ -111,11 +128,22 @@ class BookingController extends Controller
     // Hotels
     public function hotelList()
     {
-        return view('admin.bookings.hotels.index');
+        $stats = [
+            'total_hotels' => 45,
+            'featured' => 12,
+            'top_rated' => 8
+        ];
+        return view('admin.bookings.hotels.index', compact('stats'));
     }
 
     public function hotelRequests()
     {
-        return view('admin.bookings.hotels.requests');
+        $stats = [
+            'total' => 89,
+            'pending' => 12,
+            'confirmed' => 65,
+            'cancelled' => 12
+        ];
+        return view('admin.bookings.hotels.requests', compact('stats'));
     }
 }
