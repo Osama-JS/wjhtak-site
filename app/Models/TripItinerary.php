@@ -2,21 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TripImage extends Model
+class TripItinerary extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'trip_id',
-        'image_path',
+        'day_number',
+        'title',
+        'description',
+        'image_path'
     ];
 
-    /**
-     * Get the trip that owns the image.
-     */
     public function trip()
     {
         return $this->belongsTo(Trip::class);
     }
 }
-

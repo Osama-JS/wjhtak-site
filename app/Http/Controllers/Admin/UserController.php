@@ -54,7 +54,7 @@ class UserController extends Controller
                     'verified' => $verifiedBadge,
                     'actions' => '
                         <div class="d-flex">
-                            <button onclick="viewUser(' . $user->id . ')" class="btn btn-info shadow btn-xs sharp me-1"><i class="fa fa-eye"></i></button>
+                            <a href="' . route('admin.users.profile', $user->id) . '" class="btn btn-info shadow btn-xs sharp me-1"><i class="fa fa-eye"></i></a>
                             <button onclick="editUser(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></button>
                             <button onclick="toggleUserStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-ban"></i></button>
                             <button onclick="deleteUser(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
@@ -175,5 +175,13 @@ class UserController extends Controller
                 'message' => 'Failed to delete user'
             ], 500);
         }
+    }
+    /**
+     * Show user profile
+     */
+    public function profile($id)
+    {
+        $user = User::with(['bookings.trip'])->findOrFail($id);
+        return view('admin.users.profile', compact('user'));
     }
 }

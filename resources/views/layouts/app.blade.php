@@ -10,7 +10,7 @@
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/png" href="{{ asset(\App\Models\Setting::get('site_favicon', 'images/favicon.png')) }}">
-    
+
     <!-- Global Scripts -->
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
     <link href="{{ asset('vendor/sweetalert2/dist/sweetalert2.min.css') }}" rel="stylesheet">
@@ -74,7 +74,7 @@
     @stack('styles')
 </head>
 
-<body data-typography="poppins" data-theme-version="dark" data-sidebar-style="full" data-layout="vertical" data-nav-headerbg="color_1" data-headerbg="color_1" data-sibebarbg="color_1" data-sidebar-position="fixed" data-header-position="fixed" data-container="wide" direction="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}" data-primary="color_1">
+<body data-typography="poppins"  data-sidebar-style="full" data-layout="vertical" data-nav-headerbg="color_1" data-headerbg="color_1" data-sibebarbg="color_1" data-sidebar-position="fixed" data-header-position="fixed" data-container="wide" direction="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}" data-primary="color_1">
 
 
     <!-- Preloader -->

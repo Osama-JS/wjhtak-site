@@ -196,6 +196,51 @@
                         </div>
                     @endif
 
+                    {{-- Trip Itinerary / Daily Schedule --}}
+                    @if(isset($trip->itineraries) && count($trip->itineraries) > 0)
+                        <div style="margin-bottom: var(--space-8);">
+                            <h2 style="font-size: var(--text-xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-inline-end: var(--space-2);">
+                                    <path d="M8 2v4"/><path d="M16 2v4"/>
+                                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                                    <path d="M3 10h18"/>
+                                </svg>
+                                {{ __('Trip Itinerary') }}
+                            </h2>
+
+                            <div class="trip-itinerary" style="position: relative; padding-inline-start: var(--space-8);">
+                                {{-- Timeline Line --}}
+                                <div style="position: absolute; inset-inline-start: 12px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--color-primary), var(--color-accent));"></div>
+
+                                @foreach($trip->itineraries as $itinerary)
+                                    <div class="itinerary-item" style="position: relative; padding-bottom: var(--space-6); {{ $loop->last ? 'padding-bottom: 0;' : '' }}">
+                                        {{-- Day Circle --}}
+                                        <div style="position: absolute; inset-inline-start: calc(-1 * var(--space-8) + 4px); width: 18px; height: 18px; background: var(--gradient-primary); border-radius: 50%; border: 3px solid var(--color-bg);"></div>
+
+                                        {{-- Content Card --}}
+                                        <div class="card" style="padding: var(--space-4); border-inline-start: 3px solid var(--color-primary);">
+                                            <div class="flex items-start gap-3">
+                                                <span style="background: var(--gradient-primary); color: white; padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: var(--text-sm); font-weight: var(--font-bold); white-space: nowrap;">
+                                                    {{ __('Day') }} {{ $itinerary->day_number }}
+                                                </span>
+                                                <div style="flex: 1;">
+                                                    <h4 style="font-weight: var(--font-semibold); margin-bottom: var(--space-2); color: var(--color-text);">
+                                                        {{ $itinerary->title }}
+                                                    </h4>
+                                                    @if($itinerary->description)
+                                                        <p style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                                                            {{ $itinerary->description }}
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- Reviews Section --}}
                     @if(isset($trip->rates) && count($trip->rates) > 0)
                         <div style="margin-bottom: var(--space-8);">

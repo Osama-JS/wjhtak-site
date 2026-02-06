@@ -66,6 +66,7 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
 
     // User Management
     Route::get('users/data', [UserController::class, 'getData'])->name('users.data');
+    Route::get('users/{user}/profile', [UserController::class, 'profile'])->name('users.profile');
     Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::resource('users', UserController::class);
 
@@ -129,6 +130,11 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::post('/trips/{trip}/images', [App\Http\Controllers\Admin\TripsController::class, 'imagestore'])->name('trips.images-store');
     Route::get('/trips/{id}/get-images', [App\Http\Controllers\Admin\TripsController::class, 'getImages'])->name('trips.get-images');
     Route::delete('/trips/{image}/destroyimages', [App\Http\Controllers\Admin\TripsController::class, 'imagedestroy'])->name('trips.images-destroy');
+
+    // Trip Itinerary
+    Route::get('/trips/{trip}/itinerary', [App\Http\Controllers\Admin\TripsController::class, 'itinerary'])->name('trips.itinerary');
+    Route::post('/trips/{trip}/itinerary', [App\Http\Controllers\Admin\TripsController::class, 'storeItinerary'])->name('trips.itinerary.store');
+    Route::delete('/trips/itinerary/{itinerary}', [App\Http\Controllers\Admin\TripsController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
 
     // Settings
     Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');

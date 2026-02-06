@@ -117,7 +117,7 @@ class FrontendController extends Controller
     public function tripShow($id)
     {
         $trip = Trip::active()
-            ->with(['fromCountry', 'toCountry', 'fromCity', 'images', 'rates.user', 'company'])
+            ->with(['fromCountry', 'toCountry', 'fromCity', 'images', 'rates.user', 'company', 'itineraries'])
             ->findOrFail($id);
 
         // Increment page visits

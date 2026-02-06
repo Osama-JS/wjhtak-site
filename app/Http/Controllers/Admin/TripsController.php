@@ -13,17 +13,48 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+use App\Models\TripItinerary;
+
 class TripsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
-    {   
+    {
         $trips = Trip::all();
         $companies = Company::all();
         $countries = Country::all();
-        return view('admin.trips.index', compact('companies', 'countries','trips'));
+
+        $stats = [
+            'total' => Trip::count(),
+            'active' => Trip::active()->count(),
+            'inactive' => Trip::where('active', false)->count(),
+            'expired' => Trip::where('expiry_date', '<', now()->toDateString())->count(),
+        ];
+
+        return view('admin.trips.index', compact('companies', 'countries', 'trips', 'stats'));
+    }
+
+    public function itinerary(Trip $trip)
+    {
+        return view('admin.trips.itinerary', compact('trip'));
+    }
+
+    public function storeItinerary(Request $request, Trip $trip)
+    {
+        $request->validate([
+            'day_number' => 'required|integer',
+            'title' => 'required|string',
+            'description' => 'nullable|string',
+        ]);
+
+        $trip->itineraries()->create($request->all());
+
+        return redirect()->back()->with('success', __('Itinerary added successfully'));
+    }
+
+    public function destroyItinerary(TripItinerary $itinerary)
+    {
+        $itinerary->delete();
+        return redirect()->back()->with('success', __('Itinerary deleted successfully'));
     }
 
 
@@ -58,19 +89,16 @@ class TripsController extends Controller
                 $isExpired = $trip->expiry_date && $trip->expiry_date < now()->format('Y-m-d');
 
                 $actionButtons = '
-                       <button class="btn btn-sm btn-primary" onclick="editTrip('.$trip->id.')">
-                        <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="toggleTripStatus('.$trip->id.')">
-                            <i class="fas fa-ban"></i>
-                        </button>
-                        <button class="btn btn-sm btn-info" onclick="openImageUpload('.$trip->id.', \''.addslashes($trip->title).'\')" title="رفع صور">
-                            <i class="fas fa-camera"></i>
-                        </button>
-                        <button class="btn btn-sm btn-primary" onclick="editTrip('.$trip->id.')">
+                        <button class="btn btn-sm btn-primary" onclick="editTrip('.$trip->id.')" title="'.__('Edit').'">
                             <i class="fas fa-edit"></i>
+                        </button>
+                        <a href="'.route('admin.trips.itinerary', $trip->id).'" class="btn btn-sm btn-info" title="'.__('Itinerary').'">
+                            <i class="fas fa-list-ul"></i>
+                        </a>
+                        <button class="btn btn-sm btn-secondary" onclick="openImageUpload('.$trip->id.', \''.addslashes($trip->title).'\')" title="'.__('Upload Images').'">
+                            <i class="fas fa-camera"></i>
                         </button>';
-                        
+
                 if ($isExpired) {
                     $actionButtons .= '
                         <button class="btn btn-sm btn-success" onclick="renewTrip('.$trip->id.')" title="تجديد الرحلة">
@@ -93,8 +121,8 @@ class TripsController extends Controller
                           ?  '<span>'. $trip->toCountry->name .'</span>' : '...',
                     'price'    => $trip->price,
                     'expiry_date' => $trip->expiry_date,
-                    'status'      => $isExpired 
-                                    ? '<span class="badge bg-dark">Expired</span>' 
+                    'status'      => $isExpired
+                                    ? '<span class="badge bg-dark">Expired</span>'
                                     : ($trip->active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'),
                     'actions' => $actionButtons,
                 ];
@@ -126,7 +154,7 @@ class TripsController extends Controller
             'duration'              => 'nullable|string|max:100',
             'price'                 => 'required|numeric|min:0',
             'price_before_discount' => 'nullable|numeric|min:0',
-            'expiry_date'           => 'nullable|date|after_or_equal:today',  
+            'expiry_date'           => 'nullable|date|after_or_equal:today',
             'personnel_capacity'    => 'nullable|integer|min:1',
             'is_public'             => 'nullable|boolean',
             'is_ad'                 => 'nullable|boolean',
@@ -256,7 +284,7 @@ class TripsController extends Controller
         return response()->json([
             'success' => true,
             'message' => __('Trip deleted successfully'),
-            
+
         ]);
     }
 
@@ -279,14 +307,14 @@ class TripsController extends Controller
 
         try {
             return DB::transaction(function () use ($request, $trip_id) {
-                
+
                 if (!$request->hasFile('file')) {
                     throw new \Exception('File not found');
                 }
 
                 $file = $request->file('file');
                 $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                
+
                 // تخزين في مجلد خاص بكل رحلة
                 $path = $file->storeAs('trips/' . $trip_id, $fileName, 'public');
 
@@ -313,10 +341,10 @@ class TripsController extends Controller
     public function imagedestroy(TripImage $image)
     {
         try {
-           
+
 
             return DB::transaction(function () use ($image) {
-                
+
                 $path = $image->image_path;
                 $image->delete();
 
@@ -325,14 +353,14 @@ class TripsController extends Controller
                 }
 
                 return response()->json([
-                    'success' => true, 
+                    'success' => true,
                     'message' => __('Trip deleted successfully'),
                 ]);
             });
 
         } catch (\Exception $e) {
             Log::error("__('Error while deleting the image') ID {$image->id}: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => __('Sorry, an error occurred while trying to delete.'),
@@ -342,7 +370,7 @@ class TripsController extends Controller
 
    public function getImages($trip_id)
     {
-       
+
         $images = TripImage::where('trip_id', $trip_id)->get();
 
         $data = $images->map(function ($image) {
@@ -351,7 +379,7 @@ class TripsController extends Controller
                 'id'   => $image->id,
                 'name' => basename($image->image_path),
                 'size' => file_exists($path) ? filesize($path) : 0,
-                'url'  => asset('storage/' . $image->image_path), 
+                'url'  => asset('storage/' . $image->image_path),
             ];
         });
 

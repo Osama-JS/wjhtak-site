@@ -12,6 +12,42 @@
     </div>
     <div class="row">
         <div class="col-12">
+            <div class="row">
+                <div class="col-xl-3 col-sm-6 my-2">
+                    <x-stats-card
+                        :label="__('Total Trips')"
+                        :value="$stats['total']"
+                        icon="flaticon-025-dashboard"
+                        color="primary"
+                    />
+                </div>
+                <div class="col-xl-3 col-sm-6 my-2">
+                    <x-stats-card
+                        :label="__('Active Trips')"
+                        :value="$stats['active']"
+                        icon="flaticon-381-success-2"
+                        color="success"
+                    />
+                </div>
+                <div class="col-xl-3 col-sm-6 my-2">
+                    <x-stats-card
+                        :label="__('Inactive Trips')"
+                        :value="$stats['inactive']"
+                        icon="flaticon-381-error"
+                        color="warning"
+                    />
+                </div>
+                <div class="col-xl-3 col-sm-6 my-2">
+                    <x-stats-card
+                        :label="__('Expired Trips')"
+                        :value="$stats['expired']"
+                        icon="flaticon-381-clock"
+                        color="danger"
+                    />
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">{{ __('Trips List') }}</h4>
@@ -99,25 +135,95 @@
             <form id="addTripsForm">
                 @csrf
                 <div class="modal-body">
-                    <x-forms.input-text name="title" :label="__('Title')" required />
-                    <x-forms.input-text name="tickets" :label="__('Tickets')" required />
-                    <x-forms.textarea name="description" :label="__('Description')" required />
-                    <x-forms.select name="company_id" :label="__('Select Company')" :options="$companies" searchable required />
-                    <x-forms.select name="from_country_id" :label="__('Select Form Country')" :options="$countries" searchable required />
-                    <x-forms.select name="from_city_id" :label="__('Select City')" :options="$companies" searchable required />
-                    <x-forms.select name="to_country_id" :label="__('Select To Country')" :options="$countries" searchable required />
-                    <x-forms.input-text name="duration" :label="__('Duration')"  />
-                    <x-forms.input-text name="price" :label="__('Price')" required />
-                    <x-forms.input-text name="price_before_discount" :label="__('Price Before Discount')"  />
-                    <div class="form-group mb-3">
-                        <label for="{{__('Expiry Date')}}" class="form-label">{{__('Expiry Date')}}</label>
-                        <span class="text-danger">*</span>
-                        <input type="date"  name="expiry_date"  class="form-control" required>
+                    <div class="row">
+                        <!-- Basic Information -->
+                        <div class="col-12 mb-3">
+                            <h6 class="text-primary"><i class="flaticon-050-info me-2"></i>{{ __('Basic Information') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                        <div class="col-md-8">
+                            <x-forms.input-text name="title" :label="__('Trip Title')" required icon="fa fa-pen" />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.input-text name="tickets" :label="__('Tickets Count')" required icon="fa fa-ticket-alt" />
+                        </div>
+                        <div class="col-md-6">
+                            <x-forms.select name="company_id" :label="__('Company')" :options="$companies" searchable required />
+                        </div>
+                        <div class="col-md-6">
+                            <x-forms.input-text name="duration" :label="__('Duration')" icon="fa fa-clock" />
+                        </div>
+
+                        <!-- Location -->
+                        <div class="col-12 mb-3 mt-3">
+                            <h6 class="text-primary"><i class="flaticon-381-map me-2"></i>{{ __('Location Details') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.select name="from_country_id" :label="__('From Country')" :options="$countries" searchable required />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.select name="from_city_id" :label="__('From City')" :options="$companies" searchable required />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.select name="to_country_id" :label="__('To Country')" :options="$countries" searchable required />
+                        </div>
+
+                        <!-- Pricing & Capacity -->
+                        <div class="col-12 mb-3 mt-3">
+                            <h6 class="text-primary"><i class="flaticon-381-diamond me-2"></i>{{ __('Pricing & Capacity') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.input-text name="price" :label="__('Price')" required icon="fa fa-dollar-sign" />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.input-text name="price_before_discount" :label="__('Price Before Discount')" icon="fa fa-tag" />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.input-text name="personnel_capacity" :label="__('Capacity')" icon="fa fa-users" />
+                        </div>
+
+                        <!-- Dates & Description -->
+                        <div class="col-12 mb-3 mt-3">
+                            <h6 class="text-primary"><i class="flaticon-381-notepad me-2"></i>{{ __('Description & Dates') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                         <div class="col-md-12 mb-3">
+                            <label for="{{__('Expiry Date')}}" class="form-label">{{__('Expiry Date')}} <span class="text-danger">*</span></label>
+                            <input type="date"  name="expiry_date"  class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <x-forms.textarea name="description" :label="__('Description')" required rows="4" />
+                        </div>
+
+                        <!-- Settings -->
+                        <div class="col-12 mb-3 mt-3">
+                            <h6 class="text-primary"><i class="flaticon-381-settings-2 me-2"></i>{{ __('Settings') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-3">
+                                    <x-forms.checkbox name="is_public" :label="__('Public Trip')" checked type="switch" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-3">
+                                    <x-forms.checkbox name="is_ad" :label="__('Advertisement')" checked type="switch" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-3">
+                                    <x-forms.checkbox name="active" :label="__('Active Status')" checked type="switch" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <x-forms.input-text name="personnel_ capacity" :label="__('Personnel Capacity')"  />
-                    <x-forms.checkbox name="is_public" :label="__('is public ')" checked type="switch" />
-                    <x-forms.checkbox name="is_ad" :label="__('is ad ')" checked type="switch" />
-                    <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">{{ __('Close') }}</button>
@@ -141,27 +247,95 @@
                 @method('PUT')
                 <input type="hidden"  id="edit_id" >
                 <div class="modal-body">
-                    <div class="modal-body">
-                    <x-forms.input-text id="edit_title" name="title" :label="__('Title')" required />
-                    <x-forms.input-text id="edit_tickets" name="tickets" :label="__('Tickets')" required />
-                    <x-forms.textarea  id="edit_description" name="description" :label="__('Description')" required />
-                    <x-forms.select id="edit_company_id" name="company_id" :label="__('Select Company')" :options="$companies" searchable required />
-                    <x-forms.select id="edit_from_country_id" name="from_country_id" :label="__('Select Form Country')" :options="$countries" searchable required />
-                    <x-forms.select id="edit_from_city_id" name="from_city_id" :label="__('Select City')" :options="$companies" searchable required />
-                    <x-forms.select id="edit_to_country_id" name="to_country_id" :label="__('Select To Country')" :options="$countries" searchable required />
-                    <x-forms.input-text id="edit_duration" name="duration" :label="__('Duration')"  />
-                    <x-forms.input-text id="edit_price" name="price" :label="__('Price')" required />
-                    <x-forms.input-text id="edit_price_before_discount" name="price_before_discount" :label="__('Price Before Discount')"  />
-                    <div class="form-group mb-3">
-                        <label for="{{__('Expiry Date')}}" class="form-label">{{__('Expiry Date')}}</label>
-                        <span class="text-danger">*</span>
-                        <input type="date" id="edit_expiry_date" name="expiry_date"  class="form-control" required>
+                    <div class="row">
+                         <!-- Basic Information -->
+                        <div class="col-12 mb-3">
+                            <h6 class="text-primary"><i class="flaticon-050-info me-2"></i>{{ __('Basic Information') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                        <div class="col-md-8">
+                            <x-forms.input-text id="edit_title" name="title" :label="__('Trip Title')" required icon="fa fa-pen" />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.input-text id="edit_tickets" name="tickets" :label="__('Tickets Count')" required icon="fa fa-ticket-alt" />
+                        </div>
+                        <div class="col-md-6">
+                            <x-forms.select id="edit_company_id" name="company_id" :label="__('Company')" :options="$companies" searchable required />
+                        </div>
+                        <div class="col-md-6">
+                            <x-forms.input-text id="edit_duration" name="duration" :label="__('Duration')" icon="fa fa-clock" />
+                        </div>
+
+                         <!-- Location -->
+                        <div class="col-12 mb-3 mt-3">
+                            <h6 class="text-primary"><i class="flaticon-381-map me-2"></i>{{ __('Location Details') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.select id="edit_from_country_id" name="from_country_id" :label="__('From Country')" :options="$countries" searchable required />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.select id="edit_from_city_id" name="from_city_id" :label="__('From City')" :options="$companies" searchable required />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.select id="edit_to_country_id" name="to_country_id" :label="__('To Country')" :options="$countries" searchable required />
+                        </div>
+
+                        <!-- Pricing & Capacity -->
+                        <div class="col-12 mb-3 mt-3">
+                            <h6 class="text-primary"><i class="flaticon-381-diamond me-2"></i>{{ __('Pricing & Capacity') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.input-text id="edit_price" name="price" :label="__('Price')" required icon="fa fa-dollar-sign" />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.input-text id="edit_price_before_discount" name="price_before_discount" :label="__('Price Before Discount')" icon="fa fa-tag" />
+                        </div>
+                        <div class="col-md-4">
+                            <x-forms.input-text id="edit_personnel_capacity"  name="personnel_capacity" :label="__('Capacity')" icon="fa fa-users" />
+                        </div>
+
+                        <!-- Dates & Description -->
+                        <div class="col-12 mb-3 mt-3">
+                            <h6 class="text-primary"><i class="flaticon-381-notepad me-2"></i>{{ __('Description & Dates') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                         <div class="col-md-12 mb-3">
+                            <label for="{{__('Expiry Date')}}" class="form-label">{{__('Expiry Date')}} <span class="text-danger">*</span></label>
+                            <input type="date" id="edit_expiry_date" name="expiry_date"  class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <x-forms.textarea  id="edit_description" name="description" :label="__('Description')" required rows="4" />
+                        </div>
+
+                        <!-- Settings -->
+                        <div class="col-12 mb-3 mt-3">
+                            <h6 class="text-primary"><i class="flaticon-381-settings-2 me-2"></i>{{ __('Settings') }}</h6>
+                            <hr class="mt-0">
+                        </div>
+                        <div class="col-md-4">
+                             <div class="card bg-light border-0">
+                                <div class="card-body p-3">
+                                    <x-forms.checkbox id="edit_is_public" name="is_public" :label="__('Public Trip')" checked type="switch" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                             <div class="card bg-light border-0">
+                                <div class="card-body p-3">
+                                    <x-forms.checkbox id="edit_is_ad" name="is_ad" :label="__('Advertisement')" checked type="switch" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                             <div class="card bg-light border-0">
+                                <div class="card-body p-3">
+                                    <x-forms.checkbox id="edit_active" name="active" :label="__('Active Status')" checked type="switch" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <x-forms.input-text id="edit_personnel_capacity"  name="personnel_ capacity" :label="__('Personnel Capacity')"  />
-                    <x-forms.checkbox id="edit_is_public" name="is_public" :label="__('is public ')" checked type="switch" />
-                    <x-forms.checkbox id="edit_is_ad" name="is_ad" :label="__('is ad ')" checked type="switch" />
-                    <x-forms.checkbox id="edit_active" name="active" :label="__('Active status')" checked type="switch" />
-                </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">{{ __('Close') }}</button>
@@ -183,7 +357,7 @@
             <form id="renewTripForm">
                 <input type="hidden"  id="edit_id" >
                 <div class="modal-body">
-                    
+
                     <div class="form-group mb-3">
                         <label for="{{__('Expiry Date')}}" class="form-label">{{__('Expiry Date')}}</label>
                         <span class="text-danger">*</span>
@@ -198,15 +372,15 @@
         </div>
     </div>
 </div>
-    
+
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
 <script>
     let tripsTable;
     const tripsDataUrl = "{{ route('admin.trips.data') }}";
     const updateUrl = "{{ route('admin.trips.update', ':id') }}";
 
-    
-     
+
+
     $(document).ready(function() {
         // Initialize DataTable
         tripsTable = $('#trips-table').DataTable({
@@ -285,7 +459,7 @@
             const id = $('#edit_id').val();
             const url = updateUrl.replace(':id', id);
             const formData = $(this).serialize() + '&_method=PUT';
-            
+
             $.ajax({
                 url:url,
                 method: 'POST',
@@ -315,17 +489,17 @@
         // var checkDataTable = setInterval(function() {
         //     // نبحث عن أول زر "تعديل" أو "رفع" يحتوي على الـ ID
         //     let firstTripBtn = $('.btn-info[onclick^="openImageUpload"]').first();
-            
+
         //     if (firstTripBtn.length > 0) {
         //         // استخراج المعاملات من onclick="openImageUpload(ID, 'TITLE')"
         //         let onClickAttr = firstTripBtn.attr('onclick');
         //         // استخراج القيم باستخدام Regex أو ببساطة تشغيل الوظيفة
-        //         firstTripBtn.click(); 
-                
+        //         firstTripBtn.click();
+
         //         clearInterval(checkDataTable); // توقف عن البحث بمجرد التشغيل
         //     }
         // }, 500); // يفحص كل نصف ثانية حتى يظهر الجدول
-        
+
     });
 
     Dropzone.autoDiscover = false;
@@ -335,7 +509,7 @@
         // 1. إظهار الكارد وتحديث العنوان
         $('#upload-card').fadeIn();
         $('#target-trip-name').text(title);
-        
+
         // التمرير للكارد
         $('html, body').animate({ scrollTop: $("#upload-card").offset().top }, 500);
 
@@ -370,10 +544,10 @@
                     cache: false, // مهم جداً لمنع تكرار صور الرحلات السابقة
                     success: function(data) {
                         $.each(data, function(key, value) {
-                            let mockFile = { 
-                                name: value.name, 
-                                size: value.size, 
-                                serverId: value.id 
+                            let mockFile = {
+                                name: value.name,
+                                size: value.size,
+                                serverId: value.id
                             };
                             dz.displayExistingFile(mockFile, value.url);
                             dz.emit("complete", mockFile);
@@ -399,7 +573,7 @@
             }
         });
     }
-     
+
 
 
     function editTrip(id) {
@@ -501,7 +675,7 @@
                     toastr.error('Something went wrong');
                 }
             }
-        });    
+        });
 
     }
 

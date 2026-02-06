@@ -19,23 +19,12 @@ class Banner extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-<<<<<<< HEAD
         'title',
         'desc',
         'image_path',
         'mobile_image_path',
-        'link', // link is not in migration, but I'll keep it in fillable if needed elsewhere or check if I should add it
-        'trip_id',
-=======
-        'title_ar',
-        'title_en',
-        'description_ar',
-        'description_en',
-        'image_path',
         'link',
         'trip_id',
-        'sort_order',
->>>>>>> 3bbb2775a700e194ea5fcea955b258fbb44a9bd4
         'active',
     ];
 
@@ -44,10 +33,6 @@ class Banner extends Model
      */
     protected $casts = [
         'active' => 'boolean',
-<<<<<<< HEAD
-=======
-        'sort_order' => 'integer',
->>>>>>> 3bbb2775a700e194ea5fcea955b258fbb44a9bd4
     ];
 
     /**

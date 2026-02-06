@@ -125,6 +125,14 @@ class User extends Authenticatable
     /**
      * Check if user is customer
      */
+    /**
+     * Get user bookings
+     */
+    public function bookings()
+    {
+        return $this->hasMany(TripBooking::class);
+    }
+
     public function isCustomer(): bool
     {
         return $this->user_type === self::TYPE_CUSTOMER;
