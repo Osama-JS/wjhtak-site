@@ -37,7 +37,7 @@ class BannerController extends Controller
                 'title_ar' => $banner->title_ar ?? '---',
                 'title_en' => $banner->title_en ?? '---',
                 'link' => $banner->link ? '<a href="' . $banner->link . '" target="_blank" class="text-primary"><i class="fas fa-external-link-alt"></i></a>' : '---',
-                'order' => '<span class="badge badge-light">' . $banner->order . '</span>',
+                'sort_order' => '<span class="badge badge-light">' . $banner->sort_order . '</span>',
                 'status' => $banner->active
                     ? '<span class="badge badge-success">' . __('Active') . '</span>'
                     : '<span class="badge badge-danger">' . __('Inactive') . '</span>',
@@ -72,7 +72,7 @@ class BannerController extends Controller
             'description_en' => 'nullable|string|max:500',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'link' => 'nullable|url|max:500',
-            'order' => 'nullable|integer|min:0',
+            'sort_order' => 'nullable|integer|min:0',
             'active' => 'boolean',
         ]);
 
@@ -82,14 +82,18 @@ class BannerController extends Controller
 
         $data = $request->only(['title_ar', 'title_en', 'description_ar', 'description_en', 'link']);
         $data['active'] = $request->boolean('active', true);
-        $data['order'] = $request->input('order', Banner::max('order') + 1);
+        $data['sort_order'] = $request->input('sort_order', Banner::max('sort_order') + 1);
 
+       
         // Handle image upload
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('banners', 'public');
         }
 
         Banner::create($data);
+
+         dd($data);
+
 
         return response()->json([
             'success' => true,
@@ -121,7 +125,7 @@ class BannerController extends Controller
             'description_en' => 'nullable|string|max:500',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'link' => 'nullable|url|max:500',
-            'order' => 'nullable|integer|min:0',
+            'sort_order' => 'nullable|integer|min:0',
             'active' => 'boolean',
         ]);
 
@@ -129,7 +133,7 @@ class BannerController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['title_ar', 'title_en', 'description_ar', 'description_en', 'link', 'order']);
+        $data = $request->only(['title_ar', 'title_en', 'description_ar', 'description_en', 'link', 'sort_order']);
         $data['active'] = $request->boolean('active', true);
 
         // Handle image upload
@@ -168,8 +172,8 @@ class BannerController extends Controller
     public function reorder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'order' => 'required|array',
-            'order.*' => 'integer|exists:banners,id',
+            'sort_order' => 'required|array',
+            'sort_order.*' => 'integer|exists:banners,id',
         ]);
 
         if ($validator->fails()) {
@@ -177,7 +181,7 @@ class BannerController extends Controller
         }
 
         foreach ($request->order as $index => $id) {
-            Banner::where('id', $id)->update(['order' => $index + 1]);
+            Banner::where('id', $id)->update(['sort_order' => $index + 1]);
         }
 
         return response()->json([

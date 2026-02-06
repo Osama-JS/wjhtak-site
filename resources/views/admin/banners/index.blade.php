@@ -82,7 +82,7 @@
                 <h5 class="modal-title">{{ __('Add New Banner') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="addBannerForm" enctype="multipart/form-data">
+            <form action="{{ route('admin.banners.store')}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -102,10 +102,10 @@
                         </div>
                     </div>
                     <x-forms.input-text name="link" :label="__('Link URL')" placeholder="https://..." />
-                    <x-forms.file-upload name="image" :label="__('Banner Image')" accept="image/*" required />
+                    <x-forms.file-upload name="image_path" :label="__('Banner Image')" accept="image/*" required />
                     <div class="row">
                         <div class="col-md-6">
-                            <x-forms.input-text name="order" :label="__('Display Order')" type="number" />
+                            <x-forms.input-text name="sort_order" :label="__('Display Order')" type="number" />
                         </div>
                         <div class="col-md-6">
                             <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
@@ -151,10 +151,10 @@
                         </div>
                     </div>
                     <x-forms.input-text name="link" id="edit_link" :label="__('Link URL')" />
-                    <x-forms.file-upload name="image" id="edit_image" :label="__('Banner Image')" accept="image/*" preview />
+                    <x-forms.file-upload name="image_path" id="edit_image_path" :label="__('Banner Image')" accept="image/*" preview />
                     <div class="row">
                         <div class="col-md-6">
-                            <x-forms.input-text name="order" id="edit_order" :label="__('Display Order')" type="number" />
+                            <x-forms.input-text name="sort_order" id="edit_sort_order" :label="__('Display Order')" type="number" />
                         </div>
                         <div class="col-md-6">
                             <x-forms.checkbox name="active" id="edit_active" :label="__('Active status')" type="switch" />
@@ -187,11 +187,11 @@
             serverSide: false,
             ajax: bannersDataUrl,
             columns: [
-                { data: 'image' },
+                { data: 'image_path' },
                 { data: 'title_ar' },
                 { data: 'title_en' },
                 { data: 'link' },
-                { data: 'order' },
+                { data: 'sort_order' },
                 { data: 'status' },
                 { data: 'actions', orderable: false, searchable: false }
             ],
@@ -213,9 +213,9 @@
                 return ui;
             },
             update: function(event, ui) {
-                let order = [];
+                let sort_order = [];
                 $('#banners-table tbody tr').each(function() {
-                    order.push($(this).data('id'));
+                    sort_order.push($(this).data('id'));
                 });
 
                 $.ajax({
@@ -223,7 +223,7 @@
                     type: "POST",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        order: order
+                        order: sort_order
                     },
                     success: function(response) {
                         if (response.success) {
@@ -321,11 +321,11 @@
                 $('#edit_description_ar').val(banner.description_ar);
                 $('#edit_description_en').val(banner.description_en);
                 $('#edit_link').val(banner.link);
-                $('#edit_order').val(banner.order);
+                $('#edit_sort_order').val(banner.sort_order);
                 $('#edit_active').prop('checked', banner.active);
 
                 // Show current image
-                if (banner.image) {
+                if (banner.image_path) {
                     $('#editBannerForm .current-image-preview img').attr('src', response.image_url);
                     $('#editBannerForm .current-image-preview').show();
                 } else {

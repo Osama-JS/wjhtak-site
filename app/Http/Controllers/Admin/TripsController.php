@@ -1,0 +1,361 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Country;
+use App\Models\Company;
+use App\Models\Trip;
+use App\Models\TripImage;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class TripsController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {   
+        $trips = Trip::all();
+        $companies = Company::all();
+        $countries = Country::all();
+        return view('admin.trips.index', compact('companies', 'countries','trips'));
+    }
+
+
+    public function getData(Request $request)
+    {
+         $query = Trip::with(['company','fromCountry','toCountry']);
+
+         if ($request->company_id) {
+            $query->where('company_id', $request->company_id);
+        }
+
+        if ($request->from_country_id) {
+            $query->where('from_country_id', $request->from_country_id);
+        }
+
+        if ($request->to_country_id) {
+            $query->where('to_country_id', $request->to_country_id);
+        }
+
+        if ($request->expiry_date) {
+            $query->whereDate('expiry_date', $request->expiry_date);
+        }
+
+        if ($request->expiry_date) {
+           $query->whereDate('expiry_date', '>=', $request->expiry_date);
+        }
+
+        $trips = $query->get();
+
+        return response()->json([
+            'data' => $trips->map(function ($trip) {
+                $isExpired = $trip->expiry_date && $trip->expiry_date < now()->format('Y-m-d');
+
+                $actionButtons = '
+                       <button class="btn btn-sm btn-primary" onclick="editTrip('.$trip->id.')">
+                        <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="toggleTripStatus('.$trip->id.')">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="openImageUpload('.$trip->id.', \''.addslashes($trip->title).'\')" title="رفع صور">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="editTrip('.$trip->id.')">
+                            <i class="fas fa-edit"></i>
+                        </button>';
+                        
+                if ($isExpired) {
+                    $actionButtons .= '
+                        <button class="btn btn-sm btn-success" onclick="renewTrip('.$trip->id.')" title="تجديد الرحلة">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>';
+                } else {
+                    $actionButtons .= '
+                        <button class="btn btn-sm btn-warning" onclick="toggleTripStatus('.$trip->id.')">
+                            <i class="fas fa-ban"></i>
+                        </button>';
+                }
+
+                return [
+                    'title'    => $trip->title,
+                    'company' => $trip->company
+                          ?  '<span>'. $trip->company->name .'</span>' : '...',
+                    'fromCountry' => $trip->fromCountry
+                          ?  '<span>'. $trip->fromCountry->name .'</span>' : '...',
+                    'toCountry' => $trip->toCountry
+                          ?  '<span>'. $trip->toCountry->name .'</span>' : '...',
+                    'price'    => $trip->price,
+                    'expiry_date' => $trip->expiry_date,
+                    'status'      => $isExpired 
+                                    ? '<span class="badge bg-dark">Expired</span>' 
+                                    : ($trip->active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'),
+                    'actions' => $actionButtons,
+                ];
+            })
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'title'                 => 'required|string|max:255',
+            'tickets'               => 'nullable|string',
+            'description'           => 'required|string',
+            'company_id'            => 'required|exists:companies,id',
+            'from_country_id'       => 'required|exists:countries,id',
+            'from_city_id'          => 'required|exists:cities,id',
+            'to_country_id'         => 'required|exists:countries,id',
+            'duration'              => 'nullable|string|max:100',
+            'price'                 => 'required|numeric|min:0',
+            'price_before_discount' => 'nullable|numeric|min:0',
+            'expiry_date'           => 'nullable|date|after_or_equal:today',  
+            'personnel_capacity'    => 'nullable|integer|min:1',
+            'is_public'             => 'nullable|boolean',
+            'is_ad'                 => 'nullable|boolean',
+            'active'                => 'nullable|boolean',
+        ]);
+
+        // Checkbox handling
+        $data['is_public'] = $request->boolean('is_public');
+        $data['is_ad']     = $request->boolean('is_ad');
+        $data['active']    = $request->boolean('active');
+
+        // Admin who created the trip
+        $data['admin_id'] = auth()->id();
+
+        // Auto-calculate profit
+        if (!empty($data['price_before_discount'])) {
+            $data['profit'] = $data['price'] - $data['price_before_discount'];
+            $data['percentage_profit_margin'] = $data['price_before_discount'] > 0
+                ? round(($data['profit'] / $data['price_before_discount']) * 100, 2)
+                : 0;
+        }
+
+        Trip::create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' =>  __('Trip created successfully'),
+        ]);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Trip $trip)
+    {
+        return response()->json([
+            'success' => true,
+            'Trip' => $trip,
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Trip $trip)
+    {
+        $data = $request->validate([
+            'title'                 => 'required|string|max:255',
+            'tickets'               => 'nullable|string',
+            'description'           => 'required|string',
+            'company_id'            => 'required|exists:companies,id',
+            'from_country_id'       => 'required|exists:countries,id',
+            'from_city_id'          => 'required|exists:cities,id',
+            'to_country_id'         => 'required|exists:countries,id',
+            'duration'              => 'nullable|string|max:100',
+            'price'                 => 'required|numeric|min:0',
+            'price_before_discount' => 'nullable|numeric|min:0',
+            'expiry_date'           => 'nullable|date',
+            'personnel_capacity'    => 'nullable|integer|min:1',
+            'is_public'             => 'nullable|boolean',
+            'is_ad'                 => 'nullable|boolean',
+            'active'                => 'nullable|boolean',
+        ]);
+
+        // Checkbox handling
+        $data['is_public'] = $request->boolean('is_public');
+        $data['is_ad']     = $request->boolean('is_ad');
+        $data['active']    = $request->boolean('active');
+
+        // Recalculate profit
+        if (!empty($data['price_before_discount'])) {
+            $data['profit'] = $data['price'] - $data['price_before_discount'];
+
+            $data['percentage_profit_margin'] =
+                $data['price_before_discount'] > 0
+                    ? round(($data['profit'] / $data['price_before_discount']) * 100, 2)
+                    : 0;
+        } else {
+            $data['profit'] = 0;
+            $data['percentage_profit_margin'] = 0;
+        }
+
+        $trip->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' =>  __('Trip  updated successfully'),
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+
+    public function toggleStatus(Trip $trip)
+    {
+        $trip->active = ! $trip->active;
+        $trip->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Trip status updated successfully'),
+            'status'  => $trip->active ? 'Active' : 'Inactive'
+        ]);
+    }
+
+    public function renew(Request $request, $id)
+    {
+        $request->validate([
+            'expiry_date' => 'required|date|after:today',
+        ]);
+
+        $trip = Trip::findOrFail($id);
+        $trip->update([
+            'expiry_date' => $request->expiry_date,
+            'active'      => true // إعادة تفعيلها تلقائياً عند التجديد
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Trip deleted successfully'),
+            
+        ]);
+    }
+
+
+    public function destroy(Trip $trip)
+    {
+       $trip->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Trip deleted successfully'),
+        ]);
+    }
+
+    public function imagestore(Request $request, $trip_id) // نمرر الـ ID مباشرة
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        try {
+            return DB::transaction(function () use ($request, $trip_id) {
+                
+                if (!$request->hasFile('file')) {
+                    throw new \Exception('File not found');
+                }
+
+                $file = $request->file('file');
+                $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                
+                // تخزين في مجلد خاص بكل رحلة
+                $path = $file->storeAs('trips/' . $trip_id, $fileName, 'public');
+
+                // حفظ السجل
+                $newImage = TripImage::create([
+                    'trip_id' => $trip_id,
+                    'image_path' => $path,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'id' => $newImage->id, // نرجع ID السجل الجديد
+                    'url' => asset('storage/' . $path),
+                    'message' => __('Trip created successfully'),
+                ], 201);
+            });
+
+        } catch (\Exception $e) {
+            Log::error("__('The trip photo upload failed'){$trip_id}: " . $e->getMessage());
+            return response()->json(['error' => __('An error occurred during processing')], 500);
+        }
+    }
+
+    public function imagedestroy(TripImage $image)
+    {
+        try {
+           
+
+            return DB::transaction(function () use ($image) {
+                
+                $path = $image->image_path;
+                $image->delete();
+
+                if (Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
+
+                return response()->json([
+                    'success' => true, 
+                    'message' => __('Trip deleted successfully'),
+                ]);
+            });
+
+        } catch (\Exception $e) {
+            Log::error("__('Error while deleting the image') ID {$image->id}: " . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => __('Sorry, an error occurred while trying to delete.'),
+            ], 500);
+        }
+    }
+
+   public function getImages($trip_id)
+    {
+       
+        $images = TripImage::where('trip_id', $trip_id)->get();
+
+        $data = $images->map(function ($image) {
+            $path = storage_path('app/public/' . $image->image_path);
+            return [
+                'id'   => $image->id,
+                'name' => basename($image->image_path),
+                'size' => file_exists($path) ? filesize($path) : 0,
+                'url'  => asset('storage/' . $image->image_path), 
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+}

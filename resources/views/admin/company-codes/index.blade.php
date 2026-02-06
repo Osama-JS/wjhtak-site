@@ -357,7 +357,7 @@
     }
 
     function deleteCode(id) {
-        let url = "{{ route('admin.company-codes.show', ':id') }}";
+        let url = "{{ route('admin.company-codes.destroy', ':id') }}";
         url = url.replace(':id', id);
         Swal.fire({
             title: '{{ __("Delete code??") }}',
