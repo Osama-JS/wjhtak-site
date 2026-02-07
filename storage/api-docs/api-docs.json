@@ -15,7 +15,11 @@
         },
         {
             "url": "https://blueviolet-hummingbird-437500.hostingersite.com/public",
-            "description": "Production Server"
+            "description": "Production Server 1"
+        },
+        {
+            "url": "https://lavenderblush-bear-243464.hostingersite.com/public/",
+            "description": "Production Server 2"
         }
     ],
     "paths": {
