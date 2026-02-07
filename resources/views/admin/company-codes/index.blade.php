@@ -98,11 +98,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label>{{ __('Status')}}</label>
-                    <select name="active" class="form-control">
-                        <option value="1">{{ __('Active')}}</option>
-                        <option value="0">{{ __('Inactive')}}</option>
-                    </select>
+                    <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
                 </div>
             </div>
 
@@ -152,11 +148,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>{{ __('Status')}}</label>
-                        <select name="active" id="edit_active" class="form-control">
-                            <option value="1">{{ __('Active')}}</option>
-                            <option value="0">{{ __('Inactive')}}</option>
-                        </select>
+                       <x-forms.checkbox  id="edit_active" name="active" :label="__('Active status')" type="switch" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -308,6 +300,7 @@
                 $('#edit_code').val(c.code);
                 $('#edit_type').val(c.type);
                 $('#edit_value').val(c.value);
+                $('#edit_active').prop('checked', c.active);
                 $('#editcodeModal').modal('show');
             } else {
                 toastr.error('Could not load code data');

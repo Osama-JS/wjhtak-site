@@ -101,8 +101,9 @@
                             <x-forms.textarea name="description_en" :label="__('Description (English)')" rows="3" />
                         </div>
                     </div>
+                    <x-forms.file-upload name="image_path" :label="__('Banner Image')" accept="image/*"  />
                     <x-forms.input-text name="link" :label="__('Link URL')" placeholder="https://..." />
-                    <x-forms.file-upload name="image_path" :label="__('Banner Image')" accept="image/*" required />
+                   
                     <div class="row">
                         <div class="col-md-6">
                             <x-forms.input-text name="sort_order" :label="__('Display Order')" type="number" />

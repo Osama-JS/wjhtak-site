@@ -151,7 +151,7 @@ class CountryController extends Controller
             'nicename' => 'required|string|max:255',
             'numcode' => 'required|string|max:10|unique:countries,numcode,' . $country->id,
             'phonecode' => 'nullable|string|max:10',
-            'flag' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'flag'      => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'active' => 'boolean',
         ]);
 

@@ -74,6 +74,7 @@ class Company_CodesController extends Controller
             'code'       => 'required|string|unique:company_codes,code',
             'type'       => 'required|in:fixed,percentage',
             'value'      => 'required|numeric|min:0',
+            'active'     => 'boolean',
         ]);
 
         $data['active'] = true;
@@ -117,7 +118,10 @@ class Company_CodesController extends Controller
             'code'       => 'required|string|unique:company_codes,code,' . $company_code->id,
             'type'       => 'required|in:fixed,percentage',
             'value'      => 'required|numeric|min:0',
+            'active'     => 'boolean',
         ]);
+        
+        $data['active'] = $request->boolean('active', true);
 
         $company_code->update($data);
 

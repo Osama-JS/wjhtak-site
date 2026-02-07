@@ -169,10 +169,10 @@
         });
 
         // Add Country Form Submit
-       $('#addCityForm').on('submit', function(e) {
+       $('#addCountryModal').on('submit', function(e) {
             e.preventDefault();
 
-            let formData = new FormData(this); // يدعم الملفات
+            let formData = new FormData($('#addCountryForm')[0]); // يدعم الملفات
 
             $.ajax({
                 url: "{{ route('admin.countries.store') }}",
@@ -182,9 +182,11 @@
                 contentType: false, // لمنع تغيير Content-Type
                 success: function(response) {
                     if (response.success) {
-                        $('#addCityModal').modal('hide');
-                        $('#addCityForm')[0].reset();
-                        citiesTable.ajax.reload();
+                        $('#addCountryModal').modal('hide');
+                        $('#addCountryForm')[0].reset();
+                        if (typeof countriesTable !== 'undefined') {
+                            countriesTable.ajax.reload();
+                        }
                         toastr.success(response.message);
                     }
                 },
@@ -205,7 +207,13 @@
             const id = $('#edit_country_id').val();
             let url = "{{ route('admin.countries.update', ':id') }}".replace(':id', id);
             console.log(url);
-            let formData = new FormData(this);
+            const formElement = $('#editCountryForm')[0];
+            if (!formElement) {
+                console.error("Form element not found!");
+                return;
+            }
+
+            let formData = new FormData(formElement);
 
             $.ajax({
                 url: url,
@@ -216,7 +224,9 @@
                 success: function(response) {
                     if (response.success) {
                         $('#editCountryModal').modal('hide');
-                        countriesTable.ajax.reload();
+                        if (typeof countriesTable !== 'undefined') {
+                            countriesTable.ajax.reload();
+                        }
                         toastr.success(response.message);
                     }
                 },
