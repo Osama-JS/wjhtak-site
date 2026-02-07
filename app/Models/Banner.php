@@ -13,7 +13,10 @@ class Banner extends Model
     /**
      * The table associated with the model.
      */
-    protected $table = 'banners';
+
+
+    protected $guarded = [];
+
 
     /**
      * The attributes that are mass assignable.
@@ -23,9 +26,10 @@ class Banner extends Model
         'title_en',
         'description_ar',
         'description_en',
+        'link',
         'image_path',
         'mobile_image_path',
-        'link',
+        'sort_order',
         'trip_id',
         'sort_order',
         'active',
@@ -55,7 +59,7 @@ class Banner extends Model
         if ($this->image_path) {
             return asset('storage/' . $this->image_path);
         }
-        return asset('images/banners/default.jpg');
+        return asset('image_path/banners/default.jpg');
     }
 
     /**

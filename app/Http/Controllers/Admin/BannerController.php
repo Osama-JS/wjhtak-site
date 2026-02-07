@@ -70,11 +70,13 @@ class BannerController extends Controller
             'title_en' => 'nullable|string|max:255',
             'description_ar' => 'nullable|string|max:500',
             'description_en' => 'nullable|string|max:500',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'link' => 'nullable|url|max:500',
             'sort_order' => 'nullable|integer|min:0',
             'active' => 'boolean',
         ]);
+         
+         return response()->json($request->all());
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
@@ -86,8 +88,8 @@ class BannerController extends Controller
 
        
         // Handle image upload
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('banners', 'public');
+        if ($request->hasFile('image_path')) {
+            $data['image_path'] = $request->file('image_path')->store('banners', 'public');
         }
 
         Banner::create($data);
@@ -123,7 +125,7 @@ class BannerController extends Controller
             'title_en' => 'nullable|string|max:255',
             'description_ar' => 'nullable|string|max:500',
             'description_en' => 'nullable|string|max:500',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
             'link' => 'nullable|url|max:500',
             'sort_order' => 'nullable|integer|min:0',
             'active' => 'boolean',

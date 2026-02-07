@@ -109,18 +109,13 @@
                         </div>
 
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('Status') }}</label>
-                        <select name="status"  class="form-control" required>
-                            <option value="active">{{ __('Active') }}</option>
-                            <option value="inactive">{{ __('Inactive') }}</option>
-                        </select>
-                    </div>
+              
                      <div class="mb-3">
                             <div class="col-md-4 mb-3">
                             <label class="form-label">{{ __('notes') }}</label>
                             <input type="text" name="notes"  class="form-control" >
                     </div>
+                    <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -166,11 +161,7 @@
                         <input type="text" name="notes" id="edit_notes" class="form-control">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">{{ __('Status') }}</label>
-                        <select name="status" id="edit_status" class="form-control" required>
-                            <option value="active">{{ __('Active') }}</option>
-                            <option value="inactive">{{ __('Inactive') }}</option>
-                        </select>
+                        <x-forms.checkbox  id="edit_active" name="active" :label="__('Active status')" type="switch" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -292,13 +283,13 @@ $(document).ready(function() {
             console.log(response.Company);
 
             if (response.success) {
-                const Company = response.Company;
-                $('#edit_Company_id').val(Company.id);
-                $('#edit_name').val(Company.name);
-                $('#edit_email').val(Company.email);
-                $('#edit_phone').val(Company.phone);
-                $('#edit_notes').val(Company.notes);
-                $('#edit_status').val(Company.status);
+                const company = response.Company;
+                $('#edit_Company_id').val(company.id);
+                $('#edit_name').val(company.name);
+                $('#edit_email').val(company.email);
+                $('#edit_phone').val(company.phone);
+                $('#edit_notes').val(company.notes);
+                $('#edit_active').prop('checked', company.active);
                 $('#editCompanyModal').modal('show');
             }
         });
@@ -306,6 +297,7 @@ $(document).ready(function() {
 
     function togglecompanytatus(id) {
         const url = "{{ route('admin.companies.toggle-status', ':id') }}".replace(':id', id);
+        console.log(url);
         Swal.fire({
             title: '{{ __("Are you sure?") }}',
             text: '{{ __("Do you want to toggle this Company status?") }}',
@@ -333,7 +325,7 @@ $(document).ready(function() {
         });
     }
 
-    function deletecompany(id) {
+    function deletecompanie(id) {
         let url = "{{ route('admin.companies.show', ':id') }}";
         url = url.replace(':id', id);
         Swal.fire({

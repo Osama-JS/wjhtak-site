@@ -70,7 +70,7 @@ class CompanyController extends Controller
             'email'  => 'required|email|',
             'phone'  => 'nullable|string|max:100',
             'notes'  => 'required|',
-            'status' => 'required|in:active,inactive',
+            'active' => 'boolean',
         ]);
 
         Company::create($validated);
@@ -109,13 +109,13 @@ class CompanyController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'nullable|email|',
-            'phone' => 'nullable|phone|',
+            'phone' => 'nullable|',
             'notes' => 'nullable',
-            'status' => 'required|in:active,inactive',
+            'active' => 'boolean',
         ]);
 
         $data = $request->only(['name', 'email', 'phone', 'notes']);
-        $data['active'] = $request->status === 'active';
+        $data['active'] = $request->boolean('active', true);
         $company->update($data);
 
         return response()->json([
@@ -129,20 +129,13 @@ class CompanyController extends Controller
      */
     public function toggleStatus(Company $company)
     {
-        $newStatus = $company->status === 'active' ? 'inactive' : 'active';
-        $updated = $company->update(['status' => $newStatus]);
-
-        // dd([
-        //     'user_id' => $user->id,
-        //     'new_status' => $newStatus,
-        //     'updated' => $updated
-        // ]);
+        $company->update(['active' => !$company->active]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Company status updated to ' . $newStatus,
-            'status' => $newStatus
+            'message' => $company->active ? __('company activated') : __('company deactivated'),
         ]);
+        
     }
 
     /**
@@ -152,7 +145,7 @@ class CompanyController extends Controller
     {
        try {
 
-            $user->delete();
+            $company->delete();
             return response()->json([
                 'success' => true,
                 'message' => 'User deleted successfully'

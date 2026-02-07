@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\City;
+
 use App\Models\Country;
+use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -87,10 +88,12 @@ class CityController extends Controller
         }
 
         $data = $request->only(['country_id', 'title']);
+        
         $data['active'] = $request->boolean('active', true);
-
-        $cities = City::create($data);
-        // dd($cities);
+       
+       City::create($data);
+        
+        
         return response()->json([
             'success' => true,
             'message' => __('City added successfully'),
@@ -126,7 +129,7 @@ class CityController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['country_id', 'name_ar']);
+        $data = $request->only(['country_id', 'title']);
         $data['active'] = $request->boolean('active', true);
 
         $city->update($data);

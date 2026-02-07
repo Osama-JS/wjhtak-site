@@ -199,11 +199,11 @@
             e.preventDefault();
             const id = $('#edit_city_id').val();
             let url = "{{ route('admin.cities.update', ':id') }}".replace(':id', id);
-
+            const formData = $(this).serialize() + '&_method=PUT';
             $.ajax({
                 url: url,
                 type: "POST",
-                data: $(this).serialize(),
+                data:formData,
                 success: function(response) {
                     if (response.success) {
                         $('#editCityModal').modal('hide');
@@ -230,7 +230,7 @@
             if (response.success) {
                 const city = response.city;
                 $('#edit_city_id').val(city.id);
-                $('#edit_title').val(city.name_ar);
+                $('#edit_title').val(city.title);
                 $('#edit_country_id').val(city.country_id).trigger('change');
                 $('#edit_active').prop('checked', city.active);
 
@@ -256,7 +256,7 @@
                     data: { _token: "{{ csrf_token() }}" },
                     success: function(response) {
                         if (response.success) {
-                            if (typeof countriesTable !== 'undefined') {
+                            if (typeof citiesTable !== 'undefined') {
                                 citiesTable.ajax.reload(null, false);
                             }
                             Swal.fire('{{ __("Updated!") }}', response.message, 'success'); // عرض رسالة نجاح
@@ -292,8 +292,8 @@
                     data: { _token: "{{ csrf_token() }}" },
                     success: function(response) {
                         if (response.success) {
-                            if (typeof countriesTable !== 'undefined') {
-                                countriesTable.ajax.reload();
+                            if (typeof citiesTable !== 'undefined') {
+                                citiesTable.ajax.reload();
                             }
                             toastr.success(response.message);
                         } else {
