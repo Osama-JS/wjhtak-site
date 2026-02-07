@@ -9,25 +9,21 @@ class Question extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['question_ar', 'question_en', 'answer_ar', 'answer_en', 'active'];
-
-    protected $casts = [
-        'active' => 'boolean',
-    ];
+    protected $fillable = ['question', 'answer'];
 
     /**
-     * Get localized question
+     * Get question
      */
-    public function getQuestionAttribute()
+    public function getQuestionAttribute($value)
     {
-        return app()->getLocale() === 'ar' ? $this->question_ar : $this->question_en;
+        return $value;
     }
 
     /**
-     * Get localized answer
+     * Get answer
      */
-    public function getAnswerAttribute()
+    public function getAnswerAttribute($value)
     {
-        return app()->getLocale() === 'ar' ? $this->answer_ar : $this->answer_en;
+        return $value;
     }
 }

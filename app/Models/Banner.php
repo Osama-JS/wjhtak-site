@@ -19,12 +19,15 @@ class Banner extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'title',
-        'desc',
+        'title_ar',
+        'title_en',
+        'description_ar',
+        'description_en',
         'image_path',
         'mobile_image_path',
         'link',
         'trip_id',
+        'sort_order',
         'active',
     ];
 
@@ -33,7 +36,16 @@ class Banner extends Model
      */
     protected $casts = [
         'active' => 'boolean',
+        'sort_order' => 'integer',
     ];
+
+    /**
+     * Order by sort order.
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order', 'asc');
+    }
 
     /**
      * Get image URL.

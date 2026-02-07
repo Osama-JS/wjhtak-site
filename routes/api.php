@@ -19,6 +19,19 @@ Route::prefix('v1')->group(function () {
     Route::get('/cities', [\App\Http\Controllers\Api\V1\DiscoveryController::class, 'getCities']);
     Route::get('/banners', [\App\Http\Controllers\Api\V1\DiscoveryController::class, 'getBanners']);
     Route::get('/locations', [\App\Http\Controllers\Api\V1\DiscoveryController::class, 'getLocations']);
+    Route::get('/faqs', [\App\Http\Controllers\Api\V1\DiscoveryController::class, 'getFaqs']);
+
+    // Trips
+    Route::get('/trips', [\App\Http\Controllers\Api\V1\TripController::class, 'index']);
+    Route::get('/trips/{id}', [\App\Http\Controllers\Api\V1\TripController::class, 'show']);
+    Route::post('/trips/book', [\App\Http\Controllers\Api\V1\TripController::class, 'book'])->middleware('auth:sanctum');
+
+    // My Bookings & Favorites
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/my-bookings', [\App\Http\Controllers\Api\V1\TripController::class, 'myBookings']);
+        Route::get('/favorites', [\App\Http\Controllers\Api\V1\TripController::class, 'getFavorites']);
+        Route::post('/trips/{id}/favorite', [\App\Http\Controllers\Api\V1\TripController::class, 'toggleFavorite']);
+    });
 });
 
 // Public Routes

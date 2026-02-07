@@ -18,7 +18,7 @@ class City extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'company_id',
+        'country_id',
         'title',
         'active',
     ];
@@ -33,9 +33,9 @@ class City extends Model
     /**
      * Get localized name based on current locale.
      */
-    public function getNameAttribute(): string
+    public function getNameAttribute(): ?string
     {
-        return app()->getLocale() === 'name' ? $this->name : $this->nicename;
+        return $this->title;
     }
 
     /**

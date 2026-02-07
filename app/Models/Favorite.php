@@ -5,22 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TripBooking extends Model
+class Favorite extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
         'trip_id',
-        'status', // pending, confirmed, cancelled
-        'total_price',
-        'booking_date',
-        'tickets_count',
-        'notes'
-    ];
-
-    protected $casts = [
-        'booking_date' => 'date',
     ];
 
     public function user()
@@ -31,10 +22,5 @@ class TripBooking extends Model
     public function trip()
     {
         return $this->belongsTo(Trip::class);
-    }
-
-    public function passengers()
-    {
-        return $this->hasMany(BookingPassenger::class);
     }
 }

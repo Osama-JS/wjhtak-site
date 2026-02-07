@@ -27,6 +27,7 @@ class Trip extends Model
        'from_country_id',
        'from_city_id',
        'to_country_id',
+       'to_city_id',
        'admin_id',
        'profit',
        'percentage_profit_margin',
@@ -50,6 +51,10 @@ class Trip extends Model
 
     public function toCountry() {
         return $this->belongsTo(Country::class, 'to_country_id');
+    }
+
+    public function toCity() {
+        return $this->belongsTo(City::class, 'to_city_id');
     }
 
     public function fromCity() {

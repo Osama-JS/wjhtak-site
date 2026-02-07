@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost/my-trip/public",
+            "url": "http://localhost/wjhtak-site/public",
             "description": "Development Server"
         },
         {
@@ -2255,6 +2255,945 @@
                     }
                 ]
             }
+        },
+        "/api/v1/countries": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get all countries",
+                "description": "Retrieve a list of all active countries with their flags and codes.",
+                "operationId": "getCountries",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Countries retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Saudi Arabia"
+                                                    },
+                                                    "name_ar": {
+                                                        "type": "string",
+                                                        "example": "المملكة العربية السعودية"
+                                                    },
+                                                    "name_en": {
+                                                        "type": "string",
+                                                        "example": "Saudi Arabia"
+                                                    },
+                                                    "code": {
+                                                        "type": "string",
+                                                        "example": "SA"
+                                                    },
+                                                    "phone_code": {
+                                                        "type": "string",
+                                                        "example": "966"
+                                                    },
+                                                    "flag": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/flags/sa.png"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cities": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get all cities",
+                "description": "Retrieve a list of all active cities, optionally filtered by country.",
+                "operationId": "getCities",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "country_id",
+                        "in": "query",
+                        "description": "Filter cities by country ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cities retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Riyadh"
+                                                    },
+                                                    "name_ar": {
+                                                        "type": "string",
+                                                        "example": "الرياض"
+                                                    },
+                                                    "name_en": {
+                                                        "type": "string",
+                                                        "example": "Riyadh"
+                                                    },
+                                                    "country": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Saudi Arabia"
+                                                            },
+                                                            "flag": {
+                                                                "type": "string",
+                                                                "example": "http://example.com/flags/sa.png"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/banners": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get banners",
+                "description": "Retrieve a list of promotional banners for the home screen.",
+                "operationId": "getBanners",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Banners retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Summer Sale"
+                                                    },
+                                                    "title_ar": {
+                                                        "type": "string",
+                                                        "example": "عروض الصيف"
+                                                    },
+                                                    "title_en": {
+                                                        "type": "string",
+                                                        "example": "Summer Sale"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Get 50% off on flights"
+                                                    },
+                                                    "description_ar": {
+                                                        "type": "string",
+                                                        "example": "احصل على خصم 50% على الرحلات"
+                                                    },
+                                                    "description_en": {
+                                                        "type": "string",
+                                                        "example": "Get 50% off on flights"
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/banners/1.jpg"
+                                                    },
+                                                    "link": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/promo"
+                                                    },
+                                                    "order": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/locations": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get hierarchical locations",
+                "description": "Retrieve a hierarchical list of countries and their cities.",
+                "operationId": "getLocations",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Locations retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Saudi Arabia"
+                                                    },
+                                                    "flag": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/flags/sa.png"
+                                                    },
+                                                    "cities": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Riyadh"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/faqs": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get all FAQs",
+                "description": "Retrieve a list of all active frequently asked questions.",
+                "operationId": "getFaqs",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "FAQs retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "How to book?"
+                                                    },
+                                                    "answer": {
+                                                        "type": "string",
+                                                        "example": "You can book via..."
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/trips": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Get trips list",
+                "description": "Retrieve a list of active trips with optional filters.",
+                "operationId": "getTrips",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by trip title",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "destination_id",
+                        "in": "query",
+                        "description": "Filter by city or country ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "price_min",
+                        "in": "query",
+                        "description": "Minimum price",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "price_max",
+                        "in": "query",
+                        "description": "Maximum price",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trips retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Amazing Paris"
+                                                            },
+                                                            "price": {
+                                                                "type": "number",
+                                                                "example": 1500
+                                                            },
+                                                            "tickets": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "image": {
+                                                                "type": "string",
+                                                                "example": "http://example.com/trips/1.jpg"
+                                                            },
+                                                            "to_country": {
+                                                                "type": "string",
+                                                                "example": "France"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/trips/{id}": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Get trip details",
+                "description": "Retrieve full details of a specific trip including itineraries.",
+                "operationId": "getTouristTripDetails",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trip ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trip details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Amazing Paris"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Full description..."
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "itineraries": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "day": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Arrival"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Arrive at airport..."
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Trip not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/trips/book": {
+            "post": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Book a trip",
+                "description": "Book tickets for a specific trip. Requires authentication.",
+                "operationId": "bookTrip",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "trip_id",
+                                    "tickets_count"
+                                ],
+                                "properties": {
+                                    "trip_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "tickets_count": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Allergic to peanuts"
+                                    },
+                                    "passengers": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+123456789"
+                                                },
+                                                "passport_number": {
+                                                    "type": "string",
+                                                    "example": "A1234567"
+                                                },
+                                                "passport_expiry": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2030-12-31"
+                                                },
+                                                "nationality": {
+                                                    "type": "string",
+                                                    "example": "USA"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Booking successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Booking created successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation Error or Not enough tickets"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/my-bookings": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Get my bookings",
+                "description": "Retrieve a list of bookings for the authenticated user.",
+                "operationId": "getMyBookings",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookings retrieved successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/trips/{id}/favorite": {
+            "post": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Toggle favorite",
+                "description": "Add or remove a trip from user favorites. Requires authentication.",
+                "operationId": "toggleFavorite",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trip ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operation successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Trip added to favorites"
+                                        },
+                                        "is_favorite": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/favorites": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Get my favorites",
+                "description": "Retrieve a list of favorite trips for the authenticated user.",
+                "operationId": "getMyFavorites",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Favorites retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -2289,6 +3228,14 @@
         {
             "name": "Payment",
             "description": "Payment"
+        },
+        {
+            "name": "Discovery",
+            "description": "Discovery"
+        },
+        {
+            "name": "Trips",
+            "description": "Trips"
         }
     ]
 }

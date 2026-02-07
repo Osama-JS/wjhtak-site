@@ -35,9 +35,9 @@ class Country extends Model
     /**
      * Get localized name based on current locale.
      */
-    public function getNameAttribute(): string
+    public function getNameAttribute(): ?string
     {
-        return app()->getLocale() === 'name' ? $this->name : $this->nicename;
+        return $this->nicename ?? $this->name;
     }
 
     /**
