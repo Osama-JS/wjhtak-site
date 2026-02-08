@@ -21,4 +21,20 @@ class TripItinerary extends Model
     {
         return $this->belongsTo(Trip::class);
     }
+
+    public function fromCountry() {
+        return $this->belongsTo(Country::class, 'from_country_id');
+    }
+
+    public function toCountry() {
+        return $this->belongsTo(Country::class, 'to_country_id');
+    }
+
+    public function toCity() {
+        return $this->belongsTo(City::class, 'to_city_id');
+    }
+
+    public function fromCity() {
+        return $this->belongsTo(City::class, 'from_city_id');
+    }
 }
