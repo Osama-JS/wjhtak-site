@@ -304,7 +304,7 @@ class TripsController extends Controller
     public function imagestore(Request $request, $trip_id) // نمرر الـ ID مباشرة
     {
         $request->validate([
-            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif,jfif|max:5120',
         ]);
 
         try {
