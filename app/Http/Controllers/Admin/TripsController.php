@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Country;
+use App\Models\City;
 use App\Models\Company;
 use App\Models\Trip;
 use App\Models\TripImage;
@@ -22,6 +23,7 @@ class TripsController extends Controller
         $trips = Trip::all();
         $companies = Company::all();
         $countries = Country::all();
+        $cities = City::all();
 
         $stats = [
             'total' => Trip::count(),
@@ -30,7 +32,7 @@ class TripsController extends Controller
             'expired' => Trip::where('expiry_date', '<', now()->toDateString())->count(),
         ];
 
-        return view('admin.trips.index', compact('companies', 'countries', 'trips', 'stats'));
+        return view('admin.trips.index', compact('companies', 'countries', 'trips', 'stats','cities'));
     }
 
     public function itinerary(Trip $trip)

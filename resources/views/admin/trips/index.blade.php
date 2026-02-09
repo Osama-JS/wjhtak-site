@@ -163,7 +163,7 @@
                             <x-forms.select name="from_country_id" :label="__('From Country')" :options="$countries" searchable required />
                         </div>
                         <div class="col-md-4">
-                            <x-forms.select name="from_city_id" :label="__('From City')" :options="$companies" searchable required />
+                            <x-forms.select name="from_city_id" :label="__('From City')" :options="$cities" searchable required />
                         </div>
                         <div class="col-md-4">
                             <x-forms.select name="to_country_id" :label="__('To Country')" :options="$countries" searchable required />
