@@ -20,11 +20,14 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
+        \Log::info('Settings Update Request:', $request->all());
         try {
             // Validate request data
             $request->validate([
                 'site_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'site_favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,ico|max:1024',
+                'hero_bg' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'page_header_bg' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
                 'contact_email' => 'nullable|email',
                 'facebook_url' => 'nullable|url',
                 'twitter_url' => 'nullable|url',
@@ -34,7 +37,7 @@ class SettingController extends Controller
                 'maintenance_mode' => 'nullable|in:0,1',
             ]);
 
-            $data = $request->except(['_token', 'site_logo', 'site_favicon']);
+            $data = $request->except(['_token', 'site_logo', 'site_favicon', 'hero_bg', 'page_header_bg']);
 
             // Update text settings
             foreach ($data as $key => $value) {
@@ -44,6 +47,8 @@ class SettingController extends Controller
             // Handle File Uploads
             $logoPath = $this->handleFileUpload($request, 'site_logo');
             $faviconPath = $this->handleFileUpload($request, 'site_favicon');
+            $heroBgPath = $this->handleFileUpload($request, 'hero_bg');
+            $pageHeaderBgPath = $this->handleFileUpload($request, 'page_header_bg');
 
             if ($request->ajax()) {
                 return response()->json([
@@ -51,6 +56,8 @@ class SettingController extends Controller
                     'message' => __('Settings updated successfully!'),
                     'logo_url' => $logoPath ? asset($logoPath) : null,
                     'favicon_url' => $faviconPath ? asset($faviconPath) : null,
+                    'hero_bg_url' => $heroBgPath ? asset($heroBgPath) : null,
+                    'page_header_bg_url' => $pageHeaderBgPath ? asset($pageHeaderBgPath) : null,
                 ]);
             }
 

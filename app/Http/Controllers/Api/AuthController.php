@@ -186,7 +186,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Invalid or expired OTP code.")
+                        new OA\Property(property: "message", type: "string", example: "Invalid or expired OTP code."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),
@@ -252,7 +253,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "OTP has been resent to your email.")
+                        new OA\Property(property: "message", type: "string", example: "OTP has been resent to your email."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),
@@ -262,7 +264,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Account is already verified.")
+                        new OA\Property(property: "message", type: "string", example: "Account is already verified."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),
@@ -345,7 +348,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Invalid login credentials.")
+                        new OA\Property(property: "message", type: "string", example: "Invalid login credentials."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),
@@ -617,7 +621,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Logged out successfully.")
+                        new OA\Property(property: "message", type: "string", example: "Logged out successfully."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),
@@ -744,7 +749,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Invalid or expired OTP code.")
+                        new OA\Property(property: "message", type: "string", example: "Invalid or expired OTP code."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),
@@ -812,7 +818,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Password changed successfully.")
+                        new OA\Property(property: "message", type: "string", example: "Password changed successfully."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),
@@ -887,7 +894,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "FCM token updated successfully.")
+                        new OA\Property(property: "message", type: "string", example: "FCM token updated successfully."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),

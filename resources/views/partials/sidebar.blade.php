@@ -34,12 +34,19 @@
 
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
-                    <i class="flaticon-381-globe"></i>
+                    <i class="fa fa-plane"></i>
                     <span class="nav-text">{{ __('Trips') }}</span>
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="{{ route('admin.trips.index') }}">{{ __('Trips') }}</a></li>
                 </ul>
+            </li>
+
+            <li>
+                <a href="{{ route('admin.trip-bookings.index') }}" aria-expanded="false">
+                    <i class="flaticon-381-calendar-1"></i>
+                    <span class="nav-text">{{ __('Bookings') }}</span>
+                </a>
             </li>
 
             <li>
@@ -50,7 +57,7 @@
             </li>
 
             {{-- Hotel & Flight Categories --}}
-            <li>
+            <!-- <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">
                     <i class="flaticon-045-heart"></i>
                     <span class="nav-text">{{ __('Hotels') }}</span>
@@ -70,7 +77,7 @@
                     <li><a href="{{ route('admin.bookings.flights.requests') }}">{{ __('Flight Booking Requests') }}</a></li>
                     <li><a href="{{ route('admin.bookings.flights.ongoing') }}">{{ __('Tickets & Ongoing Flights') }}</a></li>
                 </ul>
-            </li>
+            </li> -->
 
             <li>
                 <a href="{{ route('admin.settings.index') }}" aria-expanded="false">

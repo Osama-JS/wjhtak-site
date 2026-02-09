@@ -6,8 +6,16 @@
             {{-- Brand Column --}}
             <div class="footer-brand">
                 <a href="{{ route('home') }}" class="footer-logo">
-                    <img src="{{ asset('images/logo-full.png') }}" alt="{{ config('app.name') }}">
-                    <span class="footer-logo-text">{{ __('Wjhtak') }}</span>
+                    @php
+                        $footerLogo = \App\Models\Setting::get('site_logo');
+                        $siteName = \App\Models\Setting::get('site_name_' . app()->getLocale(), config('app.name'));
+                    @endphp
+                    @if($footerLogo)
+                        <img src="{{ asset($footerLogo) }}" alt="{{ $siteName }}">
+                    @else
+                        <img src="{{ asset('images/logo-full.png') }}" alt="{{ $siteName }}">
+                    @endif
+                    <span class="footer-logo-text">{{ $siteName }}</span>
                 </a>
                 <p class="footer-desc">
                     {{ __('Discover amazing travel destinations and create unforgettable memories with Wjhtak. Your trusted partner for premium tourism experiences.') }}
@@ -102,4 +110,28 @@
             </div>
         </div>
     </div>
+    </div>
 </footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var backToTopBtn = document.getElementById('backToTop');
+
+        if(backToTopBtn) {
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            });
+
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    });
+</script>

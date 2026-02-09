@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\City;
 use App\Models\Country;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
 class DiscoveryController extends Controller
 {
+    use ApiResponseTrait;
     /**
      * Get all active countries.
      */
@@ -36,7 +38,8 @@ class DiscoveryController extends Controller
                 description: "Countries retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Countries retrieved successfully"),
                         new OA\Property(property: "data", type: "array", items: new OA\Items(
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
@@ -67,10 +70,7 @@ class DiscoveryController extends Controller
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $countries
-        ]);
+        return $this->apiResponse(false, __('Countries retrieved successfully'), $countries);
     }
 
     /**
@@ -104,7 +104,8 @@ class DiscoveryController extends Controller
                 description: "Cities retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Cities retrieved successfully"),
                         new OA\Property(property: "data", type: "array", items: new OA\Items(
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
@@ -145,10 +146,7 @@ class DiscoveryController extends Controller
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $cities
-        ]);
+        return $this->apiResponse(false, __('Cities retrieved successfully'), $cities);
     }
 
     /**
@@ -175,7 +173,8 @@ class DiscoveryController extends Controller
                 description: "Banners retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Banners retrieved successfully"),
                         new OA\Property(property: "data", type: "array", items: new OA\Items(
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
@@ -212,10 +211,7 @@ class DiscoveryController extends Controller
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $banners
-        ]);
+        return $this->apiResponse(false, __('Banners retrieved successfully'), $banners);
     }
 
     /**
@@ -242,7 +238,8 @@ class DiscoveryController extends Controller
                 description: "Locations retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Locations retrieved successfully"),
                         new OA\Property(property: "data", type: "array", items: new OA\Items(
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
@@ -279,10 +276,7 @@ class DiscoveryController extends Controller
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $locations
-        ]);
+        return $this->apiResponse(false, __('Locations retrieved successfully'), $locations);
     }
 
     /**
@@ -309,7 +303,8 @@ class DiscoveryController extends Controller
                 description: "FAQs retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "FAQs retrieved successfully"),
                         new OA\Property(property: "data", type: "array", items: new OA\Items(
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
@@ -332,10 +327,7 @@ class DiscoveryController extends Controller
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $faqs
-        ]);
+        return $this->apiResponse(false, __('FAQs retrieved successfully'), $faqs);
     }
 }
 

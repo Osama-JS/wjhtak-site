@@ -46,6 +46,7 @@ function getUrlParams(dParam) {
     };
 
     new dlabSettings(dlabSettingsOptions);
+    window.dlabSettingsOptions = dlabSettingsOptions;
 
     jQuery(window).on("resize", function () {
         /*Check container layout on resize */

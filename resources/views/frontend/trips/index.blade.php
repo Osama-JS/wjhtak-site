@@ -4,10 +4,23 @@
 
 @section('meta_description', __('Browse our collection of amazing travel packages and book your next adventure'))
 
+@php
+    $headerBg = \App\Models\Setting::get('page_header_bg');
+@endphp
+
 @section('content')
     {{-- Page Header --}}
-    <section class="section" style="padding-top: calc(var(--space-24) + 60px); padding-bottom: var(--space-10); background: var(--gradient-primary);">
-        <div class="container">
+    <section class="page-header" style="position: relative; padding-top: calc(var(--space-24) + 60px); padding-bottom: var(--space-10); background: var(--color-primary); overflow: hidden;">
+        @if($headerBg)
+            <div style="position: absolute; inset: 0; z-index: 0;">
+                <img src="{{ asset($headerBg) }}" alt="" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.4;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, var(--color-primary));"></div>
+            </div>
+        @else
+            <div style="position: absolute; inset: 0; background: var(--gradient-primary); z-index: 0;"></div>
+        @endif
+
+        <div class="container" style="position: relative; z-index: 1;">
             <div class="text-center" style="color: white;">
                 <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
                     {{ __('Explore Our Trips') }}
@@ -35,7 +48,7 @@
     {{-- Trips Content --}}
     <section class="section">
         <div class="container">
-            <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-8);">
+            <div class="trips-layout">
 
                 {{-- Mobile Filters Toggle --}}
                 <div class="md:hidden" style="margin-bottom: var(--space-4);">
@@ -47,10 +60,8 @@
                     </button>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-8);">
-                    @media (min-width: 1024px) {
-                        style="grid-template-columns: 280px 1fr;"
-                    }
+                {{-- Layout Wrapper --}}
+                <div class="trips-grid-wrapper">
 
                     {{-- Filters Sidebar --}}
                     <aside id="filtersSidebar" class="card" style="padding: var(--space-6); height: fit-content; display: none;">
@@ -238,13 +249,109 @@
 
 @push('styles')
 <style>
+    /* Trips Page Layout */
+    .trips-layout {
+        position: relative;
+    }
+
+    .trips-grid-wrapper {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+
     @media (min-width: 1024px) {
+        .trips-grid-wrapper {
+            grid-template-columns: 280px 1fr;
+        }
+
         #filtersSidebar {
             display: block !important;
         }
+    }
 
-        .trips-layout {
-            grid-template-columns: 280px 1fr;
+    /* Filters Sidebar */
+    #filtersSidebar {
+        background: var(--color-surface);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-sm);
+        height: fit-content;
+        position: sticky;
+        top: 90px;
+        transition: all 0.3s ease;
+    }
+
+    #filtersSidebar .form-label {
+        font-weight: var(--font-bold);
+        color: var(--color-text);
+        font-size: var(--text-sm);
+        margin-bottom: var(--space-2);
+        display: block;
+    }
+
+    #filtersSidebar .form-input {
+        width: 100%;
+        padding: var(--space-3);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        font-size: var(--text-sm);
+        background: var(--color-bg);
+        transition: all 0.2s ease;
+    }
+
+    #filtersSidebar .form-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    }
+
+    /* List View Styles */
+    .list-view {
+        display: flex !important;
+        flex-direction: column;
+        gap: var(--space-6);
+    }
+
+    .list-view .trip-card {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        max-width: 100%;
+        height: auto;
+        aspect-ratio: auto;
+    }
+
+    .list-view .trip-card-image {
+        position: relative;
+        height: 100%;
+        min-height: 220px;
+    }
+
+    .list-view .trip-card-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: var(--space-6);
+    }
+
+    .list-view .trip-card-title {
+        font-size: var(--text-xl);
+        margin-bottom: var(--space-2);
+    }
+
+    .list-view .trip-card-meta {
+        margin-top: auto;
+        padding-top: var(--space-4);
+    }
+
+    @media (max-width: 768px) {
+        .list-view .trip-card {
+            grid-template-columns: 1fr;
+        }
+
+        .list-view .trip-card-image {
+            height: 200px;
+            min-height: auto;
         }
     }
 </style>

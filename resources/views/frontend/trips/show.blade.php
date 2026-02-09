@@ -9,8 +9,14 @@
 
 @section('content')
     {{-- Trip Header/Gallery --}}
-    <section style="padding-top: calc(60px + var(--space-4)); background: var(--color-bg-alt);">
-        <div class="container">
+    @php
+        $headerBg = \App\Models\Setting::get('page_header_bg');
+    @endphp
+    <section style="padding-top: calc(60px + var(--space-4)); background: {{ $headerBg ? 'url('.asset($headerBg).') center/cover no-repeat' : 'var(--color-bg-alt)' }}; position: relative;">
+        @if($headerBg)
+            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 0;"></div>
+        @endif
+        <div class="container" style="position: relative; z-index: 1;">
             {{-- Breadcrumb --}}
             <nav class="breadcrumb" style="padding: var(--space-4) 0;" aria-label="Breadcrumb">
                 <span class="breadcrumb-item">
@@ -88,13 +94,10 @@
     {{-- Trip Details --}}
     <section class="section" style="padding-top: var(--space-10);">
         <div class="container">
-            <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-8);">
-                @media (min-width: 1024px) {
-                    style="grid-template-columns: 1fr 380px;"
-                }
+            <div class="trip-details-layout">
 
                 {{-- Main Content --}}
-                <div>
+                <div class="trip-main-content">
                     {{-- Header --}}
                     <div style="margin-bottom: var(--space-8);">
                         {{-- Location --}}
@@ -280,20 +283,20 @@
 
                 {{-- Booking Sidebar --}}
                 <aside>
-                    <div class="card" style="padding: var(--space-6); position: sticky; top: calc(60px + var(--space-4));">
+                    <div class="booking-card">
                         {{-- Price --}}
-                        <div style="margin-bottom: var(--space-5);">
+                        <div class="booking-price-wrapper">
                             @if($trip->price_before_discount && $trip->price_before_discount > $trip->price)
-                                <span style="font-size: var(--text-lg); color: var(--color-text-muted); text-decoration: line-through;">
+                                <span class="booking-price-old">
                                     ${{ number_format($trip->price_before_discount) }}
                                 </span>
-                                <span class="badge badge-accent" style="margin-left: var(--space-2);">
+                                <span class="booking-price-badge">
                                     {{ round((($trip->price_before_discount - $trip->price) / $trip->price_before_discount) * 100) }}% {{ __('Off') }}
                                 </span>
                             @endif
-                            <div style="font-size: var(--text-3xl); font-weight: var(--font-bold); color: var(--color-primary);">
+                            <div class="booking-price-current">
                                 ${{ number_format($trip->price) }}
-                                <span style="font-size: var(--text-base); font-weight: var(--font-normal); color: var(--color-text-muted);">
+                                <span class="booking-price-unit">
                                     / {{ __('person') }}
                                 </span>
                             </div>
@@ -375,10 +378,40 @@
 
 @push('styles')
 <style>
+    /* Trip Details Layout */
+    .trip-details-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+
     @media (min-width: 1024px) {
         .trip-details-layout {
-            grid-template-columns: 1fr 380px;
+            grid-template-columns: 1fr 400px;
         }
+    }
+
+    /* Trip Main Content */
+    .trip-main-content {
+        min-width: 0; /* Prevent overflow */
+    }
+
+    /* Gallery Styles */
+    .trip-gallery {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: var(--space-3);
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .trip-gallery img {
+        transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .trip-gallery:hover img {
+        transform: scale(1.05);
     }
 
     @media (max-width: 768px) {
@@ -390,5 +423,331 @@
             display: none;
         }
     }
+
+    /* Breadcrumb Styling */
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        font-size: var(--text-sm);
+    }
+
+    .breadcrumb-item a {
+        color: var(--color-text-muted);
+        transition: color 0.2s ease;
+    }
+
+    .breadcrumb-item a:hover {
+        color: var(--color-primary);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--color-text);
+        font-weight: var(--font-medium);
+    }
+
+    .breadcrumb-separator {
+        color: var(--color-border);
+    }
+
+    /* Trip Header Section */
+    .trip-header {
+        margin-bottom: var(--space-8);
+        padding-bottom: var(--space-6);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .trip-title {
+        font-size: var(--text-3xl);
+        font-weight: var(--font-extrabold);
+        color: var(--color-text);
+        margin-bottom: var(--space-4);
+        line-height: var(--leading-tight);
+    }
+
+    @media (min-width: 768px) {
+        .trip-title {
+            font-size: var(--text-4xl);
+        }
+    }
+
+    /* Content Sections */
+    .trip-section {
+        margin-bottom: var(--space-10);
+    }
+
+    .trip-section-title {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        font-size: var(--text-xl);
+        font-weight: var(--font-bold);
+        color: var(--color-text);
+        margin-bottom: var(--space-5);
+        padding-bottom: var(--space-3);
+        border-bottom: 2px solid var(--color-border);
+    }
+
+    .trip-section-title svg {
+        color: var(--color-primary);
+    }
+
+    /* Description */
+    .trip-description {
+        color: var(--color-text-secondary);
+        line-height: 1.8;
+        font-size: var(--text-base);
+    }
+
+    /* Included Items Grid */
+    .included-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-3);
+    }
+
+    .included-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-hover) 100%);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border);
+        transition: all 0.3s ease;
+    }
+
+    .included-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--color-primary);
+    }
+
+    .included-item svg {
+        flex-shrink: 0;
+    }
+
+    /* Timeline / Itinerary */
+    .trip-itinerary {
+        position: relative;
+        padding-inline-start: var(--space-10);
+    }
+
+    .itinerary-timeline {
+        position: absolute;
+        inset-inline-start: 16px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(to bottom, var(--color-primary), var(--color-accent));
+        border-radius: var(--radius-full);
+    }
+
+    .itinerary-item {
+        position: relative;
+        padding-bottom: var(--space-6);
+    }
+
+    .itinerary-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .itinerary-dot {
+        position: absolute;
+        inset-inline-start: calc(-1 * var(--space-10) + 8px);
+        width: 20px;
+        height: 20px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        border: 4px solid var(--color-bg);
+        box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.3);
+    }
+
+    .itinerary-card {
+        background: var(--color-surface);
+        border-radius: var(--radius-xl);
+        padding: var(--space-5);
+        border-inline-start: 4px solid var(--color-primary);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+    .itinerary-card:hover {
+        transform: translateX(4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    [dir="rtl"] .itinerary-card:hover {
+        transform: translateX(-4px);
+    }
+
+    .itinerary-day-badge {
+        display: inline-flex;
+        align-items: center;
+        background: var(--gradient-primary);
+        color: white;
+        padding: var(--space-1) var(--space-4);
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        font-weight: var(--font-bold);
+        margin-bottom: var(--space-3);
+    }
+
+    /* Reviews Section */
+    .review-card {
+        background: var(--color-surface);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        border: 1px solid var(--color-border);
+        transition: all 0.3s ease;
+    }
+
+    .review-card:hover {
+        box-shadow: var(--shadow-lg);
+        border-color: transparent;
+    }
+
+    .review-avatar {
+        width: 56px;
+        height: 56px;
+        background: var(--gradient-primary);
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: var(--text-xl);
+        font-weight: var(--font-bold);
+        flex-shrink: 0;
+    }
+
+    .review-stars {
+        display: flex;
+        gap: 2px;
+    }
+
+    /* Booking Sidebar */
+    .booking-card {
+        background: var(--color-surface);
+        border-radius: var(--radius-2xl);
+        padding: var(--space-8);
+        box-shadow:
+            0 4px 20px rgba(0, 0, 0, 0.08),
+            0 8px 40px rgba(0, 0, 0, 0.04);
+        border: 1px solid var(--color-border);
+        position: sticky;
+        top: calc(70px + var(--space-4));
+    }
+
+    .booking-price-wrapper {
+        margin-bottom: var(--space-6);
+        padding-bottom: var(--space-6);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .booking-price-old {
+        font-size: var(--text-lg);
+        color: var(--color-text-muted);
+        text-decoration: line-through;
+        margin-inline-end: var(--space-2);
+    }
+
+    .booking-price-badge {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, var(--color-accent) 0%, #fbbf24 100%);
+        color: var(--color-gray-900);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--font-bold);
+        text-transform: uppercase;
+    }
+
+    .booking-price-current {
+        font-size: var(--text-4xl);
+        font-weight: var(--font-extrabold);
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .booking-price-unit {
+        font-size: var(--text-base);
+        font-weight: var(--font-normal);
+        color: var(--color-text-muted);
+        -webkit-text-fill-color: var(--color-text-muted);
+    }
+
+    .booking-total {
+        padding: var(--space-5);
+        background: linear-gradient(135deg, var(--color-surface-hover) 0%, var(--color-surface) 100%);
+        border-radius: var(--radius-xl);
+        margin-bottom: var(--space-5);
+        border: 1px solid var(--color-border);
+    }
+
+    .booking-contact {
+        margin-top: var(--space-6);
+        padding-top: var(--space-6);
+        border-top: 1px solid var(--color-border);
+        text-align: center;
+    }
+
+    /* Form Styling */
+    .booking-card .form-group {
+        margin-bottom: var(--space-4);
+    }
+
+    .booking-card .form-label {
+        display: block;
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        color: var(--color-text);
+        margin-bottom: var(--space-2);
+    }
+
+    .booking-card .form-input {
+        width: 100%;
+        padding: var(--space-3) var(--space-4);
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-xl);
+        font-size: var(--text-base);
+        transition: all 0.2s ease;
+        background: var(--color-bg);
+    }
+
+    .booking-card .form-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+    }
+
+    /* Book Button */
+    .book-btn {
+        width: 100%;
+        padding: var(--space-4) var(--space-6);
+        font-size: var(--text-lg);
+        font-weight: var(--font-bold);
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-xl);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.3);
+    }
+
+    .book-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(var(--color-primary-rgb), 0.4);
+    }
+
+    .book-btn:active {
+        transform: translateY(0);
+    }
 </style>
 @endpush
+

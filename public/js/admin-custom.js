@@ -157,6 +157,36 @@
 
                 if (!isValid) {
                     e.preventDefault();
+                    e.stopPropagation();
+                } else {
+                    // Form is valid - Check if we should apply loading state
+                    // Only apply if the event hasn't been prevented (standard submit)
+                    if (!e.defaultPrevented) {
+                        const submitBtn = form.querySelector(
+                            'button[type="submit"]',
+                        );
+                        if (
+                            submitBtn &&
+                            !submitBtn.disabled &&
+                            !submitBtn.classList.contains("no-loading")
+                        ) {
+                            const text =
+                                submitBtn.dataset.loadingText ||
+                                (window.Translations &&
+                                    window.Translations.loading_text) ||
+                                "Loading...";
+
+                            // Preserve width to avoid layout jump
+                            const w = submitBtn.offsetWidth;
+                            submitBtn.style.minWidth = w + "px";
+
+                            submitBtn.dataset.originalHtml =
+                                submitBtn.innerHTML;
+                            submitBtn.disabled = true;
+                            // Add Spinner
+                            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> ${text}`;
+                        }
+                    }
                 }
             });
         });

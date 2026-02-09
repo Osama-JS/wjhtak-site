@@ -140,7 +140,6 @@ class PaymentController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
-                        new OA\Property(property: "status", type: "string", example: "paid"),
                         new OA\Property(property: "message", type: "string", example: "Payment successful."),
                         new OA\Property(property: "data", type: "object")
                     ]

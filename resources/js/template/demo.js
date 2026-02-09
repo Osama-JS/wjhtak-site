@@ -67,6 +67,23 @@ window.deleteAllCookie = deleteAllCookie;
 (function ($) {
     "use strict";
 
+    function getUrlParams(dParam) {
+        var dPageURL = window.location.search.substring(1),
+            dURLVariables = dPageURL.split("&"),
+            dParameterName,
+            i;
+
+        for (i = 0; i < dURLVariables.length; i++) {
+            dParameterName = dURLVariables[i].split("=");
+
+            if (dParameterName[0] === dParam) {
+                return dParameterName[1] === undefined
+                    ? true
+                    : decodeURIComponent(dParameterName[1]);
+            }
+        }
+    }
+
     //var direction =  getUrlParams('dir');
     var theme = getUrlParams("theme");
 

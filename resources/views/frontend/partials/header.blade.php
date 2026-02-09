@@ -1,10 +1,20 @@
 {{-- Header/Navbar Component --}}
+@php
+    $siteLogo = \App\Models\Setting::get('site_logo');
+    $siteName = app()->getLocale() === 'ar'
+        ? \App\Models\Setting::get('site_name_ar', 'وجهتك')
+        : \App\Models\Setting::get('site_name_en', 'Wjhtak');
+@endphp
 <header class="navbar" id="navbar">
     <div class="container navbar-container">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="navbar-logo">
-            <img src="{{ asset('images/logo-full.png') }}" alt="{{ config('app.name') }}">
-            <span class="navbar-logo-text">{{ __('Wjhtak') }}</span>
+            @if($siteLogo)
+                <img src="{{ asset($siteLogo) }}" alt="{{ $siteName }}" onerror="this.src='{{ asset('images/logo-full.png') }}'">
+            @else
+                <img src="{{ asset('images/logo-full.png') }}" alt="{{ $siteName }}">
+            @endif
+            <span class="navbar-logo-text">{{ $siteName }}</span>
         </a>
 
         {{-- Navigation Links --}}

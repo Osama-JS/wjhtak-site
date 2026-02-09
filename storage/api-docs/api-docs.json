@@ -385,6 +385,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Invalid or expired OTP code."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -438,6 +441,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "OTP has been resent to your email."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -458,6 +464,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Account is already verified."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -621,6 +630,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Invalid login credentials."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1032,6 +1044,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Logged out successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1220,6 +1235,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Invalid or expired OTP code."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1305,6 +1323,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Password changed successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1405,6 +1426,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "FCM token updated successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -2232,10 +2256,6 @@
                                             "type": "boolean",
                                             "example": false
                                         },
-                                        "status": {
-                                            "type": "string",
-                                            "example": "paid"
-                                        },
                                         "message": {
                                             "type": "string",
                                             "example": "Payment successful."
@@ -2291,9 +2311,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Countries retrieved successfully"
                                         },
                                         "data": {
                                             "type": "array",
@@ -2380,9 +2404,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cities retrieved successfully"
                                         },
                                         "data": {
                                             "type": "array",
@@ -2465,9 +2493,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Banners retrieved successfully"
                                         },
                                         "data": {
                                             "type": "array",
@@ -2557,9 +2589,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Locations retrieved successfully"
                                         },
                                         "data": {
                                             "type": "array",
@@ -2637,9 +2673,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "FAQs retrieved successfully"
                                         },
                                         "data": {
                                             "type": "array",
@@ -2747,9 +2787,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Trips retrieved successfully"
                                         },
                                         "data": {
                                             "properties": {
@@ -2845,9 +2889,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Trip details retrieved successfully"
                                         },
                                         "data": {
                                             "properties": {
@@ -2992,9 +3040,9 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
                                         },
                                         "message": {
                                             "type": "string",
@@ -3054,9 +3102,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bookings retrieved successful"
                                         },
                                         "data": {
                                             "type": "array",
@@ -3118,17 +3170,22 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
                                         },
                                         "message": {
                                             "type": "string",
                                             "example": "Trip added to favorites"
                                         },
-                                        "is_favorite": {
-                                            "type": "boolean",
-                                            "example": true
+                                        "data": {
+                                            "properties": {
+                                                "is_favorite": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -3175,9 +3232,13 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "error": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Favorites retrieved successfully"
                                         },
                                         "data": {
                                             "type": "array",

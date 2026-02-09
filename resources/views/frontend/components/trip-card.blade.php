@@ -30,7 +30,7 @@
 
         {{-- Favorite Button --}}
         <button
-            class="trip-card-favorite {{ auth()->check() && $trip->isFavorited ? 'active' : '' }}"
+            class="trip-card-favorite {{ auth()->check() && ($trip->isFavorited ?? false) ? 'active' : '' }}"
             data-trip-id="{{ $trip->id }}"
             aria-label="{{ __('Add to favorites') }}"
         >
@@ -40,13 +40,16 @@
         </button>
 
         {{-- Rating Overlay --}}
-        @if($trip->average_rating)
+        @php
+            $avgRating = $trip->rates_avg_rate ?? $trip->average_rating ?? null;
+        @endphp
+        @if($avgRating)
             <div class="trip-card-overlay">
                 <div class="trip-card-rating">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
-                    <span>{{ number_format($trip->average_rating, 1) }}</span>
+                    <span>{{ number_format($avgRating, 1) }}</span>
                 </div>
             </div>
         @endif
@@ -61,9 +64,9 @@
                 <circle cx="12" cy="10" r="3"/>
             </svg>
             <span>
-                {{ $trip->fromCountry->nicename ?? $trip->fromCountry->name }}
+                {{ $trip->fromCountry->nicename ?? $trip->fromCountry->name ?? __('Origin') }}
                 →
-                {{ $trip->toCountry->nicename ?? $trip->toCountry->name }}
+                {{ $trip->toCountry->nicename ?? $trip->toCountry->name ?? __('Destination') }}
             </span>
         </div>
 

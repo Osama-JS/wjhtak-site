@@ -149,6 +149,11 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     // Permission Management
     Route::get('permissions/data', [PermissionController::class, 'getData'])->name('permissions.data');
     Route::resource('permissions', PermissionController::class);
+
+    // Trip Bookings Management
+    Route::get('trip-bookings/data', [App\Http\Controllers\Admin\TripBookingController::class, 'getData'])->name('trip-bookings.data');
+    Route::post('trip-bookings/{id}/update-status', [App\Http\Controllers\Admin\TripBookingController::class, 'updateStatus'])->name('trip-bookings.update-status');
+    Route::resource('trip-bookings', App\Http\Controllers\Admin\TripBookingController::class);
 });
 
 // Customer Routes

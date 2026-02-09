@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\BaseController;
+use App\Traits\ApiResponseTrait;
 use App\Models\Trip;
 use App\Models\TripBooking;
 use App\Models\Favorite;
@@ -16,6 +16,7 @@ use OpenApi\Attributes as OA;
 
 class TripController extends Controller
 {
+    use ApiResponseTrait;
     /**
      * Get list of trips with filters.
      */
@@ -75,7 +76,8 @@ class TripController extends Controller
                 description: "Trips retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Trips retrieved successfully"),
                         new OA\Property(property: "data", type: "object", properties: [
                             new OA\Property(property: "current_page", type: "integer", example: 1),
                             new OA\Property(property: "data", type: "array", items: new OA\Items(
@@ -142,10 +144,7 @@ class TripController extends Controller
 
         $trips->setCollection($transformedData);
 
-        return response()->json([
-            'success' => true,
-            'data' => $trips
-        ]);
+        return $this->apiResponse(false, __('Trips retrieved successfully'), $trips);
     }
 
     /**
@@ -179,7 +178,8 @@ class TripController extends Controller
                 description: "Trip details retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Trip details retrieved successfully"),
                         new OA\Property(property: "data", type: "object", properties: [
                             new OA\Property(property: "id", type: "integer", example: 1),
                             new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
@@ -209,10 +209,7 @@ class TripController extends Controller
             ->find($id);
 
         if (!$trip) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Trip not found or expired')
-            ], 404);
+            return $this->apiResponse(true, __('Trip not found or expired'), null, null, 404);
         }
 
         $data = [
@@ -245,10 +242,7 @@ class TripController extends Controller
             }),
         ];
 
-        return response()->json([
-            'success' => true,
-            'data' => $data
-        ]);
+        return $this->apiResponse(false, __('Trip details retrieved successfully'), $data);
     }
 
     /**
@@ -300,7 +294,7 @@ class TripController extends Controller
                 description: "Booking successful",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Booking created successfully"),
                         new OA\Property(property: "data", type: "object")
                     ]
@@ -325,33 +319,23 @@ class TripController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Validation failed'),
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->apiResponse(true, __('Validation failed'), $validator->errors(), null, 422);
         }
 
         $trip = Trip::active()->find($request->trip_id);
 
         if (!$trip) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Trip not found or expired')
-            ], 404);
+            return $this->apiResponse(true, __('Trip not found or expired'), null, null, 404);
         }
 
         if ($trip->tickets < $request->tickets_count) {
-             return response()->json([
-                'success' => false,
-                'message' => __('Not enough tickets available. Only :count left.', ['count' => $trip->tickets])
-            ], 422);
+             return $this->apiResponse(true, __('Not enough tickets available. Only :count left.', ['count' => $trip->tickets]), null, null, 422);
         }
 
         // Create booking
         $user = Auth::guard('sanctum')->user(); // Ensure using sanctum guard
         if (!$user) {
-             return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+             return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
         }
 
         $totalPrice = $trip->price * $request->tickets_count;
@@ -371,11 +355,7 @@ class TripController extends Controller
             $booking->passengers()->create($passengerData);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => __('Booking created successfully'),
-            'data' => $booking->load('passengers')
-        ]);
+        return $this->apiResponse(false, __('Booking created successfully'), $booking->load('passengers'));
     }
 
     /**
@@ -403,7 +383,8 @@ class TripController extends Controller
                 description: "Bookings retrieved successful",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Bookings retrieved successful"),
                         new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object"))
                     ]
                 )
@@ -414,7 +395,7 @@ class TripController extends Controller
     {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+            return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
         }
 
         $bookings = TripBooking::with(['trip.toCountry', 'trip.toCity'])
@@ -422,10 +403,7 @@ class TripController extends Controller
             ->latest()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $bookings
-        ]);
+        return $this->apiResponse(false, __('Bookings retrieved successful'), $bookings);
     }
 
     /**
@@ -460,9 +438,11 @@ class TripController extends Controller
                 description: "Operation successful",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Trip added to favorites"),
-                        new OA\Property(property: "is_favorite", type: "boolean", example: true)
+                        new OA\Property(property: "data", type: "object", properties: [
+                            new OA\Property(property: "is_favorite", type: "boolean", example: true)
+                        ])
                     ]
                 )
             )
@@ -472,33 +452,25 @@ class TripController extends Controller
     {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+            return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
         }
 
         $trip = Trip::find($id);
         if (!$trip) {
-            return response()->json(['success' => false, 'message' => __('Trip not found')], 404);
+            return $this->apiResponse(true, __('Trip not found'), null, null, 404);
         }
 
         $favorite = Favorite::where('user_id', $user->id)->where('trip_id', $id)->first();
 
         if ($favorite) {
             $favorite->delete();
-            return response()->json([
-                'success' => true,
-                'message' => __('Trip removed from favorites'),
-                'is_favorite' => false
-            ]);
+            return $this->apiResponse(false, __('Trip removed from favorites'), ['is_favorite' => false]);
         } else {
             Favorite::create([
                 'user_id' => $user->id,
                 'trip_id' => $id
             ]);
-            return response()->json([
-                'success' => true,
-                'message' => __('Trip added to favorites'),
-                'is_favorite' => true
-            ]);
+            return $this->apiResponse(false, __('Trip added to favorites'), ['is_favorite' => true]);
         }
     }
 
@@ -527,7 +499,8 @@ class TripController extends Controller
                 description: "Favorites retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Favorites retrieved successfully"),
                         new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object"))
                     ]
                 )
@@ -538,7 +511,7 @@ class TripController extends Controller
     {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+            return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
         }
 
         $favorites = Favorite::with(['trip.images', 'trip.toCountry', 'trip.toCity'])
@@ -559,9 +532,6 @@ class TripController extends Controller
             ];
         })->filter();
 
-        return response()->json([
-            'success' => true,
-            'data' => $transformedData
-        ]);
+        return $this->apiResponse(false, __('Favorites retrieved successfully'), $transformedData);
     }
 }

@@ -160,6 +160,7 @@
                 { data: 'nicename' },
                 { data: 'numcode' },
                 { data: 'phonecode' },
+                { data: 'cities_count' },
                 { data: 'status' },
                 { data: 'actions', orderable: false, searchable: false }
             ],

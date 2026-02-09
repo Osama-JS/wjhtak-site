@@ -12,6 +12,27 @@
 </div>
 @endsection
 
+@push('styles')
+<style>
+    /* Custom Toastr Styles for Visibility */
+    #toast-container > .toast-success {
+        background-color: #28a745 !important; /* Green */
+        opacity: 1 !important;
+        font-size: 16px !important;
+        padding: 20px !important;
+        width: 400px !important;
+    }
+    #toast-container > .toast-error {
+        background-color: #dc3545 !important; /* Red */
+        opacity: 1 !important;
+        font-size: 16px !important;
+    }
+    .toast-message {
+        font-weight: bold;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="row my-2">
     <div class="col-xl-6 col-sm-12">
@@ -112,6 +133,56 @@
                                 <input type="file" class="d-none" name="site_favicon" onchange="previewImg(this, '#favicon-preview')">
                             </label>
                             <p class="small text-muted mt-2 mb-0">{{ __('SVG or ICO preferred') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Frontend Backgrounds --}}
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ __('Frontend Backgrounds') }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label d-block">{{ __('Hero Section Background') }}</label>
+                            <p class="small text-muted mt-0 mb-2">{{ __('Background image for the homepage hero section') }}</p>
+                            <div class="mb-3 p-3 bg-light rounded position-relative" style="min-height: 150px; background-size: cover; background-position: center;">
+                                @if(\App\Models\Setting::get('hero_bg'))
+                                    <img id="hero-bg-preview" src="{{ asset(\App\Models\Setting::get('hero_bg')) }}" class="img-fluid rounded" style="max-height: 140px; width: 100%; object-fit: cover;">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center h-100" style="min-height: 130px;">
+                                        <i class="fas fa-mountain fa-3x text-muted"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <label class="btn btn-primary btn-sm">
+                                <i class="fa fa-upload me-2"></i>{{ __('Upload Hero Background') }}
+                                <input type="file" class="d-none" name="hero_bg" onchange="previewImg(this, '#hero-bg-preview')">
+                            </label>
+                            <p class="small text-muted mt-2 mb-0">{{ __('Recommended size: 1920x1080px') }}</p>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label d-block">{{ __('Page Header Background') }}</label>
+                            <p class="small text-muted mt-0 mb-2">{{ __('Background image for internal pages header (Trips, About, Contact, etc.)') }}</p>
+                            <div class="mb-3 p-3 bg-light rounded position-relative" style="min-height: 150px; background-size: cover; background-position: center;">
+                                @if(\App\Models\Setting::get('page_header_bg'))
+                                    <img id="page-header-bg-preview" src="{{ asset(\App\Models\Setting::get('page_header_bg')) }}" class="img-fluid rounded" style="max-height: 140px; width: 100%; object-fit: cover;">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center h-100" style="min-height: 130px;">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <label class="btn btn-primary btn-sm">
+                                <i class="fa fa-upload me-2"></i>{{ __('Upload Page Header Background') }}
+                                <input type="file" class="d-none" name="page_header_bg" onchange="previewImg(this, '#page-header-bg-preview')">
+                            </label>
+                            <p class="small text-muted mt-2 mb-0">{{ __('Recommended size: 1920x400px') }}</p>
                         </div>
                     </div>
                 </div>
@@ -250,14 +321,14 @@ $(document).ready(function() {
         Swal.fire({
             title: "{{ __('Are you sure?') }}",
             text: "{{ __('Do you want to save the changes?') }}",
-            icon: 'warning',
+            type: 'warning', // Changed from icon to type for compatibility
             showCancelButton: true,
             confirmButtonColor: '#3b4bd3',
             cancelButtonColor: '#d33',
             confirmButtonText: "{{ __('Yes, save it!') }}",
             cancelButtonText: "{{ __('Cancel') }}"
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (result.isConfirmed || result.value) { // Check both for compatibility
                 saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i>{{ __("Saving...") }}');
 
                 $.ajax({
@@ -266,27 +337,57 @@ $(document).ready(function() {
                     data: formData,
                     processData: false,
                     contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
                     success: function(response) {
                         if (response.success) {
-                            toastr.success(response.message);
+                            if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+
                             if (response.logo_url) {
                                 $('#logo-preview').attr('src', response.logo_url).show();
                             }
                             if (response.favicon_url) {
                                 $('#favicon-preview').attr('src', response.favicon_url).show();
                             }
+                            if (response.hero_bg_url) {
+                                $('#hero-bg-preview').attr('src', response.hero_bg_url).show();
+                            }
+                            if (response.page_header_bg_url) {
+                                $('#page-header-bg-preview').attr('src', response.page_header_bg_url).show();
+                            }
                         } else {
-                            toastr.error(response.message);
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(response.message);
+                            } else {
+                                alert(response.message);
+                            }
                         }
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) {
                             var errors = xhr.responseJSON.errors;
                             $.each(errors, function(key, value) {
-                                toastr.error(value[0]);
+                                if (typeof toastr !== 'undefined') {
+                                    toastr.error(value[0]);
+                                } else {
+                                    alert(value[0]);
+                                }
                             });
                         } else {
-                            toastr.error("{{ __('An error occurred while saving.') }}");
+                            var msg = "{{ __('An error occurred while saving.') }}";
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg += ' ' + xhr.responseJSON.message;
+                            }
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(msg);
+                            } else {
+                                alert(msg);
+                            }
                         }
                     },
                     complete: function() {

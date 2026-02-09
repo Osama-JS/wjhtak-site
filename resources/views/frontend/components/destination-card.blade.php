@@ -1,21 +1,28 @@
 {{-- Destination Card Component --}}
 @props(['destination', 'tripCount' => 0])
 
-<a href="{{ route('trips.index', ['country' => $destination->id]) }}" class="destination-card scroll-animate">
+@php
+    $destId = $destination->id ?? 0;
+    $destName = $destination->nicename ?? $destination->name ?? __('Unknown');
+    $destIso = $destination->iso ?? '';
+    $destFlag = $destination->flag ?? null;
+@endphp
+
+<a href="{{ route('trips.index', ['country' => $destId]) }}" class="destination-card scroll-animate">
     {{-- Background Image --}}
     <div class="destination-card-image">
-        @if($destination->flag)
+        @if($destIso)
             {{-- Use a destination image if available, otherwise use flag as fallback --}}
             <img
-                src="{{ asset('images/destinations/' . strtolower($destination->iso) . '.jpg') }}"
-                alt="{{ $destination->nicename ?? $destination->name }}"
+                src="{{ asset('images/destinations/' . strtolower($destIso) . '.jpg') }}"
+                alt="{{ $destName }}"
                 loading="lazy"
                 onerror="this.src='{{ asset('images/demo/destination-placeholder.jpg') }}'"
             >
         @else
             <img
                 src="{{ asset('images/demo/destination-placeholder.jpg') }}"
-                alt="{{ $destination->nicename ?? $destination->name }}"
+                alt="{{ $destName }}"
                 loading="lazy"
             >
         @endif
@@ -27,9 +34,9 @@
     {{-- Content --}}
     <div class="destination-card-content">
         {{-- Flag --}}
-        @if($destination->flag)
+        @if($destFlag)
             <img
-                src="{{ asset('storage/' . $destination->flag) }}"
+                src="{{ asset('storage/' . $destFlag) }}"
                 alt=""
                 class="destination-card-flag"
                 onerror="this.style.display='none'"
@@ -37,7 +44,7 @@
         @endif
 
         {{-- Title --}}
-        <h3 class="destination-card-title">{{ $destination->nicename ?? $destination->name }}</h3>
+        <h3 class="destination-card-title">{{ $destName }}</h3>
 
         {{-- Trip Count --}}
         <p class="destination-card-count">
@@ -53,3 +60,4 @@
         </svg>
     </div>
 </a>
+

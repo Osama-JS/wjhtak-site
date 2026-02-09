@@ -32,6 +32,7 @@ class Trip extends Model
        'profit',
        'percentage_profit_margin',
        'active',
+       'page_visits',
     ];
 
 

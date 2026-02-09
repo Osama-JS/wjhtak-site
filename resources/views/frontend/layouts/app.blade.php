@@ -83,6 +83,84 @@
             opacity: 1;
             transition: opacity 0.3s ease;
         }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px; /* Default LTR */
+            z-index: 999;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--color-primary, #3b4bd3);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+
+        [dir="rtl"] .back-to-top {
+            right: auto;
+            left: 30px;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            background: var(--color-primary-dark, #2a3aa0);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(59, 75, 211, 0.4);
+        }
+
+        /* Footer Crystal Animation */
+        .footer {
+            position: relative;
+            overflow: hidden;
+            background: #1a1a1a; /* Fallback */
+            z-index: 1;
+        }
+
+        .footer::before, .footer::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(59, 75, 211, 0.2), rgba(255, 255, 255, 0.05));
+            filter: blur(60px);
+            z-index: -1;
+            animation: floatCrystals 15s infinite ease-in-out alternate;
+        }
+
+        .footer::before {
+            top: -100px;
+            left: -100px;
+        }
+
+        .footer::after {
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -7s;
+            background: linear-gradient(45deg, rgba(255, 0, 150, 0.15), rgba(59, 75, 211, 0.1));
+        }
+
+        @keyframes floatCrystals {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(50px, 50px) rotate(180deg); }
+            100% { transform: translate(-30px, 20px) rotate(360deg); }
+        }
     </style>
 </head>
 <body>

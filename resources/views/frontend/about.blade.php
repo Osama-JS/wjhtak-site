@@ -4,10 +4,23 @@
 
 @section('meta_description', __('Learn about Wjhtak - Your trusted partner for premium travel experiences'))
 
+@php
+    $headerBg = \App\Models\Setting::get('page_header_bg');
+@endphp
+
 @section('content')
     {{-- Page Header --}}
-    <section class="section" style="padding-top: calc(var(--space-24) + 60px); padding-bottom: var(--space-10); background: var(--gradient-primary);">
-        <div class="container">
+    <section class="page-header" style="position: relative; padding-top: calc(var(--space-24) + 60px); padding-bottom: var(--space-10); background: var(--color-primary); overflow: hidden;">
+        @if($headerBg)
+            <div style="position: absolute; inset: 0; z-index: 0;">
+                <img src="{{ asset($headerBg) }}" alt="" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.4;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, var(--color-primary));"></div>
+            </div>
+        @else
+            <div style="position: absolute; inset: 0; background: var(--gradient-primary); z-index: 0;"></div>
+        @endif
+
+        <div class="container" style="position: relative; z-index: 1;">
             <div class="text-center" style="color: white;">
                 <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
                     {{ __('About Wjhtak') }}
