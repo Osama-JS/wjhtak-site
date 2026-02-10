@@ -385,7 +385,21 @@ class TripController extends Controller
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Bookings retrieved successful"),
-                        new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object"))
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 101),
+                                new OA\Property(property: "trip_id", type: "integer", example: 1),
+                                new OA\Property(property: "tickets_count", type: "integer", example: 2),
+                                new OA\Property(property: "total_price", type: "number", example: 3000.00),
+                                new OA\Property(property: "status", type: "string", example: "pending"),
+                                new OA\Property(property: "booking_date", type: "string", format: "date-time", example: "2024-05-20 10:00:00"),
+                                new OA\Property(property: "trip", type: "object", properties: [
+                                    new OA\Property(property: "id", type: "integer", example: 1),
+                                    new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
+                                    new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
+                                ])
+                            ]
+                        ))
                     ]
                 )
             )
@@ -501,7 +515,16 @@ class TripController extends Controller
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Favorites retrieved successfully"),
-                        new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object"))
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
+                                new OA\Property(property: "price", type: "number", example: 1500.00),
+                                new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
+                                new OA\Property(property: "to_country", type: "string", example: "France"),
+                                new OA\Property(property: "to_city", type: "string", example: "Paris"),
+                            ]
+                        ))
                     ]
                 )
             )

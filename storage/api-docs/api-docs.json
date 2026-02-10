@@ -1215,6 +1215,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Password has been reset successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1346,6 +1349,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Invalid old password."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1582,6 +1588,16 @@
                                             "example": "Flights retrieved successfully."
                                         },
                                         "data": {
+                                            "properties": {
+                                                "SessionId": {
+                                                    "type": "string",
+                                                    "example": "7906efba-09db-4481-8c60-0d7f5b5e6c44"
+                                                },
+                                                "AirSearchResult": {
+                                                    "description": "Complex nested flight search results containing schedules and fares",
+                                                    "type": "object"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -1896,21 +1912,59 @@
                                 ],
                                 "properties": {
                                     "flight_session_id": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "7906efba-09db-4481-8c60-0d7f5b5e6c44"
                                     },
                                     "fare_source_code": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "MTY2ODE2Njg2Ml8yNjA5Mzk"
                                     },
                                     "customerEmail": {
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "example": "customer@example.com"
                                     },
                                     "customerPhone": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "+966500000000"
                                     },
                                     "passengers": {
                                         "type": "array",
                                         "items": {
+                                            "required": [
+                                                "firstName",
+                                                "lastName",
+                                                "dateOfBirth",
+                                                "passportNumber"
+                                            ],
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Mr"
+                                                },
+                                                "firstName": {
+                                                    "type": "string",
+                                                    "example": "John"
+                                                },
+                                                "lastName": {
+                                                    "type": "string",
+                                                    "example": "Doe"
+                                                },
+                                                "dateOfBirth": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1990-01-01"
+                                                },
+                                                "passportNumber": {
+                                                    "type": "string",
+                                                    "example": "A1234567"
+                                                },
+                                                "passportExpiry": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2030-01-01"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     }
@@ -3113,6 +3167,50 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 101
+                                                    },
+                                                    "trip_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "tickets_count": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "total_price": {
+                                                        "type": "number",
+                                                        "example": 3000
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "pending"
+                                                    },
+                                                    "booking_date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2024-05-20 10:00:00"
+                                                    },
+                                                    "trip": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Amazing Paris"
+                                                            },
+                                                            "image": {
+                                                                "type": "string",
+                                                                "example": "http://example.com/trips/1.jpg"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
@@ -3243,6 +3341,32 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Amazing Paris"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "example": 1500
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/trips/1.jpg"
+                                                    },
+                                                    "to_country": {
+                                                        "type": "string",
+                                                        "example": "France"
+                                                    },
+                                                    "to_city": {
+                                                        "type": "string",
+                                                        "example": "Paris"
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }

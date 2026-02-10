@@ -739,7 +739,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Password has been reset successfully.")
+                        new OA\Property(property: "message", type: "string", example: "Password has been reset successfully."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),
@@ -829,7 +830,8 @@ class AuthController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Invalid old password.")
+                        new OA\Property(property: "message", type: "string", example: "Invalid old password."),
+                        new OA\Property(property: "data", type: "object")
                     ]
                 )
             ),

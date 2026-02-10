@@ -70,7 +70,10 @@ class FlightController extends Controller
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Flights retrieved successfully."),
-                        new OA\Property(property: "data", type: "object")
+                        new OA\Property(property: "data", type: "object", properties: [
+                            new OA\Property(property: "SessionId", type: "string", example: "7906efba-09db-4481-8c60-0d7f5b5e6c44"),
+                            new OA\Property(property: "AirSearchResult", type: "object", description: "Complex nested flight search results containing schedules and fares")
+                        ])
                     ]
                 )
             ),
@@ -301,11 +304,22 @@ class FlightController extends Controller
             content: new OA\JsonContent(
                 required: ["flight_session_id", "fare_source_code", "customerEmail", "customerPhone", "passengers"],
                 properties: [
-                    new OA\Property(property: "flight_session_id", type: "string"),
-                    new OA\Property(property: "fare_source_code", type: "string"),
-                    new OA\Property(property: "customerEmail", type: "string", format: "email"),
-                    new OA\Property(property: "customerPhone", type: "string"),
-                    new OA\Property(property: "passengers", type: "array", items: new OA\Items(type: "object"))
+                    new OA\Property(property: "flight_session_id", type: "string", example: "7906efba-09db-4481-8c60-0d7f5b5e6c44"),
+                    new OA\Property(property: "fare_source_code", type: "string", example: "MTY2ODE2Njg2Ml8yNjA5Mzk"),
+                    new OA\Property(property: "customerEmail", type: "string", format: "email", example: "customer@example.com"),
+                    new OA\Property(property: "customerPhone", type: "string", example: "+966500000000"),
+                    new OA\Property(property: "passengers", type: "array", items: new OA\Items(
+                        type: "object",
+                        required: ["firstName", "lastName", "dateOfBirth", "passportNumber"],
+                        properties: [
+                            new OA\Property(property: "title", type: "string", example: "Mr"),
+                            new OA\Property(property: "firstName", type: "string", example: "John"),
+                            new OA\Property(property: "lastName", type: "string", example: "Doe"),
+                            new OA\Property(property: "dateOfBirth", type: "string", format: "date", example: "1990-01-01"),
+                            new OA\Property(property: "passportNumber", type: "string", example: "A1234567"),
+                            new OA\Property(property: "passportExpiry", type: "string", format: "date", example: "2030-01-01"),
+                        ]
+                    ))
                 ]
             )
         ),
