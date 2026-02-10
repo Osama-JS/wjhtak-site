@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
+use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -15,12 +16,13 @@ class BannerController extends Controller
      */
     public function index()
     {
+        $trips = Trip::all();
         $stats = [
             'total' => Banner::count(),
             'active' => Banner::where('active', true)->count(),
             'inactive' => Banner::where('active', false)->count(),
         ];
-        return view('admin.banners.index', compact('stats'));
+        return view('admin.banners.index', compact('stats','trips'));
     }
 
     /**
@@ -28,15 +30,21 @@ class BannerController extends Controller
      */
     public function getData()
     {
-        $banners = Banner::ordered()->get();
+        $banners = Banner::with(['trip'])->ordered()->get();
 
         $data = $banners->map(function ($banner) {
             return [
                 'id' => $banner->id,
-                'image' => '<img src="' . $banner->image_url . '" alt="' . $banner->title_en . '" class="rounded" width="100" height="60" style="object-fit: cover;">',
+                'image_url' => '<img src="' . $banner->image_url . '" 
+                     alt="' . $banner->title_en . '" 
+                     class="rounded" width="100" height="60" 
+                     style="object-fit: cover;" 
+                     onerror="this.onerror=null; this.src=\'' . asset('images/flags/default.jpg') . '\';">',
                 'title_ar' => $banner->title_ar ?? '---',
                 'title_en' => $banner->title_en ?? '---',
                 'link' => $banner->link ? '<a href="' . $banner->link . '" target="_blank" class="text-primary"><i class="fas fa-external-link-alt"></i></a>' : '---',
+                'trip' => $banner->trip
+                          ?  '<span>'. $banner->trip->title .'</span>' : '...',
                 'sort_order' => '<span class="badge badge-light">' . $banner->sort_order . '</span>',
                 'status' => $banner->active
                     ? '<span class="badge badge-success">' . __('Active') . '</span>'
@@ -73,18 +81,20 @@ class BannerController extends Controller
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'link' => 'nullable|url|max:500',
             'sort_order' => 'nullable|integer|min:0',
+            'trip_id'            => 'required|exists:trips,id',
             'active' => 'boolean',
         ]);
          
-         return response()->json($request->all());
+        //  return response()->json($request->all());
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['title_ar', 'title_en', 'description_ar', 'description_en', 'link']);
+        $data = $request->only(['title_ar', 'title_en', 'description_ar', 'description_en', 'link','trip_id']);
         $data['active'] = $request->boolean('active', true);
         $data['sort_order'] = $request->input('sort_order', Banner::max('sort_order') + 1);
+        $data['admin_id'] = auth()->id();
 
        
         // Handle image upload
@@ -128,6 +138,7 @@ class BannerController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
             'link' => 'nullable|url|max:500',
             'sort_order' => 'nullable|integer|min:0',
+            'trip_id'            => 'required|exists:trips,id',
             'active' => 'boolean',
         ]);
 
@@ -135,7 +146,7 @@ class BannerController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['title_ar', 'title_en', 'description_ar', 'description_en', 'link', 'sort_order']);
+        $data = $request->only(['title_ar', 'title_en', 'description_ar', 'description_en', 'link', 'trip_id','sort_order',]);
         $data['active'] = $request->boolean('active', true);
 
         // Handle image upload
@@ -148,7 +159,7 @@ class BannerController extends Controller
         }
 
         $banner->update($data);
-
+        
         return response()->json([
             'success' => true,
             'message' => __('Banner updated successfully'),

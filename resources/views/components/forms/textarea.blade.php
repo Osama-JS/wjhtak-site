@@ -24,7 +24,7 @@
 
     <textarea
         name="{{ $name }}"
-        id="{{ $name }}"
+        id="{{ $attributes->get('id', $name) }}"
         class="form-control {{ $errors->has($name) || $error ? 'is-invalid' : '' }} {{ $attributes->get('class') }}"
         rows="{{ $rows }}"
         placeholder="{{ $placeholder }}"

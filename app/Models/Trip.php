@@ -77,6 +77,12 @@ class Trip extends Model
         return $this->hasMany(TripImage::class);
     }
 
+    public function banner()
+    {
+        return $this->hasMany(Banner::class, 'trip_id');
+    }
+
+
     /**
      * Get the trip rates/reviews.
      */

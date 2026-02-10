@@ -30,6 +30,7 @@ class Banner extends Model
         'image_path',
         'mobile_image_path',
         'sort_order',
+        'admin_id',
         'trip_id',
         'sort_order',
         'active',
@@ -54,12 +55,16 @@ class Banner extends Model
     /**
      * Get image URL.
      */
+  
     public function getImageUrlAttribute(): string
     {
-        if ($this->image_path) {
+        // نتحقق أولاً أن الحقل نصي وليس فارغاً
+        if (is_string($this->image_path) && !empty($this->image_path)) {
             return asset('storage/' . $this->image_path);
         }
-        return asset('image_path/banners/default.jpg');
+        
+        // إذا كان فارغاً أو ليس نصاً، نرجع الصورة الافتراضية
+        return asset('images/flags/default.jpg');
     }
 
     /**

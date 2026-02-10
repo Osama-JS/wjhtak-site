@@ -58,6 +58,7 @@
                                     <th>{{ __('Title (Ar)') }}</th>
                                     <th>{{ __('Title (En)') }}</th>
                                     <th>{{ __('Link') }}</th>
+                                    <th>{{ __('Trip') }}</th>
                                     <th>{{ __('Order') }}</th>
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Actions') }}</th>
@@ -82,7 +83,7 @@
                 <h5 class="modal-title">{{ __('Add New Banner') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.banners.store')}}" method="post" enctype="multipart/form-data">
+            <form id="addBannerForm" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -102,7 +103,20 @@
                         </div>
                     </div>
                     <x-forms.file-upload name="image_path" :label="__('Banner Image')" accept="image/*"  />
-                    <x-forms.input-text name="link" :label="__('Link URL')" placeholder="https://..." />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <x-forms.input-text name="link" :label="__('Link URL')" placeholder="https://..." />
+                        </div>
+                        <div class="col-md-6">
+                             <label>{{ __('Trip')}}</label>
+                            <select  name="trip_id"  class="form-control" required>
+                                @foreach($trips as $trip)
+                                    <option value="{{ $trip->id }}">{{ $trip->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                    
                     <div class="row">
                         <div class="col-md-6">
@@ -145,14 +159,28 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <x-forms.textarea name="description_ar" id="edit_description_ar" :label="__('Description (Arabic)')" rows="3" />
+                            <x-forms.textarea name="description_ar" id="edit_description_ar" :label="__('Description (Arabic)')" :rows="3" />
+                            
                         </div>
                         <div class="col-md-6">
-                            <x-forms.textarea name="description_en" id="edit_description_en" :label="__('Description (English)')" rows="3" />
+                            <x-forms.textarea name="description_en" id="edit_description_en" :label="__('Description (English)')" :rows="3" />
                         </div>
                     </div>
-                    <x-forms.input-text name="link" id="edit_link" :label="__('Link URL')" />
+                    
                     <x-forms.file-upload name="image_path" id="edit_image_path" :label="__('Banner Image')" accept="image/*" preview />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                           <x-forms.input-text name="link" id="edit_link" :label="__('Link URL')" />
+                        </div>
+                        <div class="col-md-6">
+                            <label>{{ __('Trip')}}</label>
+                            <select id="edit_trip_id" name="trip_id"  class="form-control" required>
+                                @foreach($trips as $trip)
+                                    <option value="{{ $trip->id }}">{{ $trip->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     <div class="row">
                         <div class="col-md-6">
                             <x-forms.input-text name="sort_order" id="edit_sort_order" :label="__('Display Order')" type="number" />
@@ -188,10 +216,11 @@
             serverSide: false,
             ajax: bannersDataUrl,
             columns: [
-                { data: 'image_path' },
+                { data: 'image_url' },
                 { data: 'title_ar' },
                 { data: 'title_en' },
                 { data: 'link' },
+                { data: 'trip', defaultContent: "<i>Not Available</i>"},
                 { data: 'sort_order' },
                 { data: 'status' },
                 { data: 'actions', orderable: false, searchable: false }
@@ -322,6 +351,7 @@
                 $('#edit_description_ar').val(banner.description_ar);
                 $('#edit_description_en').val(banner.description_en);
                 $('#edit_link').val(banner.link);
+                $('#edit_trip_id').val(banner.trip_id);
                 $('#edit_sort_order').val(banner.sort_order);
                 $('#edit_active').prop('checked', banner.active);
 
@@ -338,39 +368,65 @@
         });
     }
 
+    
     function toggleBannerStatus(id) {
-        let url = "{{ route('admin.banners.toggle-status', ':id') }}".replace(':id', id);
-
-        WJHTAKAdmin.confirm('{{ __("Do you want to toggle this banner status?") }}', function() {
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: { _token: "{{ csrf_token() }}" },
-                success: function(response) {
-                    if (response.success) {
-                        bannersTable.ajax.reload();
-                        toastr.success(response.message);
+        const url = "{{ route('admin.banners.toggle-status', ':id') }}".replace(':id', id);
+        Swal.fire({
+            title: '{{ __("Are you sure?") }}',
+            text: '{{ __("Do you want to toggle this banner status?") }}',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '{{ __("Yes, Change it!") }}'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            bannersTable.ajax.reload(null, false);
+                            toastr.success(response.message);
+                        }
                     }
-                }
-            });
+                });
+            }
         });
     }
 
-    function deleteBanner(id) {
-        let url = "{{ route('admin.banners.destroy', ':id') }}".replace(':id', id);
-
-        WJHTAKAdmin.confirm('{{ __("Are you sure you want to delete this banner?") }}', function() {
-            $.ajax({
-                url: url,
-                type: "DELETE",
-                data: { _token: "{{ csrf_token() }}" },
-                success: function(response) {
-                    if (response.success) {
-                        bannersTable.ajax.reload();
-                        toastr.success(response.message);
+    
+     function deleteBanner(id) {
+        let url = "{{ route('admin.banners.destroy', ':id') }}";
+        url = url.replace(':id', id);
+        Swal.fire({
+            title: '{{ __("Are you sure") }}',
+            text: '{{ __("you want to delete this banner?") }}',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '{{ __("Yes, delete it!") }}'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        _method: 'DELETE'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            bannersTable.ajax.reload();
+                            toastr.success(response.message);
+                        }
                     }
-                }
-            });
+                });
+            }
         });
     }
 </script>

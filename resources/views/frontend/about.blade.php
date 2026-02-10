@@ -55,7 +55,7 @@
                         src="{{ asset('images/about/team.jpg') }}"
                         alt="{{ __('Our Team') }}"
                         style="width: 100%; border-radius: var(--radius-2xl); box-shadow: var(--shadow-xl);"
-                        onerror="this.src='{{ asset('images/demo/about-team.jpg') }}'"
+                        
                     >
                     {{-- Decoration --}}
                     <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: var(--gradient-accent); border-radius: var(--radius-2xl); z-index: -1;"></div>
