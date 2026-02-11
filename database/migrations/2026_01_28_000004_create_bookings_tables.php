@@ -17,52 +17,18 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('trip_id')->constrained('trips')->onDelete('cascade');
 
-            // Ticket and passport information - using JSON for better structure
-            $table->json('tickets')->nullable();
-            $table->json('passport'); // Changed from LONGTEXT to JSON
-            $table->json('nationality'); // Changed from LONGTEXT to JSON (supports multiple travelers)
-            $table->json('passport_expiry'); // Changed from LONGTEXT to JSON
-
-            // Payment information
-            $table->string('payment_method');
-            $table->string('card_last_four');
-            $table->string('payment_reference');
-            $table->string('payment_uid')->nullable();
-            $table->decimal('total_paid', 10, 2);
-            $table->decimal('vat', 10, 2);
-
-            // Trip dates
-            $table->date('from_date')->nullable();
-            $table->date('to_date')->nullable();
-
-            // Pricing breakdown
-            $table->decimal('trip_price', 10, 2);
-            $table->decimal('app_profit', 10, 2);
-            $table->decimal('company_profit', 10, 2);
-
-            // Status - Changed from BIGINT to ENUM for better performance
+            $table->integer('tickets_count');
+            $table->decimal('total_price', 10, 2);
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending');
-
-            // Document paths
-            $table->json('passport_image_path'); // Changed to JSON for multiple travelers
-            $table->json('visa_image_path'); // Changed to JSON for multiple travelers
-
-            // Company code information
-            $table->foreignId('company_code_id')->nullable()->constrained('company_codes')->onDelete('set null');
-            $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('set null');
-            $table->string('company_code')->nullable();
-            $table->enum('code_type', ['fixed', 'percentage'])->default('fixed');
-            $table->decimal('code_value', 8, 2)->default(0.00);
-            $table->string('code_attached_file')->nullable();
+            $table->text('notes')->nullable();
+            $table->date('booking_date')->nullable();
 
             $table->timestamps();
 
-            // Performance indexes from recommendations
-            $table->index('status', 'idx_booking_status');
-            $table->index('created_at', 'idx_bookings_created');
+            // Performance indexes
+            $table->index('status');
             $table->index('user_id');
             $table->index('trip_id');
-            $table->index('payment_method');
         });
 
         // Create booking_fees table
