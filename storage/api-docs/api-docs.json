@@ -2850,46 +2850,74 @@
                                             "example": "Trips retrieved successfully"
                                         },
                                         "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Amazing Paris"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "example": 1500
+                                                    },
+                                                    "tickets": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/trips/1.jpg"
+                                                    },
+                                                    "to_country": {
+                                                        "type": "string",
+                                                        "example": "France"
+                                                    },
+                                                    "is_favorite": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
                                             "properties": {
-                                                "current_page": {
+                                                "pageNumber": {
                                                     "type": "integer",
                                                     "example": 1
                                                 },
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "title": {
-                                                                "type": "string",
-                                                                "example": "Amazing Paris"
-                                                            },
-                                                            "price": {
-                                                                "type": "number",
-                                                                "example": 1500
-                                                            },
-                                                            "tickets": {
-                                                                "type": "integer",
-                                                                "example": 10
-                                                            },
-                                                            "image": {
-                                                                "type": "string",
-                                                                "example": "http://example.com/trips/1.jpg"
-                                                            },
-                                                            "to_country": {
-                                                                "type": "string",
-                                                                "example": "France"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
+                                                "pageSize": {
+                                                    "type": "integer",
+                                                    "example": 10
                                                 },
-                                                "total": {
+                                                "count": {
                                                     "type": "integer",
                                                     "example": 50
+                                                },
+                                                "totalPages": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "hasNextPage": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "hasPreviousPage": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "nextPage": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/trips?page=2"
+                                                },
+                                                "previousPage": {
+                                                    "type": "string",
+                                                    "example": null
                                                 }
                                             },
                                             "type": "object"
@@ -2990,6 +3018,10 @@
                                                         },
                                                         "type": "object"
                                                     }
+                                                },
+                                                "is_favorite": {
+                                                    "type": "boolean",
+                                                    "example": false
                                                 }
                                             },
                                             "type": "object"
@@ -3365,6 +3397,10 @@
                                                     "to_city": {
                                                         "type": "string",
                                                         "example": "Paris"
+                                                    },
+                                                    "is_favorite": {
+                                                        "type": "boolean",
+                                                        "example": true
                                                     }
                                                 },
                                                 "type": "object"

@@ -18,6 +18,18 @@ trait ApiResponseTrait
      */
     protected function apiResponse(bool $error, string $message, $data = null, $pagination = null, int $status = 200): JsonResponse
     {
+        // Automatically handle Laravel paginators
+        if ($data instanceof \Illuminate\Pagination\AbstractPaginator ||
+            $data instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            $pagination = $this->formatPagination($data);
+            $data = $data->items();
+
+            // If it's a collection (from getCollection), transform it to array
+            if ($data instanceof \Illuminate\Support\Collection) {
+                $data = $data->values()->all();
+            }
+        }
+
         $response = [
             'error' => $error,
             'message' => $message,

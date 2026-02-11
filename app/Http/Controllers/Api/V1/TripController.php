@@ -78,19 +78,26 @@ class TripController extends Controller
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Trips retrieved successfully"),
-                        new OA\Property(property: "data", type: "object", properties: [
-                            new OA\Property(property: "current_page", type: "integer", example: 1),
-                            new OA\Property(property: "data", type: "array", items: new OA\Items(
-                                properties: [
-                                    new OA\Property(property: "id", type: "integer", example: 1),
-                                    new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
-                                    new OA\Property(property: "price", type: "number", example: 1500.00),
-                                    new OA\Property(property: "tickets", type: "integer", example: 10),
-                                    new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
-                                    new OA\Property(property: "to_country", type: "string", example: "France"),
-                                ]
-                            )),
-                            new OA\Property(property: "total", type: "integer", example: 50)
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
+                                new OA\Property(property: "price", type: "number", example: 1500.00),
+                                new OA\Property(property: "tickets", type: "integer", example: 10),
+                                new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
+                                new OA\Property(property: "to_country", type: "string", example: "France"),
+                                new OA\Property(property: "is_favorite", type: "boolean", example: false),
+                            ]
+                        )),
+                        new OA\Property(property: "pagination", type: "object", properties: [
+                            new OA\Property(property: "pageNumber", type: "integer", example: 1),
+                            new OA\Property(property: "pageSize", type: "integer", example: 10),
+                            new OA\Property(property: "count", type: "integer", example: 50),
+                            new OA\Property(property: "totalPages", type: "integer", example: 5),
+                            new OA\Property(property: "hasNextPage", type: "boolean", example: true),
+                            new OA\Property(property: "hasPreviousPage", type: "boolean", example: false),
+                            new OA\Property(property: "nextPage", type: "string", example: "http://example.com/api/v1/trips?page=2"),
+                            new OA\Property(property: "previousPage", type: "string", example: null),
                         ])
                     ]
                 )
@@ -124,8 +131,15 @@ class TripController extends Controller
             ->latest()
             ->paginate(10);
 
+        // Get user favorites if logged in
+        $userFavoriteIds = [];
+        $user = Auth::guard('sanctum')->user();
+        if ($user) {
+            $userFavoriteIds = Favorite::where('user_id', $user->id)->pluck('trip_id')->toArray();
+        }
+
         // Transform data
-        $transformedData = $trips->getCollection()->map(function ($trip) {
+        $transformedData = $trips->getCollection()->map(function ($trip) use ($userFavoriteIds) {
             return [
                 'id' => $trip->id,
                 'title' => $trip->title, // Translatable if using Spatie Translatable
@@ -139,6 +153,7 @@ class TripController extends Controller
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
                 'is_active' => $trip->active,
                 'expiry_date' => $trip->expiry_date,
+                'is_favorite' => in_array($trip->id, $userFavoriteIds),
             ];
         });
 
@@ -192,6 +207,7 @@ class TripController extends Controller
                                     new OA\Property(property: "description", type: "string", example: "Arrive at airport..."),
                                 ]
                             )),
+                            new OA\Property(property: "is_favorite", type: "boolean", example: false),
                         ])
                     ]
                 )
@@ -240,6 +256,7 @@ class TripController extends Controller
                     'description' => $itinerary->description,
                 ];
             }),
+            'is_favorite' => Auth::guard('sanctum')->check() && Favorite::where('user_id', Auth::guard('sanctum')->id())->where('trip_id', $trip->id)->exists(),
         ];
 
         return $this->apiResponse(false, __('Trip details retrieved successfully'), $data);
@@ -523,6 +540,7 @@ class TripController extends Controller
                                 new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
                                 new OA\Property(property: "to_country", type: "string", example: "France"),
                                 new OA\Property(property: "to_city", type: "string", example: "Paris"),
+                                new OA\Property(property: "is_favorite", type: "boolean", example: true),
                             ]
                         ))
                     ]
@@ -552,6 +570,7 @@ class TripController extends Controller
                 'image' => $trip->image_url,
                 'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
+                'is_favorite' => true,
             ];
         })->filter();
 
