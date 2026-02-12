@@ -42,5 +42,18 @@ return [
         'url' => 'https://travelnext.works/api/aeroVE5/availability',
     ],
 
+     'tabby' => [
+        'public_key' => env('TABBY_PUBLIC_KEY'),
+        'secret_key' => env('TABBY_SECRET_KEY'),
+        'merchant_code' => env('TABBY_MERCHANT_CODE'),
+        'base_url' => env('TABBY_BASE_URL', 'https://api.tabby.ai/api/v2'),
+    ],
+
+    'tamara' => [
+        'api_token' => env('TAMARA_API_TOKEN'),
+        'notification_key' => env('TAMARA_NOTIFICATION_KEY'),
+        'base_url' => env('TAMARA_API_URL', 'https://api.tamara.co'),
+    ],
+
 
 ];

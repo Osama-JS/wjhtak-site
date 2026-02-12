@@ -2141,13 +2141,69 @@
                 }
             }
         },
+        "/api/payment/methods": {
+            "get": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Get available payment methods",
+                "description": "Returns a list of active payment gateways and their configuration for the UI.",
+                "operationId": "getPaymentMethods",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment methods retrieved."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string",
+                                                        "example": "visa_master"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Visa / MasterCard"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "card"
+                                                    },
+                                                    "icon": {
+                                                        "type": "string",
+                                                        "example": "url_to_icon"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/payment/initiate": {
             "post": {
                 "tags": [
                     "Payment"
                 ],
-                "summary": "Initiate HyperPay checkout",
-                "description": "Initializes a payment session and returns a Checkout ID for the mobile SDK.",
+                "summary": "Initiate payment checkout (HyperPay, Tabby, Tamara)",
+                "description": "Initializes a payment session. For HyperPay, returns a Checkout ID. For Tabby/Tamara, returns a redirect URL.",
                 "operationId": "initiatePayment",
                 "parameters": [
                     {
@@ -2171,27 +2227,44 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "amount",
+                                    "booking_id",
                                     "payment_type"
                                 ],
                                 "properties": {
-                                    "amount": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 100.5
+                                    "booking_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "payment_type": {
                                         "type": "string",
                                         "enum": [
                                             "mada",
                                             "visa_master",
-                                            "apple_pay"
+                                            "apple_pay",
+                                            "tabby",
+                                            "tamara"
                                         ],
                                         "example": "visa_master"
                                     },
-                                    "order_id": {
+                                    "first_name": {
                                         "type": "string",
-                                        "example": "ORDER-12345"
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "966500000000"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "callback_url": {
+                                        "type": "string",
+                                        "example": "https://mysite.com/payment/callback"
                                     }
                                 },
                                 "type": "object"
@@ -2217,10 +2290,22 @@
                                         "data": {
                                             "properties": {
                                                 "id": {
+                                                    "description": "HyperPay Checkout ID",
                                                     "type": "string",
-                                                    "example": "8AC7A4CA728C..."
+                                                    "example": "B9C694..."
                                                 },
-                                                "result": {
+                                                "session_id": {
+                                                    "description": "Tabby/Tamara Session ID",
+                                                    "type": "string",
+                                                    "example": "ch_..."
+                                                },
+                                                "checkout_url": {
+                                                    "description": "Redirect URL for Tabby/Tamara",
+                                                    "type": "string",
+                                                    "example": "https://checkout.tabby.ai/..."
+                                                },
+                                                "raw_response": {
+                                                    "description": "Full gateway response for debugging",
                                                     "type": "object"
                                                 }
                                             },
@@ -2251,22 +2336,17 @@
                 "tags": [
                     "Payment"
                 ],
-                "summary": "Verify HyperPay payment status",
-                "description": "Checks the status of a payment using the Checkout ID after the transaction is completed on the client side.",
+                "summary": "Verify payment status",
+                "description": "Checks the status of a payment and confirms the booking if successful.",
                 "operationId": "verifyPayment",
                 "parameters": [
                     {
                         "name": "Accept-Language",
                         "in": "header",
-                        "description": "The language of the response (ar, en)",
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "default": "en",
-                            "enum": [
-                                "en",
-                                "ar"
-                            ]
+                            "default": "en"
                         }
                     }
                 ],
@@ -2276,22 +2356,26 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "checkout_id",
                                     "payment_type"
                                 ],
                                 "properties": {
-                                    "checkout_id": {
-                                        "type": "string",
-                                        "example": "8AC7A4CA728C..."
-                                    },
                                     "payment_type": {
                                         "type": "string",
                                         "enum": [
                                             "mada",
                                             "visa_master",
-                                            "apple_pay"
-                                        ],
-                                        "example": "visa_master"
+                                            "apple_pay",
+                                            "tabby",
+                                            "tamara"
+                                        ]
+                                    },
+                                    "checkout_id": {
+                                        "description": "Required for HyperPay (mada, visa_master, apple_pay)",
+                                        "type": "string"
+                                    },
+                                    "payment_id": {
+                                        "description": "Required for Tabby/Tamara",
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -2301,7 +2385,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Payment status retrieved",
+                        "description": "Payment successful and booking confirmed",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2312,9 +2396,26 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Payment successful."
+                                            "example": "Payment successful and booking confirmed."
                                         },
                                         "data": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "paid"
+                                                },
+                                                "transaction_id": {
+                                                    "type": "string",
+                                                    "example": "T123456789"
+                                                },
+                                                "invoice_url": {
+                                                    "type": "string",
+                                                    "example": "https://mytrip.com/storage/invoices/inv_1.pdf"
+                                                },
+                                                "raw_response": {
+                                                    "type": "object"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -2324,7 +2425,10 @@
                         }
                     },
                     "400": {
-                        "description": "Payment Failed"
+                        "description": "Payment Failed or Pending"
+                    },
+                    "500": {
+                        "description": "Server Error"
                     }
                 },
                 "security": [

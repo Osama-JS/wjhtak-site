@@ -63,9 +63,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Payment Routes
     Route::prefix('payment')->group(function () {
+        Route::get('/methods', [PaymentController::class, 'methods']);
         Route::post('/initiate', [PaymentController::class, 'initiate']);
         Route::post('/verify', [PaymentController::class, 'verify']);
     });
+    Route::get('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
