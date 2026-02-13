@@ -78,19 +78,28 @@ class TripController extends Controller
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Trips retrieved successfully"),
-                        new OA\Property(property: "data", type: "object", properties: [
-                            new OA\Property(property: "current_page", type: "integer", example: 1),
-                            new OA\Property(property: "data", type: "array", items: new OA\Items(
-                                properties: [
-                                    new OA\Property(property: "id", type: "integer", example: 1),
-                                    new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
-                                    new OA\Property(property: "price", type: "number", example: 1500.00),
-                                    new OA\Property(property: "tickets", type: "integer", example: 10),
-                                    new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
-                                    new OA\Property(property: "to_country", type: "string", example: "France"),
-                                ]
-                            )),
-                            new OA\Property(property: "total", type: "integer", example: 50)
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
+                                new OA\Property(property: "price", type: "number", example: 1500.00),
+                                new OA\Property(property: "tickets", type: "integer", example: 10),
+                                new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
+                                new OA\Property(property: "to_country", type: "string", example: "France"),
+                                new OA\Property(property: "is_favorite", type: "boolean", example: false),
+                                new OA\Property(property: "base_capacity", type: "integer", example: 2),
+                                new OA\Property(property: "extra_passenger_price", type: "number", example: 100.00),
+                            ]
+                        )),
+                        new OA\Property(property: "pagination", type: "object", properties: [
+                            new OA\Property(property: "pageNumber", type: "integer", example: 1),
+                            new OA\Property(property: "pageSize", type: "integer", example: 10),
+                            new OA\Property(property: "count", type: "integer", example: 50),
+                            new OA\Property(property: "totalPages", type: "integer", example: 5),
+                            new OA\Property(property: "hasNextPage", type: "boolean", example: true),
+                            new OA\Property(property: "hasPreviousPage", type: "boolean", example: false),
+                            new OA\Property(property: "nextPage", type: "string", example: "http://example.com/api/v1/trips?page=2"),
+                            new OA\Property(property: "previousPage", type: "string", example: null),
                         ])
                     ]
                 )
@@ -124,8 +133,15 @@ class TripController extends Controller
             ->latest()
             ->paginate(10);
 
+        // Get user favorites if logged in
+        $userFavoriteIds = [];
+        $user = Auth::guard('sanctum')->user();
+        if ($user) {
+            $userFavoriteIds = Favorite::where('user_id', $user->id)->pluck('trip_id')->toArray();
+        }
+
         // Transform data
-        $transformedData = $trips->getCollection()->map(function ($trip) {
+        $transformedData = $trips->getCollection()->map(function ($trip) use ($userFavoriteIds) {
             return [
                 'id' => $trip->id,
                 'title' => $trip->title, // Translatable if using Spatie Translatable
@@ -139,6 +155,9 @@ class TripController extends Controller
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
                 'is_active' => $trip->active,
                 'expiry_date' => $trip->expiry_date,
+                'is_favorite' => in_array($trip->id, $userFavoriteIds),
+                'base_capacity' => $trip->base_capacity ?? 2,
+                'extra_passenger_price' => $trip->extra_passenger_price ?? 0,
             ];
         });
 
@@ -192,6 +211,9 @@ class TripController extends Controller
                                     new OA\Property(property: "description", type: "string", example: "Arrive at airport..."),
                                 ]
                             )),
+                            new OA\Property(property: "is_favorite", type: "boolean", example: false),
+                            new OA\Property(property: "base_capacity", type: "integer", example: 2),
+                            new OA\Property(property: "extra_passenger_price", type: "number", example: 100.00),
                         ])
                     ]
                 )
@@ -230,6 +252,8 @@ class TripController extends Controller
                 'country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'city' => $trip->toCity ? $trip->toCity->name : null,
             ],
+            'base_capacity' => $trip->base_capacity ?? 2,
+            'extra_passenger_price' => $trip->extra_passenger_price ?? 0,
             'images' => $trip->images->map(function ($img) {
                 return asset('storage/' . $img->image_path);
             }),
@@ -240,6 +264,7 @@ class TripController extends Controller
                     'description' => $itinerary->description,
                 ];
             }),
+            'is_favorite' => Auth::guard('sanctum')->check() && Favorite::where('user_id', Auth::guard('sanctum')->id())->where('trip_id', $trip->id)->exists(),
         ];
 
         return $this->apiResponse(false, __('Trip details retrieved successfully'), $data);
@@ -338,14 +363,24 @@ class TripController extends Controller
              return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
         }
 
-        $totalPrice = $trip->price * $request->tickets_count;
+        // Calculate dynamic price
+        $passengersCount = count($request->passengers);
+        $basePrice = $trip->price;
+        $baseCapacity = $trip->base_capacity ?? 2;
+        $extraPrice = $trip->extra_passenger_price ?? 0;
+
+        $totalPrice = $basePrice;
+        if ($passengersCount > $baseCapacity) {
+            $extraPassengers = $passengersCount - $baseCapacity;
+            $totalPrice += ($extraPassengers * $extraPrice);
+        }
 
         $booking = TripBooking::create([
             'user_id' => $user->id,
             'trip_id' => $trip->id,
-            'tickets_count' => $request->tickets_count,
+            'tickets_count' => $passengersCount,
             'total_price' => $totalPrice,
-            'status' => 'pending', // Default status or similar
+            'status' => 'pending',
             'notes' => $request->notes,
             'booking_date' => now(),
         ]);
@@ -385,7 +420,21 @@ class TripController extends Controller
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Bookings retrieved successful"),
-                        new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object"))
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 101),
+                                new OA\Property(property: "trip_id", type: "integer", example: 1),
+                                new OA\Property(property: "tickets_count", type: "integer", example: 2),
+                                new OA\Property(property: "total_price", type: "number", example: 3000.00),
+                                new OA\Property(property: "status", type: "string", example: "pending"),
+                                new OA\Property(property: "booking_date", type: "string", format: "date-time", example: "2024-05-20 10:00:00"),
+                                new OA\Property(property: "trip", type: "object", properties: [
+                                    new OA\Property(property: "id", type: "integer", example: 1),
+                                    new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
+                                    new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
+                                ])
+                            ]
+                        ))
                     ]
                 )
             )
@@ -501,7 +550,17 @@ class TripController extends Controller
                     properties: [
                         new OA\Property(property: "error", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "Favorites retrieved successfully"),
-                        new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object"))
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
+                                new OA\Property(property: "price", type: "number", example: 1500.00),
+                                new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
+                                new OA\Property(property: "to_country", type: "string", example: "France"),
+                                new OA\Property(property: "to_city", type: "string", example: "Paris"),
+                                new OA\Property(property: "is_favorite", type: "boolean", example: true),
+                            ]
+                        ))
                     ]
                 )
             )
@@ -529,9 +588,117 @@ class TripController extends Controller
                 'image' => $trip->image_url,
                 'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
+                'is_favorite' => true,
             ];
         })->filter();
 
         return $this->apiResponse(false, __('Favorites retrieved successfully'), $transformedData);
+    }
+
+    /**
+     * Get booking details.
+     */
+    #[OA\Get(
+        path: "/api/v1/bookings/{id}",
+        summary: "Get booking details",
+        operationId: "getBookingDetails",
+        description: "Retrieve comprehensive details of a specific booking for the authenticated user.",
+        tags: ["Trips"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "Booking ID",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Booking details retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Booking details retrieved successfully"),
+                        new OA\Property(property: "data", type: "object", properties: [
+                            new OA\Property(property: "id", type: "integer", example: 101),
+                            new OA\Property(property: "tickets_count", type: "integer", example: 3),
+                            new OA\Property(property: "total_price", type: "number", example: 600.00),
+                            new OA\Property(property: "status", type: "string", example: "pending"),
+                            new OA\Property(property: "booking_date", type: "string", format: "date", example: "2024-05-20"),
+                            new OA\Property(property: "notes", type: "string", example: "Some special requests"),
+                            new OA\Property(property: "trip", type: "object", properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
+                                new OA\Property(property: "base_price", type: "number", example: 500.00),
+                                new OA\Property(property: "base_capacity", type: "integer", example: 2),
+                                new OA\Property(property: "extra_passenger_price", type: "number", example: 100.00),
+                                new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
+                                new OA\Property(property: "location", type: "string", example: "France, Paris"),
+                            ]),
+                            new OA\Property(property: "passengers", type: "array", items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: "id", type: "integer", example: 1),
+                                    new OA\Property(property: "name", type: "string", example: "John Doe"),
+                                    new OA\Property(property: "phone", type: "string", example: "+123456789"),
+                                    new OA\Property(property: "passport_number", type: "string", example: "A1234567"),
+                                    new OA\Property(property: "nationality", type: "string", example: "USA"),
+                                ]
+                            ))
+                        ])
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: "Booking not found"),
+            new OA\Response(response: 401, description: "Unauthenticated")
+        ]
+    )]
+    public function bookingDetails($id): JsonResponse
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
+        }
+
+        $booking = TripBooking::with(['trip.toCountry', 'trip.toCity', 'trip.images', 'passengers'])
+            ->where('user_id', $user->id)
+            ->find($id);
+
+        if (!$booking) {
+            return $this->apiResponse(true, __('Booking not found'), null, null, 404);
+        }
+
+        $data = [
+            'id' => $booking->id,
+            'tickets_count' => $booking->tickets_count,
+            'total_price' => $booking->total_price,
+            'status' => $booking->status,
+            'booking_date' => $booking->booking_date ? $booking->booking_date->format('Y-m-d') : null,
+            'notes' => $booking->notes,
+            'trip' => $booking->trip ? [
+                'id' => $booking->trip->id,
+                'title' => $booking->trip->title,
+                'base_price' => $booking->trip->price,
+                'base_capacity' => $booking->trip->base_capacity ?? 2,
+                'extra_passenger_price' => $booking->trip->extra_passenger_price ?? 0,
+                'image' => $booking->trip->image_url,
+                'location' => ($booking->trip->toCountry ? $booking->trip->toCountry->name : '') .
+                              ($booking->trip->toCity ? ', ' . $booking->trip->toCity->name : ''),
+            ] : null,
+            'passengers' => $booking->passengers->map(function ($p) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'phone' => $p->phone,
+                    'passport_number' => $p->passport_number,
+                    'passport_expiry' => $p->passport_expiry ? $p->passport_expiry->format('Y-m-d') : null,
+                    'nationality' => $p->nationality,
+                ];
+            }),
+        ];
+
+        return $this->apiResponse(false, __('Booking details retrieved successfully'), $data);
     }
 }

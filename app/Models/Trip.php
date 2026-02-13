@@ -33,6 +33,8 @@ class Trip extends Model
        'percentage_profit_margin',
        'active',
        'page_visits',
+       'base_capacity',
+       'extra_passenger_price',
     ];
 
 
@@ -113,7 +115,7 @@ class Trip extends Model
         if ($image) {
             return asset('storage/' . $image->image_path);
         }
-        return asset('images/defaults/trip_placeholder.jpg');
+        return asset('images/default-placeholder.svg');
     }
 
     /**

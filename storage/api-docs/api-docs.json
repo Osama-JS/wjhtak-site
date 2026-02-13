@@ -1215,6 +1215,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Password has been reset successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1346,6 +1349,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Invalid old password."
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1582,6 +1588,16 @@
                                             "example": "Flights retrieved successfully."
                                         },
                                         "data": {
+                                            "properties": {
+                                                "SessionId": {
+                                                    "type": "string",
+                                                    "example": "7906efba-09db-4481-8c60-0d7f5b5e6c44"
+                                                },
+                                                "AirSearchResult": {
+                                                    "description": "Complex nested flight search results containing schedules and fares",
+                                                    "type": "object"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -1896,21 +1912,59 @@
                                 ],
                                 "properties": {
                                     "flight_session_id": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "7906efba-09db-4481-8c60-0d7f5b5e6c44"
                                     },
                                     "fare_source_code": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "MTY2ODE2Njg2Ml8yNjA5Mzk"
                                     },
                                     "customerEmail": {
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "example": "customer@example.com"
                                     },
                                     "customerPhone": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "+966500000000"
                                     },
                                     "passengers": {
                                         "type": "array",
                                         "items": {
+                                            "required": [
+                                                "firstName",
+                                                "lastName",
+                                                "dateOfBirth",
+                                                "passportNumber"
+                                            ],
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Mr"
+                                                },
+                                                "firstName": {
+                                                    "type": "string",
+                                                    "example": "John"
+                                                },
+                                                "lastName": {
+                                                    "type": "string",
+                                                    "example": "Doe"
+                                                },
+                                                "dateOfBirth": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1990-01-01"
+                                                },
+                                                "passportNumber": {
+                                                    "type": "string",
+                                                    "example": "A1234567"
+                                                },
+                                                "passportExpiry": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2030-01-01"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     }
@@ -2087,13 +2141,69 @@
                 }
             }
         },
+        "/api/payment/methods": {
+            "get": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Get available payment methods",
+                "description": "Returns a list of active payment gateways and their configuration for the UI.",
+                "operationId": "getPaymentMethods",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment methods retrieved."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string",
+                                                        "example": "visa_master"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Visa / MasterCard"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "card"
+                                                    },
+                                                    "icon": {
+                                                        "type": "string",
+                                                        "example": "url_to_icon"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/payment/initiate": {
             "post": {
                 "tags": [
                     "Payment"
                 ],
-                "summary": "Initiate HyperPay checkout",
-                "description": "Initializes a payment session and returns a Checkout ID for the mobile SDK.",
+                "summary": "Initiate payment checkout (HyperPay, Tabby, Tamara)",
+                "description": "Initializes a payment session. For HyperPay, returns a Checkout ID. For Tabby/Tamara, returns a redirect URL.",
                 "operationId": "initiatePayment",
                 "parameters": [
                     {
@@ -2117,27 +2227,44 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "amount",
+                                    "booking_id",
                                     "payment_type"
                                 ],
                                 "properties": {
-                                    "amount": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 100.5
+                                    "booking_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "payment_type": {
                                         "type": "string",
                                         "enum": [
                                             "mada",
                                             "visa_master",
-                                            "apple_pay"
+                                            "apple_pay",
+                                            "tabby",
+                                            "tamara"
                                         ],
                                         "example": "visa_master"
                                     },
-                                    "order_id": {
+                                    "first_name": {
                                         "type": "string",
-                                        "example": "ORDER-12345"
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "966500000000"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "callback_url": {
+                                        "type": "string",
+                                        "example": "https://mysite.com/payment/callback"
                                     }
                                 },
                                 "type": "object"
@@ -2163,10 +2290,22 @@
                                         "data": {
                                             "properties": {
                                                 "id": {
+                                                    "description": "HyperPay Checkout ID",
                                                     "type": "string",
-                                                    "example": "8AC7A4CA728C..."
+                                                    "example": "B9C694..."
                                                 },
-                                                "result": {
+                                                "session_id": {
+                                                    "description": "Tabby/Tamara Session ID",
+                                                    "type": "string",
+                                                    "example": "ch_..."
+                                                },
+                                                "checkout_url": {
+                                                    "description": "Redirect URL for Tabby/Tamara",
+                                                    "type": "string",
+                                                    "example": "https://checkout.tabby.ai/..."
+                                                },
+                                                "raw_response": {
+                                                    "description": "Full gateway response for debugging",
                                                     "type": "object"
                                                 }
                                             },
@@ -2197,22 +2336,17 @@
                 "tags": [
                     "Payment"
                 ],
-                "summary": "Verify HyperPay payment status",
-                "description": "Checks the status of a payment using the Checkout ID after the transaction is completed on the client side.",
+                "summary": "Verify payment status",
+                "description": "Checks the status of a payment and confirms the booking if successful.",
                 "operationId": "verifyPayment",
                 "parameters": [
                     {
                         "name": "Accept-Language",
                         "in": "header",
-                        "description": "The language of the response (ar, en)",
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "default": "en",
-                            "enum": [
-                                "en",
-                                "ar"
-                            ]
+                            "default": "en"
                         }
                     }
                 ],
@@ -2222,22 +2356,26 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "checkout_id",
                                     "payment_type"
                                 ],
                                 "properties": {
-                                    "checkout_id": {
-                                        "type": "string",
-                                        "example": "8AC7A4CA728C..."
-                                    },
                                     "payment_type": {
                                         "type": "string",
                                         "enum": [
                                             "mada",
                                             "visa_master",
-                                            "apple_pay"
-                                        ],
-                                        "example": "visa_master"
+                                            "apple_pay",
+                                            "tabby",
+                                            "tamara"
+                                        ]
+                                    },
+                                    "checkout_id": {
+                                        "description": "Required for HyperPay (mada, visa_master, apple_pay)",
+                                        "type": "string"
+                                    },
+                                    "payment_id": {
+                                        "description": "Required for Tabby/Tamara",
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -2247,7 +2385,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Payment status retrieved",
+                        "description": "Payment successful and booking confirmed",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2258,9 +2396,26 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Payment successful."
+                                            "example": "Payment successful and booking confirmed."
                                         },
                                         "data": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "paid"
+                                                },
+                                                "transaction_id": {
+                                                    "type": "string",
+                                                    "example": "T123456789"
+                                                },
+                                                "invoice_url": {
+                                                    "type": "string",
+                                                    "example": "https://mytrip.com/storage/invoices/inv_1.pdf"
+                                                },
+                                                "raw_response": {
+                                                    "type": "object"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -2270,7 +2425,10 @@
                         }
                     },
                     "400": {
-                        "description": "Payment Failed"
+                        "description": "Payment Failed or Pending"
+                    },
+                    "500": {
+                        "description": "Server Error"
                     }
                 },
                 "security": [
@@ -2796,46 +2954,82 @@
                                             "example": "Trips retrieved successfully"
                                         },
                                         "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Amazing Paris"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "example": 1500
+                                                    },
+                                                    "tickets": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/trips/1.jpg"
+                                                    },
+                                                    "to_country": {
+                                                        "type": "string",
+                                                        "example": "France"
+                                                    },
+                                                    "is_favorite": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "base_capacity": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "extra_passenger_price": {
+                                                        "type": "number",
+                                                        "example": 100
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
                                             "properties": {
-                                                "current_page": {
+                                                "pageNumber": {
                                                     "type": "integer",
                                                     "example": 1
                                                 },
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "title": {
-                                                                "type": "string",
-                                                                "example": "Amazing Paris"
-                                                            },
-                                                            "price": {
-                                                                "type": "number",
-                                                                "example": 1500
-                                                            },
-                                                            "tickets": {
-                                                                "type": "integer",
-                                                                "example": 10
-                                                            },
-                                                            "image": {
-                                                                "type": "string",
-                                                                "example": "http://example.com/trips/1.jpg"
-                                                            },
-                                                            "to_country": {
-                                                                "type": "string",
-                                                                "example": "France"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
+                                                "pageSize": {
+                                                    "type": "integer",
+                                                    "example": 10
                                                 },
-                                                "total": {
+                                                "count": {
                                                     "type": "integer",
                                                     "example": 50
+                                                },
+                                                "totalPages": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "hasNextPage": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "hasPreviousPage": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "nextPage": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/trips?page=2"
+                                                },
+                                                "previousPage": {
+                                                    "type": "string",
+                                                    "example": null
                                                 }
                                             },
                                             "type": "object"
@@ -2936,6 +3130,18 @@
                                                         },
                                                         "type": "object"
                                                     }
+                                                },
+                                                "is_favorite": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "base_capacity": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "extra_passenger_price": {
+                                                    "type": "number",
+                                                    "example": 100
                                                 }
                                             },
                                             "type": "object"
@@ -3113,6 +3319,50 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 101
+                                                    },
+                                                    "trip_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "tickets_count": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "total_price": {
+                                                        "type": "number",
+                                                        "example": 3000
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "pending"
+                                                    },
+                                                    "booking_date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2024-05-20 10:00:00"
+                                                    },
+                                                    "trip": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Amazing Paris"
+                                                            },
+                                                            "image": {
+                                                                "type": "string",
+                                                                "example": "http://example.com/trips/1.jpg"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
@@ -3243,6 +3493,36 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Amazing Paris"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "example": 1500
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/trips/1.jpg"
+                                                    },
+                                                    "to_country": {
+                                                        "type": "string",
+                                                        "example": "France"
+                                                    },
+                                                    "to_city": {
+                                                        "type": "string",
+                                                        "example": "Paris"
+                                                    },
+                                                    "is_favorite": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
@@ -3251,6 +3531,151 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings/{id}": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Get booking details",
+                "description": "Retrieve comprehensive details of a specific booking for the authenticated user.",
+                "operationId": "getBookingDetails",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Booking details retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 101
+                                                },
+                                                "tickets_count": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "total_price": {
+                                                    "type": "number",
+                                                    "example": 600
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                },
+                                                "booking_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-05-20"
+                                                },
+                                                "notes": {
+                                                    "type": "string",
+                                                    "example": "Some special requests"
+                                                },
+                                                "trip": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "title": {
+                                                            "type": "string",
+                                                            "example": "Amazing Paris"
+                                                        },
+                                                        "base_price": {
+                                                            "type": "number",
+                                                            "example": 500
+                                                        },
+                                                        "base_capacity": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "extra_passenger_price": {
+                                                            "type": "number",
+                                                            "example": 100
+                                                        },
+                                                        "image": {
+                                                            "type": "string",
+                                                            "example": "http://example.com/trips/1.jpg"
+                                                        },
+                                                        "location": {
+                                                            "type": "string",
+                                                            "example": "France, Paris"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "passengers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "John Doe"
+                                                            },
+                                                            "phone": {
+                                                                "type": "string",
+                                                                "example": "+123456789"
+                                                            },
+                                                            "passport_number": {
+                                                                "type": "string",
+                                                                "example": "A1234567"
+                                                            },
+                                                            "nationality": {
+                                                                "type": "string",
+                                                                "example": "USA"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 },
                 "security": [

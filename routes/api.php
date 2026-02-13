@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
     // My Bookings & Favorites
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/my-bookings', [\App\Http\Controllers\Api\V1\TripController::class, 'myBookings']);
+        Route::get('/bookings/{id}', [\App\Http\Controllers\Api\V1\TripController::class, 'bookingDetails']);
         Route::get('/favorites', [\App\Http\Controllers\Api\V1\TripController::class, 'getFavorites']);
         Route::post('/trips/{id}/favorite', [\App\Http\Controllers\Api\V1\TripController::class, 'toggleFavorite']);
     });
@@ -62,9 +63,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Payment Routes
     Route::prefix('payment')->group(function () {
+        Route::get('/methods', [PaymentController::class, 'methods']);
         Route::post('/initiate', [PaymentController::class, 'initiate']);
         Route::post('/verify', [PaymentController::class, 'verify']);
     });
+    Route::get('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
