@@ -9,7 +9,7 @@ class Question extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['question', 'answer'];
+    protected $fillable = ['question_ar', 'question_en', 'answer_ar', 'answer_en'];
 
     /**
      * Get question

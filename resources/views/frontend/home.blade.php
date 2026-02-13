@@ -282,11 +282,11 @@
                 </div>
 
                 <h4 style="font-size: var(--text-lg); font-weight: var(--font-bold); margin-bottom: var(--space-2); color: var(--color-text-main);">
-                    {{ $ques->question }}
+                    {{ app()->getLocale() == 'ar' ? $ques->question_ar : $ques->question_en }}
                 </h4>
                 
                 <p class="text-muted" style="font-size: var(--text-sm); line-height: 1.6;">
-                    {{ $ques->answer }}
+                    {{ app()->getLocale() == 'ar' ? $ques->answer_ar : $ques->answer_en }}
                 </p>
             </div>
             @empty
