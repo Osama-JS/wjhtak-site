@@ -280,6 +280,62 @@
                 </div>
             </div>
         </div>
+
+
+        {{-- About App Settings --}}
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ __('About Information') }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Our Story (English)') }}</label>
+                            <div class="input-group">
+                                 <textarea class="form-control" name="story_en" rows="3">{{ \App\Models\Setting::get('story_en') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Our Story (Arabic)') }}</label>
+                            <div class="input-group">
+                                 <textarea class="form-control" name="story_ar" rows="3">{{ \App\Models\Setting::get('story_ar') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Our Mission (English)') }}</label>
+                            <div class="input-group">
+                                <textarea class="form-control" name="mission_en" rows="3">{{ \App\Models\Setting::get('mission_en') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Our Mission (Arabic)') }}</label>
+                            <div class="input-group">
+                                <textarea class="form-control" name="mission_ar" rows="3">{{ \App\Models\Setting::get('mission_ar') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Our Vision (English)') }}</label>
+                            <div class="input-group">
+                                <textarea class="form-control" name="vision_en" rows="3">{{ \App\Models\Setting::get('vision_en') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Our Vision (Arabic)') }}</label>
+                            <div class="input-group">
+                                <textarea class="form-control" name="vision_ar" rows="3">{{ \App\Models\Setting::get('vision_ar') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 
     {{-- Save Button --}}

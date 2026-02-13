@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\City;
 use App\Models\Banner;
 use App\Models\Question;
+use App\Models\Setting;
 
 class FrontendController extends Controller
 {
@@ -42,6 +43,9 @@ class FrontendController extends Controller
             ->with('trip')
             ->get();
 
+        // Get questions
+        $questions = Question::get();
+
         // Stats
         $stats = [
             'trips' => Trip::active()->count(),
@@ -55,6 +59,7 @@ class FrontendController extends Controller
             'destinations',
             'featuredTrips',
             'banners',
+            'questions',
             'stats'
         ));
     }
@@ -217,6 +222,30 @@ class FrontendController extends Controller
                 })
                 ->with(['fromCountry', 'toCountry', 'images'])
                 ->paginate(12);
+        }
+
+        return view('frontend.search', compact('trips'));
+    }
+
+    /**
+     * Display search Model results.
+     */
+
+    public function searchModel(Request $request)
+    {
+        $searchTerm = $request->q;
+        $trips = Trip::active()
+            ->where(function ($query) use ($searchTerm) {
+                $query->where('title', 'like', "%{$searchTerm}%")
+                    ->orWhere('description', 'like', "%{$searchTerm}%");
+            })
+            ->with(['fromCountry', 'toCountry', 'images'])
+            ->take(6) // نكتفي بـ 6 نتائج في الـ Popup
+            ->get();
+
+        // إذا كان الطلب AJAX أرجع فقط محتوى النتائج
+        if ($request->ajax()) {
+            return view('frontend.components.search-results-list', compact('trips'))->render();
         }
 
         return view('frontend.search', compact('trips'));

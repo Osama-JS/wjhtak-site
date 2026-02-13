@@ -35,6 +35,7 @@
     {{-- CSS Files --}}
     <link rel="stylesheet" href="{{ asset('css/frontend/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/frontend/components.css') }}">
+    <link href="{{ asset('icons/font-awesome/css/all.min.css') }}" rel="stylesheet">
     @if(app()->getLocale() === 'ar')
     <link rel="stylesheet" href="{{ asset('css/frontend/rtl.css') }}">
     @endif
@@ -155,12 +156,161 @@
             animation-delay: -7s;
             background: linear-gradient(45deg, rgba(255, 0, 150, 0.15), rgba(59, 75, 211, 0.1));
         }
-
-        @keyframes floatCrystals {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(50px, 50px) rotate(180deg); }
-            100% { transform: translate(-30px, 20px) rotate(360deg); }
+        .search-modal {
+            display: none; 
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
         }
+
+        .search-modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .search-box-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+
+        .search-results-container {
+            margin-top: 20px;
+        }
+        :root {
+            --primary-color: #007bff;
+            --bg-light: #f8f9fa;
+        }
+
+        .search-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .search-input-group {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .search-icon { color: #888; margin-right: 15px; }
+
+        #searchInput {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 1.1rem;
+            outline: none;
+        }
+
+        .close-search {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #444;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .search-body {
+            margin-top: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        /* تنسيق النتائج */
+        .search-result-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #fff;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .search-result-card:hover {
+            transform: translateX(10px); /* للعربي استخدم -10px */
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .result-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        /* تنسيقات الجوال */
+        @media (max-width: 600px) {
+            .search-overlay { padding: 10px; }
+            .search-header { margin-top: 10px; }
+            .result-img { width: 55px; height: 55px; }
+        }
+
+        /* Spinner للحمل */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+                @keyframes floatCrystals {
+                    0% { transform: translate(0, 0) rotate(0deg); }
+                    50% { transform: translate(50px, 50px) rotate(180deg); }
+                    100% { transform: translate(-30px, 20px) rotate(360deg); }
+                }
+
     </style>
 </head>
 <body>
@@ -193,6 +343,54 @@
         </svg>
     </button>
 
+    {{-- serach --}}
+    <!-- <div id="searchModal" class="search-modal">
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>{{ __('Search Trips') }}</h3>
+                <button class="close-modal" onclick="toggleSearchModal()">&times;</button>
+            </div>
+            
+            <div class="search-modal-body">
+                <div class="search-box-wrapper">
+                    <input type="text" id="searchInput" placeholder="{{ __('Search trips, destinations...') }}" autocomplete="off">
+                    <div id="searchLoader" class="loader" style="display: none;"></div>
+                </div>
+
+                <div id="searchResults" class="search-results-container">
+                    <p class="text-muted text-center">{{ __('Start typing to see results...') }}</p>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div id="searchModal" class="search-overlay">
+        <div class="search-container">
+            <div class="search-header">
+                <div class="search-input-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="{{ __('Where to next?') }}" autocomplete="off">
+                    <div id="searchLoader" class="spinner" style="display: none;"></div>
+                </div>
+                <button class="close-search" onclick="toggleSearchModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="search-body">
+                <div id="searchResults">
+                    <div class="recent-searches">
+                        <h5>{{ __('Suggested Destinations') }}</h5>
+                        <div class="tags">
+                            <span class="tag">Egypt</span>
+                            <span class="tag">Dubai</span>
+                            <span class="tag">Saudi Arabia</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- JavaScript Files --}}
     <script src="{{ asset('js/frontend/app.js') }}"></script>
     <script src="{{ asset('js/frontend/slider.js') }}"></script>
@@ -205,6 +403,46 @@
         window.addEventListener('load', function() {
             document.body.classList.add('loaded');
             document.getElementById('pageLoader').classList.add('hidden');
+        });
+    </script>
+    <script>
+        let searchTimeout = null;
+
+        function toggleSearchModal() {
+            const modal = document.getElementById('searchModal');
+            const isVisible = modal.style.display === 'block';
+            modal.style.display = isVisible ? 'none' : 'block';
+            if(!isVisible) document.getElementById('searchInput').focus();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const query = this.value;
+            const resultsContainer = document.getElementById('searchResults');
+            const loader = document.getElementById('searchLoader');
+
+            clearTimeout(searchTimeout);
+
+            if (query.length < 2) {
+                resultsContainer.innerHTML = '<p class="text-center text-muted">Start typing to explore...</p>';
+                return;
+            }
+
+            loader.style.display = 'block';
+
+            searchTimeout = setTimeout(() => {
+                fetch(`{{ route('searchModel') }}?q=${encodeURIComponent(query)}`, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    resultsContainer.innerHTML = html;
+                    loader.style.display = 'none';
+                })
+                .catch(err => {
+                    console.error(err);
+                    loader.style.display = 'none';
+                });
+            }, 400); // ينتظر 400 مللي ثانية بعد توقف المستخدم عن الكتابة
         });
     </script>
 </body>

@@ -29,6 +29,10 @@
     </section>
 
     {{-- Contact Info Cards --}}
+     @php
+        $contactPhone = \App\Models\Setting::get('contact_phone');
+        $contactEmail = \App\Models\Setting::get('contact_email');
+    @endphp
     <section class="section" style="margin-top: -60px;">
         <div class="container">
             <div class="grid grid-cols-1 md:grid-cols-3" style="gap: var(--space-6);">
@@ -39,7 +43,7 @@
                         </svg>
                     </div>
                     <h3 style="font-weight: var(--font-bold); margin-bottom: var(--space-2);">{{ __('Call Us') }}</h3>
-                    <a href="tel:+966123456789" style="color: var(--color-primary);" dir="ltr">+966 12 345 6789</a>
+                    <a href="tel:+966123456789" style="color: var(--color-primary);" dir="ltr">{{ $contactPhone }}</a>
                 </div>
                 <div class="card text-center" style="padding: var(--space-6);">
                     <div style="width: 60px; height: 60px; background: var(--gradient-accent); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
@@ -49,7 +53,7 @@
                         </svg>
                     </div>
                     <h3 style="font-weight: var(--font-bold); margin-bottom: var(--space-2);">{{ __('Email Us') }}</h3>
-                    <a href="mailto:info@wjhtak.com" style="color: var(--color-primary);">info@wjhtak.com</a>
+                    <a href="mailto:info@wjhtak.com" style="color: var(--color-primary);">{{$contactEmail}}</a>
                 </div>
                 <div class="card text-center" style="padding: var(--space-6);">
                     <div style="width: 60px; height: 60px; background: var(--gradient-accent); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">

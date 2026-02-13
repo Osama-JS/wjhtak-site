@@ -61,6 +61,11 @@
                     <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: var(--gradient-accent); border-radius: var(--radius-2xl); z-index: -1;"></div>
                     <div style="position: absolute; bottom: -20px; left: -20px; width: 150px; height: 150px; background: var(--gradient-primary); border-radius: var(--radius-2xl); z-index: -1; opacity: 0.3;"></div>
                 </div>
+                @php
+                    $story = \App\Models\Setting::get('story_' . app()->getLocale(), config('app.name'));
+                    $mission = \App\Models\Setting::get('mission_' . app()->getLocale(), config('app.name'));
+                    $vision = \App\Models\Setting::get('vision_' . app()->getLocale(), config('app.name'));
+                @endphp
 
                 {{-- Content --}}
                 <div class="scroll-animate delay-100">
@@ -69,12 +74,9 @@
                         {{ __('Turning Travel Dreams Into Reality') }}
                     </h2>
                     <p style="color: var(--color-text-secondary); line-height: var(--leading-relaxed); margin-bottom: var(--space-4);">
-                        {{ __('Founded in 2015, Wjhtak started with a simple mission: to make premium travel experiences accessible to everyone. What began as a small team of passionate travelers has grown into one of the most trusted tourism platforms in the region.') }}
+                        {{ $story }}
                     </p>
-                    <p style="color: var(--color-text-secondary); line-height: var(--leading-relaxed); margin-bottom: var(--space-6);">
-                        {{ __('Today, we partner with over 200 tourism companies and have helped more than 50,000 travelers explore the world. Our commitment to quality, safety, and customer satisfaction remains at the heart of everything we do.') }}
-                    </p>
-
+                    
                     {{-- Stats --}}
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4);">
                         <div>
@@ -111,7 +113,7 @@
                         {{ __('Our Mission') }}
                     </h3>
                     <p style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
-                        {{ __('To provide exceptional travel experiences that inspire, connect, and transform. We believe travel has the power to broaden horizons and create lasting memories.') }}
+                        {{ $mission }}
                     </p>
                 </div>
 
@@ -127,7 +129,7 @@
                         {{ __('Our Vision') }}
                     </h3>
                     <p style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
-                        {{ __('To become the leading tourism platform in the Middle East, known for innovation, reliability, and our commitment to making travel accessible to all.') }}
+                        {{ $vision }}
                     </p>
                 </div>
             </div>

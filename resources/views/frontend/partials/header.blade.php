@@ -43,15 +43,17 @@
                 $currentLocale = app()->getLocale();
                 $switchLocale = $currentLocale === 'ar' ? 'en' : 'ar';
                 $switchLabel = $currentLocale === 'ar' ? 'EN' : 'ع';
-                $switchFlag = $currentLocale === 'ar' ? 'us' : 'sa';
+                
             @endphp
             <a href="{{ route('lang.switch', $switchLocale) }}" class="lang-switch" title="{{ __('Switch Language') }}">
-                <img src="{{ asset('images/flags/' . $switchFlag . '.svg') }}" alt="" class="lang-flag">
-                <span>{{ $switchLabel }}</span>
+                 <div class="globe-icon-wrapper">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <span class="lang-text-label">{{ $switchLabel }}</span>
             </a>
 
             {{-- Search Button --}}
-            <button class="nav-action-btn" id="searchToggle" aria-label="{{ __('Search') }}">
+            <button type="button" class="btn-search-trigger nav-action-btn" onclick="toggleSearchModal()" id="searchToggle" aria-label="{{ __('Search') }}">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.3-4.3"></path>

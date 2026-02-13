@@ -45,6 +45,9 @@ Route::get('/faq', [FrontendController::class, 'faq'])->name('faq');
 // Search
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
 
+// Search Model
+Route::get('/searchModel', [FrontendController::class, 'searchModel'])->name('searchModel');
+
 // Default dashboard - redirect based on user type
 Route::get('/dashboard', function () {
     if (auth()->user()->isAdmin()) {

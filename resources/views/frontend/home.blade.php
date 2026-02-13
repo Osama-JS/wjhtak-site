@@ -2,6 +2,8 @@
 
 @section('title', __('Home'))
 
+
+
 @section('content')
     {{-- Hero Section --}}
     <section class="hero">
@@ -93,6 +95,9 @@
                     {{ __("Discover our most loved destinations, handpicked by thousands of travelers around the world.") }}
                 </p>
             </div>
+
+           
+
 
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 250px); gap: var(--space-4);" class="scroll-animate">
                 @forelse($destinations ?? [] as $index => $destination)
@@ -216,17 +221,17 @@
                     <div style="position: relative; height: 500px; overflow: hidden;">
                         <img
                             src="{{ asset('storage/' . $banner->image_path) }}"
-                            alt="{{ $banner->title }}"
+                            alt="{{ $banner->title_ar }}"
                             style="width: 100%; height: 100%; object-fit: cover;"
                         >
                         <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, transparent 100%);"></div>
                         <div class="container" style="position: absolute; inset: 0; display: flex; align-items: center;">
                             <div style="max-width: 500px; color: white;">
                                 <h2 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
-                                    {{ $banner->title }}
+                                    {{ app()->getLocale() == 'ar' ? $banner->title_ar : $banner->title_en }}
                                 </h2>
                                 <p style="font-size: var(--text-lg); opacity: 0.9; margin-bottom: var(--space-6);">
-                                    {{ $banner->desc }}
+                                     {{ app()->getLocale() == 'ar' ? $banner->description_ar : $banner->description_en }}
                                 </p>
                                 @if($banner->trip_id)
                                     <a href="{{ route('trips.show', $banner->trip_id) }}" class="btn btn-accent">
@@ -243,6 +248,7 @@
     @endif
 
     {{-- Why Choose Us --}}
+    
     <section class="section bg-surface">
         <div class="container">
             <div class="section-header">
@@ -253,63 +259,42 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4" style="gap: var(--space-6);">
-                {{-- Feature 1 --}}
-                <div class="card text-center scroll-animate" style="padding: var(--space-8);">
-                    <div style="width: 60px; height: 60px; background: var(--color-surface-hover); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2">
-                            <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                    </div>
-                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-bold); margin-bottom: var(--space-2);">{{ __("Best Destinations") }}</h4>
-                    <p class="text-muted" style="font-size: var(--text-sm);">
-                        {{ __("Handpicked locations around the world for unforgettable experiences.") }}
-                    </p>
+           @php    
+            // تعريف المسارات الكاملة لكل أيقونة (SVG Paths)
+            $icons = [
+                'M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z', // موقع
+                'M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8', // عملة/مال
+                'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', // درع حماية
+                'M7 11V7a5 5 0 0 1 10 0v4', // قفل
+            ];
+        @endphp
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4" style="gap: var(--space-6);">
+            @forelse($questions as $index => $ques)
+            <div class="card text-center scroll-animate" 
+                style="padding: var(--space-8); transition: transform 0.3s ease; border: 1px solid var(--color-border);">
+                
+                <div style="width: 60px; height: 60px; background: var(--color-surface-hover); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="{{ $icons[$index % count($icons)] }}"/>
+                        {{-- تمت إزالة الدائرة الثابتة هنا لضمان نظافة شكل الأيقونة --}}
+                    </svg>
                 </div>
 
-                {{-- Feature 2 --}}
-                <div class="card text-center scroll-animate delay-100" style="padding: var(--space-8);">
-                    <div style="width: 60px; height: 60px; background: var(--color-surface-hover); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-                            <path d="M12 18V6"/>
-                        </svg>
-                    </div>
-                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-bold); margin-bottom: var(--space-2);">{{ __("Best Prices") }}</h4>
-                    <p class="text-muted" style="font-size: var(--text-sm);">
-                        {{ __("Competitive pricing with exclusive deals and discounts.") }}
-                    </p>
-                </div>
-
-                {{-- Feature 3 --}}
-                <div class="card text-center scroll-animate delay-200" style="padding: var(--space-8);">
-                    <div style="width: 60px; height: 60px; background: var(--color-surface-hover); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        </svg>
-                    </div>
-                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-bold); margin-bottom: var(--space-2);">{{ __("Trusted Service") }}</h4>
-                    <p class="text-muted" style="font-size: var(--text-sm);">
-                        {{ __("Licensed and certified with 24/7 customer support.") }}
-                    </p>
-                </div>
-
-                {{-- Feature 4 --}}
-                <div class="card text-center scroll-animate delay-300" style="padding: var(--space-8);">
-                    <div style="width: 60px; height: 60px; background: var(--color-surface-hover); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2">
-                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                        </svg>
-                    </div>
-                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-bold); margin-bottom: var(--space-2);">{{ __("Secure Booking") }}</h4>
-                    <p class="text-muted" style="font-size: var(--text-sm);">
-                        {{ __("Safe and encrypted payment processing for peace of mind.") }}
-                    </p>
-                </div>
+                <h4 style="font-size: var(--text-lg); font-weight: var(--font-bold); margin-bottom: var(--space-2); color: var(--color-text-main);">
+                    {{ $ques->question }}
+                </h4>
+                
+                <p class="text-muted" style="font-size: var(--text-sm); line-height: 1.6;">
+                    {{ $ques->answer }}
+                </p>
             </div>
+            @empty
+            <div class="col-span-full text-center py-10">
+                <p class="text-muted">{{ __('لا توجد نتائج لعرضها حالياً') }}</p>
+            </div>
+            @endforelse
+        </div>
         </div>
     </section>
 
@@ -329,3 +314,13 @@
         </div>
     </section>
 @endsection
+
+@push('styles')
+   <style>
+        .destination-card-content{
+          position: relative;  
+        }
+   </style>
+@endpush
+
+

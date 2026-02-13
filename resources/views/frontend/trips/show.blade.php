@@ -39,26 +39,32 @@
             </nav>
 
             {{-- Gallery --}}
-            <div class="trip-gallery" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-3); border-radius: var(--radius-2xl); overflow: hidden; margin-bottom: var(--space-8);">
-                {{-- Main Image --}}
-                <div style="aspect-ratio: 16/10; overflow: hidden;">
+            
+            <div class="swiper trip-gallery-slider">
+                <div class="swiper-wrapper">
                     @if($trip->images && count($trip->images) > 0)
-                        <img
-                            src="{{ asset('storage/' . $trip->images[0]->image_path) }}"
-                            alt="{{ $trip->title }}"
-                            style="width: 100%; height: 100%; object-fit: cover;"
-                        >
+                        @foreach($trip->images as $image)
+                            <div class="swiper-slide">
+                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $trip->title }}">
+                            </div>
+                        @endforeach
                     @else
-                        <img
-                            src="{{ asset('images/demo/trip-placeholder.jpg') }}"
-                            alt="{{ $trip->title }}"
-                            style="width: 100%; height: 100%; object-fit: cover;"
-                        >
+                        <div class="swiper-slide">
+                            <img src="{{ asset('images/demo/trip-placeholder.jpg') }}" alt="Placeholder">
+                        </div>
                     @endif
                 </div>
+                
+                {{-- هذه العناصر يجب أن تكون داخل حاوية السوايبير الأساسية --}}
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
 
+            <div class="trip-gallery" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-3); border-radius: var(--radius-2xl); overflow: hidden; margin-bottom: var(--space-8);">
+                {{-- Main Image --}}
                 {{-- Side Images --}}
-                <div style="display: grid; grid-template-rows: 1fr 1fr; gap: var(--space-3);">
+                <!-- <div style="display: grid; grid-template-rows: 1fr 1fr; gap: var(--space-3);">
                     @if($trip->images && count($trip->images) > 1)
                         @foreach($trip->images->slice(1, 2) as $image)
                             <div style="overflow: hidden; position: relative;">
@@ -86,7 +92,7 @@
                             {{ __('View All') }} ({{ count($trip->images) }})
                         </button>
                     @endif
-                </div>
+                </div> -->
             </div>
         </div>
     </section>
@@ -377,7 +383,27 @@
 @endsection
 
 @push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <style>
+    .trip-gallery-slider {
+        width: 100%;
+        height: 400px; /* أو أي ارتفاع تفضله */
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* تخصيص لون الأزرار ليتناسب مع تصميمك */
+    .swiper-button-next, .swiper-button-prev {
+        color: #fff;
+        filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
+    }
     /* Trip Details Layout */
     .trip-details-layout {
         display: grid;
@@ -750,4 +776,29 @@
     }
 </style>
 @endpush
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+    const swiper = new Swiper('.trip-gallery-slider', {
+        loop: true,
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        effect: 'fade', // يمكنك تغييرها لـ 'slide' إذا كنت تفضل ذلك
+        fadeEffect: {
+            crossFade: true
+        },
+    });
+</script>
+@endpush
+
 
