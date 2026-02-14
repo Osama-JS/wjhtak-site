@@ -128,8 +128,8 @@ class PaymentController extends Controller
             content: new OA\JsonContent(
                 required: ["booking_id", "payment_type"],
                 properties: [
-                    new OA\Property(property: "booking_id", type: "integer", example: 1),
-                    new OA\Property(property: "payment_type", type: "string", enum: ["mada", "visa_master", "apple_pay", "tabby", "tamara"], example: "visa_master"),
+                    new OA\Property(property: "booking_id", type: "integer", example: 1, description: "ID of the trip booking to pay for"),
+                    new OA\Property(property: "payment_type", type: "string", enum: ["mada", "visa_master", "apple_pay", "stc_pay", "tabby", "tamara"], example: "visa_master"),
                     // Custom fields for Tabby/Tamara override (optional)
                     new OA\Property(property: "first_name", type: "string", example: "John"),
                     new OA\Property(property: "last_name", type: "string", example: "Doe"),
@@ -325,7 +325,8 @@ class PaymentController extends Controller
                         new OA\Property(property: "data", type: "object", properties: [
                             new OA\Property(property: "status", type: "string", example: "paid"),
                             new OA\Property(property: "transaction_id", type: "string", example: "T123456789"),
-                            new OA\Property(property: "invoice_url", type: "string", example: "https://mytrip.com/storage/invoices/inv_1.pdf"),
+                            new OA\Property(property: "invoice_url", type: "string", example: "https://mytrip.com/storage/invoices/inv_1.pdf", description: "Direct URL to the generated PDF invoice"),
+                            new OA\Property(property: "payment_method", type: "string", example: "mada", description: "The specific payment method used"),
                             new OA\Property(property: "raw_response", type: "object")
                         ])
                     ]
@@ -360,7 +361,7 @@ class PaymentController extends Controller
                      $bookingId = explode('-', $reference)[1] ?? null;
 
                      if ($bookingId) {
-                         $invoicePath = $this->completePayment($bookingId, 'tabby', $request->payment_id, $result);
+                         $invoicePath = $this->completePayment($bookingId, 'tabby', $request->payment_id, $result, $request->payment_type);
                          return $this->apiResponse(false, __('Payment successful and booking confirmed.'), [
                              'status' => 'paid',
                              'transaction_id' => $request->payment_id,
@@ -381,7 +382,7 @@ class PaymentController extends Controller
                      $bookingId = explode('-', $reference)[1] ?? null;
 
                      if ($bookingId) {
-                        $invoicePath = $this->completePayment($bookingId, 'tamara', $request->payment_id, $result);
+                        $invoicePath = $this->completePayment($bookingId, 'tamara', $request->payment_id, $result, $request->payment_type);
                         return $this->apiResponse(false, __('Payment successful and booking confirmed.'), [
                             'status' => 'paid',
                             'transaction_id' => $request->payment_id,
@@ -413,7 +414,7 @@ class PaymentController extends Controller
                 $bookingId = explode('-', $reference)[1] ?? null;
 
                 if ($bookingId) {
-                    $invoicePath = $this->completePayment($bookingId, 'hyperpay', $request->checkout_id, $result);
+                    $invoicePath = $this->completePayment($bookingId, 'hyperpay', $request->checkout_id, $result, $request->payment_type);
                     return $this->apiResponse(false, __('Payment successful and booking confirmed.'), [
                         'status' => 'paid',
                         'transaction_id' => $request->checkout_id,
@@ -429,12 +430,30 @@ class PaymentController extends Controller
         throw new \Exception('HyperPay verification failed.');
     }
 
-    protected function completePayment($bookingId, $gateway, $transactionId, $response)
+    protected function completePayment($bookingId, $gateway, $transactionId, $response, $paymentMethod = null)
     {
-        $booking = TripBooking::find($bookingId);
+        $booking = TripBooking::with('trip')->find($bookingId);
         $invoicePath = null;
 
         if ($booking) {
+            // Check if already confirmed (idempotency)
+            if ($booking->status === 'confirmed') {
+                return Payment::where('trip_booking_id', $bookingId)->first()->invoice_path ?? null;
+            }
+
+            // Deduct tickets from trip
+            if ($booking->trip) {
+                if ($booking->trip->tickets < $booking->tickets_count) {
+                    Log::error("Overbooking detected for Trip #{$booking->trip->id}. Booking #{$bookingId} paid but tickets unavailable.");
+                    // We still record the payment since money was taken, but maybe status should be 'overflow' or similar
+                    // For now, we confirm but log a critical error for admin
+                }
+
+                $newCount = max(0, $booking->trip->tickets - $booking->tickets_count);
+                $booking->trip->update(['tickets' => $newCount]);
+                Log::info("Trip #{$booking->trip->id} tickets updated to {$newCount}");
+            }
+
             // Update Booking
             $booking->update([
                 'status' => 'confirmed',
@@ -442,7 +461,7 @@ class PaymentController extends Controller
             ]);
 
             // Record Payment
-            $payment = Payment::create([
+            $paymentData = [
                 'trip_booking_id' => $booking->id,
                 'payment_gateway' => $gateway,
                 'transaction_id' => $transactionId,
@@ -450,7 +469,16 @@ class PaymentController extends Controller
                 'currency' => 'SAR',
                 'status' => 'paid',
                 'raw_response' => $response,
-            ]);
+            ];
+
+            try {
+                $paymentData['payment_method'] = $paymentMethod;
+                $payment = Payment::create($paymentData);
+            } catch (\Exception $e) {
+                unset($paymentData['payment_method']);
+                $payment = Payment::create($paymentData);
+                Log::warning("Could not save payment_method: " . $e->getMessage());
+            }
 
             // Generate Invoice
             $invoicePath = $this->invoiceService->generateInvoice($booking);

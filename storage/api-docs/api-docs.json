@@ -2232,6 +2232,7 @@
                                 ],
                                 "properties": {
                                     "booking_id": {
+                                        "description": "ID of the trip booking to pay for",
                                         "type": "integer",
                                         "example": 1
                                     },
@@ -2241,6 +2242,7 @@
                                             "mada",
                                             "visa_master",
                                             "apple_pay",
+                                            "stc_pay",
                                             "tabby",
                                             "tamara"
                                         ],
@@ -2409,8 +2411,14 @@
                                                     "example": "T123456789"
                                                 },
                                                 "invoice_url": {
+                                                    "description": "Direct URL to the generated PDF invoice",
                                                     "type": "string",
                                                     "example": "https://mytrip.com/storage/invoices/inv_1.pdf"
+                                                },
+                                                "payment_method": {
+                                                    "description": "The specific payment method used",
+                                                    "type": "string",
+                                                    "example": "mada"
                                                 },
                                                 "raw_response": {
                                                     "type": "object"
@@ -2848,10 +2856,28 @@
                                                         "example": 1
                                                     },
                                                     "question": {
+                                                        "description": "Localized question content",
+                                                        "type": "string",
+                                                        "example": "How to book?"
+                                                    },
+                                                    "question_ar": {
+                                                        "type": "string",
+                                                        "example": "كيف يمكنني الحجز؟"
+                                                    },
+                                                    "question_en": {
                                                         "type": "string",
                                                         "example": "How to book?"
                                                     },
                                                     "answer": {
+                                                        "description": "Localized answer content",
+                                                        "type": "string",
+                                                        "example": "You can book via..."
+                                                    },
+                                                    "answer_ar": {
+                                                        "type": "string",
+                                                        "example": "يمكنك الحجز عبر..."
+                                                    },
+                                                    "answer_en": {
                                                         "type": "string",
                                                         "example": "You can book via..."
                                                     }
@@ -3101,9 +3127,56 @@
                                                     "type": "string",
                                                     "example": "Amazing Paris"
                                                 },
-                                                "description": {
+                                                "duration": {
                                                     "type": "string",
-                                                    "example": "Full description..."
+                                                    "example": "3 Days"
+                                                },
+                                                "tickets_available": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "expiry_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-12-31"
+                                                },
+                                                "company": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Wjhtak Tourism"
+                                                        },
+                                                        "logo": {
+                                                            "type": "string",
+                                                            "example": "http://example.com/logo.png"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "location": {
+                                                    "properties": {
+                                                        "country": {
+                                                            "type": "string",
+                                                            "example": "France"
+                                                        },
+                                                        "city": {
+                                                            "type": "string",
+                                                            "example": "Paris"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "base_capacity": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "extra_passenger_price": {
+                                                    "type": "number",
+                                                    "example": 100
                                                 },
                                                 "images": {
                                                     "type": "array",
@@ -3134,14 +3207,6 @@
                                                 "is_favorite": {
                                                     "type": "boolean",
                                                     "example": false
-                                                },
-                                                "base_capacity": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                },
-                                                "extra_passenger_price": {
-                                                    "type": "number",
-                                                    "example": 100
                                                 }
                                             },
                                             "type": "object"

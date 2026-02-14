@@ -202,7 +202,20 @@ class TripController extends Controller
                         new OA\Property(property: "data", type: "object", properties: [
                             new OA\Property(property: "id", type: "integer", example: 1),
                             new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
-                            new OA\Property(property: "description", type: "string", example: "Full description..."),
+                            new OA\Property(property: "duration", type: "string", example: "3 Days"),
+                            new OA\Property(property: "tickets_available", type: "integer", example: 10),
+                            new OA\Property(property: "expiry_date", type: "string", format: "date", example: "2024-12-31"),
+                            new OA\Property(property: "company", type: "object", properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "name", type: "string", example: "Wjhtak Tourism"),
+                                new OA\Property(property: "logo", type: "string", example: "http://example.com/logo.png"),
+                            ]),
+                            new OA\Property(property: "location", type: "object", properties: [
+                                new OA\Property(property: "country", type: "string", example: "France"),
+                                new OA\Property(property: "city", type: "string", example: "Paris"),
+                            ]),
+                            new OA\Property(property: "base_capacity", type: "integer", example: 2),
+                            new OA\Property(property: "extra_passenger_price", type: "number", example: 100.00),
                             new OA\Property(property: "images", type: "array", items: new OA\Items(type: "string")),
                             new OA\Property(property: "itineraries", type: "array", items: new OA\Items(
                                 properties: [
@@ -212,8 +225,6 @@ class TripController extends Controller
                                 ]
                             )),
                             new OA\Property(property: "is_favorite", type: "boolean", example: false),
-                            new OA\Property(property: "base_capacity", type: "integer", example: 2),
-                            new OA\Property(property: "extra_passenger_price", type: "number", example: 100.00),
                         ])
                     ]
                 )

@@ -12,6 +12,7 @@ class Payment extends Model
     protected $fillable = [
         'trip_booking_id',
         'payment_gateway',
+        'payment_method',
         'transaction_id',
         'amount',
         'currency',
