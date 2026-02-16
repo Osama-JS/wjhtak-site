@@ -13,17 +13,20 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
+            $table->string('type', 50)->default('general'); // booking_confirmed, payment_success, etc.
             $table->string('title');
             $table->text('content');
-            $table->string('icon');
+            $table->string('icon')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
-            $table->longText('data')->nullable(); // Additional JSON data
-            $table->boolean('is_show')->default(false);
+            $table->json('data')->nullable(); // Additional JSON data
+            $table->boolean('is_read')->default(false);
+            $table->softDeletes();
             $table->timestamps();
 
             // Indexes for performance
             $table->index('user_id');
-            $table->index('is_show');
+            $table->index('type');
+            $table->index('is_read');
             $table->index('created_at');
         });
     }

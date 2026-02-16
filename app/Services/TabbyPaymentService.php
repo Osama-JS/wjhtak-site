@@ -15,7 +15,7 @@ class TabbyPaymentService implements PaymentGatewayInterface
 
     public function __construct()
     {
-        $this->baseUrl = config('services.tabby.base_url');
+        $this->baseUrl = rtrim(config('services.tabby.base_url'), '/');
         $this->publicKey = config('services.tabby.public_key');
         $this->secretKey = config('services.tabby.secret_key');
         $this->merchantCode = config('services.tabby.merchant_code');
@@ -23,6 +23,7 @@ class TabbyPaymentService implements PaymentGatewayInterface
 
     /**
      * Initiate a checkout session.
+     * Endpoint: POST /api/v2/checkout
      *
      * @param array $data Payment data
      * @return array Response containing checkout URL and session ID.
@@ -31,41 +32,132 @@ class TabbyPaymentService implements PaymentGatewayInterface
     {
         $payload = $this->preparePayload($data);
 
+        Log::info('Tabby Checkout Request', [
+            'url' => "{$this->baseUrl}/checkout",
+            'payload' => $payload,
+        ]);
+
         $response = Http::withToken($this->publicKey)
             ->post("{$this->baseUrl}/checkout", $payload);
 
+        Log::info('Tabby Checkout Response', [
+            'status' => $response->status(),
+            'body' => $response->json() ?? $response->body(),
+        ]);
+
         if ($response->successful()) {
             $responseData = $response->json();
+
+            // Extract checkout URL from available products
+            $checkoutUrl = null;
+            $products = $responseData['configuration']['available_products'] ?? [];
+
+            // Try installments first, then pay_later
+            if (!empty($products['installments'])) {
+                $checkoutUrl = $products['installments'][0]['web_url'] ?? null;
+            }
+            if (!$checkoutUrl && !empty($products['pay_later'])) {
+                $checkoutUrl = $products['pay_later'][0]['web_url'] ?? null;
+            }
+
             return [
-                'session_id' => $responseData['id'],
-                'checkout_url' => $responseData['configuration']['available_products']['installments'][0]['web_url']
-                    ?? $responseData['configuration']['available_products']['pay_later'][0]['web_url']
-                    ?? null, // Fallback mostly
-                'raw_response' => $responseData
+                'session_id' => $responseData['id'] ?? null,
+                'payment_id' => $responseData['payment']['id'] ?? null,
+                'checkout_url' => $checkoutUrl,
+                'status' => $responseData['status'] ?? 'created',
+                'raw_response' => $responseData,
             ];
         }
 
-        Log::error('Tabby Checkout Failed', ['response' => $response->body()]);
-        throw new \Exception('Failed to initiate Tabby checkout: ' . $response->body());
+        $errorBody = $response->json() ?? ['message' => $response->body()];
+        Log::error('Tabby Checkout Failed', ['status' => $response->status(), 'response' => $errorBody]);
+
+        $errorMessage = $errorBody['message'] ?? ($errorBody['error'] ?? 'Unknown error');
+        throw new \Exception("Failed to initiate Tabby checkout: {$errorMessage}");
     }
 
     /**
-     * Verify payment status.
+     * Verify payment status and auto-capture if AUTHORIZED.
      *
-     * @param string $paymentId The payment or session ID to verify.
-     * @return array Detailed payment status response.
+     * Flow per Tabby docs:
+     * 1. GET /payments/{id} → check status
+     * 2. If AUTHORIZED → POST /payments/{id}/captures → CLOSED
+     *
+     * @param string $paymentId The payment ID to verify.
+     * @return array Payment details with final status.
      */
     public function verifyPayment(string $paymentId): array
     {
+        Log::info("Tabby: Verifying payment {$paymentId}");
+
+        // Step 1: Get payment status
         $response = Http::withToken($this->secretKey)
             ->get("{$this->baseUrl}/payments/{$paymentId}");
 
-        if ($response->successful()) {
-            return $response->json();
+        if (!$response->successful()) {
+            Log::error("Tabby: Failed to get payment {$paymentId}", [
+                'status' => $response->status(),
+                'body' => $response->json() ?? $response->body(),
+            ]);
+            throw new \Exception("Failed to retrieve Tabby payment: " . $response->body());
         }
 
-        Log::error('Tabby Verify Failed', ['response' => $response->body()]);
-        throw new \Exception('Failed to verify Tabby payment: ' . $response->body());
+        $paymentData = $response->json();
+        $status = strtoupper($paymentData['status'] ?? 'UNKNOWN');
+
+        Log::info("Tabby: Payment {$paymentId} status = {$status}");
+
+        // Step 2: If AUTHORIZED, capture the payment
+        if ($status === 'AUTHORIZED') {
+            $captureResult = $this->capturePayment($paymentId, $paymentData);
+            if ($captureResult) {
+                $paymentData['status'] = 'CLOSED';
+                $paymentData['capture_result'] = $captureResult;
+                Log::info("Tabby: Payment {$paymentId} captured successfully → CLOSED");
+            }
+        }
+
+        return $paymentData;
+    }
+
+    /**
+     * Capture an authorized payment.
+     * Endpoint: POST /api/v2/payments/{id}/captures
+     *
+     * @param string $paymentId
+     * @param array $paymentData Original payment data for amount extraction
+     * @return array|null Capture response or null on failure
+     */
+    public function capturePayment(string $paymentId, array $paymentData = []): ?array
+    {
+        $amount = $paymentData['amount'] ?? '0.00';
+
+        $capturePayload = [
+            'amount' => $amount,
+        ];
+
+        // Add items if available
+        if (!empty($paymentData['order']['items'])) {
+            $capturePayload['items'] = $paymentData['order']['items'];
+        }
+
+        Log::info("Tabby: Capturing payment {$paymentId}", ['payload' => $capturePayload]);
+
+        $response = Http::withToken($this->secretKey)
+            ->post("{$this->baseUrl}/payments/{$paymentId}/captures", $capturePayload);
+
+        if ($response->successful()) {
+            $result = $response->json();
+            Log::info("Tabby: Capture successful for {$paymentId}", ['response' => $result]);
+            return $result;
+        }
+
+        Log::error("Tabby: Capture failed for {$paymentId}", [
+            'status' => $response->status(),
+            'body' => $response->json() ?? $response->body(),
+        ]);
+
+        return null;
     }
 
     /**
@@ -78,38 +170,65 @@ class TabbyPaymentService implements PaymentGatewayInterface
     {
         try {
             $data = $this->verifyPayment($paymentId);
-            return $data['status'] ?? 'unknown';
+            return strtolower($data['status'] ?? 'unknown');
         } catch (\Exception $e) {
+            Log::error("Tabby getPaymentStatus failed: " . $e->getMessage());
             return 'failed';
         }
     }
 
     /**
-     * Prepare the payload for Tabby API.
+     * Prepare the payload for Tabby API checkout.
+     * Structure follows Tabby API v2 documentation.
      */
     protected function preparePayload(array $data): array
     {
+        $currency = $data['currency'] ?? 'SAR';
+        $amount = number_format((float)($data['amount'] ?? 0), 2, '.', '');
+
+        // Build items array with required structure
+        $items = [];
+        if (!empty($data['items'])) {
+            foreach ($data['items'] as $item) {
+                $items[] = [
+                    'title' => $item['title'] ?? $item['name'] ?? 'Item',
+                    'description' => $item['description'] ?? ($item['title'] ?? 'Item'),
+                    'quantity' => $item['quantity'] ?? 1,
+                    'unit_price' => number_format((float)($item['unit_price'] ?? $data['amount']), 2, '.', ''),
+                    'category' => $item['category'] ?? 'Travel',
+                    'reference_id' => (string)($item['reference_id'] ?? '1'),
+                ];
+            }
+        }
+
         return [
             'payment' => [
-                'amount' => number_format($data['amount'], 2, '.', ''),
-                'currency' => $data['currency'] ?? 'SAR',
+                'amount' => $amount,
+                'currency' => $currency,
                 'description' => $data['description'] ?? 'Order Payment',
                 'buyer' => [
-                    'name' => $data['customer_name'],
-                    'email' => $data['customer_email'],
-                    'phone' => $data['customer_phone'],
+                    'name' => $data['customer_name'] ?? (($data['first_name'] ?? 'Guest') . ' ' . ($data['last_name'] ?? 'User')),
+                    'email' => $data['customer_email'] ?? '',
+                    'phone' => $data['customer_phone'] ?? '',
                 ],
                 'shipping_address' => [
                     'city' => $data['city'] ?? 'Riyadh',
-                    'address' => $data['address'] ?? 'Test Address',
-                    'zip' => $data['zip'] ?? '0000',
+                    'address' => $data['address'] ?? 'Saudi Arabia',
+                    'zip' => $data['zip'] ?? '00000',
                 ],
                 'order' => [
-                    'reference_id' => $data['order_id'],
-                    'items' => $data['items'] ?? [],
+                    'reference_id' => $data['order_id'] ?? ('ORDER-' . time()),
+                    'items' => $items,
+                    'tax_amount' => '0.00',
+                    'shipping_amount' => '0.00',
+                    'discount_amount' => '0.00',
+                ],
+                'buyer_history' => [
+                    'registered_since' => now()->subYear()->toIso8601String(),
+                    'loyalty_level' => 0,
                 ],
             ],
-            'lang' => app()->getLocale(),
+            'lang' => app()->getLocale() === 'ar' ? 'ar' : 'en',
             'merchant_code' => $this->merchantCode,
             'merchant_urls' => [
                 'success' => $data['callback_url'] . '?status=success',

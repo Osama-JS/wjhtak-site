@@ -52,8 +52,12 @@ return [
     'tamara' => [
         'api_token' => env('TAMARA_API_TOKEN'),
         'notification_key' => env('TAMARA_NOTIFICATION_KEY'),
-        'base_url' => env('TAMARA_API_URL', 'https://api.tamara.co'),
+        'base_url' => env('TAMARA_API_URL', 'https://api-sandbox.tamara.co'),
     ],
 
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'credentials_path' => env('FIREBASE_CREDENTIALS_PATH', 'storage/app/firebase/service-account.json'),
+    ],
 
 ];

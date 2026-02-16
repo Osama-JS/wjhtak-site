@@ -1,0 +1,136 @@
+Dear Nawaf,
+
+
+
+Kindly we have a general test you can find it in the below:
+
+
+
+Integration Guide:
+
+https://hyperpay.docs.oppwa.com/integrations/widget
+
+
+
+Kindly find the credentials for the test server below:
+
+
+
+Links used in the integration in the code: https://eu-test.oppwa.com/
+
+Access Token (Authorization): OGFjN2E0Yzc5NDgzMDkyNjAxOTQ4MzY2MzY1ZDAxMTZ8NnpwP1Q9Y3dGTiUy=
+
+Entity ID (Visa, MasterCard): 8ac7a4c79483092601948366b9d1011b
+
+Payment Type: DB only
+
+Currency: SAR only
+
+Payment Methods: VISA, MASTER,MADA
+
+Also you need to add the following required parameters in the POST request (step number.1 in the guide):
+
+ - testMode=EXTERNAL (only for the test server)
+
+ - customParameters[3DS2_enrolled]=true (only for the test server)
+
+ - merchantTransactionId="your unique ID in your database"
+
+ - customer.email = The user's email.
+
+ - billing.street1= street address of customer
+
+ - billing.city= should be city of customer
+
+ - billing.state= should be state of customer
+
+ - billing.country= should be country of customer  (Alpha-2 codes with Format A2[A-Z]{2})
+
+ - billing.postcode
+
+ - customer.givenName
+
+ - customer.surname
+
+* The reference for all the Open Payment Platform parameters (https://hyperpay.docs.oppwa.com/reference/parameters).
+
+* https://hyperpay.docs.oppwa.com/tutorials/threeDSecure/3d-secure-2.0-guide
+
+
+
+For applying the required rules as per Saudi Payments for the MADA option, please follow these steps:
+
+    1- Ensure that MADA is shown as the first payment option on the checkout page with the logo placed next to it.
+
+    2- Add the required scripts and roles from this link: http://hyperpay-2024.quickconnect.to/d/f/597670674613449940
+
+Please refer to the mada guidelines for your reference.
+
+
+
+Also add the following script after our paymentWidgets.js for fully 3D Secure redirection:
+
+<script type="text/javascript">
+
+var wpwlOptions = {
+
+  paymentTarget: "_top",
+
+}
+
+</script>
+
+
+
+
+
+Testing cards for credit card transactions:
+
+    Card: 4440000009900010
+
+        Cardholder Name: Any Name
+
+        Expiry Date: 01/39
+
+        CVV: 100
+
+        Result: Success
+
+
+
+    Card: 5123450000000008
+
+        Cardholder Name: Any Name
+
+        Expiry Date: 01/39
+
+        CVV: 100
+
+        Result: Success
+
+
+
+    MADA Card: 4464040000000007
+
+        Cardholder Name: Any Name
+
+        Expiry Date: 12/25
+
+        CVV2: 100
+
+        Result: Success
+
+
+
+
+
+For a successful response, please send amounts without fractions (e.g., xx.00). This only applies on the test server.
+
+
+
+If you have any further questions or need assistance, please do not hesitate to contact me.
+
+
+
+Regards.
+

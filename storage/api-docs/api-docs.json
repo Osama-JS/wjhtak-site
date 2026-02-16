@@ -2141,6 +2141,365 @@
                 }
             }
         },
+        "/api/v1/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get my notifications",
+                "description": "Retrieve a paginated list of stored notifications for the authenticated user.\n\nOnly **storable** notification types are returned (e.g., booking, payment, favorites). Broadcast-only types (new_trip, promotion, general) are not stored.\n\nResults are ordered by most recent first.",
+                "operationId": "getMyNotifications",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Response language: ar or en",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by notification type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "booking_confirmed",
+                                "booking_cancelled",
+                                "payment_success",
+                                "payment_failed",
+                                "booking_reminder",
+                                "favorite_trip_update"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notifications retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Notifications retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "notifications": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "type": {
+                                                                "type": "string",
+                                                                "example": "payment_success"
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Payment Successful"
+                                                            },
+                                                            "content": {
+                                                                "type": "string",
+                                                                "example": "Your payment of 500 SAR was successful."
+                                                            },
+                                                            "icon": {
+                                                                "type": "string",
+                                                                "example": "payment_success"
+                                                            },
+                                                            "is_read": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            },
+                                                            "data": {
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "example": "2024-05-20T10:00:00Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "unread_count": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "pagination": {
+                                                    "properties": {
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer",
+                                                            "example": 20
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 95
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notifications/unread-count": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get unread count",
+                "description": "Returns the number of unread notifications for the authenticated user.",
+                "operationId": "getUnreadNotificationsCount",
+                "responses": {
+                    "200": {
+                        "description": "Unread count retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unread count retrieved"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "unread_count": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notifications/{id}/read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark notification as read",
+                "description": "Mark a specific notification as read for the authenticated user.",
+                "operationId": "markNotificationAsRead",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Notification ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification marked as read",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Notification marked as read"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Notification not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notifications/read-all": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark all as read",
+                "description": "Mark all unread notifications as read for the authenticated user.",
+                "operationId": "markAllNotificationsAsRead",
+                "responses": {
+                    "200": {
+                        "description": "All notifications marked as read",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "All notifications marked as read"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "updated_count": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notifications/{id}": {
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Delete a notification",
+                "description": "Delete a specific notification for the authenticated user.",
+                "operationId": "deleteNotification",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Notification ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Notification deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Notification not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/payment/methods": {
             "get": {
                 "tags": [
@@ -2203,13 +2562,13 @@
                     "Payment"
                 ],
                 "summary": "Initiate payment checkout (HyperPay, Tabby, Tamara)",
-                "description": "Initializes a payment session. For HyperPay, returns a Checkout ID. For Tabby/Tamara, returns a redirect URL.",
+                "description": "Initializes a payment session.\n\n**HyperPay (mada, visa_master, apple_pay):** Returns a `checkout_id` to load Payment Widget in WebView. Billing address and customer data are auto-filled from user profile but can be overridden.\n\n**Tabby/Tamara:** Returns a `checkout_url` to redirect the user.",
                 "operationId": "initiatePayment",
                 "parameters": [
                     {
                         "name": "Accept-Language",
                         "in": "header",
-                        "description": "The language of the response (ar, en)",
+                        "description": "Response language: ar (Arabic) or en (English). Affects error messages.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -2232,39 +2591,62 @@
                                 ],
                                 "properties": {
                                     "booking_id": {
+                                        "description": "ID of the trip booking to pay for",
                                         "type": "integer",
                                         "example": 1
                                     },
                                     "payment_type": {
+                                        "description": "Payment method key",
                                         "type": "string",
                                         "enum": [
                                             "mada",
                                             "visa_master",
                                             "apple_pay",
+                                            "stc_pay",
                                             "tabby",
                                             "tamara"
                                         ],
                                         "example": "visa_master"
                                     },
                                     "first_name": {
+                                        "description": "Optional - overrides user profile first name",
                                         "type": "string",
-                                        "example": "John"
+                                        "example": "Mohammed"
                                     },
                                     "last_name": {
+                                        "description": "Optional - overrides user profile last name",
                                         "type": "string",
-                                        "example": "Doe"
+                                        "example": "Ali"
+                                    },
+                                    "email": {
+                                        "description": "Optional - overrides user profile email",
+                                        "type": "string",
+                                        "example": "user@example.com"
                                     },
                                     "phone": {
+                                        "description": "Optional - for Tabby/Tamara",
                                         "type": "string",
                                         "example": "966500000000"
                                     },
-                                    "email": {
+                                    "address": {
+                                        "description": "Optional - billing street address for HyperPay 3DS2",
                                         "type": "string",
-                                        "example": "john@example.com"
+                                        "example": "King Fahd Road"
                                     },
-                                    "callback_url": {
+                                    "city": {
+                                        "description": "Optional - billing city for HyperPay 3DS2",
                                         "type": "string",
-                                        "example": "https://mysite.com/payment/callback"
+                                        "example": "Riyadh"
+                                    },
+                                    "state": {
+                                        "description": "Optional - billing state for HyperPay 3DS2",
+                                        "type": "string",
+                                        "example": "Riyadh"
+                                    },
+                                    "postcode": {
+                                        "description": "Optional - billing postcode for HyperPay 3DS2",
+                                        "type": "string",
+                                        "example": "12345"
                                     }
                                 },
                                 "type": "object"
@@ -2288,11 +2670,12 @@
                                             "example": "Checkout initialized successfully."
                                         },
                                         "data": {
+                                            "description": "Response varies by gateway",
                                             "properties": {
                                                 "id": {
-                                                    "description": "HyperPay Checkout ID",
+                                                    "description": "HyperPay Checkout ID — use this to load paymentWidgets.js",
                                                     "type": "string",
-                                                    "example": "B9C694..."
+                                                    "example": "A1B2C3D4E5.uat"
                                                 },
                                                 "session_id": {
                                                     "description": "Tabby/Tamara Session ID",
@@ -2300,12 +2683,12 @@
                                                     "example": "ch_..."
                                                 },
                                                 "checkout_url": {
-                                                    "description": "Redirect URL for Tabby/Tamara",
+                                                    "description": "Redirect URL (Tabby/Tamara only)",
                                                     "type": "string",
                                                     "example": "https://checkout.tabby.ai/..."
                                                 },
                                                 "raw_response": {
-                                                    "description": "Full gateway response for debugging",
+                                                    "description": "Full gateway response",
                                                     "type": "object"
                                                 }
                                             },
@@ -2317,8 +2700,11 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Booking already confirmed"
+                    },
                     "422": {
-                        "description": "Validation Error"
+                        "description": "Validation Error (missing booking_id or payment_type)"
                     },
                     "500": {
                         "description": "Payment Gateway Error"
@@ -2336,17 +2722,22 @@
                 "tags": [
                     "Payment"
                 ],
-                "summary": "Verify payment status",
-                "description": "Checks the status of a payment and confirms the booking if successful.",
+                "summary": "Verify payment status, capture, and confirm booking",
+                "description": "Checks the payment status with the gateway. If successful, confirms the booking, deducts tickets, records the payment, and generates an invoice.\n\n**Error/success messages** are translated based on `Accept-Language` header.\n\n### Gateway-specific behavior:\n- **HyperPay (mada, visa_master, apple_pay):** Send `checkout_id`. Checks result code.\n- **Tabby:** Send `payment_id`. Auto-captures if AUTHORIZED → CLOSED.\n- **Tamara:** Send `payment_id` (order_id). Auto-authorises if approved.",
                 "operationId": "verifyPayment",
                 "parameters": [
                     {
                         "name": "Accept-Language",
                         "in": "header",
+                        "description": "Response language: ar or en. Controls success/error messages.",
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "default": "en"
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
                         }
                     }
                 ],
@@ -2360,22 +2751,26 @@
                                 ],
                                 "properties": {
                                     "payment_type": {
+                                        "description": "Must match the type used in /initiate",
                                         "type": "string",
                                         "enum": [
                                             "mada",
                                             "visa_master",
                                             "apple_pay",
+                                            "stc_pay",
                                             "tabby",
                                             "tamara"
                                         ]
                                     },
                                     "checkout_id": {
-                                        "description": "Required for HyperPay (mada, visa_master, apple_pay)",
-                                        "type": "string"
+                                        "description": "Required for HyperPay — the id returned from /initiate",
+                                        "type": "string",
+                                        "example": "A1B2C3D4E5.uat"
                                     },
                                     "payment_id": {
-                                        "description": "Required for Tabby/Tamara",
-                                        "type": "string"
+                                        "description": "Required for Tabby (payment_id from callback) / Tamara (order_id from callback)",
+                                        "type": "string",
+                                        "example": "pay_abc123"
                                     }
                                 },
                                 "type": "object"
@@ -2385,7 +2780,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Payment successful and booking confirmed",
+                        "description": "Payment successful — booking confirmed, tickets deducted, invoice generated",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2395,8 +2790,9 @@
                                             "example": false
                                         },
                                         "message": {
+                                            "description": "Translated success message",
                                             "type": "string",
-                                            "example": "Payment successful and booking confirmed."
+                                            "example": "تمت عملية الدفع بنجاح!"
                                         },
                                         "data": {
                                             "properties": {
@@ -2405,14 +2801,16 @@
                                                     "example": "paid"
                                                 },
                                                 "transaction_id": {
+                                                    "description": "checkout_id (HyperPay) or payment_id (Tabby/Tamara)",
                                                     "type": "string",
-                                                    "example": "T123456789"
+                                                    "example": "A1B2C3D4E5.uat"
                                                 },
                                                 "invoice_url": {
                                                     "type": "string",
-                                                    "example": "https://mytrip.com/storage/invoices/inv_1.pdf"
+                                                    "example": "https://site.com/storage/invoices/inv_42.pdf"
                                                 },
                                                 "raw_response": {
+                                                    "description": "Full gateway response",
                                                     "type": "object"
                                                 }
                                             },
@@ -2425,10 +2823,56 @@
                         }
                     },
                     "400": {
-                        "description": "Payment Failed or Pending"
+                        "description": "Payment failed — translated error message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "description": "User-friendly translated error",
+                                            "type": "string",
+                                            "example": "فشلت عملية الدفع. يرجى المحاولة مرة أخرى."
+                                        },
+                                        "data": {
+                                            "description": "Structure varies by gateway",
+                                            "properties": {
+                                                "result_code": {
+                                                    "description": "HyperPay only — result code for debugging",
+                                                    "type": "string",
+                                                    "example": "100.100.303"
+                                                },
+                                                "description": {
+                                                    "description": "HyperPay only — original English description",
+                                                    "type": "string",
+                                                    "example": "insufficient funds"
+                                                },
+                                                "payment_status": {
+                                                    "description": "Tabby/Tamara — gateway payment status (REJECTED, EXPIRED, etc.)",
+                                                    "type": "string",
+                                                    "example": "REJECTED"
+                                                },
+                                                "raw_response": {
+                                                    "description": "Full gateway response",
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error — missing payment_type or checkout_id/payment_id"
                     },
                     "500": {
-                        "description": "Server Error"
+                        "description": "Server Error — gateway unreachable or internal failure"
                     }
                 },
                 "security": [
@@ -2848,10 +3292,28 @@
                                                         "example": 1
                                                     },
                                                     "question": {
+                                                        "description": "Localized question content",
+                                                        "type": "string",
+                                                        "example": "How to book?"
+                                                    },
+                                                    "question_ar": {
+                                                        "type": "string",
+                                                        "example": "كيف يمكنني الحجز؟"
+                                                    },
+                                                    "question_en": {
                                                         "type": "string",
                                                         "example": "How to book?"
                                                     },
                                                     "answer": {
+                                                        "description": "Localized answer content",
+                                                        "type": "string",
+                                                        "example": "You can book via..."
+                                                    },
+                                                    "answer_ar": {
+                                                        "type": "string",
+                                                        "example": "يمكنك الحجز عبر..."
+                                                    },
+                                                    "answer_en": {
                                                         "type": "string",
                                                         "example": "You can book via..."
                                                     }
@@ -3101,9 +3563,56 @@
                                                     "type": "string",
                                                     "example": "Amazing Paris"
                                                 },
-                                                "description": {
+                                                "duration": {
                                                     "type": "string",
-                                                    "example": "Full description..."
+                                                    "example": "3 Days"
+                                                },
+                                                "tickets_available": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "expiry_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-12-31"
+                                                },
+                                                "company": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Wjhtak Tourism"
+                                                        },
+                                                        "logo": {
+                                                            "type": "string",
+                                                            "example": "http://example.com/logo.png"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "location": {
+                                                    "properties": {
+                                                        "country": {
+                                                            "type": "string",
+                                                            "example": "France"
+                                                        },
+                                                        "city": {
+                                                            "type": "string",
+                                                            "example": "Paris"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "base_capacity": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "extra_passenger_price": {
+                                                    "type": "number",
+                                                    "example": 100
                                                 },
                                                 "images": {
                                                     "type": "array",
@@ -3134,14 +3643,6 @@
                                                 "is_favorite": {
                                                     "type": "boolean",
                                                     "example": false
-                                                },
-                                                "base_capacity": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                },
-                                                "extra_passenger_price": {
-                                                    "type": "number",
-                                                    "example": 100
                                                 }
                                             },
                                             "type": "object"
@@ -3684,6 +4185,116 @@
                     }
                 ]
             }
+        },
+        "/api/v1/bookings/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Cancel a pending booking",
+                "description": "Cancel a booking that has not been paid for yet (status = pending). Confirmed/paid bookings cannot be cancelled through this endpoint.\n\nThis will:\n- Set the booking status to 'cancelled'\n- Delete associated passenger records",
+                "operationId": "cancelBooking",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Response language: ar or en",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking cancelled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إلغاء الحجز بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "booking_id": {
+                                                    "type": "integer",
+                                                    "example": 101
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "cancelled"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Booking cannot be cancelled (already confirmed/paid)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "لا يمكن إلغاء حجز تم تأكيده أو دفعه"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_status": {
+                                                    "type": "string",
+                                                    "example": "confirmed"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -3714,6 +4325,10 @@
         {
             "name": "Flights",
             "description": "Flights"
+        },
+        {
+            "name": "Notifications",
+            "description": "Notifications"
         },
         {
             "name": "Payment",

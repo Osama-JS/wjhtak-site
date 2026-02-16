@@ -80,6 +80,13 @@
             </li> -->
 
             <li>
+                <a href="{{ route('admin.notifications.index') }}" aria-expanded="false">
+                    <i class="fas fa-bell"></i>
+                    <span class="nav-text">{{ __('Notifications') }}</span>
+                </a>
+            </li>
+
+            <li>
                 <a href="{{ route('admin.settings.index') }}" aria-expanded="false">
                     <i class="flaticon-381-settings-2"></i>
                     <span class="nav-text">{{ __('Platform Settings') }}</span>

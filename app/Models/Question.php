@@ -12,18 +12,20 @@ class Question extends Model
     protected $fillable = ['question_ar', 'question_en', 'answer_ar', 'answer_en'];
 
     /**
-     * Get question
+     * Get question based on locale
      */
-    public function getQuestionAttribute($value)
+    public function getQuestionAttribute()
     {
-        return $value;
+        $locale = app()->getLocale();
+        return $locale === 'ar' ? $this->question_ar : $this->question_en;
     }
 
     /**
-     * Get answer
+     * Get answer based on locale
      */
-    public function getAnswerAttribute($value)
+    public function getAnswerAttribute()
     {
-        return $value;
+        $locale = app()->getLocale();
+        return $locale === 'ar' ? $this->answer_ar : $this->answer_en;
     }
 }
