@@ -29,6 +29,10 @@ Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/trips', [FrontendController::class, 'trips'])->name('trips.index');
 Route::get('/trips/{id}', [FrontendController::class, 'tripShow'])->name('trips.show');
 
+// banner
+Route::get('/trips', [FrontendController::class, 'trips'])->name('trips.index');
+Route::get('/trips/{id}', [FrontendController::class, 'tripShow'])->name('trips.show');
+
 // Destinations
 Route::get('/destinations', [FrontendController::class, 'destinations'])->name('destinations');
 

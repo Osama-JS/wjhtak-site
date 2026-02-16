@@ -70,9 +70,10 @@ class CompanyController extends Controller
             'email'  => 'required|email|',
             'phone'  => 'nullable|string|max:100',
             'notes'  => 'required|',
-            'active' => 'boolean',
+            'active' => 'sometimes|boolean',
         ]);
 
+        
         Company::create($validated);
 
         return response()->json([

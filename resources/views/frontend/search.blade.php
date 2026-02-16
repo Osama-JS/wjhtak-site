@@ -2,6 +2,7 @@
 
 @section('title', __('Search Results'))
 
+
 @section('content')
     {{-- Page Header --}}
     <section class="section" style="padding-top: calc(var(--space-24) + 60px); padding-bottom: var(--space-10); background: var(--gradient-primary);">
