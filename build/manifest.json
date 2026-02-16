@@ -1,0 +1,21 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-BWTwYj9V.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/fonts/tajawal.ttf": {
+    "file": "assets/tajawal-YgKsg_HT.ttf",
+    "src": "resources/fonts/tajawal.ttf"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Dg3PCNIn.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

@@ -1,0 +1,458 @@
+/*
+ * =============================================================================
+ * WJHTAK Tourism Platform - RTL Support
+ * =============================================================================
+ *
+ * This file contains all RTL-specific overrides for Arabic language
+ * Applied when html[dir="rtl"]
+ *
+ * =============================================================================
+ */
+
+/* =============================================================================
+   DIRECTION & TEXT ALIGNMENT
+   ============================================================================= */
+
+[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Flip specific icons and elements */
+[dir="rtl"] .flip-rtl {
+    transform: scaleX(-1);
+}
+
+/* Adjust flex for RTL */
+[dir="rtl"] .flex-row-reverse-rtl {
+    flex-direction: row-reverse;
+}
+
+/* =============================================================================
+   NAVIGATION
+   ============================================================================= */
+
+[dir="rtl"] .navbar .nav-links {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+[dir="rtl"] .navbar .nav-actions {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+[dir="rtl"] .dropdown-menu {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .mobile-menu {
+    left: auto;
+    right: 0;
+    transform: translateX(100%);
+}
+
+[dir="rtl"] .mobile-menu.active {
+    transform: translateX(0);
+}
+
+/* =============================================================================
+   ICONS & ARROWS
+   ============================================================================= */
+
+[dir="rtl"] .icon-arrow-right,
+[dir="rtl"] .icon-chevron-right,
+[dir="rtl"] .icon-arrow-left,
+[dir="rtl"] .icon-chevron-left {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .slider-prev,
+[dir="rtl"] .slider-next {
+    transform: scaleX(-1);
+}
+
+/* Button icons */
+[dir="rtl"] .btn .icon-end {
+    margin-left: 0;
+    margin-right: var(--space-2);
+}
+
+[dir="rtl"] .btn .icon-start {
+    margin-right: 0;
+    margin-left: var(--space-2);
+}
+
+/* =============================================================================
+   FORMS
+   ============================================================================= */
+
+[dir="rtl"] .form-input,
+[dir="rtl"] .form-textarea {
+    text-align: right;
+}
+
+[dir="rtl"] .form-input-icon-left {
+    padding-left: var(--space-4);
+    padding-right: var(--space-12);
+}
+
+[dir="rtl"] .form-input-icon-left + .input-icon {
+    left: auto;
+    right: var(--space-4);
+}
+
+[dir="rtl"] .form-input-icon-right {
+    padding-right: var(--space-4);
+    padding-left: var(--space-12);
+}
+
+[dir="rtl"] .form-input-icon-right + .input-icon {
+    right: auto;
+    left: var(--space-4);
+}
+
+/* Checkbox & Radio */
+[dir="rtl"] .checkbox-label,
+[dir="rtl"] .radio-label {
+    padding-left: 0;
+    padding-right: var(--space-8);
+}
+
+[dir="rtl"] .checkbox-label::before,
+[dir="rtl"] .radio-label::before {
+    left: auto;
+    right: 0;
+}
+
+/* =============================================================================
+   LISTS & TIMELINE
+   ============================================================================= */
+
+[dir="rtl"] .list-icon li {
+    padding-left: 0;
+    padding-right: var(--space-8);
+}
+
+[dir="rtl"] .list-icon li::before {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .timeline::before {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .timeline-item {
+    padding-left: 0;
+    padding-right: var(--space-10);
+}
+
+[dir="rtl"] .timeline-dot {
+    left: auto;
+    right: calc(var(--space-10) * -1 + 6px);
+}
+
+/* =============================================================================
+   CARDS
+   ============================================================================= */
+
+[dir="rtl"] .card-badge {
+    left: auto;
+    right: var(--space-4);
+}
+
+[dir="rtl"] .card-price {
+    left: var(--space-4);
+    right: auto;
+}
+
+[dir="rtl"] .card-actions {
+    flex-direction: row-reverse;
+}
+
+/* =============================================================================
+   TRIP CARD
+   ============================================================================= */
+
+[dir="rtl"] .trip-card .trip-location {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .trip-card .trip-meta {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .trip-card .trip-rating {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* =============================================================================
+   HERO SECTION
+   ============================================================================= */
+
+[dir="rtl"] .hero-content {
+    text-align: right;
+}
+
+[dir="rtl"] .hero-search .search-divider {
+    border-left: none;
+    border-right: 1px solid var(--color-border);
+}
+
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
+
+[dir="rtl"] .footer-links li {
+    padding-left: 0;
+    padding-right: var(--space-6);
+}
+
+[dir="rtl"] .footer-links li::before {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .social-links {
+    flex-direction: row-reverse;
+}
+
+/* =============================================================================
+   BREADCRUMB
+   ============================================================================= */
+
+[dir="rtl"] .breadcrumb {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .breadcrumb-separator {
+    transform: scaleX(-1);
+}
+
+/* =============================================================================
+   PAGINATION
+   ============================================================================= */
+
+[dir="rtl"] .pagination {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .pagination .prev-icon,
+[dir="rtl"] .pagination .next-icon {
+    transform: scaleX(-1);
+}
+
+/* =============================================================================
+   SIDEBAR / FILTERS
+   ============================================================================= */
+
+[dir="rtl"] .sidebar {
+    border-left: none;
+    border-right: 1px solid var(--color-border);
+}
+
+[dir="rtl"] .filter-checkbox {
+    margin-right: 0;
+    margin-left: var(--space-3);
+}
+
+[dir="rtl"] .price-range-labels {
+    flex-direction: row-reverse;
+}
+
+/* =============================================================================
+   MODAL
+   ============================================================================= */
+
+[dir="rtl"] .modal-close {
+    right: auto;
+    left: var(--space-4);
+}
+
+/* =============================================================================
+   TESTIMONIALS
+   ============================================================================= */
+
+[dir="rtl"] .testimonial-quote::before {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .testimonial-author {
+    flex-direction: row-reverse;
+}
+
+/* =============================================================================
+   STATS
+   ============================================================================= */
+
+[dir="rtl"] .stat-icon {
+    margin-right: 0;
+    margin-left: var(--space-4);
+}
+
+/* =============================================================================
+   FAQ / ACCORDION
+   ============================================================================= */
+
+[dir="rtl"] .accordion-header {
+    padding-left: var(--space-12);
+    padding-right: var(--space-5);
+}
+
+[dir="rtl"] .accordion-icon {
+    right: auto;
+    left: var(--space-5);
+}
+
+/* =============================================================================
+   CONTACT
+   ============================================================================= */
+
+[dir="rtl"] .contact-info-item {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .contact-icon {
+    margin-right: 0;
+    margin-left: var(--space-4);
+}
+
+/* =============================================================================
+   SEARCH BOX
+   ============================================================================= */
+
+[dir="rtl"] .search-box input {
+    padding-left: var(--space-12);
+    padding-right: var(--space-4);
+}
+
+[dir="rtl"] .search-box .search-icon {
+    right: auto;
+    left: var(--space-4);
+}
+
+/* =============================================================================
+   SWIPER / SLIDERS
+   ============================================================================= */
+
+[dir="rtl"] .swiper-button-prev,
+[dir="rtl"] .swiper-button-next {
+    transform: scaleX(-1);
+}
+
+/* =============================================================================
+   MARGIN & PADDING UTILITIES
+   ============================================================================= */
+
+[dir="rtl"] .ml-auto {
+    margin-left: 0;
+    margin-right: auto;
+}
+[dir="rtl"] .mr-auto {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+[dir="rtl"] .ml-2 {
+    margin-left: 0;
+    margin-right: var(--space-2);
+}
+[dir="rtl"] .mr-2 {
+    margin-right: 0;
+    margin-left: var(--space-2);
+}
+
+[dir="rtl"] .ml-4 {
+    margin-left: 0;
+    margin-right: var(--space-4);
+}
+[dir="rtl"] .mr-4 {
+    margin-right: 0;
+    margin-left: var(--space-4);
+}
+
+[dir="rtl"] .pl-4 {
+    padding-left: 0;
+    padding-right: var(--space-4);
+}
+[dir="rtl"] .pr-4 {
+    padding-right: 0;
+    padding-left: var(--space-4);
+}
+
+[dir="rtl"] .pl-6 {
+    padding-left: 0;
+    padding-right: var(--space-6);
+}
+[dir="rtl"] .pr-6 {
+    padding-right: 0;
+    padding-left: var(--space-6);
+}
+
+/* =============================================================================
+   BORDER UTILITIES
+   ============================================================================= */
+
+[dir="rtl"] .border-l {
+    border-left: none;
+    border-right: 1px solid var(--color-border);
+}
+[dir="rtl"] .border-r {
+    border-right: none;
+    border-left: 1px solid var(--color-border);
+}
+
+/* =============================================================================
+   POSITION UTILITIES
+   ============================================================================= */
+
+[dir="rtl"] .left-0 {
+    left: auto;
+    right: 0;
+}
+[dir="rtl"] .right-0 {
+    right: auto;
+    left: 0;
+}
+
+[dir="rtl"] .left-4 {
+    left: auto;
+    right: var(--space-4);
+}
+[dir="rtl"] .right-4 {
+    right: auto;
+    left: var(--space-4);
+}
+
+/* =============================================================================
+   TEXT ALIGNMENT RTL-AWARE
+   ============================================================================= */
+
+[dir="rtl"] .text-start {
+    text-align: right;
+}
+[dir="rtl"] .text-end {
+    text-align: left;
+}
+
+/* =============================================================================
+   ANIMATIONS RTL
+   ============================================================================= */
+
+[dir="rtl"] .scroll-animate-left {
+    transform: translateX(40px);
+}
+
+[dir="rtl"] .scroll-animate-right {
+    transform: translateX(-40px);
+}
+
+[dir="rtl"] .scroll-animate-left.is-visible,
+[dir="rtl"] .scroll-animate-right.is-visible {
+    transform: translateX(0);
+}
