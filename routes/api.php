@@ -30,8 +30,16 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/my-bookings', [\App\Http\Controllers\Api\V1\TripController::class, 'myBookings']);
         Route::get('/bookings/{id}', [\App\Http\Controllers\Api\V1\TripController::class, 'bookingDetails']);
+        Route::post('/bookings/{id}/cancel', [\App\Http\Controllers\Api\V1\TripController::class, 'cancelBooking']);
         Route::get('/favorites', [\App\Http\Controllers\Api\V1\TripController::class, 'getFavorites']);
         Route::post('/trips/{id}/favorite', [\App\Http\Controllers\Api\V1\TripController::class, 'toggleFavorite']);
+
+        // Notifications
+        Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [\App\Http\Controllers\Api\NotificationController::class, 'unreadCount']);
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
+        Route::delete('/notifications/{id}', [\App\Http\Controllers\Api\NotificationController::class, 'destroy']);
     });
 });
 
@@ -61,13 +69,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::post('/update-fcm-token', [AuthController::class, 'updateFcmToken']);
 
-    // Payment Routes
+    // Payment Routes (require auth)
     Route::prefix('payment')->group(function () {
-        Route::get('/methods', [PaymentController::class, 'methods']);
         Route::post('/initiate', [PaymentController::class, 'initiate']);
         Route::post('/verify', [PaymentController::class, 'verify']);
     });
-    Route::get('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+// Payment Routes (public — no auth required)
+Route::get('/payment/methods', [PaymentController::class, 'methods']);
+Route::get('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');

@@ -1,425 +1,1404 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تقرير سير عمل API منصة وجهتك</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>تقرير تكامل بوابات الدفع الإلكترونية - Tamara | Tabby | HyperPay</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-light: #818CF8;
-            --secondary: #10B981;
-            --accent: #F59E0B;
-            --dark: #0F172A;
-            --light: #F8FAFC;
-            --gray: #64748B;
-            --glass: rgba(255, 255, 255, 0.9);
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f35;
+            --bg-code: #0d1117;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-pink: #ec4899;
+            --tamara-color: #2d4a3e;
+            --tamara-accent: #3fcea5;
+            --tabby-color: #1a2744;
+            --tabby-accent: #3dffc7;
+            --hyperpay-color: #2a1a3e;
+            --hyperpay-accent: #7c3aed;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.15);
+            --glow-purple: 0 0 30px rgba(139, 92, 246, 0.15);
+            --radius: 16px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Tajawal', sans-serif;
         }
 
         body {
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
             overflow-x: hidden;
         }
 
-        .header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 80px 20px;
-            text-align: center;
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 1;
         }
 
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-            letter-spacing: -1px;
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+            position: relative;
         }
 
-        .header p {
-            font-size: 1.25rem;
-            opacity: 0.9;
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), var(--accent-purple), transparent);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
             max-width: 700px;
             margin: 0 auto;
         }
 
-        .container {
-            max-width: 1100px;
-            margin: -50px auto 100px;
-            padding: 0 20px;
-            position: relative;
-            z-index: 10;
+        /* Gateway Cards Row */
+        .gateways-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 50px 0;
         }
 
-        .workflow-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
-            margin-bottom: 40px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            color: var(--primary);
-        }
-
-        .section-title span {
-            background: var(--primary);
-            color: white;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        .section-title h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .step-content {
-            padding-right: 55px;
-        }
-
-        .step-content p {
-            margin-bottom: 20px;
-            color: var(--gray);
-            font-size: 1.1rem;
-        }
-
-        .api-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            background: #E0E7FF;
-            color: var(--primary);
-        }
-
-        .api-badge.get { background: #DCFCE7; color: #166534; }
-        .api-badge.post { background: #FEF9C3; color: #854D0E; }
-
-        .terminal {
-            background: #1E293B;
-            color: #F8FAFC;
-            padding: 20px;
-            border-radius: 12px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            margin: 15px 0 25px;
-            direction: ltr;
-            text-align: left;
+        .gw-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .terminal::before {
-            content: 'API Response Preview';
+        .gw-card::before {
+            content: '';
             position: absolute;
             top: 0;
+            left: 0;
             right: 0;
-            background: rgba(255,255,255,0.1);
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            border-bottom-left-radius: 8px;
+            height: 3px;
         }
 
-        .highlight-box {
-            background: #F1F5F9;
-            border-right: 5px solid var(--primary);
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
+        .gw-card:nth-child(1)::before {
+            background: linear-gradient(90deg, var(--tamara-accent), #10b981);
         }
 
-        .highlight-box h4 {
+        .gw-card:nth-child(2)::before {
+            background: linear-gradient(90deg, var(--tabby-accent), #06b6d4);
+        }
+
+        .gw-card:nth-child(3)::before {
+            background: linear-gradient(90deg, var(--hyperpay-accent), #ec4899);
+        }
+
+        .gw-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .gw-card .gw-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .gw-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
             margin-bottom: 8px;
-            color: var(--dark);
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+        .gw-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
-        .feature-item {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid #E2E8F0;
-            transition: transform 0.3s ease;
-        }
-
-        .feature-item:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-light);
-        }
-
-        .footer {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
+        .gw-card .gw-type {
             display: inline-block;
-            margin-left: 8px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { opacity: 0.4; }
-        }
-
-        .success { background-color: var(--secondary); }
-
-        .mermaid-mock {
-            background: white;
-            border: 1px dashed var(--gray);
-            padding: 30px;
-            border-radius: 16px;
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .flow-diagram {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .flow-node {
-            background: var(--primary);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 8px;
+            margin-top: 12px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
-            width: 250px;
+        }
+
+        .gw-card:nth-child(1) .gw-type {
+            background: rgba(63, 206, 165, 0.15);
+            color: var(--tamara-accent);
+        }
+
+        .gw-card:nth-child(2) .gw-type {
+            background: rgba(61, 255, 199, 0.12);
+            color: var(--tabby-accent);
+        }
+
+        .gw-card:nth-child(3) .gw-type {
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--hyperpay-accent);
+        }
+
+        /* Sections */
+        .section {
+            margin: 60px 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .section-header h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Content Card */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .content-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 20px 0 10px;
+            color: var(--accent-cyan);
+        }
+
+        .content-card p,
+        .content-card li {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .content-card ul {
+            padding-right: 20px;
+        }
+
+        .content-card li {
+            margin-bottom: 6px;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 16px 0;
+            direction: ltr;
+            text-align: left;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }
+
+        .code-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            padding: 3px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            direction: ltr;
+        }
+
+        /* Flow Steps */
+        .flow-container {
+            position: relative;
+            padding: 10px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
             position: relative;
         }
 
-        .flow-node::after {
-            content: '↓';
+        .flow-step::before {
+            content: '';
             position: absolute;
-            bottom: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--primary);
-            font-size: 1.5rem;
+            right: 23px;
+            top: 48px;
+            bottom: -24px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-blue), transparent);
         }
 
-        .flow-node:last-child::after { display: none; }
+        .flow-step:last-child::before {
+            display: none;
+        }
 
+        .flow-num {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .flow-content {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .flow-content h4 {
+            margin: 0 0 8px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .flow-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Colors for steps */
+        .step-blue .flow-num {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .step-purple .flow-num {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .step-cyan .flow-num {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .step-green .flow-num {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .step-orange .flow-num {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-orange);
+            border: 2px solid rgba(245, 158, 11, 0.3);
+        }
+
+        /* Comparison Table */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        th {
+            padding: 14px 18px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-align: right;
+            color: var(--accent-blue);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px 18px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .tag-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .tag-blue {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .tag-purple {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+        }
+
+        .tag-orange {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .tag-red {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+
+        /* API Endpoint Box */
+        .endpoint-box {
+            background: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+            direction: ltr;
+        }
+
+        .method {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .method-get {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+        }
+
+        .method-post {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .endpoint-url {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        /* Alert boxes */
+        .alert {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .alert-warn {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert p {
+            margin: 0;
+            font-size: 0.88rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active,
+        .tab-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Diagram */
+        .diagram-box {
+            background: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            direction: ltr;
+        }
+
+        .diagram-box .arrow {
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            margin: 8px 0;
+            display: block;
+        }
+
+        .diagram-box .node {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 4px;
+        }
+
+        .node-app {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
+        }
+
+        .node-server {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: var(--accent-purple);
+        }
+
+        .node-gateway {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--accent-cyan);
+        }
+
+        .node-success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--accent-green);
+        }
+
+        @media (max-width: 768px) {
+            .gateways-row {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .content-card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-    <header class="header">
-        <h1>تقرير سير العمل التقني</h1>
-        <p>شرح متكامل وشامل لعمليات الـ API من الاستكشاف إلى الحجز والدفع النهائي</p>
-    </header>
-
     <div class="container">
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-badge">📄 تقرير تقني شامل</div>
+            <h1>تكامل بوابات الدفع الإلكترونية</h1>
+            <p>تحليل تفصيلي لتكامل بوابات Tamara و Tabby و HyperPay مع رحلة الدفع الكاملة من البداية حتى النهاية</p>
+        </div>
 
-        <!-- Phase 1: Discovery -->
-        <div class="workflow-card">
-            <div class="section-title">
-                <span>1</span>
-                <h2>الاستكشاف المبدئي (Discovery)</h2>
+        <!-- Gateway Overview Cards -->
+        <div class="gateways-row">
+            <div class="gw-card">
+                <div class="gw-icon">💚</div>
+                <h3>Tamara</h3>
+                <p>الدفع بالتقسيط - اشترِ الآن وادفع لاحقاً على 3 أقساط بدون فوائد</p>
+                <span class="gw-type">PAY_BY_INSTALMENTS</span>
             </div>
-            <div class="step-content">
-                <p>تبدأ تجربة المستخدم عند فتح التطبيق، حيث يقوم بطلب البيانات الأساسية لبناء الواجهة الرئيسية واستكشاف الوجهات المتاحة.</p>
+            <div class="gw-card">
+                <div class="gw-icon">💙</div>
+                <h3>Tabby</h3>
+                <p>تقسيط المدفوعات - ادفع على 4 دفعات أو ادفع لاحقاً بدون رسوم</p>
+                <span class="gw-type">Pay in 4 / Pay Later</span>
+            </div>
+            <div class="gw-card">
+                <div class="gw-icon">💜</div>
+                <h3>HyperPay</h3>
+                <p>بوابة دفع مباشر - تدعم مدى وفيزا وماستركارد و Apple Pay</p>
+                <span class="gw-type">Direct Card Payment</span>
+            </div>
+        </div>
 
-                <span class="api-badge get">GET /api/v1/banners</span>
-                <span class="api-badge get">GET /api/v1/locations</span>
-                <span class="api-badge get">GET /api/v1/countries</span>
+        <!--======================== SECTION 1: Architecture ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(59,130,246,0.12);color:var(--accent-blue);">🏗️</div>
+                <div>
+                    <h2>الهيكل المعماري (Architecture)</h2>
+                    <p>كيف تم تنظيم بوابات الدفع الثلاث في النظام باستخدام نمط Strategy Pattern</p>
+                </div>
+            </div>
 
-                <div class="highlight-box">
-                    <h4>عناصر الاستكشاف:</h4>
-                    <ul>
-                        <li><strong>اللافتات (Banners)</strong>: جلب صور العروض والرحلات المميزة.</li>
-                        <li><strong>المواقع (Locations)</strong>: جلب هيكلية الدول مع المدن التابعة لها لتسهيل البحث.</li>
-                        <li><strong>الأسئلة الشائعة (FAQs)</strong>: توفير مساعدة فورية للمستخدم.</li>
-                    </ul>
+            <div class="content-card">
+                <h3>🔌 واجهة موحدة - PaymentGatewayInterface</h3>
+                <p>تم تصميم النظام باستخدام <strong>Strategy Design Pattern</strong> حيث توجد واجهة موحدة تُلزم جميع
+                    بوابات الدفع بتوفير نفس الوظائف الأساسية:</p>
+
+                <div class="code-label">📁 app/Interfaces/PaymentGatewayInterface.php</div>
+                <pre><code>interface PaymentGatewayInterface
+{
+    // بدء جلسة الدفع والحصول على رابط أو معرّف الجلسة
+    public function initiateCheckout(array $data): array;
+
+    // التحقق من حالة الدفع بعد إتمام العملية
+    public function verifyPayment(string $paymentId): array;
+
+    // الحصول على حالة الدفع كنص مبسط
+    public function getPaymentStatus(string $paymentId): string;
+}</code></pre>
+
+                <div class="alert alert-info">
+                    <span>💡</span>
+                    <p>هذا النمط يسمح بإضافة بوابات دفع جديدة مستقبلاً بسهولة دون تعديل الكود الأساسي. كل بوابة تُنفذ
+                        هذه الواجهة بطريقتها الخاصة.</p>
+                </div>
+
+                <h4>📁 هيكل الملفات</h4>
+                <pre><code>app/
+├── Interfaces/
+│   └── PaymentGatewayInterface.php     ← الواجهة الموحدة
+├── Services/
+│   ├── TamaraPaymentService.php        ← خدمة تمارا
+│   ├── TabbyPaymentService.php         ← خدمة تابي
+│   └── HyperPayService.php            ← خدمة هايبر باي
+├── Http/Controllers/Api/
+│   └── PaymentController.php           ← المتحكم الموحد
+├── Models/
+│   └── Payment.php                     ← نموذج قاعدة البيانات
+config/
+├── services.php                        ← إعدادات تمارا وتابي
+└── hyperpay.php                        ← إعدادات هايبر باي</code></pre>
+            </div>
+
+            <!-- Unified Flow Diagram -->
+            <div class="content-card">
+                <h3>📊 مخطط التدفق الموحد</h3>
+                <div class="diagram-box">
+                    <div class="node node-app">📱 تطبيق الجوال</div>
+                    <span class="arrow">⬇️ POST /api/payment/initiate</span>
+                    <div class="node node-server">⚙️ PaymentController</div>
+                    <span class="arrow">⬇️ يحدد البوابة حسب payment_type</span>
+                    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+                        <div class="node node-gateway">Tamara API</div>
+                        <div class="node node-gateway">Tabby API</div>
+                        <div class="node node-gateway">HyperPay API</div>
+                    </div>
+                    <span class="arrow">⬇️ checkout_url أو checkout_id</span>
+                    <div class="node node-app">📱 المستخدم يُكمل الدفع</div>
+                    <span class="arrow">⬇️ POST /api/payment/verify</span>
+                    <div class="node node-server">⚙️ التحقق من الحالة</div>
+                    <span class="arrow">⬇️ تأكيد الحجز + إنشاء الفاتورة</span>
+                    <div class="node node-success">✅ تم الدفع بنجاح</div>
                 </div>
             </div>
         </div>
 
-        <!-- Phase 2: Trip Browsing -->
-        <div class="workflow-card">
-            <div class="section-title">
-                <span>2</span>
-                <h2>تصفح وبحث الرحلات (Trips & Search)</h2>
+        <!--======================== SECTION 2: API Endpoints ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(139,92,246,0.12);color:var(--accent-purple);">🔗</div>
+                <div>
+                    <h2>نقاط الاتصال API Endpoints</h2>
+                    <p>الـ Routes المتاحة للتعامل مع عمليات الدفع</p>
+                </div>
             </div>
-            <div class="step-content">
-                <p>يتم عرض باقات الرحلات السياحية مع ميزات البحث المتقدم والتصفية بناءً على الوجهة أو السعر.</p>
 
-                <span class="api-badge get">GET /api/v1/trips</span>
-                <span class="api-badge get">GET /api/v1/trips/{id}</span>
+            <div class="content-card">
+                <h3>🛤️ المسارات المتاحة</h3>
 
-                <div class="terminal">
-{
-  "error": false,
-  "data": {
-    "id": 1,
-    "title": "رحلة جزر المالديف الساحرة",
-    "price": 5000,
-    "base_capacity": 2,
-    "extra_passenger_price": 1000,
-    "image_url": "https://..."
+                <div class="endpoint-box">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/api/payment/methods</span>
+                    <span class="tag tag-green" style="margin-right:auto;">Public</span>
+                </div>
+                <p>استرجاع قائمة وسائل الدفع المتاحة (مدى، فيزا/ماستر، تابي، تمارا، Apple Pay) مع الأيقونات.</p>
+
+                <div class="endpoint-box">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/api/payment/initiate</span>
+                    <span class="tag tag-orange" style="margin-right:auto;">Auth Required</span>
+                </div>
+                <p>بدء عملية الدفع. يُرسل <code>booking_id</code> و <code>payment_type</code> ويستقبل رابط الدفع أو
+                    معرّف الجلسة.</p>
+
+                <div class="endpoint-box">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/api/payment/verify</span>
+                    <span class="tag tag-orange" style="margin-right:auto;">Auth Required</span>
+                </div>
+                <p>التحقق من حالة الدفع بعد إتمام العملية. يُؤكد الحجز ويُنشئ الفاتورة عند النجاح.</p>
+
+                <div class="endpoint-box">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/api/payment/callback?gateway={gateway}</span>
+                    <span class="tag tag-blue" style="margin-right:auto;">Callback</span>
+                </div>
+                <p>صفحة وسيطة يُعاد توجيه المستخدم إليها بعد إتمام الدفع في Tabby أو Tamara. يعترضها التطبيق لاستخراج
+                    payment_id.</p>
+            </div>
+        </div>
+
+        <!--======================== SECTION 3: Tamara ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(63,206,165,0.12);color:var(--tamara-accent);">💚</div>
+                <div>
+                    <h2>بوابة Tamara - الدفع بالتقسيط</h2>
+                    <p>تفاصيل التكامل مع Tamara API وفق التوثيق الرسمي</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>⚙️ إعدادات الاتصال</h3>
+                <div class="code-label">📁 config/services.php → tamara</div>
+                <pre><code>'tamara' => [
+    'api_token' => env('TAMARA_API_TOKEN'),         // مفتاح API للمصادقة
+    'notification_key' => env('TAMARA_NOTIFICATION_KEY'), // مفتاح Webhook
+    'base_url' => env('TAMARA_API_URL', 'https://api.tamara.co'),
+],</code></pre>
+
+                <h4>🔐 المصادقة</h4>
+                <p>تستخدم Tamara نظام <strong>Bearer Token Authentication</strong>. يُرسل الـ API Token في ترويسة
+                    Authorization مع كل طلب.</p>
+
+                <h4>📤 1. إنشاء جلسة الدفع (Checkout)</h4>
+                <div class="endpoint-box">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">{base_url}/checkout</span>
+                </div>
+
+                <div class="code-label">📦 Payload المرسل</div>
+                <pre><code>{
+  "total_amount": { "amount": 500.00, "currency": "SAR" },
+  "shipping_amount": { "amount": 0, "currency": "SAR" },
+  "tax_amount": { "amount": 0, "currency": "SAR" },
+  "order_reference_id": "BOOKING-15-1707955200",
+  "order_number": "BOOKING-15-1707955200",
+  "items": [{ "name": "Trip Booking", "quantity": 1, ... }],
+  "consumer": {
+    "email": "user@example.com",
+    "first_name": "أحمد",
+    "last_name": "محمد",
+    "phone_number": "966500000000"
+  },
+  "country_code": "SA",
+  "payment_type": "PAY_BY_INSTALMENTS",
+  "instalments": 3,
+  "merchant_url": {
+    "success": "{callback_url}?status=success",
+    "failure": "{callback_url}?status=failure",
+    "cancel": "{callback_url}?status=cancel",
+    "notification": "{callback_url}/webhook"
+  },
+  "shipping_address": { "city": "Riyadh", "country_code": "SA", ... },
+  "billing_address": { "city": "Riyadh", "country_code": "SA", ... }
+}</code></pre>
+
+                <div class="code-label">✅ الاستجابة الناجحة</div>
+                <pre><code>{
+  "checkout_id": "tam_ck_xxxxx",     // معرّف جلسة الدفع
+  "order_id": "tam_ord_xxxxx",       // معرّف الطلب
+  "checkout_url": "https://checkout.tamara.co/..."  // رابط الدفع
+}</code></pre>
+
+                <h4>🔍 2. التحقق من الدفع (Authorise Order)</h4>
+                <div class="endpoint-box">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">{base_url}/orders/{orderId}/authorise</span>
+                </div>
+                <p>بعد عودة المستخدم من صفحة الدفع، يتم استدعاء <strong>Authorise</strong> لتأكيد الطلب. إذا فشل التأكيد
+                    (ربما تم تأكيده مسبقاً)، يتم استدعاء:</p>
+                <div class="endpoint-box">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">{base_url}/orders/{orderId}</span>
+                </div>
+                <p>حالات النجاح: <span class="tag tag-green">authorised</span> أو <span
+                        class="tag tag-green">fully_captured</span></p>
+            </div>
+        </div>
+
+        <!--======================== SECTION 4: Tabby ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(61,255,199,0.1);color:var(--tabby-accent);">💙</div>
+                <div>
+                    <h2>بوابة Tabby - ادفع على 4 دفعات</h2>
+                    <p>تفاصيل التكامل مع Tabby Checkout API v2</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>⚙️ إعدادات الاتصال</h3>
+                <div class="code-label">📁 config/services.php → tabby</div>
+                <pre><code>'tabby' => [
+    'public_key' => env('TABBY_PUBLIC_KEY'),     // للمصادقة عند إنشاء الجلسة
+    'secret_key' => env('TABBY_SECRET_KEY'),     // للتحقق من حالة الدفع
+    'merchant_code' => env('TABBY_MERCHANT_CODE'), // كود التاجر
+    'base_url' => env('TABBY_BASE_URL', 'https://api.tabby.ai/api/v2'),
+],</code></pre>
+
+                <h4>🔐 المصادقة</h4>
+                <p>تستخدم Tabby مفتاحين: <strong>Public Key</strong> لإنشاء جلسات الـ Checkout، و <strong>Secret
+                        Key</strong> للتحقق من حالة الدفع واسترجاع التفاصيل.</p>
+
+                <h4>📤 1. إنشاء جلسة الدفع (Create Session)</h4>
+                <div class="endpoint-box">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">{base_url}/checkout</span>
+                </div>
+
+                <div class="code-label">📦 Payload المرسل</div>
+                <pre><code>{
+  "payment": {
+    "amount": "500.00",
+    "currency": "SAR",
+    "description": "Order Payment",
+    "buyer": {
+      "name": "أحمد محمد",
+      "email": "user@example.com",
+      "phone": "966500000000"
+    },
+    "shipping_address": {
+      "city": "Riyadh",
+      "address": "Saudi Arabia",
+      "zip": "0000"
+    },
+    "order": {
+      "reference_id": "BOOKING-15-1707955200",
+      "items": [{ "title": "Trip Booking", "quantity": 1, "unit_price": 500 }]
+    }
+  },
+  "lang": "ar",
+  "merchant_code": "YOUR_MERCHANT_CODE",
+  "merchant_urls": {
+    "success": "{callback_url}?status=success",
+    "cancel": "{callback_url}?status=cancel",
+    "failure": "{callback_url}?status=failure"
   }
-}
-                </div>
+}</code></pre>
 
-                <div class="highlight-box">
-                    <h4>الميزات الذكية:</h4>
-                    <p><strong>التسعير الديناميكي:</strong> يتم حساب السعر النهائي تلقائياً بناءً على عدد المسافرين، السعة الأساسية، وسعر الفرد الإضافي.</p>
-                    <p><strong>نظام المفضلة:</strong> يمكن للمستخدم إضافة الرحلة لمفضلته للرجوع لها لاحقاً.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Phase 3: Booking Process -->
-        <div class="workflow-card">
-            <div class="section-title">
-                <span>3</span>
-                <h2>إنشاء الحجز (Seamless Booking)</h2>
-            </div>
-            <div class="step-content">
-                <p>بعد اختيار الرحلة، يقوم المستخدم بإدخال بيانات المرافقين. يضمن الـ API صحة البيانات وتوفر التذاكر المتبقية.</p>
-
-                <span class="api-badge post">POST /api/v1/trips/book</span>
-
-                <div class="terminal">
-{
-  "trip_id": 1,
-  "tickets_count": 2,
-  "passengers": [
-    { "name": "أحمد علي", "passport_number": "A123..." },
-    { "name": "سارة محمد", "passport_number": "B456..." }
-  ]
-}
-                </div>
-
-                <div class="grid">
-                    <div class="feature-item">
-                        <h4>حالة الحجز: PENDING</h4>
-                        <p>يتم إنشاء الحجز بحالة "معلق" حتى يتم التأكد من إتمام عملية الدفع.</p>
-                    </div>
-                    <div class="feature-item">
-                        <h4>التحقق من التوفر</h4>
-                        <p>يتم فحص عدد التذاكر المتاحة في نفس اللحظة لمنع الحجز المزدوج.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Phase 4: Payment Flow -->
-        <div class="workflow-card">
-            <div class="section-title">
-                <span>4</span>
-                <h2>دورة الدفع المتكاملة (Payment Lifecycle)</h2>
-            </div>
-            <div class="step-content">
-                <p>هنا تكمن القوة التقنية، حيث يتم التعامل مع 3 بوابات دفع مختلفة في واجهة واحدة موحدة.</p>
-
-                <span class="api-badge post">POST /api/payment/initiate</span>
-                <span class="api-badge post">POST /api/payment/verify</span>
-
-                <div class="mermaid-mock">
-                    <div class="flow-diagram">
-                        <div class="flow-node">اختيار وسيلة الدفع</div>
-                        <div class="flow-node">بدء العملية (Initiate)</div>
-                        <div class="flow-node">التوجيه لبوابة الدفع</div>
-                        <div class="flow-node">الرجوع للتطبيق (Callback)</div>
-                        <div class="flow-node">التحقق النهائي (Verify)</div>
-                    </div>
-                </div>
-
-                <div class="highlight-box">
-                    <h4>الوسائل المدعومة:</h4>
-                    <ul>
-                        <li><strong>HyperPay</strong>: تدعم (مدى، فيزا، ماستركارد، أبل باي).</li>
-                        <li><strong>Tabby</strong>: تدعم التقسيط المريح.</li>
-                        <li><strong>Tamara</strong>: تدعم التقسيط وشراء الآن والدفع لاحقاً.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Phase 5: Confirmation & Fulfillment -->
-        <div class="workflow-card">
-            <div class="section-title">
-                <span>5</span>
-                <h2>التأكيد النهائي والفواتير (Confirmation)</h2>
-            </div>
-            <div class="step-content">
-                <p>بمجرد التأكد من نجاح العملية من خلال الـ API، يقوم النظام بسلسلة من العمليات الآلية في الخلفية لضمان الدقة.</p>
-
-                <div class="highlight-box" style="border-right-color: var(--secondary);">
-                    <h4>العمليات الآلية المنفذة:</h4>
-                    <ul style="list-style: none;">
-                        <li><span class="status-dot success"></span> <strong>تحديث حالة الحجز</strong>: تحول تلقائي من PENDING إلى CONFIRMED.</li>
-                        <li><span class="status-dot success"></span> <strong>خصم المخزون</strong>: خصم عدد التذاكر من سجل الرحلة (Inventory Management).</li>
-                        <li><span class="status-dot success"></span> <strong>توليد الفاتورة</strong>: إنشاء فاتورة إلكترونية PDF احترافية تدعم اللغة العربية.</li>
-                        <li><span class="status-dot success"></span> <strong>تسجيل المدفوعات</strong>: توثيق العملية في جدول المدفوعات مع تفصيل نوع البطاقة.</li>
-                    </ul>
-                </div>
-
-                <div class="terminal">
-{
-  "error": false,
-  "message": "Payment successful and booking confirmed.",
-  "data": {
-    "status": "paid",
-    "invoice_url": "https://.../storage/invoices/inv_1.pdf",
-    "transaction_id": "T789123"
+                <div class="code-label">✅ الاستجابة الناجحة</div>
+                <pre><code>{
+  "id": "sess_xxxxx",    // معرّف الجلسة
+  "configuration": {
+    "available_products": {
+      "installments": [{ "web_url": "https://checkout.tabby.ai/..." }],
+      "pay_later": [{ "web_url": "https://checkout.tabby.ai/..." }]
+    }
   }
-}
+}</code></pre>
+                <p>يتم استخراج <code>web_url</code> من المنتج الأول المتاح (installments أو pay_later) كرابط الدفع.</p>
+
+                <h4>🔍 2. التحقق من الدفع (Retrieve Payment)</h4>
+                <div class="endpoint-box">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">{base_url}/payments/{paymentId}</span>
+                </div>
+                <p>يُستخدم الـ <strong>Secret Key</strong> للمصادقة عند التحقق.</p>
+                <p>حالات النجاح: <span class="tag tag-green">authorized</span> أو <span
+                        class="tag tag-green">closed</span></p>
+            </div>
+        </div>
+
+        <!--======================== SECTION 5: HyperPay ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(124,58,237,0.12);color:var(--hyperpay-accent);">💜</div>
+                <div>
+                    <h2>بوابة HyperPay - الدفع المباشر بالبطاقات</h2>
+                    <p>تفاصيل التكامل مع HyperPay / ACI OPP API</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>⚙️ إعدادات الاتصال</h3>
+                <div class="code-label">📁 config/hyperpay.php</div>
+                <pre><code>'base_url'     => env('HYPERPAY_BASE_URL', 'https://test.oppwa.com/v1/'),
+'access_token' => env('HYPERPAY_ACCESS_TOKEN'),
+'entity_ids'   => [
+    'mada'        => env('HYPERPAY_ENTITY_ID_MADA'),
+    'visa_master' => env('HYPERPAY_ENTITY_ID_VISA_MASTER'),
+    'apple_pay'   => env('HYPERPAY_ENTITY_ID_APPLE'),
+],
+'currency' => env('HYPERPAY_CURRENCY', 'SAR'),</code></pre>
+
+                <h4>🔐 المصادقة</h4>
+                <p>تستخدم HyperPay نظام <strong>Bearer Token + Entity ID</strong>. كل وسيلة دفع (مدى / فيزا / Apple Pay)
+                    لها Entity ID خاص بها.</p>
+
+                <div class="alert alert-warn">
+                    <span>⚠️</span>
+                    <p><strong>ملاحظة مهمة:</strong> HyperPay تختلف عن Tamara و Tabby في أنها تستخدم
+                        <code>application/x-www-form-urlencoded</code> بدلاً من JSON.</p>
+                </div>
+
+                <h4>📤 1. إنشاء Checkout (Prepare Checkout)</h4>
+                <div class="endpoint-box">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">{base_url}checkouts</span>
+                </div>
+
+                <div class="code-label">📦 Parameters المرسلة (Form Data)</div>
+                <pre><code>entityId=ENTITY_ID_HERE
+&amount=500.00
+&currency=SAR
+&paymentType=DB
+&merchantTransactionId=BOOKING-15-1707955200
+&customer.email=user@example.com</code></pre>
+
+                <div class="code-label">✅ الاستجابة الناجحة</div>
+                <pre><code>{
+  "result": { "code": "000.200.100", "description": "successfully created checkout" },
+  "id": "B9C694..."   // Checkout ID - يُستخدم لعرض نموذج الدفع
+}</code></pre>
+                <p>يستخدم التطبيق الـ <code>Checkout ID</code> لعرض نموذج الدفع المضمّن (Payment Widget) داخل التطبيق.
+                </p>
+
+                <h4>🔍 2. التحقق من الدفع (Get Payment Status)</h4>
+                <div class="endpoint-box">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">{base_url}checkouts/{checkoutId}/payment?entityId={entityId}</span>
+                </div>
+
+                <div class="code-label">🔢 فحص رمز النتيجة (Result Code)</div>
+                <pre><code>// أكواد النجاح تتبع هذه الأنماط:
+// 000.000.xxx → نجاح تام
+// 000.100.1xx → نجاح مع معلومات إضافية
+// 000.3xxxxx → نجاح (مراجعة)
+// 000.6xxxxx → نجاح (معلق)
+
+function isSuccessful($resultCode) {
+    return preg_match('/^(000\.000\.|000\.100\.1|000\.[36])/', $resultCode);
+}</code></pre>
+            </div>
+        </div>
+
+        <!--======================== SECTION 6: Payment Flow ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(6,182,212,0.12);color:var(--accent-cyan);">🔄</div>
+                <div>
+                    <h2>رحلة الدفع الكاملة (Full Payment Journey)</h2>
+                    <p>من لحظة اختيار وسيلة الدفع وحتى تأكيد الحجز وإصدار الفاتورة</p>
+                </div>
+            </div>
+
+            <div class="flow-container">
+                <div class="flow-step step-blue">
+                    <div class="flow-num">1</div>
+                    <div class="flow-content">
+                        <h4>📱 عرض وسائل الدفع</h4>
+                        <p>التطبيق يستدعي <code>GET /api/payment/methods</code> لعرض الخيارات المتاحة: مدى، فيزا/ماستر،
+                            تابي، تمارا، Apple Pay. كل وسيلة تحتوي على <code>key</code> و <code>name</code> و
+                            <code>type</code> و <code>icon</code>.</p>
+                    </div>
+                </div>
+
+                <div class="flow-step step-purple">
+                    <div class="flow-num">2</div>
+                    <div class="flow-content">
+                        <h4>📤 بدء عملية الدفع</h4>
+                        <p>التطبيق يرسل <code>POST /api/payment/initiate</code> مع <code>booking_id</code> و
+                            <code>payment_type</code>. المتحكم يتحقق من صلاحية الحجز ثم يوجه الطلب للبوابة المناسبة.</p>
+                    </div>
+                </div>
+
+                <div class="flow-step step-cyan">
+                    <div class="flow-num">3</div>
+                    <div class="flow-content">
+                        <h4>🌐 التواصل مع البوابة</h4>
+                        <p><strong>Tamara/Tabby:</strong> يتم إنشاء جلسة checkout واستلام <code>checkout_url</code>
+                            لإعادة توجيه المستخدم.<br>
+                            <strong>HyperPay:</strong> يتم إنشاء <code>checkout_id</code> لعرض نموذج الدفع المضمّن في
+                            التطبيق.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flow-step step-orange">
+                    <div class="flow-num">4</div>
+                    <div class="flow-content">
+                        <h4>💳 إكمال الدفع</h4>
+                        <p><strong>Tamara/Tabby:</strong> المستخدم يُوجَّه لصفحة الدفع الخارجية، يُدخل بياناته، ثم يُعاد
+                            توجيهه إلى <code>/api/payment/callback</code> مع حالة الدفع.<br>
+                            <strong>HyperPay:</strong> المستخدم يُدخل بيانات البطاقة مباشرة في نموذج مضمّن داخل التطبيق.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flow-step step-green">
+                    <div class="flow-num">5</div>
+                    <div class="flow-content">
+                        <h4>✅ التحقق والتأكيد</h4>
+                        <p>التطبيق يستدعي <code>POST /api/payment/verify</code> مع <code>payment_id</code> أو
+                            <code>checkout_id</code>. النظام يتحقق من البوابة، وعند النجاح:</p>
+                        <ul>
+                            <li>تحديث حالة الحجز إلى <span class="tag tag-green">confirmed</span></li>
+                            <li>خصم التذاكر من الرحلة</li>
+                            <li>تسجيل عملية الدفع في جدول <code>payments</code></li>
+                            <li>إنشاء فاتورة PDF عبر <code>InvoiceService</code></li>
+                            <li>إرجاع <code>invoice_url</code> و <code>transaction_id</code> للتطبيق</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!--======================== SECTION 7: Comparison Table ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(245,158,11,0.12);color:var(--accent-orange);">📊</div>
+                <div>
+                    <h2>مقارنة شاملة بين البوابات الثلاث</h2>
+                    <p>توافق عمليات الدفع والاختلافات التقنية</p>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المعيار</th>
+                            <th>Tamara</th>
+                            <th>Tabby</th>
+                            <th>HyperPay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>نوع الدفع</strong></td>
+                            <td>تقسيط (BNPL)</td>
+                            <td>تقسيط (BNPL)</td>
+                            <td>دفع مباشر (Card)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>نوع التكامل</strong></td>
+                            <td>Redirect</td>
+                            <td>Redirect</td>
+                            <td>Embedded Widget</td>
+                        </tr>
+                        <tr>
+                            <td><strong>المصادقة</strong></td>
+                            <td>Bearer Token واحد</td>
+                            <td>Public Key + Secret Key</td>
+                            <td>Bearer Token + Entity IDs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>تنسيق البيانات</strong></td>
+                            <td>JSON</td>
+                            <td>JSON</td>
+                            <td>Form URL-Encoded</td>
+                        </tr>
+                        <tr>
+                            <td><strong>إنشاء Checkout</strong></td>
+                            <td>POST /checkout</td>
+                            <td>POST /checkout</td>
+                            <td>POST /checkouts</td>
+                        </tr>
+                        <tr>
+                            <td><strong>الاستجابة</strong></td>
+                            <td>checkout_url + order_id</td>
+                            <td>session_id + web_url</td>
+                            <td>checkout_id فقط</td>
+                        </tr>
+                        <tr>
+                            <td><strong>التحقق</strong></td>
+                            <td>POST /orders/{id}/authorise</td>
+                            <td>GET /payments/{id}</td>
+                            <td>GET /checkouts/{id}/payment</td>
+                        </tr>
+                        <tr>
+                            <td><strong>حالة النجاح</strong></td>
+                            <td><span class="tag tag-green">authorised / fully_captured</span></td>
+                            <td><span class="tag tag-green">authorized / closed</span></td>
+                            <td><span class="tag tag-green">Result Code Pattern</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Callback URL</strong></td>
+                            <td>success/failure/cancel + webhook</td>
+                            <td>success/cancel/failure</td>
+                            <td>لا يوجد (Widget مباشر)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>العملة الافتراضية</strong></td>
+                            <td>SAR</td>
+                            <td>SAR</td>
+                            <td>SAR (قابل للتغيير)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>البلد</strong></td>
+                            <td>SA (ثابت حالياً)</td>
+                            <td>حسب اللغة</td>
+                            <td>غير محدد</td>
+                        </tr>
+                        <tr>
+                            <td><strong>الأقساط</strong></td>
+                            <td>3 أقساط</td>
+                            <td>4 دفعات / ادفع لاحقاً</td>
+                            <td>دفعة واحدة كاملة</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!--======================== SECTION 8: Database ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(16,185,129,0.12);color:var(--accent-green);">🗄️</div>
+                <div>
+                    <h2>قاعدة البيانات - جدول Payments</h2>
+                    <p>هيكل تخزين بيانات الدفع الموحد</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>العمود</th>
+                                <th>النوع</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>id</code></td>
+                                <td>bigint (PK)</td>
+                                <td>المعرّف التسلسلي</td>
+                            </tr>
+                            <tr>
+                                <td><code>trip_booking_id</code></td>
+                                <td>FK → trip_bookings</td>
+                                <td>ربط بالحجز</td>
+                            </tr>
+                            <tr>
+                                <td><code>payment_gateway</code></td>
+                                <td>enum: hyperpay, tabby, tamara</td>
+                                <td>البوابة المستخدمة</td>
+                            </tr>
+                            <tr>
+                                <td><code>payment_method</code></td>
+                                <td>string (nullable)</td>
+                                <td>الوسيلة: mada, visa_master, apple_pay, tabby, tamara</td>
+                            </tr>
+                            <tr>
+                                <td><code>transaction_id</code></td>
+                                <td>string (unique)</td>
+                                <td>معرّف العملية من البوابة</td>
+                            </tr>
+                            <tr>
+                                <td><code>amount</code></td>
+                                <td>decimal(10,2)</td>
+                                <td>المبلغ المدفوع</td>
+                            </tr>
+                            <tr>
+                                <td><code>currency</code></td>
+                                <td>string (SAR)</td>
+                                <td>العملة</td>
+                            </tr>
+                            <tr>
+                                <td><code>status</code></td>
+                                <td>enum: pending, paid, failed</td>
+                                <td>حالة الدفع</td>
+                            </tr>
+                            <tr>
+                                <td><code>raw_response</code></td>
+                                <td>JSON (nullable)</td>
+                                <td>الاستجابة الكاملة من البوابة</td>
+                            </tr>
+                            <tr>
+                                <td><code>invoice_path</code></td>
+                                <td>string (nullable)</td>
+                                <td>مسار فاتورة PDF</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!--======================== SECTION 9: completePayment ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(236,72,153,0.12);color:var(--accent-pink);">⚡</div>
+                <div>
+                    <h2>عملية إتمام الدفع (completePayment)</h2>
+                    <p>الدالة الموحدة التي تُنفَّذ عند نجاح أي بوابة</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <p>بعد التحقق الناجح من أي بوابة، يتم استدعاء <code>completePayment()</code> التي تُنفذ الخطوات التالية
+                    بشكل موحد:</p>
+
+                <div class="code-label">📁 PaymentController.php → completePayment()</div>
+                <pre><code>protected function completePayment($bookingId, $gateway, $transactionId, $response, $paymentMethod)
+{
+    // 1. جلب الحجز مع بيانات الرحلة
+    $booking = TripBooking::with('trip')->find($bookingId);
+
+    // 2. فحص Idempotency - إذا كان مؤكداً مسبقاً، إرجاع الفاتورة القديمة
+    if ($booking->status === 'confirmed') {
+        return Payment::where('trip_booking_id', $bookingId)->first()->invoice_path;
+    }
+
+    // 3. خصم التذاكر من الرحلة (مع تسجيل حالة Overbooking)
+    $newCount = max(0, $booking->trip->tickets - $booking->tickets_count);
+    $booking->trip->update(['tickets' => $newCount]);
+
+    // 4. تحديث حالة الحجز إلى "confirmed"
+    $booking->update(['status' => 'confirmed']);
+
+    // 5. تسجيل عملية الدفع في قاعدة البيانات
+    $payment = Payment::create([
+        'trip_booking_id' => $booking->id,
+        'payment_gateway' => $gateway,        // hyperpay / tabby / tamara
+        'payment_method'  => $paymentMethod,  // mada / visa_master / etc.
+        'transaction_id'  => $transactionId,
+        'amount' => $booking->total_price,
+        'currency' => 'SAR',
+        'status' => 'paid',
+        'raw_response' => $response,
+    ]);
+
+    // 6. إنشاء فاتورة PDF
+    $invoicePath = $this->invoiceService->generateInvoice($booking);
+    $payment->update(['invoice_path' => $invoicePath]);
+
+    return $invoicePath;
+}</code></pre>
+
+                <div class="alert alert-success">
+                    <span>✅</span>
+                    <p><strong>التوافق الموحد:</strong> رغم اختلاف آليات كل بوابة في الـ Checkout والتحقق، فإن عملية
+                        إتمام الدفع واحدة ومشتركة لجميع البوابات. هذا يضمن اتساق البيانات وتجربة المستخدم.</p>
+                </div>
+            </div>
+        </div>
+
+        <!--======================== SECTION 10: Callback ========================-->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background:rgba(59,130,246,0.12);color:var(--accent-blue);">🔙</div>
+                <div>
+                    <h2>آلية Callback وتطبيق الجوال</h2>
+                    <p>كيف يتم التنسيق بين الخادم وتطبيق الجوال بعد إتمام الدفع</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>📱 آلية الـ Callback للتطبيق</h3>
+                <p>عند استخدام Tamara أو Tabby، يُعاد توجيه المستخدم إلى صفحة وسيطة بعد إتمام الدفع:</p>
+
+                <div class="code-label">🔗 رابط الـ Callback</div>
+                <pre><code>GET /api/payment/callback?gateway=tabby&status=success&payment_id=pay_xxxxx
+GET /api/payment/callback?gateway=tamara&status=success&payment_id=ord_xxxxx</code></pre>
+
+                <p>هذه الصفحة تعرض رسالة "جارِ المعالجة..." بينما يقوم تطبيق الجوال بـ:</p>
+                <ul>
+                    <li><strong>اعتراض الـ URL</strong> قبل عرض الصفحة عبر WebView Interception</li>
+                    <li><strong>استخراج <code>payment_id</code></strong> من معاملات الرابط</li>
+                    <li><strong>استدعاء <code>POST /api/payment/verify</code></strong> مع الـ payment_id للتحقق النهائي
+                    </li>
+                </ul>
+
+                <div class="alert alert-info">
+                    <span>💡</span>
+                    <p><strong>HyperPay</strong> لا يحتاج لهذه الآلية لأن الدفع يتم داخل التطبيق مباشرة عبر Widget
+                        مضمّن. بعد الانتهاء، يستدعي التطبيق verify مباشرة.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>📄 تقرير تكامل بوابات الدفع — تم إنشاؤه بتاريخ 16 فبراير 2026</p>
+            <p style="margin-top:8px;">Tamara API • Tabby API v2 • HyperPay OPP API v1</p>
+        </div>
     </div>
 
-    <footer class="footer">
-        <p>&copy; 2026 منصة وجهتك - جميع الحقوق محفوظة</p>
-        <p style="font-size: 0.8rem; margin-top:10px;">تم إعداد هذا التقرير تقنياً بواسطة النظام لضمان توثيق دقيق لسير العمل</p>
-    </footer>
-
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const group = this.closest('.content-card');
+                group.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                group.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                group.querySelector('#' + this.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
 </body>
+
 </html>

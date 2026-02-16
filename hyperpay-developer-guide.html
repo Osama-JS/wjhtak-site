@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل المطور - تكامل HyperPay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e1a;
+            --card: #111827;
+            --card2: #1a2236;
+            --border: rgba(255, 255, 255, .07);
+            --purple: #7c3aed;
+            --purple-g: linear-gradient(135deg, #7c3aed, #a855f7);
+            --green: #10b981;
+            --blue: #3b82f6;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --cyan: #06b6d4;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --dim: #64748b
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0
+        }
+
+        code,
+        pre {
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1a1040 0%, #0f172a 50%, #0c1425 100%);
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(124, 58, 237, .08), transparent 50%);
+            pointer-events: none
+        }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: var(--purple-g);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto
+        }
+
+        .hero .ver {
+            display: inline-block;
+            background: rgba(124, 58, 237, .15);
+            border: 1px solid rgba(124, 58, 237, .3);
+            padding: 4px 16px;
+            border-radius: 50px;
+            font-size: .75rem;
+            color: var(--purple);
+            margin-bottom: 16px
+        }
+
+        .wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 20px
+        }
+
+        .toc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 40px
+        }
+
+        .toc h3 {
+            font-size: 1rem;
+            color: var(--purple);
+            margin-bottom: 12px
+        }
+
+        .toc ol {
+            padding-right: 20px
+        }
+
+        .toc li {
+            margin-bottom: 6px
+        }
+
+        .toc a {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: .9rem
+        }
+
+        .toc a:hover {
+            text-decoration: underline
+        }
+
+        section {
+            margin-bottom: 48px
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(124, 58, 237, .3);
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        h2 .num {
+            background: var(--purple-g);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+            flex-shrink: 0
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            color: var(--cyan);
+            margin: 20px 0 10px
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 16px
+        }
+
+        .card.warn {
+            border-color: rgba(245, 158, 11, .3);
+            background: rgba(245, 158, 11, .04)
+        }
+
+        .card.success {
+            border-color: rgba(16, 185, 129, .3);
+            background: rgba(16, 185, 129, .04)
+        }
+
+        .card.info {
+            border-color: rgba(59, 130, 246, .3);
+            background: rgba(59, 130, 246, .04)
+        }
+
+        pre {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+            overflow-x: auto;
+            font-size: .82rem;
+            line-height: 1.6;
+            margin: 12px 0;
+            direction: ltr;
+            text-align: left;
+            color: #c9d1d9
+        }
+
+        .kw {
+            color: #ff7b72
+        }
+
+        .str {
+            color: #a5d6ff
+        }
+
+        .cm {
+            color: #8b949e
+        }
+
+        .fn {
+            color: #d2a8ff
+        }
+
+        .num {
+            color: #79c0ff
+        }
+
+        .key {
+            color: #ffa657
+        }
+
+        .endpoint {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0
+        }
+
+        .endpoint .method {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: .75rem;
+            font-weight: 700;
+            margin-left: 8px;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .method.post {
+            background: rgba(16, 185, 129, .15);
+            color: var(--green)
+        }
+
+        .method.get {
+            background: rgba(59, 130, 246, .15);
+            color: var(--blue)
+        }
+
+        .endpoint .url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .9rem;
+            color: #fff
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .85rem;
+            margin: 12px 0
+        }
+
+        th,
+        td {
+            padding: 10px 14px;
+            text-align: right;
+            border-bottom: 1px solid var(--border)
+        }
+
+        th {
+            color: var(--purple);
+            font-weight: 600;
+            background: rgba(124, 58, 237, .05)
+        }
+
+        td {
+            color: var(--muted)
+        }
+
+        td code {
+            background: rgba(255, 255, 255, .06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: .8rem;
+            color: var(--cyan)
+        }
+
+        .flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 20px 0
+        }
+
+        .flow-step {
+            display: flex;
+            gap: 16px;
+            position: relative
+        }
+
+        .flow-step .dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1
+        }
+
+        .flow-step .line {
+            position: absolute;
+            right: 17px;
+            top: 36px;
+            bottom: -36px;
+            width: 2px;
+            background: var(--border)
+        }
+
+        .flow-step:last-child .line {
+            display: none
+        }
+
+        .flow-step .content {
+            flex: 1;
+            padding-bottom: 24px
+        }
+
+        .flow-step .content h4 {
+            font-size: .95rem;
+            color: #fff;
+            margin-bottom: 4px
+        }
+
+        .flow-step .content p {
+            font-size: .85rem;
+            color: var(--muted)
+        }
+
+        .dot.purple {
+            background: rgba(124, 58, 237, .2);
+            color: var(--purple);
+            border: 2px solid var(--purple)
+        }
+
+        .dot.blue {
+            background: rgba(59, 130, 246, .2);
+            color: var(--blue);
+            border: 2px solid var(--blue)
+        }
+
+        .dot.green {
+            background: rgba(16, 185, 129, .2);
+            color: var(--green);
+            border: 2px solid var(--green)
+        }
+
+        .dot.orange {
+            background: rgba(245, 158, 11, .2);
+            color: var(--orange);
+            border: 2px solid var(--orange)
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: .7rem;
+            font-weight: 600
+        }
+
+        .badge.required {
+            background: rgba(239, 68, 68, .15);
+            color: var(--red)
+        }
+
+        .badge.optional {
+            background: rgba(100, 116, 139, .15);
+            color: var(--dim)
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--dim);
+            font-size: .8rem;
+            border-top: 1px solid var(--border)
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero">
+        <div class="ver">📋 وثيقة تقنية — v2.0</div>
+        <h1>💜 دليل تكامل HyperPay</h1>
+        <p>دليل شامل لمطور التطبيق لتنفيذ عمليات الدفع عبر HyperPay من البداية حتى تسجيل العملية في قاعدة البيانات</p>
+    </div>
+
+    <div class="wrap">
+
+        <!-- TOC -->
+        <div class="toc">
+            <h3>📑 الفهرس</h3>
+            <ol>
+                <li><a href="#arch">البنية العامة وسير العمل</a></li>
+                <li><a href="#step1">الخطوة 1: بدء عملية الدفع (Initiate)</a></li>
+                <li><a href="#step2">الخطوة 2: عرض Payment Widget</a></li>
+                <li><a href="#step3">الخطوة 3: التحقق من الدفع (Verify)</a></li>
+                <li><a href="#backend">ماذا يحدث في الخادم بعد النجاح</a></li>
+                <li><a href="#db">قاعدة البيانات — جدول payments</a></li>
+                <li><a href="#errors">معالجة الأخطاء ورموز الاستجابة</a></li>
+                <li><a href="#test">بيئة الاختبار وبطاقات التجربة</a></li>
+                <li><a href="#checklist">قائمة التحقق النهائية</a></li>
+            </ol>
+        </div>
+
+        <!-- 1. Architecture -->
+        <section id="arch">
+            <h2><span class="num">1</span> البنية العامة وسير العمل</h2>
+
+            <div class="card info">
+                <p>⚡ HyperPay يختلف عن Tabby/Tamara — لا يوجد إعادة توجيه لصفحة خارجية. بدلاً من ذلك، يتم تضمين
+                    <strong>Payment Widget</strong> داخل التطبيق باستخدام WebView.</p>
+            </div>
+
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="dot purple">1</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>التطبيق → POST /api/payment/initiate</h4>
+                        <p>إرسال booking_id و payment_type (mada أو visa_master) ← يعود checkout_id</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="dot blue">2</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>التطبيق → عرض Payment Widget في WebView</h4>
+                        <p>تحميل paymentWidgets.js مع checkout_id ← المستخدم يدخل بيانات البطاقة</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="dot orange">3</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>HyperPay → إعادة التوجيه إلى shopperResultUrl</h4>
+                        <p>بعد إتمام الدفع، HyperPay يوجه إلى الـ URL المحدد مع ?id=checkout_id&resourcePath=...</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="dot green">4</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>التطبيق → POST /api/payment/verify</h4>
+                        <p>إرسال checkout_id و payment_type ← الخادم يتحقق ويسجل العملية ← يعود النتيجة + الفاتورة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Step 1: Initiate -->
+        <section id="step1">
+            <h2><span class="num">2</span> الخطوة 1: بدء عملية الدفع</h2>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/payment/initiate</span>
+                <p style="color:var(--muted);font-size:.8rem;margin-top:6px">🔒 يتطلب Authorization: Bearer {token}</p>
+            </div>
+
+            <h3>📤 Request Body</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الحقل</th>
+                        <th>النوع</th>
+                        <th>الحالة</th>
+                        <th>الوصف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>booking_id</code></td>
+                        <td>integer</td>
+                        <td><span class="badge required">مطلوب</span></td>
+                        <td>معرف الحجز</td>
+                    </tr>
+                    <tr>
+                        <td><code>payment_type</code></td>
+                        <td>string</td>
+                        <td><span class="badge required">مطلوب</span></td>
+                        <td><code>mada</code> أو <code>visa_master</code> أو <code>apple_pay</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📥 مثال الطلب</h3>
+            <pre>{
+  <span class="key">"booking_id"</span>: <span class="num">42</span>,
+  <span class="key">"payment_type"</span>: <span class="str">"visa_master"</span>
+}</pre>
+
+            <h3>✅ استجابة النجاح (200)</h3>
+            <pre>{
+  <span class="key">"error"</span>: <span class="kw">false</span>,
+  <span class="key">"message"</span>: <span class="str">"Checkout initialized successfully."</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"id"</span>: <span class="str">"A1B2C3D4E5F6G7H8.uat"</span>,  <span class="cm">// ← هذا هو checkout_id</span>
+    <span class="key">"result"</span>: {
+      <span class="key">"code"</span>: <span class="str">"000.200.100"</span>,
+      <span class="key">"description"</span>: <span class="str">"successfully created checkout"</span>
+    }
+  }
+}</pre>
+
+            <div class="card warn">
+                <p>⚠️ <strong>مهم:</strong> احفظ قيمة <code>data.id</code> — هذا هو الـ <code>checkout_id</code> الذي
+                    ستحتاجه في الخطوة 2 (العرض) والخطوة 3 (التحقق).</p>
+            </div>
+
+            <h3>ماذا يحدث في الـ Backend</h3>
+            <p>الخادم يرسل طلب POST إلى HyperPay مع البيانات التالية تلقائياً:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>المعامل</th>
+                        <th>القيمة</th>
+                        <th>ملاحظة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>entityId</code></td>
+                        <td>حسب payment_type</td>
+                        <td>يتم اختياره تلقائياً</td>
+                    </tr>
+                    <tr>
+                        <td><code>amount</code></td>
+                        <td>من الحجز</td>
+                        <td>total_price</td>
+                    </tr>
+                    <tr>
+                        <td><code>currency</code></td>
+                        <td>SAR</td>
+                        <td>ثابت</td>
+                    </tr>
+                    <tr>
+                        <td><code>paymentType</code></td>
+                        <td>DB</td>
+                        <td>Debit مباشر</td>
+                    </tr>
+                    <tr>
+                        <td><code>testMode</code></td>
+                        <td>EXTERNAL</td>
+                        <td>بيئة الاختبار فقط</td>
+                    </tr>
+                    <tr>
+                        <td><code>customParameters[3DS2_enrolled]</code></td>
+                        <td>true</td>
+                        <td>بيئة الاختبار فقط</td>
+                    </tr>
+                    <tr>
+                        <td><code>merchantTransactionId</code></td>
+                        <td>BOOKING-{id}-{time}</td>
+                        <td>معرف فريد</td>
+                    </tr>
+                    <tr>
+                        <td><code>customer.email</code></td>
+                        <td>من المستخدم</td>
+                        <td>تلقائي</td>
+                    </tr>
+                    <tr>
+                        <td><code>customer.givenName</code></td>
+                        <td>الاسم الأول</td>
+                        <td>تلقائي</td>
+                    </tr>
+                    <tr>
+                        <td><code>customer.surname</code></td>
+                        <td>الاسم الأخير</td>
+                        <td>تلقائي</td>
+                    </tr>
+                    <tr>
+                        <td><code>billing.*</code></td>
+                        <td>عنوان العميل</td>
+                        <td>street1, city, state, country, postcode</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 3. Step 2: Widget -->
+        <section id="step2">
+            <h2><span class="num">3</span> الخطوة 2: عرض Payment Widget</h2>
+
+            <div class="card info">
+                <p>💡 يجب فتح WebView في التطبيق يحتوي على صفحة HTML تحمّل سكريبت HyperPay وتعرض نموذج إدخال البطاقة.
+                </p>
+            </div>
+
+            <h3>كود HTML للـ WebView</h3>
+            <pre><span class="cm">&lt;!-- 1. أضف هذا السكريبت أولاً --&gt;</span>
+&lt;script&gt;
+  var wpwlOptions = {
+    paymentTarget: "_top",  <span class="cm">// مطلوب لـ 3DS</span>
+    locale: "ar"
+  };
+&lt;/script&gt;
+
+<span class="cm">&lt;!-- 2. حمّل سكريبت HyperPay مع checkout_id --&gt;</span>
+&lt;script src="https://eu-test.oppwa.com/v1/paymentWidgets.js
+  ?checkoutId=<span class="str">{CHECKOUT_ID}</span>"&gt;&lt;/script&gt;
+
+<span class="cm">&lt;!-- 3. نموذج الدفع --&gt;</span>
+&lt;form action="<span class="str">{YOUR_RESULT_URL}</span>"
+      class="paymentWidgets"
+      data-brands="VISA MASTER MADA"&gt;
+&lt;/form&gt;</pre>
+
+            <div class="card warn">
+                <p>⚠️ <strong>shopperResultUrl (action):</strong> هي الصفحة التي يوجه إليها HyperPay بعد إكمال الدفع.
+                    يجب أن تراقبها WebView لالتقاط الـ <code>id</code> parameter من الـ URL.</p>
+            </div>
+
+            <h3>آلية العمل في التطبيق (Flutter/Native)</h3>
+            <pre><span class="cm">// Pseudo-code for mobile app</span>
+
+<span class="cm">// 1. إنشاء checkout</span>
+response = POST "/api/payment/initiate" {booking_id, payment_type}
+checkoutId = response.data.id
+
+<span class="cm">// 2. فتح WebView مع صفحة تحمل paymentWidgets.js</span>
+<span class="cm">//    action URL = "https://yoursite.com/payment/callback?gateway=hyperpay"</span>
+
+<span class="cm">// 3. مراقبة WebView — عند التوجه إلى shopperResultUrl</span>
+<span class="cm">//    التقط الـ id من URL parameters</span>
+onUrlChanged(url) {
+  <span class="kw">if</span> (url.contains(<span class="str">"payment/callback"</span>)) {
+    capturedCheckoutId = url.queryParam(<span class="str">"id"</span>)
+    <span class="cm">// 4. أرسل طلب التحقق</span>
+    POST "/api/payment/verify" {
+      checkout_id: capturedCheckoutId,
+      payment_type: selectedPaymentType
+    }
+  }
+}</pre>
+
+            <div class="card">
+                <p>🔑 <strong>Base URL للاختبار:</strong> <code>https://eu-test.oppwa.com</code></p>
+                <p>🔑 <strong>Base URL للإنتاج:</strong> سيتم توفيره من HyperPay عند التفعيل</p>
+            </div>
+        </section>
+
+        <!-- 4. Step 3: Verify -->
+        <section id="step3">
+            <h2><span class="num">4</span> الخطوة 3: التحقق من الدفع</h2>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/payment/verify</span>
+                <p style="color:var(--muted);font-size:.8rem;margin-top:6px">🔒 يتطلب Authorization: Bearer {token}</p>
+            </div>
+
+            <h3>📤 Request Body</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الحقل</th>
+                        <th>النوع</th>
+                        <th>الحالة</th>
+                        <th>الوصف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>checkout_id</code></td>
+                        <td>string</td>
+                        <td><span class="badge required">مطلوب</span></td>
+                        <td>الـ checkout_id من الخطوة 1 (أو من URL بعد Widget)</td>
+                    </tr>
+                    <tr>
+                        <td><code>payment_type</code></td>
+                        <td>string</td>
+                        <td><span class="badge required">مطلوب</span></td>
+                        <td><code>mada</code> أو <code>visa_master</code> أو <code>apple_pay</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📥 مثال الطلب</h3>
+            <pre>{
+  <span class="key">"checkout_id"</span>: <span class="str">"A1B2C3D4E5F6G7H8.uat"</span>,
+  <span class="key">"payment_type"</span>: <span class="str">"visa_master"</span>
+}</pre>
+
+            <h3>✅ استجابة النجاح (200)</h3>
+            <pre>{
+  <span class="key">"error"</span>: <span class="kw">false</span>,
+  <span class="key">"message"</span>: <span class="str">"Payment successful and booking confirmed."</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"status"</span>: <span class="str">"paid"</span>,
+    <span class="key">"transaction_id"</span>: <span class="str">"A1B2C3D4E5F6G7H8.uat"</span>,
+    <span class="key">"invoice_url"</span>: <span class="str">"https://site.com/storage/invoices/inv_42.pdf"</span>,
+    <span class="key">"raw_response"</span>: { <span class="cm">/* بيانات HyperPay الكاملة */</span> }
+  }
+}</pre>
+
+            <h3>❌ استجابة الفشل (400)</h3>
+            <pre>{
+  <span class="key">"error"</span>: <span class="kw">true</span>,
+  <span class="key">"message"</span>: <span class="str">"transaction declined"</span>,
+  <span class="key">"data"</span>: { <span class="cm">/* بيانات HyperPay مع result.code */</span> }
+}</pre>
+        </section>
+
+        <!-- 5. Backend Logic -->
+        <section id="backend">
+            <h2><span class="num">5</span> ماذا يحدث في الخادم بعد نجاح الدفع</h2>
+            <p>عند نجاح التحقق، يتم استدعاء دالة <code>completePayment()</code> التي تنفذ العمليات التالية بالترتيب:</p>
+
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="dot purple">1</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>فحص Idempotency</h4>
+                        <p>إذا كان الحجز مؤكد مسبقاً → يعيد الفاتورة القديمة بدون تكرار العملية (حماية من الطلبات
+                            المكررة)</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="dot blue">2</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>خصم التذاكر من الرحلة</h4>
+                        <p><code>trip.tickets -= booking.tickets_count</code> — مع تسجيل تحذير إذا حصل Overbooking</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="dot orange">3</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>تحديث حالة الحجز</h4>
+                        <p><code>booking.status = 'confirmed'</code></p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="dot green">4</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>تسجيل عملية الدفع</h4>
+                        <p>إنشاء سجل جديد في جدول <code>payments</code> بكامل التفاصيل (gateway, transaction_id, amount,
+                            raw_response)</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="dot purple">5</div>
+                    <div class="line"></div>
+                    <div class="content">
+                        <h4>إنشاء الفاتورة</h4>
+                        <p>توليد ملف PDF للفاتورة وحفظ مساره في <code>invoice_path</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>الكود المسؤول — completePayment()</h3>
+            <pre><span class="kw">protected function</span> <span class="fn">completePayment</span>($bookingId, $gateway, $transactionId, $response, $paymentMethod)
+{
+    $booking = TripBooking::with(<span class="str">'trip'</span>)->find($bookingId);
+
+    <span class="cm">// 1. Idempotency check</span>
+    <span class="kw">if</span> ($booking->status === <span class="str">'confirmed'</span>) {
+        <span class="kw">return</span> Payment::where(<span class="str">'trip_booking_id'</span>, $bookingId)->first()->invoice_path;
+    }
+
+    <span class="cm">// 2. Deduct tickets</span>
+    $newCount = max(<span class="num">0</span>, $booking->trip->tickets - $booking->tickets_count);
+    $booking->trip->update([<span class="str">'tickets'</span> => $newCount]);
+
+    <span class="cm">// 3. Confirm booking</span>
+    $booking->update([<span class="str">'status'</span> => <span class="str">'confirmed'</span>]);
+
+    <span class="cm">// 4. Record payment</span>
+    $payment = Payment::create([
+        <span class="str">'trip_booking_id'</span>  => $booking->id,
+        <span class="str">'payment_gateway'</span> => $gateway,      <span class="cm">// 'hyperpay'</span>
+        <span class="str">'payment_method'</span>  => $paymentMethod, <span class="cm">// 'mada' | 'visa_master'</span>
+        <span class="str">'transaction_id'</span>  => $transactionId, <span class="cm">// checkout_id</span>
+        <span class="str">'amount'</span>          => $booking->total_price,
+        <span class="str">'currency'</span>        => <span class="str">'SAR'</span>,
+        <span class="str">'status'</span>          => <span class="str">'paid'</span>,
+        <span class="str">'raw_response'</span>    => $response,
+    ]);
+
+    <span class="cm">// 5. Generate invoice PDF</span>
+    $invoicePath = $this->invoiceService->generateInvoice($booking);
+    $payment->update([<span class="str">'invoice_path'</span> => $invoicePath]);
+
+    <span class="kw">return</span> $invoicePath;
+}</pre>
+        </section>
+
+        <!-- 6. Database -->
+        <section id="db">
+            <h2><span class="num">6</span> قاعدة البيانات — جدول payments</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>العمود</th>
+                        <th>النوع</th>
+                        <th>الوصف</th>
+                        <th>مثال</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>id</code></td>
+                        <td>bigint</td>
+                        <td>المعرف</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td><code>trip_booking_id</code></td>
+                        <td>bigint FK</td>
+                        <td>معرف الحجز</td>
+                        <td>42</td>
+                    </tr>
+                    <tr>
+                        <td><code>payment_gateway</code></td>
+                        <td>enum</td>
+                        <td>البوابة</td>
+                        <td><code>hyperpay</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>payment_method</code></td>
+                        <td>string</td>
+                        <td>الطريقة</td>
+                        <td><code>mada</code> / <code>visa_master</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>transaction_id</code></td>
+                        <td>string</td>
+                        <td>معرف العملية</td>
+                        <td><code>A1B2C3...</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>amount</code></td>
+                        <td>decimal</td>
+                        <td>المبلغ</td>
+                        <td>500.00</td>
+                    </tr>
+                    <tr>
+                        <td><code>currency</code></td>
+                        <td>string</td>
+                        <td>العملة</td>
+                        <td>SAR</td>
+                    </tr>
+                    <tr>
+                        <td><code>status</code></td>
+                        <td>enum</td>
+                        <td>الحالة</td>
+                        <td><code>paid</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>raw_response</code></td>
+                        <td>JSON</td>
+                        <td>الاستجابة الكاملة</td>
+                        <td>{...}</td>
+                    </tr>
+                    <tr>
+                        <td><code>invoice_path</code></td>
+                        <td>string</td>
+                        <td>مسار الفاتورة</td>
+                        <td>invoices/inv_42.pdf</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 7. Errors -->
+        <section id="errors">
+            <h2><span class="num">7</span> معالجة الأخطاء ورموز الاستجابة</h2>
+
+            <h3>رموز النجاح (HyperPay result.code)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>النمط</th>
+                        <th>المعنى</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>000.000.xxx</code></td>
+                        <td>عملية ناجحة</td>
+                    </tr>
+                    <tr>
+                        <td><code>000.100.1xx</code></td>
+                        <td>عملية ناجحة (بانتظار معالجة)</td>
+                    </tr>
+                    <tr>
+                        <td><code>000.3xx.xxx</code></td>
+                        <td>عملية ناجحة (تحتاج مراجعة)</td>
+                    </tr>
+                    <tr>
+                        <td><code>000.6xx.xxx</code></td>
+                        <td>عملية ناجحة (تحتاج مراجعة)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>رموز الفشل الشائعة</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الرمز</th>
+                        <th>المعنى</th>
+                        <th>الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>800.100.151</code></td>
+                        <td>بطاقة غير صالحة</td>
+                        <td>اطلب من المستخدم التأكد من البيانات</td>
+                    </tr>
+                    <tr>
+                        <td><code>800.100.152</code></td>
+                        <td>عملية مرفوضة</td>
+                        <td>اطلب من المستخدم التواصل مع البنك</td>
+                    </tr>
+                    <tr>
+                        <td><code>100.100.303</code></td>
+                        <td>رصيد غير كافي</td>
+                        <td>إبلاغ المستخدم</td>
+                    </tr>
+                    <tr>
+                        <td><code>700.400.200</code></td>
+                        <td>Checkout منتهي الصلاحية</td>
+                        <td>أعد إنشاء checkout جديد</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>أكواد HTTP من الـ API</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الكود</th>
+                        <th>المعنى</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>200</code></td>
+                        <td>نجاح — الدفع تم وتم تأكيد الحجز</td>
+                    </tr>
+                    <tr>
+                        <td><code>400</code></td>
+                        <td>فشل الدفع أو في الانتظار</td>
+                    </tr>
+                    <tr>
+                        <td><code>422</code></td>
+                        <td>خطأ في التحقق (حقول مفقودة)</td>
+                    </tr>
+                    <tr>
+                        <td><code>500</code></td>
+                        <td>خطأ في الخادم</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 8. Test -->
+        <section id="test">
+            <h2><span class="num">8</span> بيئة الاختبار</h2>
+
+            <div class="card success">
+                <p>✅ <strong>تم اختبار الدفع بنجاح</strong> باستخدام صفحة الاختبار المدمجة في
+                    <code>/hyperpay-test</code></p>
+            </div>
+
+            <h3>بيانات الاختبار</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>المعامل</th>
+                        <th>القيمة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Base URL</td>
+                        <td><code>https://eu-test.oppwa.com/v1/</code></td>
+                    </tr>
+                    <tr>
+                        <td>Access Token</td>
+                        <td><code>OGFjN2E0Yzc5NDgzMDky...YWo=</code></td>
+                    </tr>
+                    <tr>
+                        <td>Entity ID</td>
+                        <td><code>8ac7a4c79483092601948366b9d1011b</code></td>
+                    </tr>
+                    <tr>
+                        <td>Currency</td>
+                        <td>SAR فقط</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Type</td>
+                        <td>DB فقط</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>بطاقات الاختبار</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>النوع</th>
+                        <th>الرقم</th>
+                        <th>انتهاء</th>
+                        <th>CVV</th>
+                        <th>النتيجة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Visa</td>
+                        <td><code>4440000009900010</code></td>
+                        <td>01/39</td>
+                        <td>100</td>
+                        <td style="color:var(--green)">✅ نجاح</td>
+                    </tr>
+                    <tr>
+                        <td>MasterCard</td>
+                        <td><code>5123450000000008</code></td>
+                        <td>01/39</td>
+                        <td>100</td>
+                        <td style="color:var(--green)">✅ نجاح</td>
+                    </tr>
+                    <tr>
+                        <td>MADA</td>
+                        <td><code>4464040000000007</code></td>
+                        <td>12/25</td>
+                        <td>100</td>
+                        <td style="color:var(--green)">✅ نجاح</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card warn">
+                <p>⚠️ <strong>ملاحظة:</strong> في بيئة الاختبار، يجب أن تكون المبالغ بدون كسور (مثل <code>100.00</code>
+                    وليس <code>99.50</code>)</p>
+            </div>
+        </section>
+
+        <!-- 9. Checklist -->
+        <section id="checklist">
+            <h2><span class="num">9</span> قائمة التحقق لمطور التطبيق</h2>
+            <div class="card">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>☐</td>
+                            <td>استدعاء <code>POST /api/payment/initiate</code> مع <code>booking_id</code> و
+                                <code>payment_type</code></td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>حفظ <code>data.id</code> (checkout_id) من الاستجابة</td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>فتح WebView يحمّل <code>paymentWidgets.js?checkoutId={id}</code></td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>إضافة <code>wpwlOptions = { paymentTarget: "_top" }</code> قبل سكريبت HyperPay</td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>تحديد <code>data-brands="VISA MASTER MADA"</code></td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>مراقبة URL في WebView لالتقاط checkout_id بعد الدفع</td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>استدعاء <code>POST /api/payment/verify</code> مع <code>checkout_id</code> و
+                                <code>payment_type</code></td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>معالجة الاستجابة: <code>error: false</code> = نجاح، <code>error: true</code> = فشل</td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>عرض <code>invoice_url</code> للمستخدم عند النجاح</td>
+                        </tr>
+                        <tr>
+                            <td>☐</td>
+                            <td>معالجة أخطاء الشبكة وانتهاء صلاحية الـ checkout</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="footer">
+        <p>📋 تم إنشاء هذا الدليل تلقائياً — آخر تحديث: 16 فبراير 2026</p>
+        <p>wjhtak-site Payment Integration Documentation</p>
+    </div>
+
+</body>
+
+</html>

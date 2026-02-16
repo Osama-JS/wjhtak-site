@@ -157,6 +157,13 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::get('trip-bookings/data', [App\Http\Controllers\Admin\TripBookingController::class, 'getData'])->name('trip-bookings.data');
     Route::post('trip-bookings/{id}/update-status', [App\Http\Controllers\Admin\TripBookingController::class, 'updateStatus'])->name('trip-bookings.update-status');
     Route::resource('trip-bookings', App\Http\Controllers\Admin\TripBookingController::class);
+
+    // Notifications Management
+    Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/data', [App\Http\Controllers\Admin\NotificationController::class, 'getData'])->name('notifications.data');
+    Route::get('notifications/search-users', [App\Http\Controllers\Admin\NotificationController::class, 'searchUsers'])->name('notifications.search-users');
+    Route::post('notifications/send', [App\Http\Controllers\Admin\NotificationController::class, 'send'])->name('notifications.send');
+    Route::delete('notifications/{id}', [App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
 // Customer Routes
@@ -169,5 +176,192 @@ Route::middleware(['auth'])->prefix('customer')->name('customer.')->group(functi
     Route::get('/profile', [\App\Http\Controllers\Customer\ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\Customer\ProfileController::class, 'update'])->name('profile.update');
 });
+
+// =============================================================================
+// HYPERPAY TEST PAGE (Development Only)
+// =============================================================================
+Route::get('/hyperpay-test', function () {
+    return view('hyperpay-test');
+})->name('hyperpay.test');
+
+// Backend route to create checkout (avoids CORS)
+Route::post('/hyperpay-test/checkout', function (\Illuminate\Http\Request $request) {
+    $service = app(\App\Services\HyperPayService::class);
+
+    $params = [
+        'merchantTransactionId' => 'TEST-' . time(),
+        'customer.email' => $request->email ?? 'test@example.com',
+        'customer.givenName' => $request->first_name ?? 'Test',
+        'customer.surname' => $request->last_name ?? 'User',
+        'billing.street1' => $request->street ?? 'Test Street',
+        'billing.city' => $request->city ?? 'Riyadh',
+        'billing.state' => $request->city ?? 'Riyadh',
+        'billing.country' => 'SA',
+        'billing.postcode' => '00000',
+    ];
+
+    $result = $service->prepareCheckout(
+        (float) $request->amount,
+        $request->payment_type ?? 'visa_master',
+        $params
+    );
+
+    return response()->json($result ?: ['error' => 'Failed to create checkout']);
+})->name('hyperpay.checkout');
+
+Route::get('/hyperpay-test/result', function (\Illuminate\Http\Request $request) {
+    $checkoutId = $request->id;
+    $result = ['success' => false, 'message' => 'No checkout ID provided', 'data' => []];
+
+    if ($checkoutId) {
+        $service = app(\App\Services\HyperPayService::class);
+        $data = $service->getPaymentStatus($checkoutId, 'visa_master');
+        if (!$data) {
+            $data = $service->getPaymentStatus($checkoutId, 'mada');
+        }
+
+        if ($data && isset($data['result']['code'])) {
+            $result = [
+                'success' => $service->isSuccessful($data['result']['code']),
+                'message' => $data['result']['description'] ?? 'Unknown',
+                'data' => $data,
+            ];
+        } else {
+            $result['message'] = 'Could not retrieve payment status';
+            $result['data'] = $data ?? [];
+        }
+    }
+
+    return view('hyperpay-test', compact('result'));
+})->name('hyperpay.result');
+
+// =============================================================================
+// TAMARA TEST PAGE (Development Only)
+// =============================================================================
+Route::get('/tamara-test', function () {
+    return view('tamara-test');
+})->name('tamara.test');
+
+// Backend route to create Tamara checkout session
+Route::post('/tamara-test/checkout', function (\Illuminate\Http\Request $request) {
+    try {
+        $service = app(\App\Services\TamaraPaymentService::class);
+
+        $data = [
+            'amount' => (float) $request->amount,
+            'currency' => 'SAR',
+            'customer_email' => $request->email ?? 'test@example.com',
+            'customer_phone' => $request->phone ?? '966500000000',
+            'first_name' => $request->first_name ?? 'Test',
+            'last_name' => $request->last_name ?? 'User',
+            'order_id' => 'TEST-' . time(),
+            'callback_url' => url('/tamara-test/result'),
+            'items' => [
+                [
+                    'name' => $request->item_name ?? 'Trip Booking Test',
+                    'type' => 'Digital',
+                    'reference_id' => 'ITEM-1',
+                    'quantity' => 1,
+                    'unit_price' => (float) $request->amount,
+                    'total_amount' => [
+                        'amount' => (float) $request->amount,
+                        'currency' => 'SAR'
+                    ],
+                ]
+            ],
+            'city' => $request->city ?? 'Riyadh',
+            'address' => $request->address ?? 'Test Address',
+            'description' => 'Tamara Test Payment',
+        ];
+
+        $result = $service->initiateCheckout($data);
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+    }
+})->name('tamara.checkout');
+
+// Tamara callback result page
+Route::get('/tamara-test/result', function (\Illuminate\Http\Request $request) {
+    $status = $request->status;
+    $orderId = $request->orderId ?? $request->order_id ?? $request->paymentStatus ?? null;
+    $result = ['status' => $status, 'order_id' => $orderId, 'data' => []];
+
+    if ($orderId && $status === 'success') {
+        try {
+            $service = app(\App\Services\TamaraPaymentService::class);
+            $data = $service->verifyPayment($orderId);
+            $result['data'] = $data;
+            $result['authorised'] = ($data['status'] ?? '') === 'authorised' || ($data['status'] ?? '') === 'approved';
+        } catch (\Exception $e) {
+            $result['error'] = $e->getMessage();
+        }
+    }
+
+    return view('tamara-test', compact('result'));
+})->name('tamara.result');
+
+// =============================================================================
+// TABBY TEST PAGE (Development Only)
+// =============================================================================
+Route::get('/tabby-test', function () {
+    return view('tabby-test');
+})->name('tabby.test');
+
+Route::post('/tabby-test/checkout', function (\Illuminate\Http\Request $request) {
+    try {
+        $service = app(\App\Services\TabbyPaymentService::class);
+
+        $data = [
+            'amount' => (float) $request->amount,
+            'currency' => 'SAR',
+            'customer_name' => ($request->first_name ?? 'Test') . ' ' . ($request->last_name ?? 'User'),
+            'customer_email' => $request->email ?? 'test@example.com',
+            'customer_phone' => $request->phone ?? '+966500000000',
+            'first_name' => $request->first_name ?? 'Test',
+            'last_name' => $request->last_name ?? 'User',
+            'order_id' => 'TEST-' . time(),
+            'callback_url' => url('/tabby-test/result'),
+            'items' => [
+                [
+                    'title' => $request->item_name ?? 'Trip Booking Test',
+                    'quantity' => 1,
+                    'unit_price' => (float) $request->amount,
+                    'reference_id' => 'ITEM-1',
+                    'category' => 'Travel',
+                ]
+            ],
+            'city' => $request->city ?? 'Riyadh',
+            'address' => $request->address ?? 'Test Address',
+            'description' => 'Tabby Test Payment',
+        ];
+
+        $result = $service->initiateCheckout($data);
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+    }
+})->name('tabby.checkout');
+
+Route::get('/tabby-test/result', function (\Illuminate\Http\Request $request) {
+    $status = $request->status;
+    $paymentId = $request->payment_id ?? $request->id ?? null;
+    $result = ['status' => $status, 'payment_id' => $paymentId, 'data' => []];
+
+    if ($paymentId && $status === 'success') {
+        try {
+            $service = app(\App\Services\TabbyPaymentService::class);
+            // verifyPayment now auto-captures if AUTHORIZED
+            $data = $service->verifyPayment($paymentId);
+            $result['data'] = $data;
+            $finalStatus = strtoupper($data['status'] ?? 'UNKNOWN');
+            $result['captured'] = $finalStatus === 'CLOSED';
+        } catch (\Exception $e) {
+            $result['error'] = $e->getMessage();
+        }
+    }
+
+    return view('tabby-test', compact('result'));
+})->name('tabby.result');
 
 require __DIR__.'/auth.php';

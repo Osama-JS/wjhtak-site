@@ -7,11 +7,14 @@ use App\Traits\ApiResponseTrait;
 use App\Models\Trip;
 use App\Models\TripBooking;
 use App\Models\Favorite;
+use App\Models\Notification;
 use App\Models\BookingPassenger;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OA;
 
 class TripController extends Controller
@@ -711,5 +714,113 @@ class TripController extends Controller
         ];
 
         return $this->apiResponse(false, __('Booking details retrieved successfully'), $data);
+    }
+
+    /**
+     * Cancel a pending (unpaid) booking.
+     */
+    #[OA\Post(
+        path: "/api/v1/bookings/{id}/cancel",
+        summary: "Cancel a pending booking",
+        operationId: "cancelBooking",
+        description: "Cancel a booking that has not been paid for yet (status = pending). Confirmed/paid bookings cannot be cancelled through this endpoint.\n\nThis will:\n- Set the booking status to 'cancelled'\n- Delete associated passenger records",
+        tags: ["Trips"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "Accept-Language",
+                in: "header",
+                description: "Response language: ar or en",
+                required: false,
+                schema: new OA\Schema(type: "string", default: "en", enum: ["en", "ar"])
+            ),
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "Booking ID",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Booking cancelled successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "تم إلغاء الحجز بنجاح"),
+                        new OA\Property(property: "data", type: "object", properties: [
+                            new OA\Property(property: "booking_id", type: "integer", example: 101),
+                            new OA\Property(property: "status", type: "string", example: "cancelled"),
+                        ])
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: "Booking cannot be cancelled (already confirmed/paid)",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "error", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "لا يمكن إلغاء حجز تم تأكيده أو دفعه"),
+                        new OA\Property(property: "data", type: "object", properties: [
+                            new OA\Property(property: "current_status", type: "string", example: "confirmed"),
+                        ])
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: "Booking not found"),
+            new OA\Response(response: 401, description: "Unauthenticated")
+        ]
+    )]
+    public function cancelBooking($id): JsonResponse
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
+        }
+
+        // Find booking belonging to the authenticated user
+        $booking = TripBooking::where('user_id', $user->id)->find($id);
+
+        if (!$booking) {
+            return $this->apiResponse(true, __('Booking not found'), null, null, 404);
+        }
+
+        // Only allow cancellation of pending (unpaid) bookings
+        if ($booking->status !== 'pending') {
+            return $this->apiResponse(true, __('Cannot cancel a booking that has been confirmed or paid.'), [
+                'current_status' => $booking->status,
+            ], null, 400);
+        }
+
+        // Delete associated passengers
+        $booking->passengers()->delete();
+
+        // Update status to cancelled
+        $booking->update([
+            'status' => 'cancelled',
+        ]);
+
+        Log::info("Booking #{$id} cancelled by user #{$user->id}");
+
+        // Send cancellation notification
+        $tripTitle = $booking->trip ? $booking->trip->title : __('Trip');
+        app(NotificationService::class)->sendToUser(
+            $user,
+            Notification::TYPE_BOOKING_CANCELLED,
+            __('Booking Cancelled'),
+            __('Your booking for ":trip" has been cancelled.', ['trip' => $tripTitle]),
+            [
+                'booking_id' => (string) $booking->id,
+                'trip_id' => (string) ($booking->trip_id ?? ''),
+            ]
+        );
+
+        return $this->apiResponse(false, __('Booking cancelled successfully.'), [
+            'booking_id' => $booking->id,
+            'status' => 'cancelled',
+        ]);
     }
 }
