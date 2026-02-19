@@ -12,6 +12,7 @@ class TripItinerary extends Model
     protected $fillable = [
         'trip_id',
         'day_number',
+        'sort_order',
         'title',
         'description',
         'image_path'

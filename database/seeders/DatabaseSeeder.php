@@ -21,12 +21,12 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
             SettingSeeder::class,
-            LocationSeeder::class,
-            CompanySeeder::class,
-            TripSeeder::class,
-            TripItinerarySeeder::class, // Added
-            BannerSeeder::class,
-            QuestionSeeder::class,
+            // LocationSeeder::class,
+            // CompanySeeder::class,
+            // TripSeeder::class,
+            // TripItinerarySeeder::class, // Added
+            // BannerSeeder::class,
+            // QuestionSeeder::class,
         ]);
     }
 }

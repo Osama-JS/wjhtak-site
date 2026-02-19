@@ -5,10 +5,45 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\SubscriberController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Admin\TripsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\Web\PaymentWebController;
 
 use Illuminate\Support\Facades\Route;
+
+// =============================================================================
+// WEB VIEW PAYMENT ROUTES
+// =============================================================================
+Route::group(['prefix' => 'payments', 'as' => 'payments.web.'], function () {
+    Route::get('/checkout/{booking_id}/{method}', [PaymentWebController::class, 'checkout'])->name('checkout');
+    Route::post('/initiate-redirect', [PaymentWebController::class, 'initiateRedirect'])->name('initiate-redirect');
+    Route::get('/success', [PaymentWebController::class, 'success'])->name('success');
+    Route::get('/failure', [PaymentWebController::class, 'failure'])->name('failure');
+
+    // Specialized callback that triggers verification then redirects to success/failure
+    Route::get('/callback/{payment_type}', function (Illuminate\Http\Request $request, $payment_type) {
+        $paymentId = $request->payment_id ?? $request->orderId ?? $request->id;
+        $checkoutId = $request->id; // For HyperPay
+
+        // We'll redirect to success or failure based on basic query params for now,
+        // but ideally we verify here. For the WebView flow, we'll let the success/failure
+        // pages handle the verification or use this intermediate route.
+        if ($request->status === 'cancel') {
+             return redirect()->route('payments.web.failure', ['error' => __('Payment cancelled by user.')]);
+        }
+
+        // Return a processing page that will then call the verify logic
+        return view('payments.callback_processing', [
+            'payment_type' => $payment_type,
+            'payment_id' => $paymentId,
+            'checkout_id' => $checkoutId,
+            'status' => $request->status
+        ]);
+    })->name('callback');
+});
 
 // =============================================================================
 // FRONTEND ROUTES (Public)
@@ -139,9 +174,11 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::delete('/trips/{image}/destroyimages', [App\Http\Controllers\Admin\TripsController::class, 'imagedestroy'])->name('trips.images-destroy');
 
     // Trip Itinerary
-    Route::get('/trips/{trip}/itinerary', [App\Http\Controllers\Admin\TripsController::class, 'itinerary'])->name('trips.itinerary');
-    Route::post('/trips/{trip}/itinerary', [App\Http\Controllers\Admin\TripsController::class, 'storeItinerary'])->name('trips.itinerary.store');
-    Route::delete('/trips/itinerary/{itinerary}', [App\Http\Controllers\Admin\TripsController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
+    Route::get('/trips/{trip}/itinerary', [TripsController::class, 'itinerary'])->name('trips.itinerary');
+    Route::post('/trips/{trip}/itinerary', [TripsController::class, 'storeItinerary'])->name('trips.itinerary.store');
+    Route::put('/trips/itinerary/{itinerary}', [TripsController::class, 'updateItinerary'])->name('trips.itinerary.update');
+    Route::post('/trips/itinerary/reorder', [TripsController::class, 'reorderItinerary'])->name('trips.itinerary.reorder');
+    Route::delete('/trips/itinerary/{itinerary}', [TripsController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
 
     // Settings
     Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
@@ -163,11 +200,21 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::resource('trip-bookings', App\Http\Controllers\Admin\TripBookingController::class);
 
     // Notifications Management
-    Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
-    Route::get('notifications/data', [App\Http\Controllers\Admin\NotificationController::class, 'getData'])->name('notifications.data');
-    Route::get('notifications/search-users', [App\Http\Controllers\Admin\NotificationController::class, 'searchUsers'])->name('notifications.search-users');
-    Route::post('notifications/send', [App\Http\Controllers\Admin\NotificationController::class, 'send'])->name('notifications.send');
-    Route::delete('notifications/{id}', [App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/data', [AdminNotificationController::class, 'getData'])->name('notifications.data');
+    Route::get('notifications/search-users', [AdminNotificationController::class, 'searchUsers'])->name('notifications.search-users');
+    Route::post('notifications/send', [AdminNotificationController::class, 'send'])->name('notifications.send');
+    Route::delete('notifications/{id}', [AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Subscribers
+    Route::get('/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
+    Route::get('/subscribers/data', [SubscriberController::class, 'getData'])->name('subscribers.data');
+    Route::get('/subscribers/profile/{id}', [SubscriberController::class, 'profile'])->name('subscribers.profile');
+    Route::post('/subscribers', [SubscriberController::class, 'store'])->name('subscribers.store');
+    Route::get('/subscribers/{id}', [SubscriberController::class, 'show'])->name('subscribers.show');
+    Route::put('/subscribers/{id}', [SubscriberController::class, 'update'])->name('subscribers.update');
+    Route::post('/subscribers/{id}/toggle-status', [SubscriberController::class, 'toggleStatus'])->name('subscribers.toggle-status');
+    Route::delete('/subscribers/{id}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
 });
 
 // Customer Routes

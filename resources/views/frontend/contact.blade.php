@@ -19,11 +19,11 @@
         @endif
 
         <div class="container" style="position: relative; z-index: 1;">
-            <div class="text-center" style="color: white;">
-                <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
+            <div class="text-center" style="color: white !important;">
+                <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4); color: white !important;">
                     {{ __('Contact Us') }}
                 </h1>
-                <p style="font-size: var(--text-lg); opacity: 0.9;">{{ __('We would love to hear from you') }}</p>
+                <p style="font-size: var(--text-lg); opacity: 0.9; color: white !important;">{{ __('We would love to hear from you') }}</p>
             </div>
         </div>
     </section>

@@ -2561,25 +2561,9 @@
                 "tags": [
                     "Payment"
                 ],
-                "summary": "Initiate payment checkout (HyperPay, Tabby, Tamara)",
-                "description": "Initializes a payment session.\n\n**HyperPay (mada, visa_master, apple_pay):** Returns a `checkout_id` to load Payment Widget in WebView. Billing address and customer data are auto-filled from user profile but can be overridden.\n\n**Tabby/Tamara:** Returns a `checkout_url` to redirect the user.",
+                "summary": "Initiate payment checkout (WebView Flow)",
+                "description": "Initializes a payment session and returns a URL to be opened in a WebView.\n\nThe backend will handle all gateway communications and user data pre-filling. The app developer should monitor the WebView URL to detect final success/failure: \n\n- **Success URL pattern:** `/payments/success?booking_id={id}`\n- **Failure URL pattern:** `/payments/failure?error={msg}`",
                 "operationId": "initiatePayment",
-                "parameters": [
-                    {
-                        "name": "Accept-Language",
-                        "in": "header",
-                        "description": "Response language: ar (Arabic) or en (English). Affects error messages.",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "en",
-                            "enum": [
-                                "en",
-                                "ar"
-                            ]
-                        }
-                    }
-                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2602,51 +2586,10 @@
                                             "mada",
                                             "visa_master",
                                             "apple_pay",
-                                            "stc_pay",
                                             "tabby",
                                             "tamara"
                                         ],
                                         "example": "visa_master"
-                                    },
-                                    "first_name": {
-                                        "description": "Optional - overrides user profile first name",
-                                        "type": "string",
-                                        "example": "Mohammed"
-                                    },
-                                    "last_name": {
-                                        "description": "Optional - overrides user profile last name",
-                                        "type": "string",
-                                        "example": "Ali"
-                                    },
-                                    "email": {
-                                        "description": "Optional - overrides user profile email",
-                                        "type": "string",
-                                        "example": "user@example.com"
-                                    },
-                                    "phone": {
-                                        "description": "Optional - for Tabby/Tamara",
-                                        "type": "string",
-                                        "example": "966500000000"
-                                    },
-                                    "address": {
-                                        "description": "Optional - billing street address for HyperPay 3DS2",
-                                        "type": "string",
-                                        "example": "King Fahd Road"
-                                    },
-                                    "city": {
-                                        "description": "Optional - billing city for HyperPay 3DS2",
-                                        "type": "string",
-                                        "example": "Riyadh"
-                                    },
-                                    "state": {
-                                        "description": "Optional - billing state for HyperPay 3DS2",
-                                        "type": "string",
-                                        "example": "Riyadh"
-                                    },
-                                    "postcode": {
-                                        "description": "Optional - billing postcode for HyperPay 3DS2",
-                                        "type": "string",
-                                        "example": "12345"
                                     }
                                 },
                                 "type": "object"
@@ -2656,7 +2599,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Checkout initialized successfully",
+                        "description": "Checkout URL generated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2667,32 +2610,12 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Checkout initialized successfully."
+                                            "example": "Checkout link generated."
                                         },
-                                        "data": {
-                                            "description": "Response varies by gateway",
-                                            "properties": {
-                                                "id": {
-                                                    "description": "HyperPay Checkout ID — use this to load paymentWidgets.js",
-                                                    "type": "string",
-                                                    "example": "A1B2C3D4E5.uat"
-                                                },
-                                                "session_id": {
-                                                    "description": "Tabby/Tamara Session ID",
-                                                    "type": "string",
-                                                    "example": "ch_..."
-                                                },
-                                                "checkout_url": {
-                                                    "description": "Redirect URL (Tabby/Tamara only)",
-                                                    "type": "string",
-                                                    "example": "https://checkout.tabby.ai/..."
-                                                },
-                                                "raw_response": {
-                                                    "description": "Full gateway response",
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "payment_url": {
+                                            "description": "URL to open in a WebView for payment completion",
+                                            "type": "string",
+                                            "example": "https://domain.com/payments/checkout/1/visa_master"
                                         }
                                     },
                                     "type": "object"
@@ -2704,10 +2627,10 @@
                         "description": "Booking already confirmed"
                     },
                     "422": {
-                        "description": "Validation Error (missing booking_id or payment_type)"
+                        "description": "Validation Error"
                     },
                     "500": {
-                        "description": "Payment Gateway Error"
+                        "description": "Server Error"
                     }
                 },
                 "security": [

@@ -4,15 +4,28 @@
 
 @section('meta_description', __('Explore amazing travel destinations around the world'))
 
+@php
+    $headerBg = \App\Models\Setting::get('page_header_bg');
+@endphp
+
 @section('content')
     {{-- Page Header --}}
-    <section class="section" style="padding-top: calc(var(--space-24) + 60px); padding-bottom: var(--space-10); background: var(--gradient-primary);">
-        <div class="container">
-            <div class="text-center" style="color: white;">
-                <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
+    <section class="page-header" style="position: relative; padding-top: calc(var(--space-24) + 60px); padding-bottom: var(--space-10); background: var(--color-primary); overflow: hidden;">
+        @if($headerBg)
+            <div style="position: absolute; inset: 0; z-index: 0;">
+                <img src="{{ asset($headerBg) }}" alt="" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.4;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, var(--color-primary));"></div>
+            </div>
+        @else
+            <div style="position: absolute; inset: 0; background: var(--gradient-primary); z-index: 0;"></div>
+        @endif
+
+        <div class="container" style="position: relative; z-index: 1;">
+            <div class="text-center" style="color: white !important;">
+                <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4); color: white !important;">
                     {{ __('Explore Destinations') }}
                 </h1>
-                <p style="font-size: var(--text-lg); opacity: 0.9; max-width: 600px; margin: 0 auto;">
+                <p style="font-size: var(--text-lg); opacity: 0.9; max-width: 600px; margin: 0 auto; color: white !important;">
                     {{ __('Discover breathtaking locations around the world and plan your next adventure.') }}
                 </p>
             </div>
@@ -20,14 +33,14 @@
             {{-- Breadcrumb --}}
             <nav class="breadcrumb" style="justify-content: center; margin-top: var(--space-6);" aria-label="Breadcrumb">
                 <span class="breadcrumb-item">
-                    <a href="{{ route('home') }}" style="color: rgba(255,255,255,0.7);">{{ __('Home') }}</a>
+                    <a href="{{ route('home') }}" style="color: rgba(255,255,255,0.7) !important;">{{ __('Home') }}</a>
                 </span>
-                <span class="breadcrumb-separator" style="color: rgba(255,255,255,0.5);">
+                <span class="breadcrumb-separator" style="color: rgba(255,255,255,0.5) !important;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </span>
-                <span class="breadcrumb-item active" style="color: white;">{{ __('Destinations') }}</span>
+                <span class="breadcrumb-item active" style="color: white !important;">{{ __('Destinations') }}</span>
             </nav>
         </div>
     </section>
@@ -41,76 +54,48 @@
             </div>
 
             {{-- Featured Grid (Large Cards) --}}
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 250px); gap: var(--space-4);">
+            <div class="home-destinations-grid scroll-animate">
                 @forelse($featuredCountries ?? [] as $index => $country)
                     @php
                         $gridStyles = [
-                            0 => 'grid-row: span 2;',
+                            0 => '--desktop-grid-row: span 2;',
                             1 => '',
                             2 => '',
-                            3 => 'grid-column: span 2;',
+                            3 => '--desktop-grid-column: span 2;',
                         ];
                     @endphp
-                    <a
-                        href="{{ route('trips.index', ['country' => $country->id]) }}"
-                        class="destination-card scroll-animate"
-                        style="{{ $gridStyles[$index] ?? '' }}"
-                    >
-                        <div class="destination-card-image">
-                            <img
-                                src="{{ asset('images/destinations/' . strtolower($country->iso ?? 'default') . '.jpg') }}"
-                                alt="{{ $country->nicename ?? $country->name }}"
-                                loading="lazy"
-                                onerror="this.src='{{ asset('images/demo/destination-placeholder.jpg') }}'"
-                            >
-                        </div>
-                        <div class="destination-card-overlay"></div>
-                        <div class="destination-card-content">
-                            @if($country->flag)
-                                <img
-                                    src="{{ asset('storage/' . $country->flag) }}"
-                                    alt=""
-                                    class="destination-card-flag"
-                                    onerror="this.style.display='none'"
-                                >
-                            @endif
-                            <h3 class="destination-card-title">{{ $country->nicename ?? $country->name }}</h3>
-                            <p class="destination-card-count">
-                                {{ $country->trips_count ?? 0 }} {{ __('Trips Available') }}
-                            </p>
-                        </div>
-                        <div class="destination-card-arrow">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-                            </svg>
-                        </div>
-                    </a>
+                    <div class="home-destination-item" style="{{ $gridStyles[$index % 4] ?? '' }}">
+                        @include('frontend.components.destination-card', [
+                            'destination' => $country,
+                            'tripCount' => $country->trips_count ?? 0
+                        ])
+                    </div>
                 @empty
                     {{-- Demo Featured Destinations --}}
-                    @foreach(['Dubai', 'Paris', 'Maldives', 'Istanbul'] as $index => $name)
+                    @php
+                        $demoDestinations = [
+                            ['nicename' => 'Dubai', 'iso' => 'ae', 'trips_count' => 45],
+                            ['nicename' => 'Paris', 'iso' => 'fr', 'trips_count' => 32],
+                            ['nicename' => 'Maldives', 'iso' => 'mv', 'trips_count' => 28],
+                            ['nicename' => 'Istanbul', 'iso' => 'tr', 'trips_count' => 50],
+                        ];
+                    @endphp
+                    @foreach($demoDestinations as $index => $demo)
                         @php
                             $gridStyles = [
-                                0 => 'grid-row: span 2;',
+                                0 => '--desktop-grid-row: span 2;',
                                 1 => '',
                                 2 => '',
-                                3 => 'grid-column: span 2;',
+                                3 => '--desktop-grid-column: span 2;',
                             ];
+                            $destObj = (object)$demo;
                         @endphp
-                        <a href="#" class="destination-card scroll-animate delay-{{ ($index + 1) * 100 }}" style="{{ $gridStyles[$index] }}">
-                            <div class="destination-card-image">
-                                <img src="{{ asset('images/demo/destination-' . ($index + 1) . '.jpg') }}" alt="{{ $name }}" loading="lazy">
-                            </div>
-                            <div class="destination-card-overlay"></div>
-                            <div class="destination-card-content">
-                                <h3 class="destination-card-title">{{ $name }}</h3>
-                                <p class="destination-card-count">{{ rand(15, 50) }} {{ __('Trips Available') }}</p>
-                            </div>
-                            <div class="destination-card-arrow">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-                                </svg>
-                            </div>
-                        </a>
+                        <div class="home-destination-item" style="{{ $gridStyles[$index % 4] ?? '' }}">
+                            @include('frontend.components.destination-card', [
+                                'destination' => $destObj,
+                                'tripCount' => $demo['trips_count']
+                            ])
+                        </div>
                     @endforeach
                 @endforelse
             </div>

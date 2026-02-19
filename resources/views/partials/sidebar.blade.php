@@ -79,8 +79,24 @@
                 </ul>
             </li> -->
 
+            <!-- <li>
+                <a class="has-arrow" href="javascript:void() " aria-expanded="false">
+                    <i class="fas fa-users-cog"></i>
+                    <span class="nav-text">{{ __('Staff & Users') }}</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="{{ route('admin.users.index') }}">{{ __('Manage Admins') }}</a></li>
+                    <li><a href="{{ route('admin.subscribers.index') }}"></a></li>
+                </ul>
+            </li> -->
+              <li>
+                <a href="{{ route('admin.subscribers.index') }}" class="" aria-expanded="false">
+                    <i class="fas fa-users-cog"></i>
+                    <span class="nav-text">{{ __('Manage Subscribers') }}</span>
+                </a>
+            </li>
             <li>
-                <a href="{{ route('admin.notifications.index') }}" aria-expanded="false">
+                <a href="{{ route('admin.notifications.index') }}" class="" aria-expanded="false">
                     <i class="fas fa-bell"></i>
                     <span class="nav-text">{{ __('Notifications') }}</span>
                 </a>

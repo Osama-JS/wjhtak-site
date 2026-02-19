@@ -8,91 +8,79 @@
 @section('og_description', Str::limit(strip_tags($trip->description ?? ''), 160))
 
 @section('content')
-    {{-- Trip Header/Gallery --}}
-    @php
-        $headerBg = \App\Models\Setting::get('page_header_bg');
-    @endphp
-    <section style="padding-top: calc(60px + var(--space-4)); background: {{ $headerBg ? 'url('.asset($headerBg).') center/cover no-repeat' : 'var(--color-bg-alt)' }}; position: relative;">
-        @if($headerBg)
-            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 0;"></div>
-        @endif
-        <div class="container" style="position: relative; z-index: 1;">
-            {{-- Breadcrumb --}}
-            <nav class="breadcrumb" style="padding: var(--space-4) 0;" aria-label="Breadcrumb">
-                <span class="breadcrumb-item">
-                    <a href="{{ route('home') }}">{{ __('Home') }}</a>
-                </span>
+    {{-- Trip Breadcrumb & Mini Info (Separated from Slider) --}}
+    <section class="trip-top-bar" style="padding-top: calc(85px + var(--space-4)); background: var(--color-bg); position: relative; z-index: 10;">
+        <div class="container">
+            <nav class="breadcrumb" style="padding: var(--space-2) 0;" aria-label="Breadcrumb">
+                <span class="breadcrumb-item"><a href="{{ route('home') }}">{{ __('Home') }}</a></span>
                 <span class="breadcrumb-separator">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </span>
-                <span class="breadcrumb-item">
-                    <a href="{{ route('trips.index') }}">{{ __('Trips') }}</a>
-                </span>
+                <span class="breadcrumb-item"><a href="{{ route('trips.index') }}">{{ __('Trips') }}</a></span>
                 <span class="breadcrumb-separator">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </span>
-                <span class="breadcrumb-item active">{{ Str::limit($trip->title ?? '', 30) }}</span>
+                <span class="breadcrumb-item active">{{ Str::limit($trip->title ?? '', 40) }}</span>
             </nav>
+        </div>
+    </section>
 
-            {{-- Gallery --}}
-            
-            <div class="swiper trip-gallery-slider">
-                <div class="swiper-wrapper">
-                    @if($trip->images && count($trip->images) > 0)
-                        @foreach($trip->images as $image)
-                            <div class="swiper-slide">
-                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $trip->title }}">
+    {{-- Premium Glass Gallery Section --}}
+    <section class="premium-gallery-section" style="padding: var(--space-4) 0 var(--space-16) 0; background: var(--color-bg); overflow: visible;">
+        <div class="container">
+            <div class="gallery-layout-wrapper animate__animated animate__fadeIn">
+                <div class="gallery-grid">
+                    {{-- Main Large Slider (Left/Center) --}}
+                    <div class="gallery-main-col">
+                        <div class="swiper main-trip-slider">
+                            <div class="swiper-wrapper">
+                                @if($trip->images && count($trip->images) > 0)
+                                    @foreach($trip->images as $image)
+                                        <div class="swiper-slide">
+                                            <div class="slide-inner">
+                                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $trip->title }}">
+                                                <div class="glass-overlay"></div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="swiper-slide">
+                                        <div class="slide-inner">
+                                            <img src="{{ asset('images/demo/trip-placeholder.jpg') }}" alt="Placeholder">
+                                            <div class="glass-overlay"></div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
-                        @endforeach
-                    @else
-                        <div class="swiper-slide">
-                            <img src="{{ asset('images/demo/trip-placeholder.jpg') }}" alt="Placeholder">
+
+                            {{-- Glass Navigation --}}
+                            <div class="swiper-nav-glass swiper-button-next"></div>
+                            <div class="swiper-nav-glass swiper-button-prev"></div>
+
+                            {{-- Badge Info --}}
+                            <div class="gallery-badge-info">
+                                <span class="badge-glass">
+                                    <i class="fas fa-camera me-1"></i> {{ count($trip->images) }} {{ __('Photos') }}
+                                </span>
+                            </div>
                         </div>
-                    @endif
-                </div>
-                
-                {{-- هذه العناصر يجب أن تكون داخل حاوية السوايبير الأساسية --}}
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div>
+                    </div>
 
-            <div class="trip-gallery" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-3); border-radius: var(--radius-2xl); overflow: hidden; margin-bottom: var(--space-8);">
-                {{-- Main Image --}}
-                {{-- Side Images --}}
-                <!-- <div style="display: grid; grid-template-rows: 1fr 1fr; gap: var(--space-3);">
-                    @if($trip->images && count($trip->images) > 1)
-                        @foreach($trip->images->slice(1, 2) as $image)
-                            <div style="overflow: hidden; position: relative;">
-                                <img
-                                    src="{{ asset('storage/' . $image->image_path) }}"
-                                    alt="{{ $trip->title }}"
-                                    style="width: 100%; height: 100%; object-fit: cover;"
-                                >
+                    {{-- Vertical Thumbnails Slider (Right Side) --}}
+                    <div class="gallery-thumbs-col">
+                        <div class="swiper thumbnails-trip-slider">
+                            <div class="swiper-wrapper">
+                                @foreach($trip->images as $image)
+                                    <div class="swiper-slide">
+                                        <div class="thumb-inner">
+                                            <img src="{{ asset('storage/' . $image->image_path) }}" alt="Thumbnail">
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
-                        @endforeach
-                    @else
-                        <div style="overflow: hidden; background: var(--color-surface);"></div>
-                        <div style="overflow: hidden; background: var(--color-surface);"></div>
-                    @endif
-
-                    {{-- View All Photos Button --}}
-                    @if($trip->images && count($trip->images) > 3)
-                        <button class="btn btn-ghost" style="position: absolute; bottom: var(--space-3); right: var(--space-3); background: white;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect width="7" height="7" x="3" y="3" rx="1"></rect>
-                                <rect width="7" height="7" x="14" y="3" rx="1"></rect>
-                                <rect width="7" height="7" x="14" y="14" rx="1"></rect>
-                                <rect width="7" height="7" x="3" y="14" rx="1"></rect>
-                            </svg>
-                            {{ __('View All') }} ({{ count($trip->images) }})
-                        </button>
-                    @endif
-                </div> -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -338,8 +326,8 @@
                                 </div>
                             </div>
 
-                            {{-- Book Button --}}
-                            <button type="submit" class="btn btn-accent btn-lg w-full">
+                            {{-- Book Button - Now triggers Modal --}}
+                            <button type="button" class="btn btn-accent btn-lg w-full" onclick="showDownloadModal()">
                                 {{ __('Book Now') }}
                             </button>
                         </form>
@@ -380,29 +368,220 @@
             </div>
         </section>
     @endif
+    {{-- Premium Download App Modal --}}
+    <div id="downloadAppModal" class="premium-download-modal">
+        <div class="modal-backdrop" onclick="closeDownloadModal()"></div>
+        <div class="modal-content-glass animate__animated animate__zoomIn">
+            <button class="modal-close-btn" onclick="closeDownloadModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div class="modal-body-content">
+                <div class="modal-graphic">
+                    <div class="phone-illustration">
+                        <i class="fas fa-mobile-alt"></i>
+                        <div class="phone-screen-circles">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                <h2 class="modal-title-premium text-center">{{ __('Experience Wjhtak on Mobile') }}</h2>
+                <p class="modal-desc-premium text-center">{{ __('For a faster booking experience, real-time updates and exclusive mobile-only offers, download our app now.') }}</p>
+
+                <div class="store-buttons-container">
+                    <a href="#" class="store-btn apple-store">
+                        <div class="store-icon"><i class="fab fa-apple"></i></div>
+                        <div class="store-text">
+                            <span class="store-label">{{ __('Download on the') }}</span>
+                            <span class="store-name">App Store</span>
+                        </div>
+                    </a>
+                    <a href="#" class="store-btn google-play">
+                        <div class="store-icon"><i class="fab fa-google-play"></i></div>
+                        <div class="store-text">
+                            <span class="store-label">{{ __('Get it on') }}</span>
+                            <span class="store-name">Google Play</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="modal-footer-hint text-center">
+                    <p>{{ __('Already have the app?') }} <a href="#">{{ __('Open here') }}</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <style>
-    .trip-gallery-slider {
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: 1fr 180px;
+        gap: 15px;
+        height: 560px;
+        margin-bottom: var(--space-4);
+    }
+
+    .gallery-main-col {
+        min-width: 0;
+    }
+
+    .gallery-thumbs-col {
+        min-width: 0;
+    }
+
+    .main-trip-slider {
         width: 100%;
-        height: 400px; /* أو أي ارتفاع تفضله */
-        border-radius: 15px;
+        height: 100%;
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    }
+
+    .main-trip-slider .swiper-slide {
+        position: relative;
         overflow: hidden;
     }
 
-    .swiper-slide img {
-        display: block;
+    .main-trip-slider .slide-inner {
+        width: 100%;
+        height: 100%;
+        transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .main-trip-slider .swiper-slide-active .slide-inner {
+        transform: scale(1.05);
+    }
+
+    .main-trip-slider img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-    
-    /* تخصيص لون الأزرار ليتناسب مع تصميمك */
-    .swiper-button-next, .swiper-button-prev {
-        color: #fff;
-        filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
+
+    .glass-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 150px;
+        background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+        pointer-events: none;
+    }
+
+    /* Glass Navigation */
+    .swiper-nav-glass {
+        width: 50px !important;
+        height: 50px !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50% !important;
+        color: #fff !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .swiper-nav-glass:after {
+        font-size: 18px !important;
+        font-weight: bold;
+    }
+
+    .swiper-nav-glass:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+        transform: scale(1.1);
+    }
+
+    /* Thumbnails - Vertical */
+    .thumbnails-trip-slider {
+        height: 100%;
+        width: 100%;
+    }
+
+    .thumbnails-trip-slider .swiper-slide {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 4/3;
+        opacity: 0.6;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .thumbnails-trip-slider .swiper-slide-thumb-active {
+        opacity: 1;
+        transform: translateX(-10px);
+    }
+
+    [dir="rtl"] .thumbnails-trip-slider .swiper-slide-thumb-active {
+        transform: translateX(10px);
+    }
+
+    .thumb-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .swiper-slide-thumb-active .thumb-inner {
+        border-color: var(--color-primary);
+        box-shadow: 0 5px 15px rgba(var(--color-primary-rgb), 0.3);
+    }
+
+    .thumbnails-trip-slider img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Badge Info */
+    .gallery-badge-info {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 10;
+    }
+
+    .badge-glass {
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        color: white;
+        padding: 8px 16px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 991px) {
+        .gallery-grid {
+            grid-template-columns: 1fr;
+            height: auto;
+        }
+        .main-trip-slider {
+            height: 400px;
+        }
+        .gallery-thumbs-col {
+            padding-top: 10px;
+        }
+        .thumbnails-trip-slider {
+            height: 80px;
+        }
+        .thumbnails-trip-slider .swiper-slide {
+            width: 100px !important;
+            aspect-ratio: 1/1;
+        }
+        .thumbnails-trip-slider .swiper-slide-thumb-active {
+            transform: translateY(-5px);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .main-trip-slider {
+            height: 300px;
+        }
     }
     /* Trip Details Layout */
     .trip-details-layout {
@@ -774,30 +953,201 @@
     .book-btn:active {
         transform: translateY(0);
     }
+    /* Premium Download Modal */
+    .premium-download-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .premium-download-modal.active {
+        display: flex;
+    }
+
+    .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        animation: fadeIn 0.4s ease;
+    }
+
+    .modal-content-glass {
+        position: relative;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        width: 100%;
+        max-width: 500px;
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        text-align: center;
+        z-index: 1;
+    }
+
+    .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #f0f0f0;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #666;
+        transition: all 0.2s ease;
+    }
+
+    .modal-close-btn:hover {
+        background: #e0e0e0;
+        color: #000;
+        transform: rotate(90deg);
+    }
+
+    .modal-graphic {
+        margin-bottom: 25px;
+    }
+
+    .phone-illustration {
+        font-size: 80px;
+        color: var(--color-primary);
+        position: relative;
+        display: inline-block;
+    }
+
+    .phone-screen-circles span {
+        position: absolute;
+        border-radius: 50%;
+        background: var(--color-primary);
+        opacity: 0.1;
+        z-index: -1;
+    }
+
+    .phone-screen-circles span:nth-child(1) { width: 120px; height: 120px; top: -20px; left: -20px; animation: pulse 2s infinite; }
+    .phone-screen-circles span:nth-child(2) { width: 160px; height: 160px; top: -40px; left: -40px; animation: pulse 3s infinite; }
+
+    .modal-title-premium {
+        font-size: 24px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 12px;
+    }
+
+    .modal-desc-premium {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    .store-buttons-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .store-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #000;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: transform 0.2s ease;
+        text-align: left;
+    }
+
+    .store-btn:hover {
+        transform: translateY(-3px);
+        color: white;
+    }
+
+    .store-icon { font-size: 24px; }
+    .store-label { display: block; font-size: 10px; opacity: 0.8; line-height: 1; }
+    .store-name { display: block; font-size: 14px; font-weight: 700; line-height: 1.2; }
+
+    .modal-footer-hint { font-size: 14px; color: #888; }
+    .modal-footer-hint a { color: var(--color-primary); font-weight: 600; text-decoration: none; }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.1; }
+        50% { transform: scale(1.1); opacity: 0.15; }
+        100% { transform: scale(1); opacity: 0.1; }
+    }
+
+    @media (max-width: 480px) {
+        .store-buttons-container { grid-template-columns: 1fr; }
+        .modal-content-glass { padding: 30px 20px; }
+    }
 </style>
 @endpush
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-    const swiper = new Swiper('.trip-gallery-slider', {
+    const thumbsSwiper = new Swiper('.thumbnails-trip-slider', {
+        direction: 'vertical',
+        spaceBetween: 10,
+        slidesPerView: 4,
+        freeMode: true,
+        watchSlidesProgress: true,
+        mousewheel: true,
+        breakpoints: {
+            0: {
+                direction: 'horizontal',
+                slidesPerView: 3,
+            },
+            992: {
+                direction: 'vertical',
+                slidesPerView: 4,
+            }
+        }
+    });
+
+    const mainSwiper = new Swiper('.main-trip-slider', {
         loop: true,
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
+        spaceBetween: 10,
+        effect: 'fade',
+        fadeEffect: {
+            crossFade: true
         },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
+        speed: 1000,
+        autoplay: {
+            delay: 4000,
+            disableOnInteraction: false,
         },
         navigation: {
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
         },
-        effect: 'fade', // يمكنك تغييرها لـ 'slide' إذا كنت تفضل ذلك
-        fadeEffect: {
-            crossFade: true
+        thumbs: {
+            swiper: thumbsSwiper,
+        },
+        mousewheel: {
+            invert: false,
+            forceToAxis: true,
         },
     });
+
+    function showDownloadModal() {
+        document.getElementById('downloadAppModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDownloadModal() {
+        document.getElementById('downloadAppModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
 </script>
 @endpush
 
