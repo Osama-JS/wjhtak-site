@@ -468,3 +468,93 @@
         padding: 0 !important;
     }
 }
+
+/* ============================================
+   PROFESSIONAL TOASTR CUSTOMIZATION
+   ============================================ */
+#toast-container {
+    top: 30px !important;
+}
+
+#toast-container > div {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    opacity: 1 !important;
+    padding: 18px 20px 18px 50px !important;
+    width: 350px !important;
+    background-image: none !important;
+}
+
+[dir="rtl"] #toast-container > div {
+    padding: 18px 50px 18px 20px !important;
+}
+
+.toast-success {
+    background-color: var(--wjhtak-primary) !important;
+    border-left: 5px solid #00b894 !important;
+}
+
+[dir="rtl"] .toast-success {
+    border-left: none !important;
+    border-right: 5px solid #00b894 !important;
+}
+
+.toast-error {
+    background-color: #d63031 !important;
+    border-left: 5px solid #ff7675 !important;
+}
+
+[dir="rtl"] .toast-error {
+    border-left: none !important;
+    border-right: 5px solid #ff7675 !important;
+}
+
+#toast-container > .toast-success:before {
+    content: "\f058";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: #fff;
+}
+
+[dir="rtl"] #toast-container > .toast-success:before {
+    left: auto;
+    right: 15px;
+}
+
+#toast-container > .toast-error:before {
+    content: "\f06a";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: #fff;
+}
+
+[dir="rtl"] #toast-container > .toast-error:before {
+    left: auto;
+    right: 15px;
+}
+
+.toast-title {
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    margin-bottom: 5px !important;
+}
+
+.toast-message {
+    font-size: 0.9rem !important;
+    opacity: 0.9;
+}
+
+.toast-progress {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+    height: 4px !important;
+}

@@ -6,82 +6,124 @@
 
 @section('content')
     {{-- Hero Section --}}
-    <section class="hero">
-        {{-- Background --}}
-        @php
-            $heroBg = \App\Models\Setting::get('hero_bg');
-        @endphp
-        <div class="hero-bg">
-            <img src="{{ $heroBg ? asset($heroBg) : asset('images/hero-bg.jpg') }}" alt="" loading="eager">
-            <div class="hero-overlay"></div>
+    <section class="hero-premium-v1">
+        {{-- Decorative SVG Shapes --}}
+        <div class="hero-decorations">
+            <svg class="decoration-item plane-trail" width="400" height="200" viewBox="0 0 400 200" fill="none">
+                <path d="M10 150C50 120 150 50 350 20" stroke="var(--color-primary)" stroke-width="2" stroke-dasharray="8 8" opacity="0.15" />
+                <path d="M345 15L355 20L348 28" fill="var(--color-primary)" opacity="0.2" />
+            </svg>
+            <div class="decoration-item blob-1"></div>
+            <div class="decoration-item blob-2"></div>
+            <div class="decoration-item circle-dots"></div>
         </div>
 
-        <div class="container">
-            <div class="hero-content">
-                {{-- Badge --}}
-                <div class="hero-badge scroll-animate">
-                    <svg class="hero-badge-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                    </svg>
-                    <span class="hero-badge-text">{{ __('Premium Tourism Experience') }}</span>
-                </div>
-
-                {{-- Title --}}
-                <h1 class="hero-title scroll-animate delay-100">
-                    {{ __('Discover Your') }}
-                    <br>
-                    <span class="hero-title-accent">{{ __('Dream Destination') }}</span>
-                </h1>
-
-                {{-- Description --}}
-                <p class="hero-desc scroll-animate delay-200">
-                    {{ __('Explore the world with our curated travel experiences. From exotic beaches to mountain adventures, we make your travel dreams come true.') }}
-                </p>
-
-                {{-- CTA Buttons --}}
-                <div class="hero-cta scroll-animate delay-300">
-                    <a href="{{ route('trips.index') }}" class="btn btn-accent btn-lg">
-                        {{ __('Explore Trips') }}
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14"/>
-                            <path d="m12 5 7 7-7 7"/>
+        <div class="container hero-container">
+            <div class="hero-grid">
+                {{-- Left Content --}}
+                <div class="hero-text-content">
+                    {{-- Badge --}}
+                    <div class="hero-badge scroll-animate">
+                        <svg class="hero-badge-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                         </svg>
-                    </a>
-                    <a href="{{ route('about') }}" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.3); color: white;">
-                        {{ __('Learn More') }}
-                    </a>
+                        <span class="hero-badge-text">{{ __('Premium Tourism Experience') }}</span>
+                    </div>
+
+                    {{-- Title --}}
+                    <h1 class="hero-title scroll-animate delay-100">
+                        {{ __('Discover Your') }}
+                        <br>
+                        <span class="hero-title-accent">{{ __('Dream Destination') }}</span>
+                    </h1>
+
+                    {{-- Description --}}
+                    <p class="hero-desc scroll-animate delay-200">
+                        {{ __('Explore the world with our curated travel experiences. From exotic beaches to mountain adventures, we make your travel dreams come true.') }}
+                    </p>
+
+                    {{-- CTA Buttons --}}
+                    <div class="hero-cta scroll-animate delay-300">
+                        <a href="{{ route('trips.index') }}" class="btn btn-primary btn-lg">
+                            {{ __('Explore Trips') }}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                                <path d="m12 5 7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <a href="{{ route('about') }}" class="btn btn-outline btn-lg">
+                            {{ __('Learn More') }}
+                        </a>
+                    </div>
+
+                    {{-- Search Box --}}
+                    <div class="hero-search-inline scroll-animate delay-400">
+                        @include('frontend.components.search-box', ['countries' => $countries ?? []])
+                    </div>
                 </div>
 
-                {{-- Search Box --}}
-                <div class="hero-search scroll-animate delay-400">
-                    @include('frontend.components.search-box', ['countries' => $countries ?? []])
-                </div>
-
-                {{-- Stats --}}
-                <div class="hero-stats scroll-animate delay-500">
-                    <div class="hero-stat">
-                        <div class="hero-stat-value" data-counter="{{ $stats['trips'] ?? 500 }}" data-suffix="+">0</div>
-                        <div class="hero-stat-label">{{ __('Trips') }}</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-value" data-counter="{{ $stats['destinations'] ?? 50 }}" data-suffix="+">0</div>
-                        <div class="hero-stat-label">{{ __('Destinations') }}</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-value" data-counter="{{ $stats['customers'] ?? 10000 }}" data-suffix="+">0</div>
-                        <div class="hero-stat-label">{{ __('Happy Travelers') }}</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-value" data-counter="{{ $stats['rating'] ?? 4.9 }}" data-prefix="">0</div>
-                        <div class="hero-stat-label">{{ __('Rating') }}</div>
+                {{-- Right Image --}}
+                <div class="hero-image-content scroll-animate-right">
+                    @php
+                        $heroBg = \App\Models\Setting::get('hero_bg');
+                    @endphp
+                    <div class="hero-main-image-wrapper">
+                        <img src="{{ $heroBg ? asset($heroBg) : asset('images/hero-bg.jpg') }}" alt="{{ __('Travel with Wjhtak') }}" class="hero-main-image">
+                        <div class="hero-image-card card-glass shadow-xl animate-float">
+                            <i class="fas fa-map-marked-alt text-primary"></i>
+                            <div>
+                                <strong>500+</strong>
+                                <span>{{ __('Places to Visit') }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        {{-- Scroll Indicator --}}
-        <div class="hero-scroll">
-            <div class="hero-scroll-icon"></div>
+            {{-- New Professional Counters Section --}}
+            <div class="hero-stats-new scroll-animate delay-500">
+                <div class="stats-grid">
+                    <div class="stat-card-premium">
+                        <div class="stat-icon-box">
+                            <i class="fas fa-plane-departure"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="hero-stat-value" data-counter="{{ $stats['trips'] ?? 500 }}" data-suffix="+">0</h3>
+                            <p class="hero-stat-label">{{ __('Trips') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-premium">
+                        <div class="stat-icon-box">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="hero-stat-value" data-counter="{{ $stats['destinations'] ?? 50 }}" data-suffix="+">0</h3>
+                            <p class="hero-stat-label">{{ __('Destinations') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-premium">
+                        <div class="stat-icon-box">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="hero-stat-value" data-counter="{{ $stats['customers'] ?? 10000 }}" data-suffix="+">0</h3>
+                            <p class="hero-stat-label">{{ __('Happy Travelers') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-premium">
+                        <div class="stat-icon-box">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="hero-stat-value" data-counter="{{ $stats['rating'] ?? 4.9 }}" data-prefix="">0</h3>
+                            <p class="hero-stat-label">{{ __('Rating') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -96,20 +138,20 @@
                 </p>
             </div>
 
-           
 
 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 250px); gap: var(--space-4);" class="scroll-animate">
+
+            <div class="home-destinations-grid scroll-animate">
                 @forelse($destinations ?? [] as $index => $destination)
                     @php
                         $gridStyles = [
-                            0 => 'grid-row: span 2;',
+                            0 => '--desktop-grid-row: span 2;',
                             1 => '',
                             2 => '',
-                            3 => 'grid-column: span 2;',
+                            3 => '--desktop-grid-column: span 2;',
                         ];
                     @endphp
-                    <div style="{{ $gridStyles[$index % 4] ?? '' }}">
+                    <div class="home-destination-item" style="{{ $gridStyles[$index % 4] ?? '' }}">
                         @include('frontend.components.destination-card', [
                             'destination' => $destination,
                             'tripCount' => $destination->trips_count ?? 0
@@ -128,16 +170,16 @@
                     @foreach($demoDestinations as $index => $demo)
                         @php
                             $gridStyles = [
-                                0 => 'grid-row: span 2;',
+                                0 => '--desktop-grid-row: span 2;',
                                 1 => '',
                                 2 => '',
-                                3 => 'grid-column: span 2;',
+                                3 => '--desktop-grid-column: span 2;',
                             ];
                             // Create a dummy object to satisfy component expectations if necessary,
                             // but component uses $destination->nicename etc.
                             $destObj = (object)$demo;
                         @endphp
-                        <div style="{{ $gridStyles[$index % 4] ?? '' }}">
+                        <div class="home-destination-item" style="{{ $gridStyles[$index % 4] ?? '' }}">
                             @include('frontend.components.destination-card', [
                                 'destination' => $destObj,
                                 'tripCount' => $demo['trips_count']
@@ -218,7 +260,7 @@
         <div data-slider="banner" class="slider">
             @foreach($banners as $banner)
                 <div class="slider-slide">
-                    <div style="position: relative; height: 500px; overflow: hidden;">
+                    <div style="position: relative; overflow: hidden;">
                         <img
                             src="{{ asset('storage/' . $banner->image_path) }}"
                             alt="{{ $banner->title_ar }}"
@@ -248,7 +290,7 @@
     @endif
 
     {{-- Why Choose Us --}}
-    
+
     <section class="section bg-surface">
         <div class="container">
             <div class="section-header">
@@ -259,7 +301,7 @@
                 </p>
             </div>
 
-           @php    
+           @php
             // تعريف المسارات الكاملة لكل أيقونة (SVG Paths)
             $icons = [
                 'M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z', // موقع
@@ -271,9 +313,9 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4" style="gap: var(--space-6);">
             @forelse($questions as $index => $ques)
-            <div class="card text-center scroll-animate" 
+            <div class="card text-center scroll-animate"
                 style="padding: var(--space-8); transition: transform 0.3s ease; border: 1px solid var(--color-border);">
-                
+
                 <div style="width: 60px; height: 60px; background: var(--color-surface-hover); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="{{ $icons[$index % count($icons)] }}"/>
@@ -284,14 +326,14 @@
                 <h4 style="font-size: var(--text-lg); font-weight: var(--font-bold); margin-bottom: var(--space-2); color: var(--color-text-main);">
                     {{ app()->getLocale() == 'ar' ? $ques->question_ar : $ques->question_en }}
                 </h4>
-                
+
                 <p class="text-muted" style="font-size: var(--text-sm); line-height: 1.6;">
                     {{ app()->getLocale() == 'ar' ? $ques->answer_ar : $ques->answer_en }}
                 </p>
             </div>
             @empty
             <div class="col-span-full text-center py-10">
-                <p class="text-muted">{{ __('لا توجد نتائج لعرضها حالياً') }}</p>
+                <p class="text-muted">{{ __('No results found currently') }}</p>
             </div>
             @endforelse
         </div>
@@ -318,7 +360,7 @@
 @push('styles')
    <style>
         .destination-card-content{
-          position: relative;  
+          position: relative;
         }
    </style>
 @endpush

@@ -27,24 +27,24 @@
                     $instagramUrl = \App\Models\Setting::get('instagram_url');
                 @endphp
                 <div class="footer-social">
-                    <a href="{{$facebookUrl}}" aria-label="Facebook">
+                    <a href="{{$facebookUrl}}" aria-label="{{ __('Facebook') }}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
                         </svg>
                     </a>
-                    <a href="{{$twitterUrl}}#" aria-label="Twitter">
+                    <a href="{{$twitterUrl}}#" aria-label="{{ __('Twitter') }}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
                         </svg>
                     </a>
-                    <a href="{{$instagramUrl}}" aria-label="Instagram">
+                    <a href="{{$instagramUrl}}" aria-label="{{ __('Instagram') }}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
                             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                             <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
                         </svg>
                     </a>
-                    <a href="#" aria-label="YouTube">
+                    <a href="#" aria-label="{{ __('YouTube') }}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
                             <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white"></polygon>
@@ -113,10 +113,22 @@
                 © {{ date('Y') }} {{ config('app.name', 'Wjhtak') }}. {{ __('All Rights Reserved') }}
             </p>
             <div class="footer-payment">
-                <img src="{{ asset('images/payment/visa.svg') }}" alt="Visa">
-                <img src="{{ asset('images/payment/mastercard.svg') }}" alt="Mastercard">
-                <img src="{{ asset('images/payment/apple-pay.svg') }}" alt="Apple Pay">
-                <img src="{{ asset('images/payment/mada.svg') }}" alt="Mada">
+                {{-- Visa --}}
+                <svg width="40" height="25" viewBox="0 0 45 15" fill="none"><path d="M17.443.243l-2.4 14.514h-3.837L8.805.243h3.838l.6 4.37h2.822l.538-4.37h3.84zM32.89 10.372c0 2.821-4.368 2.946-4.368 4.605 0 .54.499.982 1.54.982 1.346 0 2.503-.352 3.424-.92l.635 2.895c-1.02.491-2.485.882-4.144.882-3.614 0-6.173-1.89-6.173-4.823 0-2.82 4.385-3.003 4.385-4.605 0-.52-.519-.982-1.712-.982-1.154 0-2.193.303-2.923.702l-.654-2.921c.884-.39 2.308-.76 3.933-.76 3.48 0 6.057 1.833 6.057 4.945M22.04 14.757l-1.635-14.514h4.143l1.636 14.514h-4.144zM44.757.243l-3.327 14.514h-3.578L36.012.243h3.913l.865 6.368 2.057-6.368h3.91z" fill="#1434CB"/></svg>
+                {{-- Mastercard --}}
+                <svg width="35" height="25" viewBox="0 0 24 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="#EB001B"/><circle cx="16.5" cy="7.5" r="7.5" fill="#F79E1B"/><path d="M12 1.402a7.472 7.472 0 012.916 6.098c0 2.39-1.116 4.52-2.863 5.903a7.473 7.473 0 01-3.027-5.903c0-2.443 1.168-4.615 2.974-5.998z" fill="#FF5F00"/></svg>
+                {{-- Apple Pay --}}
+                <svg width="40" height="25" viewBox="0 0 50 20" fill="none"><path d="M7.74 3.7c.94-1.12 1.55-2.67 1.38-4.22-1.34.05-2.95.88-3.9 1.99-.86.99-1.6 2.58-1.4 4.09 1.48.11 3-.74 3.92-1.86" fill="#000"/><path d="M10.15 13.56c-.05 3.39 2.95 4.54 3 4.57s-.47 1.62-1.58 3.23c-1 1.46-2.03 2.93-3.66 2.93s-2.09-.99-3.95-.99-2.39.96-3.89 1.02c-1.57.06-2.73-1.61-3.73-3.06-2.05-2.96-3.62-8.36-1.52-12 1.04-1.8 2.9-2.94 4.93-2.97 1.55-.03 3.01 1.04 3.96 1.04s2.72-1.28 4.56-1.09c.77.03 2.93.31 4.31 2.33-.12.06-2.58 1.44-2.53 4.92" fill="#000"/><text x="22" y="16" font-family="Arial" font-weight="bold" font-size="14" fill="#000">Pay</text></svg>
+                {{-- Mada --}}
+                <svg width="40" height="25" viewBox="0 0 40 15" fill="none"><rect width="40" height="15" rx="2" fill="#004A97"/><text x="5" y="11" font-family="Arial" font-weight="bold" font-size="10" fill="white">mada</text></svg>
+                {{-- Tamara --}}
+                <div class="payment-badge tamara">
+                    <span style="background: #ffc20e; color: black; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">tamara</span>
+                </div>
+                {{-- Tabby --}}
+                <div class="payment-badge tabby">
+                    <span style="background: #3affbe; color: black; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">tabby</span>
+                </div>
             </div>
         </div>
     </div>
@@ -145,3 +157,34 @@
         }
     });
 </script>
+
+@push('styles')
+<style>
+    .footer-payment {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .footer-payment svg {
+        opacity: 0.8;
+        transition: all 0.3s ease;
+        filter: grayscale(1) brightness(1.5);
+    }
+
+    .footer-payment svg:hover {
+        opacity: 1;
+        filter: grayscale(0) brightness(1);
+        transform: translateY(-2px);
+    }
+
+    .payment-badge {
+        transition: all 0.3s ease;
+    }
+
+    .payment-badge:hover {
+        transform: translateY(-2px);
+    }
+</style>
+@endpush

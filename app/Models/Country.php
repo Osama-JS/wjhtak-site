@@ -22,6 +22,7 @@ class Country extends Model
         'numcode',
         'phonecode',
         'flag',
+        'landmark_image',
         'active',
     ];
 
@@ -86,5 +87,25 @@ class Country extends Model
             return asset('storage/' . $this->flag);
         }
         return asset('images/flags/default.png');
+    }
+
+    /**
+     * Get landmark image URL.
+     */
+    public function getLandmarkImageUrlAttribute(): string
+    {
+        if ($this->landmark_image) {
+            return asset('storage/' . $this->landmark_image);
+        }
+
+        // Fallback to ISO-based image if available, otherwise placeholder
+        if ($this->iso) {
+            $path = 'images/destinations/' . strtolower($this->iso) . '.jpg';
+            if (file_exists(public_path($path))) {
+                return asset($path);
+            }
+        }
+
+        return asset('images/demo/destination-placeholder.jpg');
     }
 }

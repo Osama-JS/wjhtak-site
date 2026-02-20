@@ -1,8 +1,18 @@
-{{-- Mobile Menu Component --}}
+@php
+    $siteLogo = \App\Models\Setting::get('site_logo');
+    $siteName = app()->getLocale() === 'ar'
+        ? \App\Models\Setting::get('site_name_ar', 'وجهتك')
+        : \App\Models\Setting::get('site_name_en', 'Wjhtak');
+@endphp
+
 <aside class="mobile-menu" id="mobileMenu">
     <div class="mobile-menu-header">
         <a href="{{ route('home') }}" class="mobile-menu-logo">
-            <img src="{{ asset('images/logo-full.png') }}" alt="{{ config('app.name') }}">
+            @if($siteLogo)
+                <img src="{{ asset($siteLogo) }}" alt="{{ $siteName }}" onerror="this.src='{{ asset('images/logo-full.png') }}'">
+            @else
+                <img src="{{ asset('images/logo-full.png') }}" alt="{{ $siteName }}">
+            @endif
         </a>
         <button class="mobile-menu-close" id="mobileMenuClose" aria-label="{{ __('Close menu') }}">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -76,7 +86,7 @@
                 <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
                 <path d="M2 12h20"></path>
             </svg>
-            {{ $currentLocale === 'ar' ? 'English' : 'العربية' }}
+            {{ $currentLocale === 'ar' ? __('English') : __('Arabic') }}
         </a>
 
         {{-- Auth Links --}}

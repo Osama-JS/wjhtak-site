@@ -21,11 +21,11 @@
         @endif
 
         <div class="container" style="position: relative; z-index: 1;">
-            <div class="text-center" style="color: white;">
-                <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
+            <div class="text-center" style="color: white !important;">
+                <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4); color: white !important;">
                     {{ __('Explore Our Trips') }}
                 </h1>
-                <p style="font-size: var(--text-lg); opacity: 0.9; max-width: 600px; margin: 0 auto;">
+                <p style="font-size: var(--text-lg); opacity: 0.9; max-width: 600px; margin: 0 auto; color: white !important;">
                     {{ __('Discover handpicked travel experiences designed to create unforgettable memories.') }}
                 </p>
             </div>
@@ -33,14 +33,14 @@
             {{-- Breadcrumb --}}
             <nav class="breadcrumb" style="justify-content: center; margin-top: var(--space-6);" aria-label="Breadcrumb">
                 <span class="breadcrumb-item">
-                    <a href="{{ route('home') }}" style="color: rgba(255,255,255,0.7);">{{ __('Home') }}</a>
+                    <a href="{{ route('home') }}" style="color: rgba(255,255,255,0.7) !important;">{{ __('Home') }}</a>
                 </span>
-                <span class="breadcrumb-separator" style="color: rgba(255,255,255,0.5);">
+                <span class="breadcrumb-separator" style="color: rgba(255,255,255,0.5) !important;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </span>
-                <span class="breadcrumb-item active" style="color: white;">{{ __('Trips') }}</span>
+                <span class="breadcrumb-item active" style="color: white !important;">{{ __('Trips') }}</span>
             </nav>
         </div>
     </section>

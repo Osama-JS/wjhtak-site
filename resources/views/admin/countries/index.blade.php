@@ -59,6 +59,7 @@
                             <thead>
                                 <tr>
                                     <th>{{ __('Flag') }}</th>
+                                    <th>{{ __('Landmark') }}</th>
                                     <th>{{ __('Name (Ar)') }}</th>
                                     <th>{{ __('Name (En)') }}</th>
                                     <th>{{ __('Code') }}</th>
@@ -98,6 +99,7 @@
                         </div>
                     </div>
                     <x-forms.file-upload name="flag" :label="__('Country Flag')" accept="image/*" />
+                    <x-forms.file-upload name="landmark_image" :label="__('Landmark Image')" accept="image/*" />
                     <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
                 </div>
                 <div class="modal-footer">
@@ -133,6 +135,7 @@
                         </div>
                     </div>
                     <x-forms.file-upload  id="edit_flag" name="flag" :label="__('Country Flag')" accept="image/*" preview />
+                    <x-forms.file-upload  id="edit_landmark_image" name="landmark_image" :label="__('Landmark Image')" accept="image/*" preview />
                     <x-forms.checkbox  id="edit_active" name="active" :label="__('Active status')" type="switch" />
                 </div>
                 <div class="modal-footer">
@@ -156,6 +159,7 @@
             ajax: countriesDataUrl,
             columns: [
                 { data: 'flag' },
+                { data: 'landmark' },
                 { data: 'name' },
                 { data: 'nicename' },
                 { data: 'numcode' },
@@ -257,12 +261,12 @@
                 $('#edit_phonecode').val(country.phonecode);
                 $('#edit_active').prop('checked', country.active);
 
-                // Show current flag
-                if (country.flag) {
-                    $('#editCountryForm .current-image-preview img').attr('src', response.flag_url);
-                    $('#editCountryForm .current-image-preview').show();
+                // Show current landmark image
+                if (country.landmark_image) {
+                    $('#editCountryForm .landmark_image-preview img').attr('src', response.landmark_image_url);
+                    $('#editCountryForm .landmark_image-preview').show();
                 } else {
-                    $('#editCountryForm .current-image-preview').hide();
+                    $('#editCountryForm .landmark_image-preview').hide();
                 }
 
                 $('#editCountryModal').modal('show');

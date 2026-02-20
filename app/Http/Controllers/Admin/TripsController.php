@@ -48,9 +48,48 @@ class TripsController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $trip->itineraries()->create($request->all());
+        $data = $request->all();
+        // Set sort_order as the same as day_number initially,
+        // or just after the last one
+        $lastOrder = $trip->itineraries()->max('sort_order') ?? 0;
+        $data['sort_order'] = $lastOrder + 1;
+
+        $trip->itineraries()->create($data);
 
         return redirect()->back()->with('success', __('Itinerary added successfully'));
+    }
+
+    public function updateItinerary(Request $request, TripItinerary $itinerary)
+    {
+        $request->validate([
+            'day_number' => 'required|integer',
+            'title' => 'required|string',
+            'description' => 'nullable|string',
+        ]);
+
+        $itinerary->update($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Itinerary updated successfully')
+        ]);
+    }
+
+    public function reorderItinerary(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'exists:trip_itineraries,id'
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            TripItinerary::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Itinerary reordered successfully')
+        ]);
     }
 
     public function destroyItinerary(TripItinerary $itinerary)

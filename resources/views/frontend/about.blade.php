@@ -21,13 +21,11 @@
         @endif
 
         <div class="container" style="position: relative; z-index: 1;">
-            <div class="text-center" style="color: white;">
-                <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
-                    {{ __('About Wjhtak') }}
+            <div class="text-center" style="color: white !important;">
+                <h1 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4); color: white !important;">
+                    {{ __('About Us') }}
                 </h1>
-                <p style="font-size: var(--text-lg); opacity: 0.9; max-width: 600px; margin: 0 auto;">
-                    {{ __('Crafting unforgettable journeys since 2015') }}
-                </p>
+                <p style="font-size: var(--text-lg); opacity: 0.9; color: white !important;">{{ __('Discover our story, mission, and the passion behind Wjhtak.') }}</p>
             </div>
 
             {{-- Breadcrumb --}}
@@ -55,7 +53,7 @@
                         src="{{ asset('images/about/team.jpg') }}"
                         alt="{{ __('Our Team') }}"
                         style="width: 100%; border-radius: var(--radius-2xl); box-shadow: var(--shadow-xl);"
-                        
+
                     >
                     {{-- Decoration --}}
                     <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: var(--gradient-accent); border-radius: var(--radius-2xl); z-index: -1;"></div>
@@ -76,20 +74,37 @@
                     <p style="color: var(--color-text-secondary); line-height: var(--leading-relaxed); margin-bottom: var(--space-4);">
                         {{ $story }}
                     </p>
-                    
-                    {{-- Stats --}}
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4);">
-                        <div>
-                            <div style="font-size: var(--text-3xl); font-weight: var(--font-bold); color: var(--color-primary);" data-counter="50000" data-suffix="+">0</div>
-                            <div class="text-muted">{{ __('Happy Travelers') }}</div>
+
+                    {{-- Premium Stats Cards --}}
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-4); margin-top: var(--space-8);">
+                        <div class="stat-premium-card">
+                            <div class="stat-icon-circle">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                            </div>
+                            <div class="stat-number" data-counter="50000" data-suffix="+">0</div>
+                            <div class="stat-label">{{ __('Happy Travelers') }}</div>
                         </div>
-                        <div>
-                            <div style="font-size: var(--text-3xl); font-weight: var(--font-bold); color: var(--color-primary);" data-counter="200" data-suffix="+">0</div>
-                            <div class="text-muted">{{ __('Partners') }}</div>
+
+                        <div class="stat-premium-card">
+                            <div class="stat-icon-circle">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M17 11V7a5 5 0 0 0-10 0v4"/>
+                                </svg>
+                            </div>
+                            <div class="stat-number" data-counter="200" data-suffix="+">0</div>
+                            <div class="stat-label">{{ __('Partners') }}</div>
                         </div>
-                        <div>
-                            <div style="font-size: var(--text-3xl); font-weight: var(--font-bold); color: var(--color-primary);" data-counter="50" data-suffix="+">0</div>
-                            <div class="text-muted">{{ __('Destinations') }}</div>
+
+                        <div class="stat-premium-card">
+                            <div class="stat-icon-circle">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+                                </svg>
+                            </div>
+                            <div class="stat-number" data-counter="50" data-suffix="+">0</div>
+                            <div class="stat-label">{{ __('Destinations') }}</div>
                         </div>
                     </div>
                 </div>
@@ -235,6 +250,59 @@
 
 @push('styles')
 <style>
+    /* Premium Stats Cards */
+    .stat-premium-card {
+        background: white;
+        padding: var(--space-6);
+        border-radius: var(--radius-2xl);
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--color-border);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-premium-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border-color: var(--color-primary-light);
+    }
+
+    .stat-icon-circle {
+        width: 50px;
+        height: 50px;
+        background: var(--color-surface-hover);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-primary);
+        margin-bottom: var(--space-4);
+        transition: all 0.3s ease;
+    }
+
+    .stat-premium-card:hover .stat-icon-circle {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    .stat-number {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-bold);
+        color: var(--color-text);
+        margin-bottom: var(--space-1);
+    }
+
+    .stat-label {
+        font-size: var(--text-xs);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--color-text-secondary);
+        font-weight: var(--font-medium);
+    }
+
     @media (max-width: 768px) {
         .story-grid {
             grid-template-columns: 1fr !important;

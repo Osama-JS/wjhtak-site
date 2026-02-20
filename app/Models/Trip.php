@@ -95,7 +95,7 @@ class Trip extends Model
 
     public function itineraries()
     {
-        return $this->hasMany(TripItinerary::class)->orderBy('day_number');
+        return $this->hasMany(TripItinerary::class)->orderBy('sort_order', 'asc');
     }
 
     /**

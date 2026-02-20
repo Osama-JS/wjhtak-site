@@ -68,6 +68,7 @@ class CountryController extends Controller
                     'numcode' => '<span class="badge badge-light">' . $country->numcode . '</span>',
                     'phonecode' => $country->phonecode ?? '---',
                     'cities_count' => '<span class="badge badge-primary">' . $country->cities_count . '</span>',
+                    'landmark' => '<img src="' . $country->landmark_image_url . '" alt="' . $country->nicename . '" class="rounded" width="50" height="35" style="object-fit: cover;">',
                     'status' => $country->active
                         ? '<span class="badge badge-success">' . __('Active') . '</span>'
                         : '<span class="badge badge-danger">' . __('Inactive') . '</span>',
@@ -104,6 +105,7 @@ class CountryController extends Controller
             'numcode' => 'required|string|max:10|unique:countries,numcode',
             'phonecode' => 'nullable|string|max:10',
             'flag' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'landmark_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'active' => 'sometimes|boolean',
         ]);
 
@@ -117,6 +119,11 @@ class CountryController extends Controller
         // Handle flag upload
         if ($request->hasFile('flag')) {
             $data['flag'] = $request->file('flag')->store('flags', 'public');
+        }
+
+        // Handle landmark image upload
+        if ($request->hasFile('landmark_image')) {
+            $data['landmark_image'] = $request->file('landmark_image')->store('landmarks', 'public');
         }
 
         $countrie = Country::create($data);
@@ -138,6 +145,7 @@ class CountryController extends Controller
             'success' => true,
             'country' => $country,
             'flag_url' => $country->flag_url,
+            'landmark_image_url' => $country->landmark_image_url,
         ]);
     }
 
@@ -152,6 +160,7 @@ class CountryController extends Controller
             'numcode' => 'required|string|max:10|unique:countries,numcode,' . $country->id,
             'phonecode' => 'nullable|string|max:10',
             'flag'      => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'landmark_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'active' => 'boolean',
         ]);
 
@@ -169,6 +178,15 @@ class CountryController extends Controller
                 Storage::disk('public')->delete($country->flag);
             }
             $data['flag'] = $request->file('flag')->store('flags', 'public');
+        }
+
+        // Handle landmark image upload
+        if ($request->hasFile('landmark_image')) {
+            // Delete old landmark image
+            if ($country->landmark_image) {
+                Storage::disk('public')->delete($country->landmark_image);
+            }
+            $data['landmark_image'] = $request->file('landmark_image')->store('landmarks', 'public');
         }
 
         $country->update($data);
@@ -200,6 +218,11 @@ class CountryController extends Controller
         // Delete flag if exists
         if ($country->flag) {
             Storage::disk('public')->delete($country->flag);
+        }
+
+        // Delete landmark image if exists
+        if ($country->landmark_image) {
+            Storage::disk('public')->delete($country->landmark_image);
         }
 
         $country->delete();

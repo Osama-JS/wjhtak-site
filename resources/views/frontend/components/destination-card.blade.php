@@ -11,21 +11,12 @@
 <a href="{{ route('trips.index', ['country' => $destId]) }}" class="destination-card scroll-animate">
     {{-- Background Image --}}
     <div class="destination-card-image">
-        @if($destIso)
-            {{-- Use a destination image if available, otherwise use flag as fallback --}}
-            <img
-                src="{{ asset('images/destinations/' . strtolower($destIso) . '.jpg') }}"
-                alt="{{ $destName }}"
-                loading="lazy"
-                onerror="this.src='{{ asset('images/demo/destination-placeholder.jpg') }}'"
-            >
-        @else
-            <img
-                src="{{ asset('images/demo/destination-placeholder.jpg') }}"
-                alt="{{ $destName }}"
-                loading="lazy"
-            >
-        @endif
+        <img
+            src="{{ $destination->landmark_image_url ?? asset('images/demo/destination-placeholder.jpg') }}"
+            alt="{{ $destName }}"
+            loading="lazy"
+            onerror="this.src='{{ asset('images/demo/destination-placeholder.jpg') }}'"
+        >
     </div>
 
     {{-- Overlay --}}

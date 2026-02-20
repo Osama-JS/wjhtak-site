@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
-class UserController extends Controller
+class SubscriberController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,28 +17,28 @@ class UserController extends Controller
     public function index()
     {
         $stats = [
-            'total' => User::where('user_type', User::TYPE_ADMIN)->count(),
-            'active' => User::where('user_type', User::TYPE_ADMIN)->where('status', 'active')->count(),
-            'inactive' => User::where('user_type', User::TYPE_ADMIN)->where('status', 'inactive')->count(),
-            'unverified' => User::where('user_type', User::TYPE_ADMIN)->whereNull('email_verified_at')->count(),
+            'total' => User::where('user_type', User::TYPE_CUSTOMER)->count(),
+            'active' => User::where('user_type', User::TYPE_CUSTOMER)->where('status', 'active')->count(),
+            'inactive' => User::where('user_type', User::TYPE_CUSTOMER)->where('status', 'inactive')->count(),
+            'unverified' => User::where('user_type', User::TYPE_CUSTOMER)->whereNull('phone_verified_at')->count(),
         ];
-        return view('admin.users.index', compact('stats'));
+        return view('admin.subscribers.index', compact('stats'));
     }
 
     /**
-     * Get users for DataTables.
+     * Get subscribers for DataTables.
      */
     public function getData(Request $request)
     {
-        $users = User::where('user_type', User::TYPE_ADMIN)->get();
+        $subscribers = User::where('user_type', User::TYPE_CUSTOMER)->orderBy('created_at', 'desc')->get();
 
         return response()->json([
-            'data' => $users->map(function($user) {
+            'data' => $subscribers->map(function($user) {
                 $statusBadge = $user->status === 'active'
                     ? '<span class="badge badge-success">'.__('Active').'</span>'
                     : '<span class="badge badge-danger">'.__('Inactive').'</span>';
 
-                $verifiedBadge = $user->email_verified_at
+                $verifiedBadge = $user->phone_verified_at
                     ? '<span class="badge badge-light">'.__('Verified').'</span>'
                     : '<span class="badge badge-warning">'.__('Unverified').'</span>';
 
@@ -54,22 +54,22 @@ class UserController extends Controller
                     'verified' => $verifiedBadge,
                     'actions' => '
                         <div class="d-flex">
-                            <button onclick="editUser(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></button>
-                            <button onclick="toggleUserStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-ban"></i></button>
-                            <button onclick="deleteUser(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
+                            <a href="' . route('admin.subscribers.profile', $user->id) . '" class="btn btn-info shadow btn-xs sharp me-1"><i class="fa fa-eye"></i></a>
+                            <button onclick="editSubscriber(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></button>
+                            <button onclick="toggleSubscriberStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-ban"></i></button>
+                            <button onclick="deleteSubscriber(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
                         </div>'
                 ];
             })
         ]);
-
     }
-
 
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show($id)
     {
+        $user = User::findOrFail($id);
         return response()->json([
             'success' => true,
             'user' => $user,
@@ -78,7 +78,9 @@ class UserController extends Controller
         ]);
     }
 
-
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -92,22 +94,23 @@ class UserController extends Controller
         ]);
 
         $validated['password'] = Hash::make($request->password);
-        $validated['user_type'] = User::TYPE_ADMIN;
+        $validated['user_type'] = User::TYPE_CUSTOMER;
 
         User::create($validated);
 
         return response()->json([
             'success' => true,
-            'message' => __('Admin user created successfully')
+            'message' => __('Subscriber created successfully')
         ]);
     }
-
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
+        $user = User::findOrFail($id);
+
         $request->validate([
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
@@ -128,27 +131,22 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'User updated successfully'
+            'message' => __('Subscriber updated successfully')
         ]);
     }
 
     /**
-     * Toggle user status.
+     * Toggle subscriber status.
      */
-    public function toggleStatus(User $user)
+    public function toggleStatus($id)
     {
+        $user = User::findOrFail($id);
         $newStatus = $user->status === 'active' ? 'inactive' : 'active';
-        $updated = $user->update(['status' => $newStatus]);
-
-        // dd([
-        //     'user_id' => $user->id,
-        //     'new_status' => $newStatus,
-        //     'updated' => $updated
-        // ]);
+        $user->update(['status' => $newStatus]);
 
         return response()->json([
             'success' => true,
-            'message' => 'User status updated to ' . $newStatus,
+            'message' => __('Subscriber status updated to ') . $newStatus,
             'status' => $newStatus
         ]);
     }
@@ -156,8 +154,9 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
+        $user = User::findOrFail($id);
         try {
             if ($user->profile_photo) {
                 Storage::disk('public')->delete($user->profile_photo);
@@ -165,21 +164,22 @@ class UserController extends Controller
             $user->delete();
             return response()->json([
                 'success' => true,
-                'message' => 'User deleted successfully'
+                'message' => __('Subscriber deleted successfully')
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete user'
+                'message' => __('Failed to delete subscriber')
             ], 500);
         }
     }
+
     /**
-     * Show user profile
+     * Show subscriber profile
      */
     public function profile($id)
     {
         $user = User::with(['bookings.trip'])->findOrFail($id);
-        return view('admin.users.profile', compact('user'));
+        return view('admin.subscribers.profile', compact('user'));
     }
 }

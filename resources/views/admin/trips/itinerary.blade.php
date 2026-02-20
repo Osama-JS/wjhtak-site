@@ -18,6 +18,9 @@
     .bg-soft-success { background-color: #135846; color: #ffffff; }
     .price-tag { font-size: 1.5rem; color: #2c3e50; }
     .location-dot { color: #0d6efd; font-size: 12px; }
+    .sortable-handler { cursor: grab; padding-right: 15px; display: flex; align-items: center; }
+    .sortable-ghost { opacity: 0.4; background-color: #f8f9fa !important; border: 2px dashed #0d6efd !important; }
+    .itinerary-item { position: relative; }
 </style>
 
 <div class="container-fluid">
@@ -151,7 +154,7 @@
 
                                         <div class="col-md-6 p-4">
                                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                                
+
                                                 <h4 class="fw-bold text-dark mb-0"> <i class="fas fa-plane-departure me-2"></i> {{ $trip->title }}</h4>
                                                 <span class="badge rounded-pill {{ $trip->is_public ? 'bg-soft-success' : 'bg-secondary' }}">
                                                     {{ $trip->is_public ?  __('Public') :  __('Private') }}
@@ -159,18 +162,18 @@
                                             </div>
                                                 <p class="text-muted small mb-1 mt-4">{{ __('Description') }}</p>
                                                 <p class="fw-bold mb-4">{{ Str::limit($trip->description, 100) }}</p>
-                                            
-                                            
+
+
                                             <div class="location-flow d-flex align-items-center mb-3">
                                                 <div class="text-start">
                                                     <h6 class="mb-0 fw-bold">{{ $trip->fromCity->name ?? 'N/A' }}</h6>
                                                     <small class="text-muted">{{ $trip->fromCountry->name ?? 'N/A' }}</small>
                                                 </div>
-                                                
+
                                                 <div class="flex-grow-1 border-bottom border-primary border-2 mx-3 position-relative">
                                                     <i class="fas fa-plane position-absolute top-50 start-50 translate-middle bg-white px-2 text-primary"></i>
                                                 </div>
-                                                
+
                                                 <div class="text-end">
                                                     <h6 class="mb-0 fw-bold">{{ $trip->toCity->name ?? 'N/A' }}</h6>
                                                     <small class="text-muted">{{ $trip->toCountry->name }}</small>
@@ -184,7 +187,7 @@
                                                     <h6 class="fw-bold">{{ $trip->duration }}</h6>
                                                 </div>
                                                 <div class="col-4 border-end">
-                                                    <i class="fas fa-ticket-alt me-1 text-primary mb-1"></i> 
+                                                    <i class="fas fa-ticket-alt me-1 text-primary mb-1"></i>
                                                     <p class="small text-muted mb-0">{{ __('Tickets') }}</p>
                                                     <h6 class="fw-bold">{{ $trip->tickets }}</h6>
                                                 </div>
@@ -195,9 +198,9 @@
                                                 </div>
                                             </div>
                                         </div>
-   
 
-                                        
+
+
 
                                         <div class="col-md-3 p-4 bg-light d-flex flex-column justify-content-center text-center" style="border-radius: 0 20px 20px 0;">
                                             <div class="mb-3">
@@ -223,7 +226,7 @@
                                             </ul>
 
 
-                                            
+
                                             <!-- <div class="mb-3">
                                                 <div class="d-flex justify-content-between px-3 small">
                                                     <span>Profit:</span>
@@ -235,13 +238,13 @@
                                                 </div>
                                             </div> -->
 
-                                        
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -286,24 +289,35 @@
                             {{ __('No itinerary days added yet.') }}
                         </div>
                     @else
-                        <div class="timeline-area">
-                            @foreach($trip->itineraries->sortBy('day_number') as $itinerary)
-                                <div class="card border mb-3">
+                        <div class="timeline-area" id="itinerary-list">
+                            @foreach($trip->itineraries as $itinerary)
+                                <div class="card border mb-3 itinerary-item" data-id="{{ $itinerary->id }}">
                                     <div class="card-body">
-                                        <div class="d-flex justify-content-between">
-                                            <div>
-                                                <h5 class="text-primary mb-1">
-                                                    <span class="badge badge-primary me-2">{{ __('Day') }} {{ $itinerary->day_number }}</span>
-                                                    {{ $itinerary->title }}
-                                                </h5>
-                                                <p class="mb-0 text-muted mt-2">{{ $itinerary->description }}</p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="sortable-handler">
+                                                <i class="fas fa-grip-vertical text-muted"></i>
                                             </div>
-                                            <div class="ms-3">
-                                                <form action="{{ route('admin.trips.itinerary.destroy', $itinerary->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure?') }}')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
-                                                </form>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between">
+                                                    <div>
+                                                        <h5 class="text-primary mb-1">
+                                                            <span class="badge badge-primary me-2">{{ __('Day') }} {{ $itinerary->day_number }}</span>
+                                                            {{ $itinerary->title }}
+                                                        </h5>
+                                                        <p class="mb-0 text-muted mt-2">{{ $itinerary->description }}</p>
+                                                    </div>
+                                                    <div class="ms-3 d-flex align-items-center">
+                                                        <button type="button" class="btn btn-primary shadow btn-xs sharp me-1"
+                                                                onclick="editItinerary({{ $itinerary->id }}, {{ $itinerary->day_number }}, '{{ addslashes($itinerary->title) }}', '{{ addslashes($itinerary->description) }}')">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                        </button>
+                                                        <form action="{{ route('admin.trips.itinerary.destroy', $itinerary->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure?') }}')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -316,4 +330,118 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Itinerary Modal -->
+<div class="modal fade" id="editItineraryModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('Edit Day Details') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editItineraryForm">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <input type="hidden" id="edit_id">
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Day Number') }}</label>
+                        <input type="number" id="edit_day_number" name="day_number" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Title') }}</label>
+                        <input type="text" id="edit_title" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Description') }}</label>
+                        <textarea id="edit_description" name="description" class="form-control" rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('Update Changes') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const el = document.getElementById('itinerary-list');
+        if (el) {
+            Sortable.create(el, {
+                animation: 150,
+                handle: '.sortable-handler',
+                ghostClass: 'sortable-ghost',
+                onEnd: function() {
+                    let order = [];
+                    document.querySelectorAll('.itinerary-item').forEach(item => {
+                        order.push(item.getAttribute('data-id'));
+                    });
+
+                    fetch("{{ route('admin.trips.itinerary.reorder') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ order : order })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            toastr.success(data.message);
+                        } else {
+                            toastr.error('Failed to reorder');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        toastr.error('Error reordering itinerary');
+                    });
+                }
+            });
+        }
+    });
+
+    function editItinerary(id, dayNumber, title, description) {
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_day_number').value = dayNumber;
+        document.getElementById('edit_title').value = title;
+        document.getElementById('edit_description').value = description;
+        new bootstrap.Modal(document.getElementById('editItineraryModal')).show();
+    }
+
+    document.getElementById('editItineraryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit_id').value;
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        fetch(`/admin/trips/itinerary/${id}`, {
+            method: 'POST', // Trick to use PUT with FormData
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': data._token
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                toastr.error(data.message || 'Error updating itinerary');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            toastr.error('Connection error');
+        });
+    });
+</script>
+@endpush
 @endsection

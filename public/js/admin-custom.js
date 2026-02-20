@@ -18,7 +18,34 @@
         initForms();
         initTooltips();
         initAnimations();
+        initToastr();
     });
+
+    // ============================================
+    // TOASTR CONFIGURATION
+    // ============================================
+    function initToastr() {
+        if (typeof toastr !== "undefined") {
+            toastr.options = {
+                closeButton: true,
+                debug: false,
+                newestOnTop: true,
+                progressBar: true,
+                positionClass: "toast-top-center",
+                preventDuplicates: false,
+                onclick: null,
+                showDuration: "300",
+                hideDuration: "1000",
+                timeOut: "5000",
+                extendedTimeOut: "1000",
+                showEasing: "swing",
+                hideEasing: "linear",
+                showMethod: "fadeIn",
+                hideMethod: "fadeOut",
+                rtl: document.dir === "rtl",
+            };
+        }
+    }
 
     // Use jQuery for delegation to be consistent with template scripts
     jQuery(document).on("click", ".nav-control", function (e) {

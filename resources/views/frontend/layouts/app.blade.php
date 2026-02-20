@@ -25,19 +25,29 @@
     <meta name="twitter:description" content="@yield('og_description', __('Discover amazing travel destinations'))">
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    @php
+        $siteFavicon = \App\Models\Setting::get('site_favicon');
+    @endphp
+    @if($siteFavicon)
+        <link rel="icon" type="image/x-icon" href="{{ asset($siteFavicon) }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset($siteFavicon) }}">
+    @else
+        <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    @endif
 
     {{-- Preconnect to external resources --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     {{-- CSS Files --}}
-    <link rel="stylesheet" href="{{ asset('css/frontend/app.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/frontend/components.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/frontend/app.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/frontend/components.css') }}?v={{ time() }}">
     <link href="{{ asset('icons/font-awesome/css/all.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     @if(app()->getLocale() === 'ar')
     <link rel="stylesheet" href="{{ asset('css/frontend/rtl.css') }}">
+    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/material_orange.css">
     @endif
 
     {{-- Page-specific CSS --}}
@@ -157,7 +167,7 @@
             background: linear-gradient(45deg, rgba(255, 0, 150, 0.15), rgba(59, 75, 211, 0.1));
         }
         .search-modal {
-            display: none; 
+            display: none;
             position: fixed;
             z-index: 9999;
             left: 0; top: 0;
@@ -350,7 +360,7 @@
                 <h3>{{ __('Search Trips') }}</h3>
                 <button class="close-modal" onclick="toggleSearchModal()">&times;</button>
             </div>
-            
+
             <div class="search-modal-body">
                 <div class="search-box-wrapper">
                     <input type="text" id="searchInput" placeholder="{{ __('Search trips, destinations...') }}" autocomplete="off">
@@ -392,11 +402,97 @@
     </div>
 
     {{-- JavaScript Files --}}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    @if(app()->getLocale() === 'ar')
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ar.js"></script>
+    @endif
     <script src="{{ asset('js/frontend/app.js') }}"></script>
     <script src="{{ asset('js/frontend/slider.js') }}"></script>
 
     {{-- Page-specific JavaScript --}}
     @stack('scripts')
+
+    {{-- Global Initializations --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Flatpickr Initialization
+            flatpickr(".date-picker", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                locale: "{{ app()->getLocale() == 'ar' ? 'ar' : 'default' }}",
+                disableMobile: "true",
+                animate: true
+            });
+
+            // Custom Premium Dropdowns Logic
+            const dropdowns = document.querySelectorAll('.custom-dropdown');
+
+            dropdowns.forEach(dropdown => {
+                const trigger = dropdown.querySelector('.dropdown-trigger');
+                const menu = dropdown.querySelector('.dropdown-menu-premium');
+                const options = dropdown.querySelectorAll('.dropdown-option');
+                const hiddenInput = dropdown.querySelector('.hidden-input');
+                const selectedText = dropdown.querySelector('.selected-value');
+                const searchInput = dropdown.querySelector('.dropdown-search-input');
+
+                // Toggle Dropdown
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+
+                    // Close other dropdowns
+                    dropdowns.forEach(d => {
+                        if (d !== dropdown) d.classList.remove('active');
+                    });
+
+                    dropdown.classList.toggle('active');
+
+                    // Focus search if exists
+                    if (dropdown.classList.contains('active') && searchInput) {
+                        setTimeout(() => searchInput.focus(), 100);
+                    }
+                });
+
+                // Selection Logic
+                options.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const value = option.dataset.value;
+                        const text = option.textContent.trim();
+
+                        // Update hidden input and UI
+                        hiddenInput.value = value;
+                        selectedText.textContent = text;
+
+                        // Update active state in list
+                        options.forEach(opt => opt.classList.remove('active'));
+                        option.classList.add('active');
+
+                        // Close dropdown
+                        dropdown.classList.remove('active');
+                    });
+                });
+
+                // Search Filter for Destination
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        options.forEach(option => {
+                            const text = option.textContent.toLowerCase();
+                            option.style.display = text.includes(term) ? 'block' : 'none';
+                        });
+                    });
+
+                    // Prevent closing when clicking search
+                    searchInput.addEventListener('click', e => e.stopPropagation());
+                }
+            });
+
+            // Close on outside click
+            document.addEventListener('click', () => {
+                dropdowns.forEach(d => d.classList.remove('active'));
+            });
+        });
+    </script>
 
     {{-- Hide loader when page is ready --}}
     <script>
