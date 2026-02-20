@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('notes')->nullable();
             $table->boolean('active')->default(false);
             $table->timestamps();
-        $table->softDeletes();
+            $table->softDeletes();
 
             // Indexes for performance
             $table->index('email');

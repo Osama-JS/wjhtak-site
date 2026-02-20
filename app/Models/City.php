@@ -14,7 +14,7 @@ class City extends Model
      */
     
 
-    protected $guarded = [];
+    
 
     /**
      * The attributes that are mass assignable.
@@ -63,4 +63,6 @@ class City extends Model
     {
         return $query->where('country_id', $countryId);
     }
+
+    
 }
