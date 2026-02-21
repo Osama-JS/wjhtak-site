@@ -1,0 +1,23 @@
+يا هلا بشريكنا العزيز !
+يسعدنا نشوفك جزء من مجتمع شُركاء تمارا ومتحمسين نحقق إنجازات رهيبة سوا.
+بس باقي خطوات بسيطة لتفعيل تمارا:
+أكمل خطوات التفعيل باستخدام معلومات تسجيل الدخول الخاصة بتمارا.
+تأكد من الإعدادات المناسبة الخاصة بحسابك في تمارا التي تعمل مع متجرك في مرحلة الاختبار أو المتعارف عليها بـstaging environment.
+عند تفعيل تمارا، تواصل معنا عبر الرد على الرسائل المرسلة للتأكد من فعالية الدفع لطلبات متجرك مع تمارا.
+
+Merchant details
+Tamara Merchant ID: 3299456e-486c-4d3a-8178-dd27b7f58ffa
+Merchant Type: Online
+Merchant Country:SA
+
+API URL
+https://api.tamara.co
+
+Merchant Key
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhY2NvdW50SWQiOiIzMjk5NDU2ZS00ODZjLTRkM2EtODE3OC1kZDI3YjdmNThmZmEiLCJ0eXBlIjoibWVyY2hhbnQiLCJzYWx0IjoiOTY5YTRkMTMtN2RiOC00ODQ5LTgyNWYtOWJiNGE0NTk0NDkwIiwicm9sZXMiOlsiUk9MRV9NRVJDSEFOVCJdLCJpc010bHMiOmZhbHNlLCJpYXQiOjE3NjE3NDA5MTcsImlzcyI6IlRhbWFyYSBQUCJ9.oHsu0Gm_n_s7Lln-OzTSFFJz6PTqJJb5QdRW4yEQkxLghsS9rJLSik35D4OEjuQL3tzAcuAsfLiY72GadWepSQWBndYrMkvwlvd1bnaUZUIDs7WF67PG0XQf2QJVVv8TsJ-fb91nVlYlShXCP97vYWYbPt6_3Y7kuc4Exfaw8tWpZnXsGv8FuHKekslRUmSNjpghZweNkbxS39feV3zxHFDzhZK5mmtU--T4mtLw5fQa1ankgzZIU3ZY8FA8j5xi9mPTWsi1z0jqiWhtfJ9wp2QR8xPVL8-S9j8N214QHooFCy38QG-4kpSSe7DSe_GVgpams1aLWIA_Ej6zFDxgtQ
+
+Notification Token
+8f5ccd55-7556-4f68-8a4a-4e908a85696e
+
+Public Key
+6bb3e798-2409-4f05-bc11-6e5669a66aa3

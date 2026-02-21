@@ -12,15 +12,11 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Server(
     url: L5_SWAGGER_CONST_HOST,
-    description: "Development Server"
+    description: "Local Server"
 )]
 #[OA\Server(
-    url: "https://blueviolet-hummingbird-437500.hostingersite.com/public",
-    description: "Production Server 1"
-)]
-#[OA\Server(
-    url: "https://lavenderblush-bear-243464.hostingersite.com/public/",
-    description: "Production Server 2"
+    url: "https://n.wjhtak.com",
+    description: "Production Server"
 )]
 #[OA\SecurityScheme(
     securityScheme: "bearerAuth",
