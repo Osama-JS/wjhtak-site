@@ -182,8 +182,9 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::delete('/trips/itinerary/{itinerary}', [TripsController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
 
     // Trip Categories
-    Route::get('trip-categories/all', [App\Http\Controllers\Admin\TripCategoryController::class, 'getAll'])->name('trip-categories.all');
-    Route::resource('trip-categories', App\Http\Controllers\Admin\TripCategoryController::class);
+    Route::get('trip-categories', [TripCategoryController::class, 'index'])->name('trip-categories.index');
+    Route::get('trip-categories/all', [TripCategoryController::class, 'getAll'])->name('trip-categories.all');
+    Route::resource('trip-categories', TripCategoryController::class)->except(['index']);
 
     // Settings
     Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
