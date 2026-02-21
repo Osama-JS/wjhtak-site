@@ -62,6 +62,26 @@ class TripCategoryController extends Controller
         ]);
     }
 
+    public function getData(Request $request)
+    {
+        $categories = TripCategory::latest()->get();
+
+        return response()->json([
+            'data' => $categories->map(function($category, $index) {
+                return [
+                    'id' => $index + 1,
+                    'name_ar' => $category->name_ar,
+                    'name_en' => $category->name_en,
+                    'actions' => '
+                        <div class="d-flex">
+                            <button onclick="editCategory('.$category->id.')" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></button>
+                            <button onclick="deleteCategory('.$category->id.')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
+                        </div>'
+                ];
+            })
+        ]);
+    }
+
     public function getAll()
     {
         return response()->json(TripCategory::all());

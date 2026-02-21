@@ -182,6 +182,7 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::delete('/trips/itinerary/{itinerary}', [TripsController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
 
     // Trip Categories
+    Route::get('trip-categories/data', [TripCategoryController::class, 'getData'])->name('trip-categories.data');
     Route::get('trip-categories', [TripCategoryController::class, 'index'])->name('trip-categories.index');
     Route::get('trip-categories/all', [TripCategoryController::class, 'getAll'])->name('trip-categories.all');
     Route::resource('trip-categories', TripCategoryController::class)->except(['index']);

@@ -290,7 +290,7 @@ class DiscoveryController extends Controller
         path: "/api/v1/faqs",
         summary: "Get all FAQs",
         operationId: "getFaqs",
-        description: "Retrieve a list of all active frequently asked questions.",
+        description: "Retrieve a list of all active frequently asked questionsLocalized by Accept-Language header (ar, en).",
         tags: ["Discovery"],
         parameters: [
             new OA\Parameter(
@@ -313,11 +313,7 @@ class DiscoveryController extends Controller
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "question", type: "string", example: "How to book?", description: "Localized question content"),
-                                new OA\Property(property: "question_ar", type: "string", example: "كيف يمكنني الحجز؟"),
-                                new OA\Property(property: "question_en", type: "string", example: "How to book?"),
                                 new OA\Property(property: "answer", type: "string", example: "You can book via...", description: "Localized answer content"),
-                                new OA\Property(property: "answer_ar", type: "string", example: "يمكنك الحجز عبر..."),
-                                new OA\Property(property: "answer_en", type: "string", example: "You can book via..."),
                             ]
                         ))
                     ]
@@ -330,12 +326,8 @@ class DiscoveryController extends Controller
         $faqs = \App\Models\Question::all()->map(function ($faq) {
             return [
                 'id' => $faq->id,
-                'question' => $faq->question,
-                'question_ar' => $faq->question_ar,
-                'question_en' => $faq->question_en,
-                'answer' => $faq->answer,
-                'answer_ar' => $faq->answer_ar,
-                'answer_en' => $faq->answer_en,
+                'question' => app()->getLocale() == 'ar' ? $faq->question_ar : $faq->question_en,
+                'answer' => app()->getLocale() == 'ar' ? $faq->answer_ar : $faq->answer_en,
             ];
         });
 

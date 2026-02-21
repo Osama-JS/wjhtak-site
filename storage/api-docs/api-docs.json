@@ -3178,7 +3178,7 @@
                     "Discovery"
                 ],
                 "summary": "Get all FAQs",
-                "description": "Retrieve a list of all active frequently asked questions.",
+                "description": "Retrieve a list of all active frequently asked questionsLocalized by Accept-Language header (ar, en).",
                 "operationId": "getFaqs",
                 "parameters": [
                     {
@@ -3224,24 +3224,8 @@
                                                         "type": "string",
                                                         "example": "How to book?"
                                                     },
-                                                    "question_ar": {
-                                                        "type": "string",
-                                                        "example": "كيف يمكنني الحجز؟"
-                                                    },
-                                                    "question_en": {
-                                                        "type": "string",
-                                                        "example": "How to book?"
-                                                    },
                                                     "answer": {
                                                         "description": "Localized answer content",
-                                                        "type": "string",
-                                                        "example": "You can book via..."
-                                                    },
-                                                    "answer_ar": {
-                                                        "type": "string",
-                                                        "example": "يمكنك الحجز عبر..."
-                                                    },
-                                                    "answer_en": {
                                                         "type": "string",
                                                         "example": "You can book via..."
                                                     }
