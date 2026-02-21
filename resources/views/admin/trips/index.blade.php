@@ -737,7 +737,7 @@
                 setTimeout(function() {
                     // Update Select2 (for searchable selects)
                     if ($.fn.select2) {
-                        $('#edit_company_id, #edit_from_country_id, #edit_from_city_id, #edit_to_country_id').trigger('change.select2');
+                        $('#edit_company_id, #edit_from_country_id, #edit_from_city_id, #edit_to_country_id, #edit_category_ids').trigger('change.select2');
                     }
 
                     // Update nice-select (if used)

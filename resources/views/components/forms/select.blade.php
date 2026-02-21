@@ -75,11 +75,16 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof $.fn.select2 !== 'undefined') {
-        $('#{{ $name }}').select2({
+        const selectId = '{{ $attributes->get('id', $name) }}';
+        const $select = $('#' + selectId);
+        const $modal = $select.closest('.modal');
+
+        $select.select2({
             theme: 'bootstrap-5',
             placeholder: '{{ $placeholder }}',
             allowClear: true,
-            dir: document.dir || 'ltr'
+            dir: document.dir || 'ltr',
+            dropdownParent: $modal.length ? $modal : $(document.body)
         });
     }
 });
