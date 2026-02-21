@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use OpenApi\Attributes as OA;
 
 #[OA\Info(
-    title: "My-Trip API Documentation",
+    title: "Wjhtak API Documentation",
     version: "1.0.0",
-    description: "API documentation for My-Trip Platform",
-    contact: new OA\Contact(email: "support@mytrip.com")
+    description: "API documentation for Wjhtak Platform",
+    contact: new OA\Contact(email: "support@wjhtak.com")
 )]
 #[OA\Server(
     url: L5_SWAGGER_CONST_HOST,

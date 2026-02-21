@@ -187,6 +187,7 @@ class DiscoveryController extends Controller
                                 new OA\Property(property: "image", type: "string", example: "http://example.com/banners/1.jpg"),
                                 new OA\Property(property: "link", type: "string", example: "https://example.com/promo"),
                                 new OA\Property(property: "order", type: "integer", example: 1),
+                                new OA\Property(property: "trip_id", type: "integer", example: 42, nullable: true),
                             ]
                         ))
                     ]
@@ -208,6 +209,7 @@ class DiscoveryController extends Controller
                 'image' => $banner->image_url,
                 'link' => $banner->link,
                 'order' => $banner->sort_order,
+                'trip_id' => $banner->trip_id,
             ];
         });
 

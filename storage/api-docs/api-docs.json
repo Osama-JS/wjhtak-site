@@ -1,10 +1,10 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "My-Trip API Documentation",
-        "description": "API documentation for My-Trip Platform",
+        "title": "Wjhtak API Documentation",
+        "description": "API documentation for Wjhtak Platform",
         "contact": {
-            "email": "support@mytrip.com"
+            "email": "support@wjhtak.com"
         },
         "version": "1.0.0"
     },
@@ -3069,6 +3069,11 @@
                                                     "order": {
                                                         "type": "integer",
                                                         "example": 1
+                                                    },
+                                                    "trip_id": {
+                                                        "type": "integer",
+                                                        "example": 42,
+                                                        "nullable": true
                                                     }
                                                 },
                                                 "type": "object"
