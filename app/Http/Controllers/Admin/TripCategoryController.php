@@ -29,22 +29,22 @@ class TripCategoryController extends Controller
         ]);
     }
 
-    public function show(TripCategory $category)
+    public function show(TripCategory $trip_category)
     {
         return response()->json([
             'success' => true,
-            'category' => $category,
+            'category' => $trip_category,
         ]);
     }
 
-    public function update(Request $request, TripCategory $category)
+    public function update(Request $request, TripCategory $trip_category)
     {
         $data = $request->validate([
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
         ]);
 
-        $category->update($data);
+        $trip_category->update($data);
 
         return response()->json([
             'success' => true,
@@ -52,9 +52,9 @@ class TripCategoryController extends Controller
         ]);
     }
 
-    public function destroy(TripCategory $category)
+    public function destroy(TripCategory $trip_category)
     {
-        $category->delete();
+        $trip_category->delete();
 
         return response()->json([
             'success' => true,

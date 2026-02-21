@@ -232,12 +232,7 @@
                                     <x-forms.input-text name="title" :label="__('Trip Title')" required icon="fa fa-pen" />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">{{ __('Categories') }}</label>
-                                    <select name="category_ids[]" class="form-control default-select" multiple>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
+                                    <x-forms.select name="category_ids" :label="__('Categories')" :options="$categories" multiple searchable />
                                 </div>
                                 <div class="col-md-12">
                                     <x-forms.textarea name="description" :label="__('Description')" required rows="6" />
@@ -343,12 +338,7 @@
                                     <x-forms.input-text id="edit_title" name="title" :label="__('Trip Title')" required icon="fa fa-pen" />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">{{ __('Categories') }}</label>
-                                    <select id="edit_category_ids" name="category_ids[]" class="form-control default-select" multiple>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
+                                    <x-forms.select name="category_ids" id="edit_category_ids" :label="__('Categories')" :options="$categories" multiple searchable />
                                 </div>
                                 <div class="col-md-12">
                                     <x-forms.textarea id="edit_description" name="description" :label="__('Description')" required rows="6" />
