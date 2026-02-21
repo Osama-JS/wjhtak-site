@@ -39,6 +39,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="{{ route('admin.trips.index') }}">{{ __('Trips') }}</a></li>
+                    <li><a href="{{ route('admin.trip-categories.index') }}">{{ __('Trip Categories') }}</a></li>
                 </ul>
             </li>
 
