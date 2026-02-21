@@ -49,6 +49,7 @@ class DiscoveryController extends Controller
                                 new OA\Property(property: "code", type: "string", example: "SA"),
                                 new OA\Property(property: "phone_code", type: "string", example: "966"),
                                 new OA\Property(property: "flag", type: "string", example: "http://example.com/flags/sa.png"),
+                                new OA\Property(property: "landmark_image", type: "string", example: "http://example.com/landmarks/mecca.jpg"),
                             ]
                         ))
                     ]
@@ -67,6 +68,7 @@ class DiscoveryController extends Controller
                 'code' => $country->numcode,
                 'phone_code' => $country->phonecode,
                 'flag' => $country->flag_url,
+                'landmark_image' => $country->landmark_image_url,
             ];
         });
 
@@ -338,6 +340,59 @@ class DiscoveryController extends Controller
         });
 
         return $this->apiResponse(false, __('FAQs retrieved successfully'), $faqs);
+    }
+
+    /**
+     * Get all trip categories.
+     */
+    #[OA\Get(
+        path: "/api/v1/categories",
+        summary: "Get all trip categories",
+        operationId: "getCategories",
+        description: "Retrieve a list of all trip categories (e.g., Economy, Family, Royal).",
+        tags: ["Discovery"],
+        parameters: [
+            new OA\Parameter(
+                name: "Accept-Language",
+                in: "header",
+                description: "The language of the response (ar, en)",
+                required: false,
+                schema: new OA\Schema(type: "string", default: "en", enum: ["en", "ar"])
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Categories retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Categories retrieved successfully"),
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "name", type: "string", example: "Economy"),
+                                new OA\Property(property: "name_ar", type: "string", example: "اقتصادي"),
+                                new OA\Property(property: "name_en", type: "string", example: "Economy"),
+                            ]
+                        ))
+                    ]
+                )
+            )
+        ]
+    )]
+    public function getCategories(): JsonResponse
+    {
+        $categories = \App\Models\TripCategory::all()->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name_attribute,
+                'name_ar' => $category->name_ar,
+                'name_en' => $category->name_en,
+            ];
+        });
+
+        return $this->apiResponse(false, __('Categories retrieved successfully'), $categories);
     }
 }
 

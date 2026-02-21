@@ -20,8 +20,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/banners', [\App\Http\Controllers\Api\V1\DiscoveryController::class, 'getBanners']);
     Route::get('/locations', [\App\Http\Controllers\Api\V1\DiscoveryController::class, 'getLocations']);
     Route::get('/faqs', [\App\Http\Controllers\Api\V1\DiscoveryController::class, 'getFaqs']);
+    Route::get('/categories', [\App\Http\Controllers\Api\V1\DiscoveryController::class, 'getCategories']);
 
     // Trips
+    Route::get('/trips/featured', [\App\Http\Controllers\Api\V1\TripController::class, 'featured']);
     Route::get('/trips', [\App\Http\Controllers\Api\V1\TripController::class, 'index']);
     Route::get('/trips/{id}', [\App\Http\Controllers\Api\V1\TripController::class, 'show']);
     Route::post('/trips/book', [\App\Http\Controllers\Api\V1\TripController::class, 'book'])->middleware('auth:sanctum');

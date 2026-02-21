@@ -24,6 +24,7 @@ class TripsController extends Controller
         $companies = Company::all();
         $countries = Country::all();
         $cities = City::all();
+        $categories = \App\Models\TripCategory::all();
 
         $stats = [
             'total' => Trip::count(),
@@ -32,7 +33,7 @@ class TripsController extends Controller
             'expired' => Trip::where('expiry_date', '<', now()->toDateString())->count(),
         ];
 
-        return view('admin.trips.index', compact('companies', 'countries', 'trips', 'stats','cities'));
+        return view('admin.trips.index', compact('companies', 'countries', 'trips', 'stats','cities', 'categories'));
     }
 
     public function itinerary(Trip $trip)
@@ -198,14 +199,20 @@ class TripsController extends Controller
             'expiry_date'           => 'nullable|date|after_or_equal:today',
             'personnel_capacity'    => 'nullable|integer|min:1',
             'is_public'             => 'nullable|boolean',
+            'is_featured'           => 'nullable|boolean',
+            'base_capacity'         => 'nullable|integer|min:0',
+            'extra_passenger_price' => 'nullable|numeric|min:0',
+            'category_ids'          => 'nullable|array',
+            'category_ids.*'        => 'exists:trip_categories,id',
             'is_ad'                 => 'nullable|boolean',
             'active'                => 'nullable|boolean',
         ]);
 
         // Checkbox handling
-        $data['is_public'] = $request->boolean('is_public');
-        $data['is_ad']     = $request->boolean('is_ad');
-        $data['active']    = $request->boolean('active');
+        $data['is_public']   = $request->boolean('is_public');
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_ad']       = $request->boolean('is_ad');
+        $data['active']      = $request->boolean('active');
 
         // Admin who created the trip
         $data['admin_id'] = auth()->id();
@@ -218,7 +225,11 @@ class TripsController extends Controller
                 : 0;
         }
 
-        Trip::create($data);
+        $trip = Trip::create($data);
+
+        if ($request->has('category_ids')) {
+            $trip->categories()->sync($request->category_ids);
+        }
 
         return response()->json([
             'success' => true,
@@ -233,7 +244,7 @@ class TripsController extends Controller
     {
         return response()->json([
             'success' => true,
-            'Trip' => $trip,
+            'Trip' => $trip->load('categories'),
         ]);
     }
 
@@ -263,15 +274,21 @@ class TripsController extends Controller
             'price_before_discount' => 'nullable|numeric|min:0',
             'expiry_date'           => 'nullable|date',
             'personnel_capacity'    => 'nullable|integer|min:1',
+            'base_capacity'         => 'nullable|integer|min:0',
+            'extra_passenger_price' => 'nullable|numeric|min:0',
             'is_public'             => 'nullable|boolean',
+            'is_featured'           => 'nullable|boolean',
             'is_ad'                 => 'nullable|boolean',
             'active'                => 'nullable|boolean',
+            'category_ids'          => 'nullable|array',
+            'category_ids.*'        => 'exists:trip_categories,id',
         ]);
 
         // Checkbox handling
-        $data['is_public'] = $request->boolean('is_public');
-        $data['is_ad']     = $request->boolean('is_ad');
-        $data['active']    = $request->boolean('active');
+        $data['is_public']   = $request->boolean('is_public');
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_ad']       = $request->boolean('is_ad');
+        $data['active']      = $request->boolean('active');
 
         // Recalculate profit
         if (!empty($data['price_before_discount'])) {
@@ -287,6 +304,12 @@ class TripsController extends Controller
         }
 
         $trip->update($data);
+
+        if ($request->has('category_ids')) {
+            $trip->categories()->sync($request->category_ids);
+        } else {
+            $trip->categories()->detach();
+        }
 
         return response()->json([
             'success' => true,

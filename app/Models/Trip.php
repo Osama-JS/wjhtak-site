@@ -35,6 +35,7 @@ class Trip extends Model
        'page_visits',
        'base_capacity',
        'extra_passenger_price',
+       'is_featured',
     ];
 
 
@@ -96,6 +97,11 @@ class Trip extends Model
     public function itineraries()
     {
         return $this->hasMany(TripItinerary::class)->orderBy('sort_order', 'asc');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(TripCategory::class, 'trip_category_trip');
     }
 
     /**

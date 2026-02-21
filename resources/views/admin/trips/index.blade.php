@@ -228,8 +228,16 @@
                                 <i class="fas fa-info-circle"></i> {{ __('General Information') }}
                             </div>
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <x-forms.input-text name="title" :label="__('Trip Title')" required icon="fa fa-pen" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ __('Categories') }}</label>
+                                    <select name="category_ids[]" class="form-control default-select" multiple>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="col-md-12">
                                     <x-forms.textarea name="description" :label="__('Description')" required rows="6" />
@@ -267,8 +275,14 @@
                                 <div class="col-md-4">
                                     <x-forms.input-text name="tickets" :label="__('Tickets')" required icon="fa fa-ticket-alt" />
                                 </div>
-                                <div class="col-md-6">
-                                    <x-forms.input-text name="personnel_capacity" :label="__('Capacity')" icon="fa fa-users" />
+                                <div class="col-md-4">
+                                    <x-forms.input-text name="personnel_capacity" :label="__('Max Capacity')" icon="fa fa-users" />
+                                </div>
+                                <div class="col-md-4">
+                                    <x-forms.input-text name="base_capacity" :label="__('Base Capacity')" icon="fa fa-user-plus" />
+                                </div>
+                                <div class="col-md-4">
+                                    <x-forms.input-text name="extra_passenger_price" :label="__('Extra Pax Price')" icon="fa fa-money-bill-wave" />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">{{ __('Expiry Date') }} <span class="text-danger">*</span></label>
@@ -282,6 +296,9 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <x-forms.checkbox name="is_public" :label="__('Public')" checked type="switch" />
+                                </div>
+                                <div class="col-md-4">
+                                    <x-forms.checkbox name="is_featured" :label="__('Featured')" type="switch" />
                                 </div>
                                 <div class="col-md-4">
                                     <x-forms.checkbox name="is_ad" :label="__('Advertisement')" checked type="switch" />
@@ -322,8 +339,16 @@
                                 <i class="fas fa-info-circle"></i> {{ __('General Information') }}
                             </div>
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <x-forms.input-text id="edit_title" name="title" :label="__('Trip Title')" required icon="fa fa-pen" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ __('Categories') }}</label>
+                                    <select id="edit_category_ids" name="category_ids[]" class="form-control default-select" multiple>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="col-md-12">
                                     <x-forms.textarea id="edit_description" name="description" :label="__('Description')" required rows="6" />
@@ -361,8 +386,14 @@
                                 <div class="col-md-4">
                                     <x-forms.input-text id="edit_tickets" name="tickets" :label="__('Tickets')" required icon="fa fa-ticket-alt" />
                                 </div>
-                                <div class="col-md-6">
-                                    <x-forms.input-text id="edit_personnel_capacity"  name="personnel_capacity" :label="__('Capacity')" icon="fa fa-users" />
+                                <div class="col-md-4">
+                                    <x-forms.input-text id="edit_personnel_capacity"  name="personnel_capacity" :label="__('Max Capacity')" icon="fa fa-users" />
+                                </div>
+                                <div class="col-md-4">
+                                    <x-forms.input-text id="edit_base_capacity"  name="base_capacity" :label="__('Base Capacity')" icon="fa fa-user-plus" />
+                                </div>
+                                <div class="col-md-4">
+                                    <x-forms.input-text id="edit_extra_passenger_price"  name="extra_passenger_price" :label="__('Extra Pax Price')" icon="fa fa-money-bill-wave" />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">{{ __('Expiry Date') }} <span class="text-danger">*</span></label>
@@ -376,6 +407,9 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <x-forms.checkbox id="edit_is_public" name="is_public" :label="__('Public')" checked type="switch" />
+                                </div>
+                                <div class="col-md-4">
+                                    <x-forms.checkbox id="edit_is_featured" name="is_featured" :label="__('Featured')" type="switch" />
                                 </div>
                                 <div class="col-md-4">
                                     <x-forms.checkbox id="edit_is_ad" name="is_ad" :label="__('Advertisement')" checked type="switch" />
@@ -496,6 +530,11 @@
                     }
                 },
                 error: function (xhr) {
+                    const submitBtn = $('#addTripsForm').find('button[type="submit"]');
+                    if (window.WJHTAKAdmin && window.WJHTAKAdmin.btnLoading) {
+                        window.WJHTAKAdmin.btnLoading(submitBtn, false);
+                    }
+
                     if (xhr.status === 422) {
                         let errors = xhr.responseJSON.errors;
                         Object.values(errors).forEach(err => {
@@ -527,6 +566,11 @@
                     }
                 },
                 error: function(xhr) {
+                    const submitBtn = $('#editTripsForm').find('button[type="submit"]');
+                    if (window.WJHTAKAdmin && window.WJHTAKAdmin.btnLoading) {
+                        window.WJHTAKAdmin.btnLoading(submitBtn, false);
+                    }
+
                     if (xhr.status === 422) {
                         let errors = xhr.responseJSON.errors;
                         Object.keys(errors).forEach(key => {
@@ -554,6 +598,27 @@
         //         clearInterval(checkDataTable); // توقف عن البحث بمجرد التشغيل
         //     }
         // }, 500); // يفحص كل نصف ثانية حتى يظهر الجدول
+
+        // Clear forms on modal close
+        $('.modal').on('hidden.bs.modal', function () {
+            const form = $(this).find('form');
+            if (form.length) {
+                form[0].reset();
+                // Clear validation states
+                form.find('.is-invalid, .is-valid').removeClass('is-invalid is-valid');
+                // Clear image previews generated by admin-custom.js if any
+                form.find('.file-preview').remove();
+                form.find('.file-upload-text').text('{{ __("Choose file") }}');
+                // Update selects
+                if ($.fn.niceSelect) {
+                    form.find('select').niceSelect('update');
+                }
+                // Clear Dropzone if it exists in the modal
+                if (myDropzone && $(this).find('#trip-images-upload').length) {
+                    myDropzone.removeAllFiles(true);
+                }
+            }
+        });
 
     });
 
@@ -641,6 +706,16 @@
                 $('#edit_title').val(c.title);
                 $('#edit_tickets').val(c.tickets);
                 $('#edit_description').val(c.description);
+                $('#edit_base_capacity').val(c.base_capacity);
+                $('#edit_extra_passenger_price').val(c.extra_passenger_price);
+
+                // Set multiple categories
+                if (c.categories) {
+                    let categoryIds = c.categories.map(cat => cat.id);
+                    $('#edit_category_ids').val(categoryIds);
+                } else {
+                    $('#edit_category_ids').val([]);
+                }
 
                 // Set values for selects
                 $('#edit_company_id').val(c.company_id);
@@ -664,6 +739,7 @@
 
                 // Checkboxes - using !! to force boolean
                 $('#edit_is_public').prop('checked', !!parseInt(c.is_public));
+                $('#edit_is_featured').prop('checked', !!parseInt(c.is_featured));
                 $('#edit_is_ad').prop('checked', !!parseInt(c.is_ad));
                 $('#edit_active').prop('checked', !!parseInt(c.active));
 

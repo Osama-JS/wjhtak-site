@@ -66,6 +66,13 @@ class TripController extends Controller
                 schema: new OA\Schema(type: "number")
             ),
             new OA\Parameter(
+                name: "category_id",
+                in: "query",
+                description: "Filter by category ID",
+                required: false,
+                schema: new OA\Schema(type: "integer")
+            ),
+            new OA\Parameter(
                 name: "page",
                 in: "query",
                 description: "Page number",
@@ -132,7 +139,13 @@ class TripController extends Controller
             $query->where('price', '<=', $request->price_max);
         }
 
-        $trips = $query->with(['images', 'toCountry', 'toCity'])
+        if ($request->has('category_id')) {
+            $query->whereHas('categories', function($q) use ($request) {
+                $q->where('trip_categories.id', $request->category_id);
+            });
+        }
+
+        $trips = $query->with(['images', 'toCountry', 'toCity', 'categories'])
             ->latest()
             ->paginate(10);
 
@@ -159,8 +172,15 @@ class TripController extends Controller
                 'is_active' => $trip->active,
                 'expiry_date' => $trip->expiry_date,
                 'is_favorite' => in_array($trip->id, $userFavoriteIds),
+                'is_featured' => (bool)$trip->is_featured,
                 'base_capacity' => $trip->base_capacity ?? 2,
                 'extra_passenger_price' => $trip->extra_passenger_price ?? 0,
+                'categories' => $trip->categories->map(function ($cat) {
+                    return [
+                        'id' => $cat->id,
+                        'name' => $cat->name_attribute,
+                    ];
+                }),
             ];
         });
 
@@ -240,7 +260,7 @@ class TripController extends Controller
     )]
     public function show($id): JsonResponse
     {
-        $trip = Trip::with(['images', 'toCountry', 'toCity', 'itineraries', 'company'])
+        $trip = Trip::with(['images', 'toCountry', 'toCity', 'itineraries', 'company', 'categories'])
             ->active()
             ->find($id);
 
@@ -276,6 +296,12 @@ class TripController extends Controller
                     'day' => $itinerary->day_number,
                     'title' => $itinerary->title,
                     'description' => $itinerary->description,
+                ];
+            }),
+            'categories' => $trip->categories->map(function ($cat) {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->name_attribute,
                 ];
             }),
             'is_favorite' => Auth::guard('sanctum')->check() && Favorite::where('user_id', Auth::guard('sanctum')->id())->where('trip_id', $trip->id)->exists(),
@@ -822,5 +848,67 @@ class TripController extends Controller
             'booking_id' => $booking->id,
             'status' => 'cancelled',
         ]);
+    }
+
+    /**
+     * Get featured trips.
+     */
+    #[OA\Get(
+        path: "/api/v1/trips/featured",
+        summary: "Get featured trips",
+        operationId: "getFeaturedTrips",
+        description: "Retrieve a list of featured trips.",
+        tags: ["Trips"],
+        parameters: [
+            new OA\Parameter(
+                name: "Accept-Language",
+                in: "header",
+                description: "The language of the response (ar, en)",
+                required: false,
+                schema: new OA\Schema(type: "string", default: "en", enum: ["en", "ar"])
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Featured trips retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Featured trips retrieved successfully"),
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
+                                new OA\Property(property: "price", type: "number", example: 1500.00),
+                                new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
+                                new OA\Property(property: "to_country", type: "string", example: "France"),
+                                new OA\Property(property: "to_city", type: "string", example: "Paris"),
+                            ]
+                        ))
+                    ]
+                )
+            )
+        ]
+    )]
+    public function featured(): JsonResponse
+    {
+        $trips = Trip::active()->where('is_featured', true)
+            ->with(['images', 'toCountry', 'toCity'])
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function ($trip) {
+                return [
+                    'id' => $trip->id,
+                    'title' => $trip->title,
+                    'price' => $trip->price,
+                    'image' => $trip->image_url,
+                    'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
+                    'to_city' => $trip->toCity ? $trip->toCity->name : null,
+                ];
+            });
+
+        return $this->apiResponse(false, __('Featured trips retrieved successfully'), $trips);
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\SubscriberController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\TripsController;
+use App\Http\Controllers\Admin\TripCategoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\Web\PaymentWebController;
@@ -179,6 +180,10 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::put('/trips/itinerary/{itinerary}', [TripsController::class, 'updateItinerary'])->name('trips.itinerary.update');
     Route::post('/trips/itinerary/reorder', [TripsController::class, 'reorderItinerary'])->name('trips.itinerary.reorder');
     Route::delete('/trips/itinerary/{itinerary}', [TripsController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
+
+    // Trip Categories
+    Route::get('trip-categories/all', [App\Http\Controllers\Admin\TripCategoryController::class, 'getAll'])->name('trip-categories.all');
+    Route::resource('trip-categories', App\Http\Controllers\Admin\TripCategoryController::class);
 
     // Settings
     Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');

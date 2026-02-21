@@ -2871,6 +2871,10 @@
                                                     "flag": {
                                                         "type": "string",
                                                         "example": "http://example.com/flags/sa.png"
+                                                    },
+                                                    "landmark_image": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/landmarks/mecca.jpg"
                                                     }
                                                 },
                                                 "type": "object"
@@ -3254,6 +3258,78 @@
                 }
             }
         },
+        "/api/v1/categories": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get all trip categories",
+                "description": "Retrieve a list of all trip categories (e.g., Economy, Family, Royal).",
+                "operationId": "getCategories",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categories retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Categories retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Economy"
+                                                    },
+                                                    "name_ar": {
+                                                        "type": "string",
+                                                        "example": "اقتصادي"
+                                                    },
+                                                    "name_en": {
+                                                        "type": "string",
+                                                        "example": "Economy"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/trips": {
             "get": {
                 "tags": [
@@ -3311,6 +3387,15 @@
                         "required": false,
                         "schema": {
                             "type": "number"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Filter by category ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
                         }
                     },
                     {
@@ -4218,6 +4303,86 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/api/v1/trips/featured": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Get featured trips",
+                "description": "Retrieve a list of featured trips.",
+                "operationId": "getFeaturedTrips",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Featured trips retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Featured trips retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Amazing Paris"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "example": 1500
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "http://example.com/trips/1.jpg"
+                                                    },
+                                                    "to_country": {
+                                                        "type": "string",
+                                                        "example": "France"
+                                                    },
+                                                    "to_city": {
+                                                        "type": "string",
+                                                        "example": "Paris"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     },
