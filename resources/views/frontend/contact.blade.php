@@ -63,11 +63,56 @@
                         </svg>
                     </div>
                     <h3 style="font-weight: var(--font-bold); margin-bottom: var(--space-2);">{{ __('Visit Us') }}</h3>
-                    <span style="color: var(--color-primary);">{{ __('Riyadh, Saudi Arabia') }}</span>
+                    <span style="color: var(--color-primary);">{{ \App\Models\Setting::get('site_address', __('Riyadh, Saudi Arabia')) }}</span>
+                </div>
+            </div>
+
+            {{-- Social Media Links --}}
+            <div style="margin-top: var(--space-12); text-align: center;">
+                <h3 style="font-weight: var(--font-bold); margin-bottom: var(--space-6); font-size: var(--text-xl);">{{ __('Follow Us') }}</h3>
+                <div style="display: flex; justify-content: center; gap: var(--space-6);">
+                    @if($fb = \App\Models\Setting::get('facebook_url'))
+                        <a href="{{ $fb }}" class="social-btn" style="background: #1877f2;" title="Facebook">
+                            <i class="fab fa-facebook-f" style="font-size: 20px;"></i>
+                        </a>
+                    @endif
+                    @if($tw = \App\Models\Setting::get('twitter_url'))
+                        <a href="{{ $tw }}" class="social-btn" style="background: #000;" title="X (Twitter)">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+                            </svg>
+                        </a>
+                    @endif
+                    @if($ig = \App\Models\Setting::get('instagram_url'))
+                        <a href="{{ $ig }}" class="social-btn" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);" title="Instagram">
+                            <i class="fab fa-instagram" style="font-size: 20px;"></i>
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
     </section>
+
+    @push('styles')
+    <style>
+        .social-btn {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white !important;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .social-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            filter: brightness(1.1);
+        }
+    </style>
+    @endpush
 
     {{-- Contact Form --}}
     <section class="section">

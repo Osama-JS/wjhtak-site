@@ -302,14 +302,18 @@
 
                             {{-- Date --}}
                             <div class="form-group">
-                                <label class="form-label">{{ __('Select Date') }}</label>
-                                <input type="date" name="date" class="form-input" required>
+                                <label class="form-label">{{ __('Departure Date') }}</label>
+                                <div class="form-input" style="background: var(--color-surface-hover); display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-calendar-alt text-primary"></i>
+                                    <span>{{ $trip->expiry_date ? $trip->expiry_date->format('Y-m-d') : __('To be determined') }}</span>
+                                </div>
+                                <input type="hidden" name="date" value="{{ $trip->expiry_date ? $trip->expiry_date->format('Y-m-d') : '' }}">
                             </div>
 
                             {{-- Travelers --}}
                             <div class="form-group">
                                 <label class="form-label">{{ __('Number of Travelers') }}</label>
-                                <select name="travelers" class="form-input form-select">
+                                <select name="travelers" id="travelersCount" class="form-input form-select" onchange="calculateTotal()">
                                     @for($i = 1; $i <= ($trip->personnel_capacity ?? 10); $i++)
                                         <option value="{{ $i }}">{{ $i }} {{ $i == 1 ? __('Traveler') : __('Travelers') }}</option>
                                     @endfor
@@ -318,9 +322,18 @@
 
                             {{-- Total --}}
                             <div style="padding: var(--space-4); background: var(--color-surface-hover); border-radius: var(--radius-lg); margin-bottom: var(--space-5);">
+                                <div class="flex items-center justify-between" style="margin-bottom: 5px;">
+                                    <span class="text-muted">{{ __('Unit Price') }}</span>
+                                    <span>${{ number_format($trip->price) }}</span>
+                                </div>
+                                <div id="extraPriceRow" class="flex items-center justify-between" style="margin-bottom: 10px; display: none;">
+                                    <span class="text-muted">{{ __('Extra Passengers') }}</span>
+                                    <span id="extraPriceValue text-danger">$0</span>
+                                </div>
+                                <hr style="opacity: 0.1; margin: 10px 0;">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-muted">{{ __('Total') }}</span>
-                                    <span style="font-size: var(--text-xl); font-weight: var(--font-bold);">
+                                    <span class="text-muted" style="font-weight: var(--font-bold);">{{ __('Total') }}</span>
+                                    <span id="totalPriceDisplay" style="font-size: var(--text-xl); font-weight: var(--font-bold); color: var(--color-primary);">
                                         ${{ number_format($trip->price) }}
                                     </span>
                                 </div>
@@ -1148,6 +1161,34 @@
         document.getElementById('downloadAppModal').classList.remove('active');
         document.body.style.overflow = '';
     }
+
+    // Dynamic Pricing Calculation
+    function calculateTotal() {
+        const travelers = parseInt(document.getElementById('travelersCount').value);
+        const basePrice = {{ $trip->price }};
+        const baseCapacity = {{ $trip->base_capacity ?? 1 }};
+        const extraPrice = {{ $trip->extra_passenger_price ?? 0 }};
+
+        let total = basePrice;
+        let extraTotal = 0;
+
+        if (travelers > baseCapacity) {
+            extraTotal = (travelers - baseCapacity) * extraPrice;
+            total += extraTotal;
+
+            document.getElementById('extraPriceRow').style.display = 'flex';
+            document.getElementById('extraPriceRow').querySelector('span:last-child').textContent = '$' + extraTotal.toLocaleString();
+        } else {
+            document.getElementById('extraPriceRow').style.display = 'none';
+        }
+
+        document.getElementById('totalPriceDisplay').textContent = '$' + total.toLocaleString();
+    }
+
+    // Initial calculation
+    $(document).ready(function() {
+        calculateTotal();
+    });
 </script>
 @endpush
 

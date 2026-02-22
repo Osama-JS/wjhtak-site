@@ -14,6 +14,7 @@ use App\Services\NotificationService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\Traits\PaymentLogTrait;
+use App\Traits\ApiResponseTrait;
 use OpenApi\Attributes as OA;
 
 class PaymentController extends Controller
