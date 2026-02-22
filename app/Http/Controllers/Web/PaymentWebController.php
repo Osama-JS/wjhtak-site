@@ -126,7 +126,7 @@ class PaymentWebController extends Controller
             'customer_email' => $user->email,
             'customer_phone' => $user->phone,
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
-            'callback_url' => route('api.payment.verify.callback', ['payment_type' => 'tabby']), // Note: we'll use a specific callback
+            'callback_url' => route('payments.web.callback', ['payment_type' => 'tabby']),
             'items' => [
                 [
                     'title' => $booking->trip ? $booking->trip->title : 'Trip Booking',
@@ -151,7 +151,7 @@ class PaymentWebController extends Controller
             'first_name' => $user->first_name ?? $user->full_name,
             'last_name' => $user->last_name ?? 'User',
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
-            'callback_url' => route('api.payment.verify.callback', ['payment_type' => 'tamara']),
+            'callback_url' => route('payments.web.callback', ['payment_type' => 'tamara']),
             'items' => [
                 [
                     'name' => $booking->trip ? $booking->trip->title : 'Trip Booking',

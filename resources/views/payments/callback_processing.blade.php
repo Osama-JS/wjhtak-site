@@ -44,7 +44,9 @@
                 },
                 data: {
                     payment_type: paymentType,
-                    id: paymentId || checkoutId
+                    id: paymentId || checkoutId,
+                    payment_id: (paymentType === 'tabby' || paymentType === 'tamara') ? paymentId : null,
+                    checkout_id: (paymentType !== 'tabby' && paymentType !== 'tamara') ? checkoutId : null
                 },
                 success: function(response) {
                     if (response.success || response.error === false) {
