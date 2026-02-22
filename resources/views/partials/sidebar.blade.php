@@ -57,6 +57,13 @@
                 </a>
             </li>
 
+            <li>
+                <a href="{{ route('admin.pages.index') }}" aria-expanded="false">
+                    <i class="flaticon-381-file"></i>
+                    <span class="nav-text">{{ __('Pages Management') }}</span>
+                </a>
+            </li>
+
             {{-- Hotel & Flight Categories --}}
             <!-- <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">
@@ -108,6 +115,17 @@
                     <i class="flaticon-381-settings-2"></i>
                     <span class="nav-text">{{ __('Platform Settings') }}</span>
                 </a>
+            </li>
+
+            {{-- Financial Management --}}
+            <li>
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-layer-1"></i>
+                    <span class="nav-text">{{ __('Financial Management') }}</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="{{ route('admin.payments.index') }}">{{ __('Payment Records') }}</a></li>
+                </ul>
             </li>
 
             @can('view users')

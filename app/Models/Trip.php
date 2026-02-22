@@ -129,7 +129,8 @@ class Trip extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_public', true)
+        return $query->where('active', true)
+                     ->where('is_public', true)
                      ->where(function ($q) {
                          $q->whereNull('expiry_date')
                            ->orWhere('expiry_date', '>=', now()->toDateString());

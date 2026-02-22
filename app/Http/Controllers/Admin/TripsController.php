@@ -117,23 +117,19 @@ class TripsController extends Controller
         }
 
         if ($request->expiry_date) {
-            $query->whereDate('expiry_date', $request->expiry_date);
-        }
-
-        if ($request->expiry_date) {
            $query->whereDate('expiry_date', '>=', $request->expiry_date);
         }
 
-        $trips = $query->get();
+        $trips = $query->latest()->get();
 
         return response()->json([
             'data' => $trips->map(function ($trip) {
                 $isExpired = $trip->expiry_date && $trip->expiry_date < now()->format('Y-m-d');
 
                 $actionButtons = '
-                        <button class="btn btn-sm btn-primary" onclick="editTrip('.$trip->id.')" title="'.__('Edit').'">
+                        <a href="'.route('admin.trips.edit', $trip->id).'" class="btn btn-sm btn-primary" title="'.__('Edit').'">
                             <i class="fas fa-edit"></i>
-                        </button>
+                        </a>
                         <a href="'.route('admin.trips.itinerary', $trip->id).'" class="btn btn-sm btn-info" title="'.__('Itinerary').'">
                             <i class="fas fa-list-ul"></i>
                         </a>
@@ -153,6 +149,11 @@ class TripsController extends Controller
                         </button>';
                 }
 
+                $actionButtons .= '
+                        <button class="btn btn-sm btn-danger" onclick="deleteTrip('.$trip->id.')" title="'.__('Delete').'">
+                            <i class="fas fa-trash"></i>
+                        </button>';
+
                 return [
                     'title'    => $trip->title,
                     'company' => $trip->company
@@ -164,8 +165,8 @@ class TripsController extends Controller
                     'price'    => $trip->price,
                     'expiry_date' => $trip->expiry_date,
                     'status'      => $isExpired
-                                    ? '<span class="badge bg-dark">Expired</span>'
-                                    : ($trip->active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'),
+                                    ? '<span class="badge bg-dark">' . __('Expired') . '</span>'
+                                    : ($trip->active ? '<span class="badge bg-success">' . __('Active') . '</span>' : '<span class="badge bg-danger">' . __('Inactive') . '</span>'),
                     'actions' => $actionButtons,
                 ];
             })
@@ -177,7 +178,12 @@ class TripsController extends Controller
      */
     public function create()
     {
-        //
+        $companies = Company::active()->get();
+        $countries = Country::active()->get();
+        $cities = City::active()->get();
+        $categories = \App\Models\TripCategory::all();
+
+        return view('admin.trips.create', compact('companies', 'countries', 'cities', 'categories'));
     }
 
     /**
@@ -231,10 +237,14 @@ class TripsController extends Controller
             $trip->categories()->sync($request->category_ids);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' =>  __('Trip created successfully'),
-        ]);
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' =>  __('Trip created successfully'),
+            ]);
+        }
+
+        return redirect()->route('admin.trips.index')->with('success', __('Trip created successfully'));
     }
 
     /**
@@ -251,9 +261,14 @@ class TripsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Trip $trip)
     {
-        //
+        $companies = Company::active()->get();
+        $countries = Country::active()->get();
+        $cities = City::active()->get();
+        $categories = \App\Models\TripCategory::all();
+
+        return view('admin.trips.edit', compact('trip', 'companies', 'countries', 'cities', 'categories'));
     }
 
     /**
@@ -311,10 +326,14 @@ class TripsController extends Controller
             $trip->categories()->detach();
         }
 
-        return response()->json([
-            'success' => true,
-            'message' =>  __('Trip  updated successfully'),
-        ]);
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' =>  __('Trip updated successfully'),
+            ]);
+        }
+
+        return redirect()->route('admin.trips.index')->with('success', __('Trip updated successfully'));
     }
 
     /**

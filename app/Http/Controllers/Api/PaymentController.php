@@ -11,19 +11,19 @@ use App\Services\TabbyPaymentService;
 use App\Services\TamaraPaymentService;
 use App\Services\InvoiceService;
 use App\Services\NotificationService;
-use App\Traits\ApiResponseTrait;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use App\Traits\PaymentLogTrait;
 use OpenApi\Attributes as OA;
 
 class PaymentController extends Controller
 {
-    use ApiResponseTrait;
+    use ApiResponseTrait, PaymentLogTrait;
 
     protected $hyperPayService;
     protected $tabbyService;
     protected $tamaraService;
+    protected $tapService;
     protected $invoiceService;
     protected $notificationService;
 
@@ -31,12 +31,14 @@ class PaymentController extends Controller
         HyperPayService $hyperPayService,
         TabbyPaymentService $tabbyService,
         TamaraPaymentService $tamaraService,
+        \App\Services\TapPaymentService $tapService,
         InvoiceService $invoiceService,
         NotificationService $notificationService
     ) {
         $this->hyperPayService = $hyperPayService;
         $this->tabbyService = $tabbyService;
         $this->tamaraService = $tamaraService;
+        $this->tapService = $tapService;
         $this->invoiceService = $invoiceService;
         $this->notificationService = $notificationService;
     }
@@ -150,7 +152,7 @@ class PaymentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'booking_id' => 'required|exists:trip_bookings,id',
-            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tabby,stc_pay,tamara',
+            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tabby,stc_pay,tamara,tap',
         ]);
 
         if ($validator->fails()) {
@@ -209,6 +211,7 @@ class PaymentController extends Controller
         );
 
         if ($result && isset($result['id'])) {
+            $this->logPendingPayment($booking->id, 'hyperpay', $request->payment_type, $result['id'], $booking->total_price, $result);
             return $this->apiResponse(false, __('Checkout initialized successfully.'), $result);
         }
 
@@ -242,6 +245,10 @@ class PaymentController extends Controller
         }
 
         $result = $this->tabbyService->initiateCheckout($data);
+
+        if ($result['payment_id'] ?? null) {
+            $this->logPendingPayment($booking->id, 'tabby', 'installments', $result['payment_id'], $booking->total_price, $result);
+        }
 
         return $this->apiResponse(false, __('Tabby checkout initialized.'), $result);
     }
@@ -278,7 +285,34 @@ class PaymentController extends Controller
 
         $result = $this->tamaraService->initiateCheckout($data);
 
+        if ($result['order_id'] ?? null) {
+            $this->logPendingPayment($booking->id, 'tamara', 'installments', $result['order_id'], $booking->total_price, $result);
+        }
+
         return $this->apiResponse(false, __('Tamara checkout initialized.'), $result);
+    }
+
+    protected function initiateTap(Request $request, $user, $booking)
+    {
+        $data = [
+            'booking_id' => $booking->id,
+            'amount' => $booking->total_price,
+            'customer_email' => $request->email ?? $user->email,
+            'customer_phone' => $request->phone ?? $user->phone,
+            'first_name' => $request->first_name ?? ($user->first_name ?? $user->full_name),
+            'last_name' => $request->last_name ?? ($user->last_name ?? 'User'),
+            'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
+            'callback_url' => route('payment.callback', ['gateway' => 'tap']),
+            'description' => 'Booking #' . $booking->id . ' - ' . ($booking->trip->title ?? 'Trip'),
+        ];
+
+        $result = $this->tapService->initiateCheckout($data);
+
+        if ($result['id'] ?? null) {
+            $this->logPendingPayment($booking->id, 'tap', 'card', $result['id'], $booking->total_price, $result);
+        }
+
+        return $this->apiResponse(false, __('Tap checkout initialized.'), $result);
     }
 
     /**
@@ -351,7 +385,7 @@ class PaymentController extends Controller
     public function verify(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tabby,tamara',
+            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tabby,tamara,tap',
             'id' => 'required_without_all:checkout_id,payment_id', // Fallback for WebView
             'checkout_id' => 'required_without_all:id,payment_id|required_if:payment_type,mada,visa_master,apple_pay',
             'payment_id' => 'required_without_all:id,checkout_id|required_if:payment_type,tabby,tamara',
@@ -411,6 +445,30 @@ class PaymentController extends Controller
                 return $this->apiResponse(true, __('payment.general_failure'), [
                     'payment_status' => $status,
                     'raw_response' => $result,
+                ], null, 400);
+            }
+
+            if ($type === 'tap') {
+                $result = $this->tapService->verifyPayment($id);
+                $status = strtoupper($result['status'] ?? 'UNKNOWN');
+
+                if ($status === 'CAPTURED' || $status === 'AUTHORIZED') {
+                     $bookingId = $result['metadata']['booking_id'] ?? explode('-', $result['reference']['order'] ?? '')[1] ?? null;
+
+                     if ($bookingId) {
+                         $this->completePayment($bookingId, 'tap', $id, $result, $request->payment_type);
+                         return $this->apiResponse(false, __('Payment successful and booking confirmed.'), [
+                             'status' => 'paid',
+                             'booking_id' => (int) $bookingId,
+                             'transaction_id' => $id,
+                             'raw_response' => $result
+                         ]);
+                     }
+                }
+
+                return $this->apiResponse(true, __('Payment failed or was declined.'), [
+                    'payment_status' => $status,
+                    'raw_response' => $result
                 ], null, 400);
             }
 
@@ -555,25 +613,19 @@ class PaymentController extends Controller
                 'updated_at' => now(),
             ]);
 
-            // Record Payment
-            $paymentData = [
-                'trip_booking_id' => $booking->id,
-                'payment_gateway' => $gateway,
-                'transaction_id' => $transactionId,
-                'amount' => $booking->total_price,
-                'currency' => 'SAR',
-                'status' => 'paid',
-                'raw_response' => $response,
-            ];
-
-            try {
-                $paymentData['payment_method'] = $paymentMethod;
-                $payment = Payment::create($paymentData);
-            } catch (\Exception $e) {
-                unset($paymentData['payment_method']);
-                $payment = Payment::create($paymentData);
-                Log::warning("Could not save payment_method: " . $e->getMessage());
-            }
+            // Record or Update Payment
+            $payment = Payment::updateOrCreate(
+                ['transaction_id' => $transactionId],
+                [
+                    'trip_booking_id' => $booking->id,
+                    'payment_gateway' => $gateway,
+                    'payment_method' => $paymentMethod ?? 'unknown',
+                    'amount' => $booking->total_price,
+                    'currency' => 'SAR',
+                    'status' => 'paid',
+                    'raw_response' => $response,
+                ]
+            );
 
             // Generate Invoice
             $invoicePath = $this->invoiceService->generateInvoice($booking);

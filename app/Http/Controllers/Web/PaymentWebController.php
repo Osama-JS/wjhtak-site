@@ -9,21 +9,27 @@ use App\Services\TabbyPaymentService;
 use App\Services\TamaraPaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Traits\PaymentLogTrait;
 
 class PaymentWebController extends Controller
 {
+    use PaymentLogTrait;
+
     protected $hyperPayService;
     protected $tabbyService;
     protected $tamaraService;
+    protected $tapService;
 
     public function __construct(
         HyperPayService $hyperPayService,
         TabbyPaymentService $tabbyService,
-        TamaraPaymentService $tamaraService
+        TamaraPaymentService $tamaraService,
+        \App\Services\TapPaymentService $tapService
     ) {
         $this->hyperPayService = $hyperPayService;
         $this->tabbyService = $tabbyService;
         $this->tamaraService = $tamaraService;
+        $this->tapService = $tapService;
     }
 
     /**
@@ -53,7 +59,12 @@ class PaymentWebController extends Controller
             // If HyperPay, we might need a checkout_id immediately to load the widget
             if (in_array($method, ['mada', 'visa_master', 'apple_pay'])) {
                 $checkoutResult = $this->prepareHyperPayCheckout($booking, $method, $request);
-                $data['checkout_id'] = $checkoutResult['id'] ?? null;
+                $checkoutId = $checkoutResult['id'] ?? null;
+                $data['checkout_id'] = $checkoutId;
+
+                if ($checkoutId) {
+                    $this->logPendingPayment($booking->id, 'hyperpay', $method, $checkoutId, $booking->total_price, $checkoutResult);
+                }
             }
 
             return view('payments.checkout', $data);
@@ -71,7 +82,7 @@ class PaymentWebController extends Controller
     {
         $request->validate([
             'booking_id' => 'required|exists:trip_bookings,id',
-            'method' => 'required|string|in:tabby,tamara',
+            'method' => 'required|string|in:tabby,tamara,tap',
         ]);
 
         try {
@@ -85,6 +96,10 @@ class PaymentWebController extends Controller
 
             if ($method === 'tamara') {
                 return $this->initiateTamara($booking, $user, $request);
+            }
+
+            if ($method === 'tap') {
+                return $this->initiateTap($booking, $user, $request);
             }
 
         } catch (\Exception $e) {
@@ -139,6 +154,11 @@ class PaymentWebController extends Controller
         ];
 
         $result = $this->tabbyService->initiateCheckout($data);
+
+        if ($result['payment_id'] ?? null) {
+            $this->logPendingPayment($booking->id, 'tabby', 'installments', $result['payment_id'], $booking->total_price, $result);
+        }
+
         return response()->json($result);
     }
 
@@ -169,6 +189,34 @@ class PaymentWebController extends Controller
         ];
 
         $result = $this->tamaraService->initiateCheckout($data);
+
+        if ($result['order_id'] ?? null) {
+            $this->logPendingPayment($booking->id, 'tamara', 'installments', $result['order_id'], $booking->total_price, $result);
+        }
+
+        return response()->json($result);
+    }
+
+    protected function initiateTap($booking, $user, $request)
+    {
+        $data = [
+            'booking_id' => $booking->id,
+            'amount' => $booking->total_price,
+            'customer_email' => $user->email,
+            'customer_phone' => $user->phone,
+            'first_name' => $user->first_name ?? $user->full_name,
+            'last_name' => $user->last_name ?? 'User',
+            'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
+            'callback_url' => route('payments.web.callback', ['payment_type' => 'tap']),
+            'description' => 'Booking #' . $booking->id . ' - ' . ($booking->trip->title ?? 'Trip'),
+        ];
+
+        $result = $this->tapService->initiateCheckout($data);
+
+        if ($result['id'] ?? null) {
+            $this->logPendingPayment($booking->id, 'tap', 'card', $result['id'], $booking->total_price, $result);
+        }
+
         return response()->json($result);
     }
 

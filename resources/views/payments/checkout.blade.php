@@ -8,63 +8,172 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #7c3aed;
-            --primary-light: #a855f7;
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
             --bg: #0f172a;
-            --card: #1e293b;
+            --card: rgba(30, 41, 59, 0.7);
             --text: #f8fafc;
             --text-muted: #94a3b8;
-            --border: rgba(255,255,255,0.08);
+            --border: rgba(255,255,255,0.1);
             --success: #10b981;
             --danger: #ef4444;
-            --warning: #f59e0b;
+            --accent: #f59e0b;
         }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
 
-        .checkout-container { max-width: 500px; margin: 0 auto; padding: 20px; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .checkout-container { max-width: 500px; margin: 20px auto; padding: 20px; animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Header */
-        .page-header { text-align: center; margin-bottom: 24px; }
-        .logo { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
-        .step-indicator { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
-        .step { width: 30px; height: 4px; border-radius: 2px; background: var(--border); }
-        .step.active { background: var(--primary); }
+        .page-header { text-align: center; margin-bottom: 30px; }
+        .logo { font-size: 2.2rem; font-weight: 800; letter-spacing: 2px; background: linear-gradient(to right, #fff, var(--primary-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+        .page-header p { color: var(--text-muted); font-size: 0.95rem; }
 
-        /* Summary Card */
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
-        .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed var(--border); }
-        .summary-title { font-weight: 700; font-size: 1.1rem; }
-        .trip-price { font-size: 1.25rem; font-weight: 800; color: var(--primary-light); }
+        .step-indicator { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .step { width: 35px; height: 5px; border-radius: 10px; background: var(--border); transition: all 0.3s; }
+        .step.active { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
 
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        /* Modern Glass Cards */
+        .card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        .summary-title { font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .trip-price { font-size: 1.4rem; font-weight: 800; color: #fff; }
+
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; }
         .info-label { color: var(--text-muted); }
-        .info-value { font-weight: 600; }
+        .info-value { font-weight: 600; color: #e2e8f0; }
 
-        /* Payment Logic */
-        .payment-section-title { font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .payment-section-title i { color: var(--primary); }
+        /* Payment Section */
+        .payment-section-title { font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 1.1rem; }
 
-        /* HyperPay Widget Override */
+        .method-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+        }
+        .gateway-logo {
+            height: 45px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            transition: transform 0.3s;
+        }
+        .gateway-logo:hover { transform: scale(1.05); }
+
+        /* HyperPay Widget Customization */
         .wpwl-container { direction: ltr !important; }
         .wpwl-form { background: transparent !important; border: none !important; padding: 0 !important; width: 100% !important; }
-        .wpwl-label { color: var(--text-muted) !important; font-family: 'Cairo' !important; font-size: 0.85rem !important; margin-bottom: 6px !important; }
-        .wpwl-control { background: #0f172a !important; border: 1px solid var(--border) !important; color: white !important; border-radius: 12px !important; padding: 12px !important; height: auto !important; }
-        .wpwl-button-pay { background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important; border: none !important; border-radius: 14px !important; padding: 14px !important; font-family: 'Cairo' !important; font-weight: 700 !important; font-size: 1rem !important; cursor: pointer !important; width: 100% !important; margin-top: 20px !important; box-shadow: 0 8px 20px rgba(124,58,237,0.3) !important; transition: transform 0.2s !important; }
-        .wpwl-button-pay:active { transform: scale(0.98) !important; }
+        .wpwl-label {
+            color: var(--text-muted) !important;
+            font-family: 'Cairo' !important;
+            font-size: 0.8rem !important;
+            margin-bottom: 8px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+        }
+        .wpwl-control {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid var(--border) !important;
+            color: white !important;
+            border-radius: 16px !important;
+            padding: 14px 16px !important;
+            height: 54px !important;
+            transition: all 0.3s !important;
+        }
+        .wpwl-control:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2) !important;
+            outline: none !important;
+        }
+        .wpwl-group { margin-bottom: 20px !important; }
 
-        /* Redirect Button (Tabby/Tamara) */
-        .btn-redirect { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border: none; border-radius: 16px; font-weight: 700; font-size: 1rem; cursor: pointer; text-decoration: none; box-shadow: 0 8px 20px rgba(124,58,237,0.3); transition: all 0.3s; }
-        .btn-redirect:active { transform: scale(0.98); opacity: 0.9; }
+        .wpwl-button-pay {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
+            border: none !important;
+            border-radius: 18px !important;
+            padding: 18px !important;
+            font-family: 'Cairo' !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+            cursor: pointer !important;
+            width: 100% !important;
+            margin-top: 15px !important;
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.4) !important;
+            transition: all 0.3s !important;
+            color: white !important;
+        }
+        .wpwl-button-pay:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.5) !important;
+        }
+        .wpwl-button-pay:active { transform: translateY(0) !important; }
 
-        .method-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); border-radius: 50px; font-size: 0.75rem; color: var(--primary-light); font-weight: 600; }
+        /* Redirect Button (Tabby/Tamara/Tap) */
+        .btn-redirect {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.4);
+            transition: all 0.3s;
+        }
+        .btn-redirect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.5);
+        }
+        .btn-redirect:active { transform: translateY(0); }
 
-        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-        .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .secure-badge {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .security-icons { display: flex; gap: 15px; opacity: 0.6; grayscale: 1; }
+        .security-icons img { height: 20px; }
 
-        .secure-badge { text-align: center; margin-top: 20px; font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -72,69 +181,88 @@
 <div class="checkout-container">
     <div class="page-header">
         <div class="logo">WJHTAK</div>
-        <p>إكمال حجز رحلتك</p>
+        <p>بوابة الدفع الآمنة</p>
         <div class="step-indicator">
             <div class="step active"></div>
             <div class="step active"></div>
-            <div class="step"></div>
+            <div class="step active"></div>
         </div>
     </div>
 
     <!-- Summary Card -->
     <div class="card">
         <div class="summary-header">
-            <span class="summary-title">ملخص الحجز</span>
+            <span class="summary-title"><i>📝</i> تفاصيل الحجز</span>
             <span class="trip-price">{{ number_format($amount, 2) }} ر.س</span>
         </div>
         <div class="info-row">
-            <span class="info-label">الرحلة:</span>
+            <span class="info-label">الرحلة</span>
             <span class="info-value">{{ $trip->title_ar ?? $trip->title }}</span>
         </div>
         <div class="info-row">
-            <span class="info-label">المسافر:</span>
+            <span class="info-label">اسم العميل</span>
             <span class="info-value">{{ $user->full_name }}</span>
         </div>
         <div class="info-row">
-            <span class="info-label">رقم الحجز:</span>
+            <span class="info-label">رقم المرجع</span>
             <span class="info-value">#{{ $booking->id }}</span>
         </div>
     </div>
 
     <!-- Payment Section -->
     <div class="card">
-        <div class="payment-section-title">
-            <i>💳</i>
-            <span>دفع عبر</span>
-            <span class="method-badge">{{ strtoupper($method) }}</span>
+        <div class="method-display">
+            @php
+                $logoUrl = match($method) {
+                    'mada' => 'https://checkout.hyperpay.com/v1/paymentWidgets/img/mada.png',
+                    'visa_master' => 'https://checkout.hyperpay.com/v1/paymentWidgets/img/visa_master.png',
+                    'apple_pay' => 'https://checkout.hyperpay.com/v1/paymentWidgets/img/applepay.png',
+                    'tamara' => 'https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg',
+                    'tabby' => 'https://cdn.tabby.ai/assets/logo-main.svg',
+                    'tap' => 'https://www.tap.company/content/images/2021/04/Tap-Logo-1.png',
+                    default => null
+                };
+            @endphp
+
+            @if($logoUrl)
+                <img src="{{ $logoUrl }}" alt="{{ $method }}" class="gateway-logo">
+            @endif
+            <div class="payment-section-title">
+                <span>إكمال الدفع عبر {{ strtoupper($method) }}</span>
+            </div>
         </div>
 
         @if(in_array($method, ['mada', 'visa_master', 'apple_pay']))
             @if(isset($checkout_id))
-                <form action="{{ route('payments.web.callback', ['payment_type' => $method]) }}" class="paymentWidgets" data-brands="{{ $method === 'mada' ? 'MADA' : 'VISA MASTER' }}"></form>
+                <form action="{{ route('payments.web.callback', ['payment_type' => $method]) }}" class="paymentWidgets" data-brands="{{ $method === 'mada' ? 'MADA' : ($method === 'apple_pay' ? 'APPLEPAY' : 'VISA MASTER') }}"></form>
             @else
                 <div style="text-align:center; padding:20px;">
                     <p style="color:var(--danger)">فشل تحميل طلب الدفع. يرجى المحاولة لاحقاً.</p>
                 </div>
             @endif
         @else
-            <!-- Tamara / Tabby Logic -->
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-                سيتم توجيهك الآن إلى بوابة {{ ucfirst($method) }} لإكمال عملية الدفع بالتقسيط.
+            <!-- Tamara / Tabby / Tap Logic -->
+            <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center; margin-bottom: 24px;">
+                سيتم توجيهك الآن إلى صفحة الدفع الرسمية لإكمال العملية بأمان.
             </p>
             <button id="btn-redirect" class="btn-redirect">
-                استمرار عبر {{ ucfirst($method) }} 🚀
+                متابعة الدفع الآن 💳
             </button>
         @endif
     </div>
 
     <div class="secure-badge">
-        <span>🔒 دفع آمن ومشفر 256-بت</span>
+        <p>🔒 جميع المدفوعات مشفرة وآمنة تماماً</p>
+        <div class="security-icons">
+            <img src="https://checkout.hyperpay.com/v1/paymentWidgets/img/pci-dss.png" alt="PCI DSS">
+            <img src="https://checkout.hyperpay.com/v1/paymentWidgets/img/3d-secure.png" alt="3D Secure">
+        </div>
     </div>
 </div>
 
 <div class="loader-overlay" id="loader">
     <div class="spinner"></div>
-    <p>جاري تحضير صفحة الدفع...</p>
+    <p>جاري تأمين الاتصال ومعالجة طلبك...</p>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

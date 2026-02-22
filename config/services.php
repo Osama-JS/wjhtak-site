@@ -60,4 +60,10 @@ return [
         'credentials_path' => env('FIREBASE_CREDENTIALS_PATH', 'storage/app/firebase/service-account.json'),
     ],
 
+    'tap' => [
+        'secret_key' => env('TAP_SECRET_KEY'),
+        'public_key' => env('TAP_PUBLIC_KEY'),
+        'base_url' => env('TAP_BASE_URL', 'https://api.tap.company/v2'),
+    ],
+
 ];

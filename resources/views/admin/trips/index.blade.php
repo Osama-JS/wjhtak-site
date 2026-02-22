@@ -164,9 +164,9 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">{{ __('Trips List') }}</h4>
-                    <button type="button" class="btn btn-primary btn-rounded" data-bs-toggle="modal" data-bs-target="#addTripsModal">
+                    <a href="{{ route('admin.trips.create') }}" class="btn btn-primary btn-rounded">
                          <i class="fa fa-plus me-2"></i> {{ __('Add New Trip') }}
-                    </button>
+                    </a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -209,223 +209,12 @@
         </div>
     </div>
 </div>
-
-<!-- Add Modal -->
-<div class="modal fade" id="addTripsModal">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-primary"><i class="fa fa-plus-circle me-2"></i>{{ __('Add New Trip') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="addTripsForm">
-                @csrf
-                <div class="modal-body">
-                    <div class="row">
-                        <!-- Basic Information -->
-                        <div class="col-md-6 border-end">
-                            <div class="form-section-title">
-                                <i class="fas fa-info-circle"></i> {{ __('General Information') }}
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <x-forms.input-text name="title" :label="__('Trip Title')" required icon="fa fa-pen" />
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.select name="category_ids" :label="__('Categories')" :options="$categories" multiple searchable />
-                                </div>
-                                <div class="col-md-12">
-                                    <x-forms.textarea name="description" :label="__('Description')" required rows="6" />
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.select name="company_id" :label="__('Company')" :options="$companies" searchable required />
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.input-text name="duration" :label="__('Duration')" placeholder="e.g. 5 Days" icon="fa fa-clock" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Logistics & Pricing -->
-                        <div class="col-md-6">
-                            <div class="form-section-title">
-                                <i class="fas fa-map-marker-alt"></i> {{ __('Logistics & Pricing') }}
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <x-forms.select name="from_country_id" :label="__('From Country')" :options="$countries" searchable required />
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.select name="to_country_id" :label="__('To Country')" :options="$countries" searchable required />
-                                </div>
-                                <div class="col-md-12">
-                                    <x-forms.select name="from_city_id" :label="__('From City')" :options="$cities" searchable required />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text name="price" :label="__('Current Price')" required icon="fa fa-dollar-sign" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text name="price_before_discount" :label="__('Old Price')" icon="fa fa-tag" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text name="tickets" :label="__('Tickets')" required icon="fa fa-ticket-alt" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text name="personnel_capacity" :label="__('Max Capacity')" icon="fa fa-users" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text name="base_capacity" :label="__('Base Capacity')" icon="fa fa-user-plus" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text name="extra_passenger_price" :label="__('Extra Pax Price')" icon="fa fa-money-bill-wave" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">{{ __('Expiry Date') }} <span class="text-danger">*</span></label>
-                                    <input type="date" name="expiry_date" class="form-control" required>
-                                </div>
-                            </div>
-
-                            <div class="form-section-title">
-                                <i class="fas fa-cogs"></i> {{ __('Visibility & Status') }}
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <x-forms.checkbox name="is_public" :label="__('Public')" checked type="switch" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.checkbox name="is_featured" :label="__('Featured')" type="switch" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.checkbox name="is_ad" :label="__('Advertisement')" checked type="switch" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.checkbox name="active" :label="__('Active')" checked type="switch" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('Save Trip') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal fade" id="editTripsModal">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-primary"><i class="fa fa-edit me-2"></i>{{ __('Edit Trip Details') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="editTripsForm">
-                @csrf
-                @method('PUT')
-                <input type="hidden"  id="edit_id" >
-                <div class="modal-body">
-                    <div class="row">
-                        <!-- Basic Information -->
-                        <div class="col-md-6 border-end">
-                            <div class="form-section-title">
-                                <i class="fas fa-info-circle"></i> {{ __('General Information') }}
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <x-forms.input-text id="edit_title" name="title" :label="__('Trip Title')" required icon="fa fa-pen" />
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.select name="category_ids" id="edit_category_ids" :label="__('Categories')" :options="$categories" multiple searchable />
-                                </div>
-                                <div class="col-md-12">
-                                    <x-forms.textarea id="edit_description" name="description" :label="__('Description')" required rows="6" />
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.select id="edit_company_id" name="company_id" :label="__('Company')" :options="$companies" searchable required />
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.input-text id="edit_duration" name="duration" :label="__('Duration')" placeholder="e.g. 5 Days" icon="fa fa-clock" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Logistics & Pricing -->
-                        <div class="col-md-6">
-                            <div class="form-section-title">
-                                <i class="fas fa-map-marker-alt"></i> {{ __('Logistics & Pricing') }}
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <x-forms.select id="edit_from_country_id" name="from_country_id" :label="__('From Country')" :options="$countries" searchable required />
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.select id="edit_to_country_id" name="to_country_id" :label="__('To Country')" :options="$countries" searchable required />
-                                </div>
-                                <div class="col-md-12">
-                                    <x-forms.select id="edit_from_city_id" name="from_city_id" :label="__('From City')" :options="$cities" searchable required />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text id="edit_price" name="price" :label="__('Current Price')" required icon="fa fa-dollar-sign" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text id="edit_price_before_discount" name="price_before_discount" :label="__('Old Price')" icon="fa fa-tag" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text id="edit_tickets" name="tickets" :label="__('Tickets')" required icon="fa fa-ticket-alt" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text id="edit_personnel_capacity"  name="personnel_capacity" :label="__('Max Capacity')" icon="fa fa-users" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text id="edit_base_capacity"  name="base_capacity" :label="__('Base Capacity')" icon="fa fa-user-plus" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.input-text id="edit_extra_passenger_price"  name="extra_passenger_price" :label="__('Extra Pax Price')" icon="fa fa-money-bill-wave" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">{{ __('Expiry Date') }} <span class="text-danger">*</span></label>
-                                    <input type="date" id="edit_expiry_date" name="expiry_date" class="form-control" required>
-                                </div>
-                            </div>
-
-                            <div class="form-section-title">
-                                <i class="fas fa-cogs"></i> {{ __('Visibility & Status') }}
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <x-forms.checkbox id="edit_is_public" name="is_public" :label="__('Public')" checked type="switch" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.checkbox id="edit_is_featured" name="is_featured" :label="__('Featured')" type="switch" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.checkbox id="edit_is_ad" name="is_ad" :label="__('Advertisement')" checked type="switch" />
-                                </div>
-                                <div class="col-md-4">
-                                    <x-forms.checkbox id="edit_active" name="active" :label="__('Active')" checked type="switch" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('Update Trip') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal fade" id="renewTripModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ __('Edit Expiry Date Trips') }}</h5>
+    {{-- Renew Trip Modal --}}
+    <div class="modal fade" id="renewTripModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('Edit Expiry Date Trips') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="renewTripForm">
@@ -502,258 +291,44 @@
         $('#company_id, #from_country_id, #to_country_id, #expiry_date').change(function () {
             tripsTable.ajax.reload();
         });
-
-
-         $('#addTripsForm').on('submit', function (e) {
-            e.preventDefault();
-            $.ajax({
-                url: "{{ route('admin.trips.store') }}",
-                type: "POST",
-                data: $(this).serialize(),
-                success: function (response) {
-                    if (response.success) {
-                        console.log(response);
-                        $('#addTripsModal').modal('hide');
-                        $('#addTripsForm')[0].reset();
-                        tripsTable.ajax.reload(null, false);
-                        toastr.success(response.message);
-                    }
-                },
-                error: function (xhr) {
-                    const submitBtn = $('#addTripsForm').find('button[type="submit"]');
-                    if (window.WJHTAKAdmin && window.WJHTAKAdmin.btnLoading) {
-                        window.WJHTAKAdmin.btnLoading(submitBtn, false);
-                    }
-
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        Object.values(errors).forEach(err => {
-                            toastr.error(err[0]);
-                        });
-                    } else {
-                        toastr.error('Something went wrong');
-                    }
-                }
-            });
-        });
-
-         // Handle Edit Form Submit
-        $('#editTripsForm').on('submit', function(e) {
-            e.preventDefault();
-            const id = $('#edit_id').val();
-            const url = updateUrl.replace(':id', id);
-            const formData = $(this).serialize() + '&_method=PUT';
-
-            $.ajax({
-                url:url,
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        $('#editTripsModal').modal('hide');
-                        tripsTable.ajax.reload();
-                        toastr.success(response.message);
-                    }
-                },
-                error: function(xhr) {
-                    const submitBtn = $('#editTripsForm').find('button[type="submit"]');
-                    if (window.WJHTAKAdmin && window.WJHTAKAdmin.btnLoading) {
-                        window.WJHTAKAdmin.btnLoading(submitBtn, false);
-                    }
-
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        Object.keys(errors).forEach(key => {
-                            toastr.error(errors[key][0]);
-                        });
-                    } else {
-                        toastr.error('Something went wrong');
-                    }
-                }
-            });
-        });
-
-
-            // بما أنك تستخدم AJAX لملء الجدول، سننتظر حتى يكتمل تحميل البيانات
-        // var checkDataTable = setInterval(function() {
-        //     // نبحث عن أول زر "تعديل" أو "رفع" يحتوي على الـ ID
-        //     let firstTripBtn = $('.btn-info[onclick^="openImageUpload"]').first();
-
-        //     if (firstTripBtn.length > 0) {
-        //         // استخراج المعاملات من onclick="openImageUpload(ID, 'TITLE')"
-        //         let onClickAttr = firstTripBtn.attr('onclick');
-        //         // استخراج القيم باستخدام Regex أو ببساطة تشغيل الوظيفة
-        //         firstTripBtn.click();
-
-        //         clearInterval(checkDataTable); // توقف عن البحث بمجرد التشغيل
-        //     }
-        // }, 500); // يفحص كل نصف ثانية حتى يظهر الجدول
-
-        // Clear forms on modal close
-        $('.modal').on('hidden.bs.modal', function () {
-            const form = $(this).find('form');
-            if (form.length) {
-                form[0].reset();
-                // Clear validation states
-                form.find('.is-invalid, .is-valid').removeClass('is-invalid is-valid');
-                // Clear image previews generated by admin-custom.js if any
-                form.find('.file-preview').remove();
-                form.find('.file-upload-text').text('{{ __("Choose file") }}');
-                // Update selects
-                if ($.fn.niceSelect) {
-                    form.find('select').niceSelect('update');
-                }
-                // Clear Dropzone if it exists in the modal
-                if (myDropzone && $(this).find('#trip-images-upload').length) {
-                    myDropzone.removeAllFiles(true);
-                }
-            }
-        });
-
     });
 
+    // Dropzone initialization
     Dropzone.autoDiscover = false;
-    let myDropzone = null; // تعريف المتغير خارجاً
+    let myDropzone;
 
-    function openImageUpload(id, title) {
-        // 1. Show the Modal and update title
+    function openImageUpload(id, name) {
+        $('#target-trip-name').text(name);
         $('#tripImagesModal').modal('show');
-        $('#target-trip-name').text(title);
 
-        let storeUrl = "{{ route('admin.trips.images-store', ':id') }}".replace(':id', id);
-        let getUrl   = "{{ route('admin.trips.get-images', ':id') }}".replace(':id', id);
-
-        // 2. Destroy previous instance to prevent conflicts
-        if (myDropzone !== null) {
-            myDropzone.destroy();
+        // Initialize Dropzone if not already initialized
+        if (!myDropzone) {
+            myDropzone = new Dropzone("#trip-images-upload", {
+                url: "{{ route('admin.trips.images-store', ':id') }}".replace(':id', id),
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                paramName: "file",
+                maxFilesize: 5,
+                acceptedFiles: "image/*",
+                addRemoveLinks: true,
+                dictDefaultMessage: "{{ __('Drag and drop photos here to upload') }}",
+                init: function() {
+                    this.on("success", function(file, response) {
+                        toastr.success(response.message || "{{ __('Image uploaded successfully') }}");
+                    });
+                    this.on("error", function(file, response) {
+                        toastr.error(response.error || "{{ __('Error while uploading the image') }}");
+                    });
+                }
+            });
+        } else {
+            // Update URL for the new trip ID
+            myDropzone.options.url = "{{ route('admin.trips.images-store', ':id') }}".replace(':id', id);
+            myDropzone.removeAllFiles();
         }
 
-        // 3. إنشاء نسخة جديدة مخصصة لهذه الرحلة فقط
-        myDropzone = new Dropzone("#trip-images-upload", {
-            url: storeUrl,
-            method: "post",
-            paramName: "file",
-            maxFilesize: 5,
-            acceptedFiles: ".jpeg,.jpg,.png,.gif",
-            addRemoveLinks: true,
-            dictRemoveFile: "{{ __('Delete') }}",
-            dictDefaultMessage: "{{ __('Drop files here or click to upload') }}",
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            init: function() {
-                let dz = this;
-
-                // 4. جلب الصور الخاصة بهذه الرحلة من السيرفر
-                $.ajax({
-                    url: getUrl,
-                    type: 'GET',
-                    cache: false, // مهم جداً لمنع تكرار صور الرحلات السابقة
-                    success: function(data) {
-                        $.each(data, function(key, value) {
-                            let mockFile = {
-                                name: value.name,
-                                size: value.size,
-                                serverId: value.id
-                            };
-                            dz.displayExistingFile(mockFile, value.url);
-                            dz.emit("complete", mockFile);
-                        });
-                    }
-                });
-
-                // الأحداث
-                this.on("success", function(file, response) {
-                    file.serverId = response.id;
-                });
-
-                this.on("removedfile", function(file) {
-                    if (file.serverId) {
-                        let deleteUrl = "{{ route('admin.trips.images-destroy', ':id') }}".replace(':id', file.serverId);
-                        $.ajax({
-                            url: deleteUrl,
-                            type: 'DELETE',
-                            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-
-
-    function editTrip(id) {
-        let url = "{{ route('admin.trips.show', ':id') }}".replace(':id', id);
-        console.log('URL:', url);
-
-        $.get(url, function(response) {
-            console.log('Response:', response);
-
-            if (response.success) {
-                let c = response.Trip;
-                $('#edit_id').val(c.id);
-                $('#edit_title').val(c.title);
-                $('#edit_tickets').val(c.tickets);
-                $('#edit_description').val(c.description);
-                $('#edit_base_capacity').val(c.base_capacity);
-                $('#edit_extra_passenger_price').val(c.extra_passenger_price);
-
-                // Set multiple categories
-                if (c.categories) {
-                    let categoryIds = c.categories.map(cat => cat.id);
-                    $('#edit_category_ids').val(categoryIds);
-                } else {
-                    $('#edit_category_ids').val([]);
-                }
-
-                // Set values for selects
-                $('#edit_company_id').val(c.company_id);
-                $('#edit_from_country_id').val(c.from_country_id);
-                $('#edit_from_city_id').val(c.from_city_id);
-                $('#edit_to_country_id').val(c.to_country_id);
-
-                // Set duration, price, capacity
-                $('#edit_duration').val(c.duration);
-                $('#edit_price').val(c.price);
-                $('#edit_price_before_discount').val(c.price_before_discount);
-                $('#edit_personnel_capacity').val(c.personnel_capacity);
-
-                // Date handling
-                if(c.expiry_date) {
-                    let formattedDate = c.expiry_date.split(' ')[0];
-                    $('#edit_expiry_date').val(formattedDate);
-                } else {
-                    $('#edit_expiry_date').val('');
-                }
-
-                // Checkboxes - using !! to force boolean
-                $('#edit_is_public').prop('checked', !!parseInt(c.is_public));
-                $('#edit_is_featured').prop('checked', !!parseInt(c.is_featured));
-                $('#edit_is_ad').prop('checked', !!parseInt(c.is_ad));
-                $('#edit_active').prop('checked', !!parseInt(c.active));
-
-                // Force Update UI Libraries
-                setTimeout(function() {
-                    // Update Select2 (for searchable selects)
-                    if ($.fn.select2) {
-                        $('#edit_company_id, #edit_from_country_id, #edit_from_city_id, #edit_to_country_id, #edit_category_ids').trigger('change.select2');
-                    }
-
-                    // Update nice-select (if used)
-                    if ($.fn.niceSelect) {
-                        $('select').niceSelect('update');
-                    }
-                }, 100);
-
-                $('#editTripsModal').modal('show');
-            } else {
-                toastr.error('Could not load trip data');
-            }
-        }).fail(function(xhr) {
-            console.log('AJAX Error:', xhr.responseText);
-            toastr.error('Failed to fetch trip data');
-        });
+        // Load existing images if needed (optional enhancement)
     }
 
     function toggleTripStatus(id) {

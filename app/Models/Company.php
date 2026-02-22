@@ -8,7 +8,7 @@ class Company extends Model
 {
 
     protected $table = 'companies';
-    
+
     protected $fillable = [
         'name',
         'email',
@@ -22,6 +22,11 @@ class Company extends Model
         'active' => 'boolean',
     ];
 
-
-
+    /**
+     * Scope a query to only include active companies.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
+    }
 }

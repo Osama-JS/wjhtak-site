@@ -35,6 +35,14 @@
                 return;
             }
 
+            // Detection of ID from URL if not passed by Blade
+            const urlParams = new URLSearchParams(window.location.search);
+            const tapId = urlParams.get('tap_id') || urlParams.get('id');
+            const tamaraOrderId = urlParams.get('orderId');
+            const tabbyPaymentId = urlParams.get('payment_id');
+
+            const finalId = paymentId || checkoutId || tapId || tamaraOrderId || tabbyPaymentId;
+
             // Call the verification API
             $.ajax({
                 url: "/api/payment/verify",
@@ -44,9 +52,9 @@
                 },
                 data: {
                     payment_type: paymentType,
-                    id: paymentId || checkoutId,
-                    payment_id: (paymentType === 'tabby' || paymentType === 'tamara') ? paymentId : null,
-                    checkout_id: (paymentType !== 'tabby' && paymentType !== 'tamara') ? checkoutId : null
+                    id: finalId,
+                    payment_id: (paymentType === 'tabby' || paymentType === 'tamara' || paymentType === 'tap') ? finalId : null,
+                    checkout_id: (paymentType !== 'tabby' && paymentType !== 'tamara' && paymentType !== 'tap') ? finalId : null
                 },
                 success: function(response) {
                     if (response.success || response.error === false) {

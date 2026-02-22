@@ -70,10 +70,12 @@
                 <h4 class="footer-title">{{ __('Support') }}</h4>
                 <ul class="footer-links">
                     <li><a href="{{ route('faq') }}" class="footer-link">{{ __('FAQ') }}</a></li>
-                    <li><a href="#" class="footer-link">{{ __('Privacy Policy') }}</a></li>
-                    <li><a href="#" class="footer-link">{{ __('Terms of Service') }}</a></li>
-                    <li><a href="#" class="footer-link">{{ __('Refund Policy') }}</a></li>
-                    <li><a href="#" class="footer-link">{{ __('Help Center') }}</a></li>
+                    @php
+                        $footerPages = \App\Models\Page::where('is_active', true)->where('show_in_footer', true)->get();
+                    @endphp
+                    @foreach($footerPages as $fPage)
+                        <li><a href="{{ route('pages.show', $fPage->slug) }}" class="footer-link">{{ $fPage->title }}</a></li>
+                    @endforeach
                 </ul>
             </div>
 

@@ -213,6 +213,10 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::post('notifications/send', [AdminNotificationController::class, 'send'])->name('notifications.send');
     Route::delete('notifications/{id}', [AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
 
+    // Payments Management
+    Route::get('payments', [App\Http\Controllers\Admin\PaymentLogController::class, 'index'])->name('payments.index');
+    Route::get('payments/{id}', [App\Http\Controllers\Admin\PaymentLogController::class, 'show'])->name('payments.show');
+
     // Subscribers
     Route::get('/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
     Route::get('/subscribers/data', [SubscriberController::class, 'getData'])->name('subscribers.data');
@@ -222,7 +226,14 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::put('/subscribers/{id}', [SubscriberController::class, 'update'])->name('subscribers.update');
     Route::post('/subscribers/{id}/toggle-status', [SubscriberController::class, 'toggleStatus'])->name('subscribers.toggle-status');
     Route::delete('/subscribers/{id}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
+
+    // Pages Management
+    Route::get('pages/data', [App\Http\Controllers\Admin\PageController::class, 'getData'])->name('pages.data');
+    Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
 });
+
+// Public Page Display
+Route::get('/page/{slug}', [App\Http\Controllers\Web\PageController::class, 'show'])->name('pages.show');
 
 // Customer Routes
 Route::middleware(['auth'])->prefix('customer')->name('customer.')->group(function () {
