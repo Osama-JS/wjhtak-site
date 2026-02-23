@@ -28,10 +28,11 @@
             const paymentId = "{{ $payment_id }}";
             const checkoutId = "{{ $checkout_id }}";
             const status = "{{ $status }}";
+            const source = "{{ $source ?? '' }}";
 
             // If it's already a failure from the URL
             if (status === 'failure' || status === 'cancel') {
-                window.location.href = "{{ route('payments.web.failure') }}?error=" + encodeURIComponent("فشلت عملية الدفع أو تم إلغاؤها.");
+                window.location.href = "{{ route('payments.web.failure') }}?error=" + encodeURIComponent("فشلت عملية الدفع أو تم إلغاؤها.") + (source ? "&source=" + source : "");
                 return;
             }
 
@@ -45,10 +46,11 @@
 
             // Call the verification API
             $.ajax({
-                url: "/api/payment/verify",
+                url: "{{ url('api/payment/verify') }}",
                 method: "POST",
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
                 },
                 data: {
                     payment_type: paymentType,
@@ -58,14 +60,14 @@
                 },
                 success: function(response) {
                     if (response.success || response.error === false) {
-                        window.location.href = "{{ route('payments.web.success') }}?booking_id=" + (response.booking_id || "");
+                        window.location.href = "{{ route('payments.web.success') }}?booking_id=" + (response.booking_id || "") + (source ? "&source=" + source : "");
                     } else {
-                        window.location.href = "{{ route('payments.web.failure') }}?error=" + encodeURIComponent(response.message || "فشل التحقق من الدفع");
+                        window.location.href = "{{ route('payments.web.failure') }}?error=" + encodeURIComponent(response.message || "فشل التحقق من الدفع") + (source ? "&source=" + source : "");
                     }
                 },
                 error: function(xhr) {
                     const msg = xhr.responseJSON?.message || "حدث خطأ أثناء التواصل مع الخادم";
-                    window.location.href = "{{ route('payments.web.failure') }}?error=" + encodeURIComponent(msg);
+                    window.location.href = "{{ route('payments.web.failure') }}?error=" + encodeURIComponent(msg) + (source ? "&source=" + source : "");
                 }
             });
         });

@@ -230,8 +230,8 @@
                                 </div>
                             </div>
                             <div class="trip-card-content">
-                                <div class="trip-card-location"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>{{ ['Dubai → Maldives', 'Cairo → Luxor', 'Riyadh → Istanbul'][$i % 3] }}</span></div>
-                                <h3 class="trip-card-title"><a href="#">{{ ['Luxury Beach Resort', 'Ancient Wonders Tour', 'Cultural Heritage Trip'][$i % 3] }}</a></h3>
+                                <div class="trip-card-location"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>{{ [__('Dubai → Maldives'), __('Cairo → Luxor'), __('Riyadh → Istanbul')][$i % 3] }}</span></div>
+                                <h3 class="trip-card-title"><a href="#">{{ [__('Luxury Beach Resort'), __('Ancient Wonders Tour'), __('Cultural Heritage Trip')][$i % 3] }}</a></h3>
                                 <div class="trip-card-meta">
                                     <div class="trip-card-meta-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>{{ rand(3, 10) }} {{ __('Days') }}</span></div>
                                     <div class="trip-card-price"><span class="trip-card-price-old">${{ rand(800, 1200) }}</span><span class="trip-card-price-current">${{ rand(500, 799) }}<span class="trip-card-price-unit">/ {{ __('person') }}</span></span></div>
@@ -268,15 +268,19 @@
                         >
                         <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, transparent 100%);"></div>
                         <div class="container" style="position: absolute; inset: 0; display: flex; align-items: center;">
-                            <div style="max-width: 500px; color: white;">
-                                <h2 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
+                            <div style="max-width: 500px; color: white !important;">
+                                <h2 style="font-size: var(--text-4xl); font-weight: var(--font-bold); margin-bottom: var(--space-4); color: white !important;">
                                     {{ app()->getLocale() == 'ar' ? $banner->title_ar : $banner->title_en }}
                                 </h2>
-                                <p style="font-size: var(--text-lg); opacity: 0.9; margin-bottom: var(--space-6);">
+                                <p style="font-size: var(--text-lg); opacity: 0.9; margin-bottom: var(--space-6); color: white !important;">
                                      {{ app()->getLocale() == 'ar' ? $banner->description_ar : $banner->description_en }}
                                 </p>
                                 @if($banner->trip_id)
                                     <a href="{{ route('trips.show', $banner->trip_id) }}" class="btn btn-accent">
+                                        {{ __('View Details') }}
+                                    </a>
+                                @elseif($banner->link)
+                                    <a href="{{ $banner->link }}" class="btn btn-accent" target="_blank">
                                         {{ __('View Details') }}
                                     </a>
                                 @endif

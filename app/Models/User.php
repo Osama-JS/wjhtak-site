@@ -137,4 +137,12 @@ class User extends Authenticatable
     {
         return $this->user_type === self::TYPE_CUSTOMER;
     }
+
+    /**
+     * Get user favorites.
+     */
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
 }

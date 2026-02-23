@@ -21,7 +21,29 @@
         <div class="icon">✕</div>
         <h1>عذراً، فشلت العملية</h1>
         <p class="error-msg">{{ $error ?? 'حدث خطأ غير متوقع أثناء عملية الدفع.' }}</p>
-        <a href="{{ route('home') }}" class="btn">العودة للرئيسية</a>
+        @if(request()->query('source') !== 'api')
+            <a href="{{ route('home') }}" class="btn">العودة للرئيسية</a>
+        @endif
     </div>
+
+    <script>
+       function sendResultToWjhtakApp() {
+            // تجهيز البيانات المطلوبة فقط
+            var simpleResult = {
+                success: false,
+                message: "لم تنجح عملية الدفع"
+            };
+
+            // تحويل الكائن إلى نص JSON
+            var resultJson = JSON.stringify(simpleResult);
+
+            // الإرسال عبر الجسر البرمجي الخاص بتطبيق وجهتك
+            if (window.FlutterBridge) {
+                window.FlutterBridge.postMessage(resultJson);
+            } else {
+                console.log("FlutterBridge not found");
+            }
+        }
+    </script>
 </body>
 </html>

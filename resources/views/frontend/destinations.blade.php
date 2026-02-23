@@ -153,7 +153,7 @@
                     </a>
                 @empty
                     {{-- Demo Countries --}}
-                    @foreach(['Saudi Arabia', 'UAE', 'Egypt', 'Turkey', 'Indonesia', 'Thailand', 'Malaysia', 'Japan', 'France', 'Italy'] as $name)
+                    @foreach([__('Saudi Arabia'), __('UAE'), __('Egypt'), __('Turkey'), __('Indonesia'), __('Thailand'), __('Malaysia'), __('Japan'), __('France'), __('Italy')] as $name)
                         <a href="#" class="destination-item scroll-animate" data-name="{{ strtolower($name) }}">
                             <div class="destination-item-flag">
                                 <span style="font-size: 32px;">🌍</span>

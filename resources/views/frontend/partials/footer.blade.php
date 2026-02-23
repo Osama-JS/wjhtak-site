@@ -115,22 +115,25 @@
                 © {{ date('Y') }} {{ config('app.name', 'Wjhtak') }}. {{ __('All Rights Reserved') }}
             </p>
             <div class="footer-payment">
-                {{-- Visa --}}
-                <svg width="40" height="25" viewBox="0 0 45 15" fill="none"><path d="M17.443.243l-2.4 14.514h-3.837L8.805.243h3.838l.6 4.37h2.822l.538-4.37h3.84zM32.89 10.372c0 2.821-4.368 2.946-4.368 4.605 0 .54.499.982 1.54.982 1.346 0 2.503-.352 3.424-.92l.635 2.895c-1.02.491-2.485.882-4.144.882-3.614 0-6.173-1.89-6.173-4.823 0-2.82 4.385-3.003 4.385-4.605 0-.52-.519-.982-1.712-.982-1.154 0-2.193.303-2.923.702l-.654-2.921c.884-.39 2.308-.76 3.933-.76 3.48 0 6.057 1.833 6.057 4.945M22.04 14.757l-1.635-14.514h4.143l1.636 14.514h-4.144zM44.757.243l-3.327 14.514h-3.578L36.012.243h3.913l.865 6.368 2.057-6.368h3.91z" fill="#1434CB"/></svg>
-                {{-- Mastercard --}}
-                <svg width="35" height="25" viewBox="0 0 24 15" fill="none"><circle cx="7.5" cy="7.5" r="7.5" fill="#EB001B"/><circle cx="16.5" cy="7.5" r="7.5" fill="#F79E1B"/><path d="M12 1.402a7.472 7.472 0 012.916 6.098c0 2.39-1.116 4.52-2.863 5.903a7.473 7.473 0 01-3.027-5.903c0-2.443 1.168-4.615 2.974-5.998z" fill="#FF5F00"/></svg>
-                {{-- Apple Pay --}}
-                <svg width="40" height="25" viewBox="0 0 50 20" fill="none"><path d="M7.74 3.7c.94-1.12 1.55-2.67 1.38-4.22-1.34.05-2.95.88-3.9 1.99-.86.99-1.6 2.58-1.4 4.09 1.48.11 3-.74 3.92-1.86" fill="#000"/><path d="M10.15 13.56c-.05 3.39 2.95 4.54 3 4.57s-.47 1.62-1.58 3.23c-1 1.46-2.03 2.93-3.66 2.93s-2.09-.99-3.95-.99-2.39.96-3.89 1.02c-1.57.06-2.73-1.61-3.73-3.06-2.05-2.96-3.62-8.36-1.52-12 1.04-1.8 2.9-2.94 4.93-2.97 1.55-.03 3.01 1.04 3.96 1.04s2.72-1.28 4.56-1.09c.77.03 2.93.31 4.31 2.33-.12.06-2.58 1.44-2.53 4.92" fill="#000"/><text x="22" y="16" font-family="Arial" font-weight="bold" font-size="14" fill="#000">Pay</text></svg>
-                {{-- Mada --}}
-                <svg width="40" height="25" viewBox="0 0 40 15" fill="none"><rect width="40" height="15" rx="2" fill="#004A97"/><text x="5" y="11" font-family="Arial" font-weight="bold" font-size="10" fill="white">mada</text></svg>
-                {{-- Tamara --}}
-                <div class="payment-badge tamara">
-                    <span style="background: #ffc20e; color: black; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">tamara</span>
-                </div>
-                {{-- Tabby --}}
-                <div class="payment-badge tabby">
-                    <span style="background: #3affbe; color: black; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">tabby</span>
-                </div>
+
+                <!-- Visa -->
+                <img src="https://t3.ftcdn.net/jpg/03/33/21/62/240_F_333216210_HjHUw1jjcYdGr3rRtYm3W1DIXAElEFJL.jpg" alt="Visa" class="pay-icon">
+
+                <!-- Mastercard -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="pay-icon">
+
+                <!-- Apple Pay -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" class="pay-icon">
+
+                <!-- Mada -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fb/Mada_Logo.svg" alt="Mada" class="pay-icon">
+
+                <!-- Tamara -->
+                <img src="https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg" alt="Tamara" class="pay-icon">
+
+                <!-- Tabby -->
+                <img src="https://uaelogos.ae/storage/1950/conversions/Tabby-thumb.png" alt="Tabby" class="pay-icon">
+
             </div>
         </div>
     </div>

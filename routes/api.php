@@ -60,8 +60,8 @@ Route::post('/flights/book', [FlightController::class, 'book']);
 Route::post('/flights/order-ticket', [FlightController::class, 'orderTicket']);
 Route::post('/flights/trip-details', [FlightController::class, 'getTripDetails']);
 
-// Protected Routes
-Route::middleware('auth:sanctum')->group(function () {
+// Protected Routes (Sanctum for Mobile, Web for Site)
+Route::middleware(['web', 'auth:sanctum'])->group(function () {
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
     Route::get('/check-token', [AuthController::class, 'checkToken']);
@@ -71,7 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::post('/update-fcm-token', [AuthController::class, 'updateFcmToken']);
 
-    // Payment Routes (require auth)
+    // Payment Routes
     Route::prefix('payment')->group(function () {
         Route::post('/initiate', [PaymentController::class, 'initiate']);
         Route::post('/verify', [PaymentController::class, 'verify']);

@@ -22,7 +22,28 @@
         <div class="icon">✓</div>
         <h1>تم الدفع بنجاح!</h1>
         <p>لقد استلمنا دفعتك بنجاح، وتم تأكيد حجزك. نتمنى لك رحلة ممتعة.</p>
-        <a href="{{ route('home') }}" class="btn">العودة للرئيسية</a>
+        @if(request()->query('source') !== 'api')
+            <a href="{{ route('home') }}" class="btn">العودة للرئيسية</a>
+        @endif
     </div>
+    <script>
+       function sendResultToWjhtakApp() {
+            // تجهيز البيانات المطلوبة فقط
+            var simpleResult = {
+                success: true,
+                message: "تمت عملية الدفع بنجاح"
+            };
+
+            // تحويل الكائن إلى نص JSON
+            var resultJson = JSON.stringify(simpleResult);
+
+            // الإرسال عبر الجسر البرمجي الخاص بتطبيق وجهتك
+            if (window.FlutterBridge) {
+                window.FlutterBridge.postMessage(resultJson);
+            } else {
+                console.log("FlutterBridge not found");
+            }
+        }
+    </script>
 </body>
 </html>

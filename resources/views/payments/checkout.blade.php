@@ -214,11 +214,11 @@
         <div class="method-display">
             @php
                 $logoUrl = match($method) {
-                    'mada' => 'https://checkout.hyperpay.com/v1/paymentWidgets/img/mada.png',
-                    'visa_master' => 'https://checkout.hyperpay.com/v1/paymentWidgets/img/visa_master.png',
-                    'apple_pay' => 'https://checkout.hyperpay.com/v1/paymentWidgets/img/applepay.png',
+                    'mada' => 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Mada_Logo.svg',
+                    'visa_master' => 'https://t3.ftcdn.net/jpg/03/33/21/62/240_F_333216210_HjHUw1jjcYdGr3rRtYm3W1DIXAElEFJL.jpg',
+                    'apple_pay' => 'https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg',
                     'tamara' => 'https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg',
-                    'tabby' => 'https://cdn.tabby.ai/assets/logo-main.svg',
+                    'tabby' => 'https://uaelogos.ae/storage/1950/conversions/Tabby-thumb.png',
                     'tap' => 'https://www.tap.company/content/images/2021/04/Tap-Logo-1.png',
                     default => null
                 };
@@ -234,7 +234,7 @@
 
         @if(in_array($method, ['mada', 'visa_master', 'apple_pay']))
             @if(isset($checkout_id))
-                <form action="{{ route('payments.web.callback', ['payment_type' => $method]) }}" class="paymentWidgets" data-brands="{{ $method === 'mada' ? 'MADA' : ($method === 'apple_pay' ? 'APPLEPAY' : 'VISA MASTER') }}"></form>
+                <form action="{{ route('payments.web.callback', ['payment_type' => $method, 'source' => $source]) }}" class="paymentWidgets" data-brands="{{ $method === 'mada' ? 'MADA' : ($method === 'apple_pay' ? 'APPLEPAY' : 'VISA MASTER') }}"></form>
             @else
                 <div style="text-align:center; padding:20px;">
                     <p style="color:var(--danger)">فشل تحميل طلب الدفع. يرجى المحاولة لاحقاً.</p>
@@ -281,7 +281,7 @@
             }
         };
     </script>
-    <script src="https://{{ config('services.hyperpay.mode') === 'production' ? 'oppwa.com' : 'test.oppwa.com' }}/v1/paymentWidgets.js?checkoutId={{ $checkout_id }}"></script>
+    <script src="https://{{ config('hyperpay.test_mode') ? 'eu-test.oppwa.com' : 'oppwa.com' }}/v1/paymentWidgets.js?checkoutId={{ $checkout_id }}"></script>
 @endif
 
 <script>
@@ -292,12 +292,13 @@
             $btn.prop('disabled', true);
 
             $.ajax({
-                url: "{{ route('payments.web.initiate-redirect') }}",
+                url: "{{ route('payments.web.initiate') }}",
                 method: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
                     booking_id: "{{ $booking->id }}",
-                    method: "{{ $method }}"
+                    method: "{{ $method }}",
+                    source: "{{ $source }}"
                 },
                 success: function(response) {
                     if (response.checkout_url) {

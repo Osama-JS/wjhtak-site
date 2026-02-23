@@ -54,6 +54,7 @@ class PaymentWebController extends Controller
                 'user' => $user,
                 'method' => $method,
                 'amount' => $booking->total_price,
+                'source' => $request->source,
             ];
 
             // If HyperPay, we might need a checkout_id immediately to load the widget
@@ -83,6 +84,7 @@ class PaymentWebController extends Controller
         $request->validate([
             'booking_id' => 'required|exists:trip_bookings,id',
             'method' => 'required|string|in:tabby,tamara,tap',
+            'source' => 'nullable|string',
         ]);
 
         try {
@@ -116,12 +118,12 @@ class PaymentWebController extends Controller
         $customerParams = $this->hyperPayService->buildCustomerParams([
             'email' => $booking->user->email,
             'first_name' => $booking->user->first_name ?? $booking->user->full_name,
-            'last_name' => $booking->user->last_name ?? 'User',
-            'street' => $booking->user->address ?? 'Not Provided',
+            'last_name' => $booking->user->last_name ?? 'Guest',
+            'street' => $booking->user->address ?? 'Saudi Arabia',
             'city' => $booking->user->city ?? 'Riyadh',
-            'state' => 'Riyadh',
-            'country' => 'SA',
-            'postcode' => '00000',
+            'state' => $booking->user->state ?? 'Riyadh',
+            'country' => $booking->user->country_code ?? 'SA',
+            'postcode' => $booking->user->postcode ?? '12345',
         ]);
 
         $params = array_merge($params, $customerParams);
@@ -141,7 +143,10 @@ class PaymentWebController extends Controller
             'customer_email' => $user->email,
             'customer_phone' => $user->phone,
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
-            'callback_url' => route('payments.web.callback', ['payment_type' => 'tabby']),
+            'callback_url' => route('payments.web.callback', [
+                'payment_type' => 'tabby',
+                'source' => $request->source
+            ]),
             'items' => [
                 [
                     'title' => $booking->trip ? $booking->trip->title : 'Trip Booking',
@@ -171,7 +176,10 @@ class PaymentWebController extends Controller
             'first_name' => $user->first_name ?? $user->full_name,
             'last_name' => $user->last_name ?? 'User',
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
-            'callback_url' => route('payments.web.callback', ['payment_type' => 'tamara']),
+            'callback_url' => route('payments.web.callback', [
+                'payment_type' => 'tamara',
+                'source' => $request->source
+            ]),
             'items' => [
                 [
                     'name' => $booking->trip ? $booking->trip->title : 'Trip Booking',
@@ -207,7 +215,10 @@ class PaymentWebController extends Controller
             'first_name' => $user->first_name ?? $user->full_name,
             'last_name' => $user->last_name ?? 'User',
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
-            'callback_url' => route('payments.web.callback', ['payment_type' => 'tap']),
+            'callback_url' => route('payments.web.callback', [
+                'payment_type' => 'tap',
+                'source' => $request->source
+            ]),
             'description' => 'Booking #' . $booking->id . ' - ' . ($booking->trip->title ?? 'Trip'),
         ];
 
@@ -224,14 +235,16 @@ class PaymentWebController extends Controller
     {
         return view('payments.success', [
             'booking_id' => $request->booking_id,
-            'transaction_id' => $request->transaction_id
+            'transaction_id' => $request->transaction_id,
+            'source' => $request->source
         ]);
     }
 
     public function failure(Request $request)
     {
         return view('payments.failure', [
-            'error' => $request->error ?? __('Payment failed or was cancelled.')
+            'error' => $request->error ?? __('Payment failed or was cancelled.'),
+            'source' => $request->source
         ]);
     }
 }

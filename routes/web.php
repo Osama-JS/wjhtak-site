@@ -13,6 +13,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\Web\PaymentWebController;
 
+// Customer Controllers
+use App\Http\Controllers\Customer\CustomerDashboardController;
+use App\Http\Controllers\Customer\BookingController as CustomerBookingController;
+use App\Http\Controllers\Customer\FavoriteController;
+use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Customer\CustomerPaymentController;
+use App\Http\Controllers\Customer\NotificationController as CustomerNotificationController;
+
 use Illuminate\Support\Facades\Route;
 
 // =============================================================================
@@ -20,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 // =============================================================================
 Route::group(['prefix' => 'payments', 'as' => 'payments.web.'], function () {
     Route::get('/checkout/{booking_id}/{method}', [PaymentWebController::class, 'checkout'])->name('checkout');
-    Route::post('/initiate-redirect', [PaymentWebController::class, 'initiateRedirect'])->name('initiate-redirect');
+    Route::post('/initiate', [PaymentWebController::class, 'initiateRedirect'])->name('initiate');
     Route::get('/success', [PaymentWebController::class, 'success'])->name('success');
     Route::get('/failure', [PaymentWebController::class, 'failure'])->name('failure');
 
@@ -41,7 +49,8 @@ Route::group(['prefix' => 'payments', 'as' => 'payments.web.'], function () {
             'payment_type' => $payment_type,
             'payment_id' => $paymentId,
             'checkout_id' => $checkoutId,
-            'status' => $request->status
+            'status' => $request->status,
+            'source' => $request->source
         ]);
     })->name('callback');
 });
@@ -432,5 +441,50 @@ Route::get('/tabby-test/result', function (\Illuminate\Http\Request $request) {
 
     return view('tabby-test', compact('result'));
 })->name('tabby.result');
+
+// =============================================================================
+// CUSTOMER (USER) ROUTES
+// =============================================================================
+Route::middleware(['auth', 'isCustomer'])->prefix('customer')->name('customer.')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
+
+    // Bookings
+    Route::get('/bookings', [CustomerBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/create/{trip_id}', [CustomerBookingController::class, 'create'])->name('bookings.create');
+    Route::get('/bookings/{id}', [CustomerBookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings', [CustomerBookingController::class, 'store'])->name('bookings.store');
+    Route::post('/bookings/{id}/cancel', [CustomerBookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('/bookings/{id}/invoice', [CustomerBookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+
+    // Favorites
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/{tripId}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+
+    // Profile
+    Route::get('/profile', [CustomerProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/photo', [CustomerProfileController::class, 'updatePhoto'])->name('profile.photo');
+    Route::post('/profile/password', [CustomerProfileController::class, 'changePassword'])->name('profile.password');
+
+    // Payments & Invoices
+    Route::get('/payments', [CustomerPaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/checkout/{bookingId}', [CustomerPaymentController::class, 'checkout'])->name('payments.checkout');
+    Route::get('/payments/{bookingId}/invoice', [CustomerPaymentController::class, 'downloadInvoice'])->name('payments.invoice');
+
+    // Notifications
+    Route::get('/notifications', [CustomerNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [CustomerNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [CustomerNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+});
+
+// Alias: redirect old /dashboard -> customer.dashboard
+Route::get('/dashboard', function () {
+    if (auth()->check() && auth()->user()->isAdmin()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('customer.dashboard');
+})->middleware('auth')->name('dashboard');
 
 require __DIR__.'/auth.php';

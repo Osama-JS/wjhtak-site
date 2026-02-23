@@ -108,9 +108,24 @@
                         </div>
 
                         {{-- Title --}}
-                        <h1 style="font-size: var(--text-3xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
-                            {{ $trip->title }}
-                        </h1>
+                        <div class="flex items-center justify-between gap-4" style="margin-bottom: var(--space-4);">
+                            <h1 style="font-size: var(--text-3xl); font-weight: var(--font-bold); margin: 0;">
+                                {{ $trip->title }}
+                            </h1>
+
+                            @auth
+                                <button type="button"
+                                        class="favorite-toggle-btn {{ auth()->user()->favorites()->where('trip_id', $trip->id)->exists() ? 'active' : '' }}"
+                                        data-trip-id="{{ $trip->id }}"
+                                        onclick="toggleFavorite(this)">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            @else
+                                <a href="{{ route('login') }}" class="favorite-toggle-btn">
+                                    <i class="far fa-heart"></i>
+                                </a>
+                            @endauth
+                        </div>
 
                         {{-- Meta --}}
                         <div class="flex flex-wrap items-center gap-4" style="color: var(--color-text-muted);">
@@ -296,54 +311,20 @@
                             </div>
                         </div>
 
-                        {{-- Booking Form --}}
-                        <form action="#" method="POST">
-                            @csrf
-
-                            {{-- Date --}}
-                            <div class="form-group">
-                                <label class="form-label">{{ __('Departure Date') }}</label>
-                                <div class="form-input" style="background: var(--color-surface-hover); display: flex; align-items: center; gap: 10px;">
-                                    <i class="fas fa-calendar-alt text-primary"></i>
-                                    <span>{{ $trip->expiry_date ? $trip->expiry_date->format('Y-m-d') : __('To be determined') }}</span>
+                        {{-- Booking Action (Simplified) --}}
+                        <div style="margin-top: var(--space-6);">
+                            @auth
+                                <a href="{{ route('customer.bookings.create', $trip->id) }}" class="btn btn-accent btn-lg w-full" style="display: flex; align-items: center; justify-content: center; height: 56px; gap: 10px; font-weight: 800; border-radius: 14px; box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.2);">
+                                    {{ __('Book Now') }}
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            @else
+                                <div class="text-center" style="padding: var(--space-6); background: var(--color-surface-hover); border-radius: var(--radius-lg);">
+                                    <p style="margin-bottom: var(--space-4); color: var(--color-text-secondary);">{{ __('Please login to book this trip and manage your favorites.') }}</p>
+                                    <a href="{{ route('login') }}" class="btn btn-accent w-full">{{ __('Login to Book') }}</a>
                                 </div>
-                                <input type="hidden" name="date" value="{{ $trip->expiry_date ? $trip->expiry_date->format('Y-m-d') : '' }}">
-                            </div>
-
-                            {{-- Travelers --}}
-                            <div class="form-group">
-                                <label class="form-label">{{ __('Number of Travelers') }}</label>
-                                <select name="travelers" id="travelersCount" class="form-input form-select" onchange="calculateTotal()">
-                                    @for($i = 1; $i <= ($trip->personnel_capacity ?? 10); $i++)
-                                        <option value="{{ $i }}">{{ $i }} {{ $i == 1 ? __('Traveler') : __('Travelers') }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-
-                            {{-- Total --}}
-                            <div style="padding: var(--space-4); background: var(--color-surface-hover); border-radius: var(--radius-lg); margin-bottom: var(--space-5);">
-                                <div class="flex items-center justify-between" style="margin-bottom: 5px;">
-                                    <span class="text-muted">{{ __('Unit Price') }}</span>
-                                    <span>${{ number_format($trip->price) }}</span>
-                                </div>
-                                <div id="extraPriceRow" class="flex items-center justify-between" style="margin-bottom: 10px; display: none;">
-                                    <span class="text-muted">{{ __('Extra Passengers') }}</span>
-                                    <span id="extraPriceValue text-danger">$0</span>
-                                </div>
-                                <hr style="opacity: 0.1; margin: 10px 0;">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-muted" style="font-weight: var(--font-bold);">{{ __('Total') }}</span>
-                                    <span id="totalPriceDisplay" style="font-size: var(--text-xl); font-weight: var(--font-bold); color: var(--color-primary);">
-                                        ${{ number_format($trip->price) }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {{-- Book Button - Now triggers Modal --}}
-                            <button type="button" class="btn btn-accent btn-lg w-full" onclick="showDownloadModal()">
-                                {{ __('Book Now') }}
-                            </button>
-                        </form>
+                            @endauth
+                        </div>
 
                         {{-- Contact --}}
                         <div style="margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--color-border); text-align: center;">
@@ -428,6 +409,74 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <style>
+    .favorite-toggle-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid #e5e7eb;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        flex-shrink: 0;
+    }
+
+    .favorite-toggle-btn:hover {
+        transform: scale(1.1);
+        border-color: #fecaca;
+        color: #f87171;
+    }
+
+    .favorite-toggle-btn.active {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #ef4444;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+    }
+
+    .passenger-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .passenger-card-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .passenger-field {
+        margin-bottom: 10px;
+    }
+
+    .passenger-field label {
+        display: block;
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+
+    .passenger-field input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.85rem;
+    }
+
     .gallery-grid {
         display: grid;
         grid-template-columns: 1fr 180px;
@@ -1162,34 +1211,56 @@
         document.body.style.overflow = '';
     }
 
-    // Dynamic Pricing Calculation
-    function calculateTotal() {
-        const travelers = parseInt(document.getElementById('travelersCount').value);
-        const basePrice = {{ $trip->price }};
-        const baseCapacity = {{ $trip->base_capacity ?? 1 }};
-        const extraPrice = {{ $trip->extra_passenger_price ?? 0 }};
+    // Favorite Toggle Logic
+    function toggleFavorite(btn) {
+        const tripId = btn.dataset.tripId;
+        const icon = btn.querySelector('i');
 
-        let total = basePrice;
-        let extraTotal = 0;
+        btn.disabled = true;
 
-        if (travelers > baseCapacity) {
-            extraTotal = (travelers - baseCapacity) * extraPrice;
-            total += extraTotal;
-
-            document.getElementById('extraPriceRow').style.display = 'flex';
-            document.getElementById('extraPriceRow').querySelector('span:last-child').textContent = '$' + extraTotal.toLocaleString();
-        } else {
-            document.getElementById('extraPriceRow').style.display = 'none';
-        }
-
-        document.getElementById('totalPriceDisplay').textContent = '$' + total.toLocaleString();
+        fetch(`{{ url('customer/favorites') }}/${tripId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'added') {
+                btn.classList.add('active');
+                icon.className = 'fas fa-heart';
+            } else {
+                btn.classList.remove('active');
+                icon.className = 'far fa-heart';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // If unauthorized, redirect to login
+            if (error.status === 401) window.location.href = '{{ route("login") }}';
+        })
+        .finally(() => {
+            btn.disabled = false;
+        });
     }
 
-    // Initial calculation
-    $(document).ready(function() {
-        calculateTotal();
-    });
+    // Dynamic Passenger Fields
+    function updatePassengerFields() {
+        const container = document.getElementById('passengerDetailsContainer');
+        if (!container) return;
+
+        const count = parseInt(document.getElementById('travelersCount').value);
+        const currentCount = container.querySelectorAll('.passenger-card').length;
+
+        if (count > currentCount) {
+            // Add fields
+            for (let i = currentCount + 1; i <= count; i++) {
+                const card = document.createElement('div');
+                card.className = 'passenger-card animate__animated animate__fadeInUp';
+                card.innerHTML = `
+                    <div class="passenger-card-title">
+    {{-- No additional JS needed for simplified booking action --}}
 </script>
 @endpush
-
-

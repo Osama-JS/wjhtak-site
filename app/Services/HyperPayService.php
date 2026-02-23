@@ -46,7 +46,7 @@ class HyperPayService
             'paymentType' => 'DB',
         ];
 
-        // Add test mode parameters (required for test server)
+        // Add test mode parameters (REQUIRED for test server & 3DS2)
         if ($this->testMode) {
             $params['testMode'] = 'EXTERNAL';
             $params['customParameters[3DS2_enrolled]'] = 'true';
@@ -117,22 +117,19 @@ class HyperPayService
     {
         $params = [];
 
+        // Customer Info
         if (!empty($userData['email'])) {
             $params['customer.email'] = $userData['email'];
         }
-        if (!empty($userData['first_name'])) {
-            $params['customer.givenName'] = $userData['first_name'];
-        }
-        if (!empty($userData['last_name'])) {
-            $params['customer.surname'] = $userData['last_name'];
-        }
+        $params['customer.givenName'] = $userData['first_name'] ?? 'User';
+        $params['customer.surname'] = $userData['last_name'] ?? 'Guest';
 
-        // Billing address (required by HyperPay for 3DS2)
-        $params['billing.street1'] = $userData['street'] ?? 'Not Provided';
+        // Billing address (MANDATORY for 3DS2)
+        $params['billing.street1'] = $userData['street'] ?? 'Saudi Arabia';
         $params['billing.city'] = $userData['city'] ?? 'Riyadh';
         $params['billing.state'] = $userData['state'] ?? 'Riyadh';
         $params['billing.country'] = $userData['country'] ?? 'SA';
-        $params['billing.postcode'] = $userData['postcode'] ?? '00000';
+        $params['billing.postcode'] = $userData['postcode'] ?? '12345';
 
         return $params;
     }

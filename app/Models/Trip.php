@@ -42,6 +42,8 @@ class Trip extends Model
     protected $casts = [
         'active' => 'boolean',
         'expiry_date' => 'date',
+        'tickets' => 'integer',
+        'price' => 'decimal:2',
     ];
 
     // Relationships

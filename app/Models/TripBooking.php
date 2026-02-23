@@ -21,6 +21,8 @@ class TripBooking extends Model
 
     protected $casts = [
         'booking_date' => 'date',
+        'tickets_count' => 'integer',
+        'total_price' => 'decimal:2',
     ];
 
     public function user()
@@ -36,5 +38,10 @@ class TripBooking extends Model
     public function passengers()
     {
         return $this->hasMany(BookingPassenger::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'trip_booking_id');
     }
 }

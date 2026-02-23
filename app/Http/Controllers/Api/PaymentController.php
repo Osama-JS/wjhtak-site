@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\TripBooking;
@@ -149,7 +150,7 @@ class PaymentController extends Controller
             new OA\Response(response: 500, description: "Server Error")
         ]
     )]
-    public function initiate(Request $request)
+    public function initiate(\Illuminate\Http\Request $request)
     {
         $validator = Validator::make($request->all(), [
             'booking_id' => 'required|exists:trip_bookings,id',
@@ -172,7 +173,8 @@ class PaymentController extends Controller
             // Generate the WebView URL
             $paymentUrl = route('payments.web.checkout', [
                 'booking_id' => $booking->id,
-                'method' => $request->payment_type
+                'method' => $request->payment_type,
+                'source' => 'api'
             ]);
 
             return $this->apiResponse(false, __('Checkout link generated successfully.'), [
@@ -185,7 +187,7 @@ class PaymentController extends Controller
         }
     }
 
-    protected function initiateHyperPay(Request $request, $user, $booking)
+    protected function initiateHyperPay(\Illuminate\Http\Request $request, $user, $booking)
     {
         $params = [
             'merchantTransactionId' => 'BOOKING-' . $booking->id . '-' . time(),
@@ -219,7 +221,7 @@ class PaymentController extends Controller
         throw new \Exception('HyperPay service returned error.');
     }
 
-    protected function initiateTabby(Request $request, $user, $booking)
+    protected function initiateTabby(\Illuminate\Http\Request $request, $user, $booking)
     {
         $data = [
             'amount' => $booking->total_price,
@@ -254,7 +256,7 @@ class PaymentController extends Controller
         return $this->apiResponse(false, __('Tabby checkout initialized.'), $result);
     }
 
-    protected function initiateTamara(Request $request, $user, $booking)
+    protected function initiateTamara(\Illuminate\Http\Request $request, $user, $booking)
     {
         $data = [
             'amount' => $booking->total_price,
@@ -293,7 +295,7 @@ class PaymentController extends Controller
         return $this->apiResponse(false, __('Tamara checkout initialized.'), $result);
     }
 
-    protected function initiateTap(Request $request, $user, $booking)
+    protected function initiateTap(\Illuminate\Http\Request $request, $user, $booking)
     {
         $data = [
             'booking_id' => $booking->id,
@@ -383,8 +385,9 @@ class PaymentController extends Controller
             new OA\Response(response: 500, description: "Server Error — gateway unreachable or internal failure")
         ]
     )]
-    public function verify(Request $request)
+    public function verify(\Illuminate\Http\Request $request)
     {
+        Log::info('Payment verification started', $request->all());
         $validator = Validator::make($request->all(), [
             'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tabby,tamara,tap',
             'id' => 'required_without_all:checkout_id,payment_id', // Fallback for WebView
@@ -525,8 +528,9 @@ class PaymentController extends Controller
         }
     }
 
-    protected function verifyHyperPay(Request $request)
+    protected function verifyHyperPay(\Illuminate\Http\Request $request)
     {
+        Log::info('Verifying HyperPay payment', ['id' => $request->id ?? $request->checkout_id, 'type' => $request->payment_type]);
         $id = $request->id ?? $request->checkout_id;
         $result = $this->hyperPayService->getPaymentStatus($id, $request->payment_type);
 
@@ -603,7 +607,7 @@ class PaymentController extends Controller
                     // For now, we confirm but log a critical error for admin
                 }
 
-                $newCount = max(0, $booking->trip->tickets - $booking->tickets_count);
+                $newCount = max(0, (int)$booking->trip->tickets - (int)$booking->tickets_count);
                 $booking->trip->update(['tickets' => $newCount]);
                 Log::info("Trip #{$booking->trip->id} tickets updated to {$newCount}");
             }
@@ -680,7 +684,7 @@ class PaymentController extends Controller
     /**
      * Centralized callback handler that provides a server-side landing page
      */
-    public function handleCallback(Request $request)
+    public function handleCallback(\Illuminate\Http\Request $request)
     {
         $gateway = $request->gateway;
         $status = $request->status;

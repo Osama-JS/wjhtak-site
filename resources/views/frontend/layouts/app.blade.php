@@ -39,6 +39,7 @@
     {{-- Preconnect to external resources --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 
     {{-- CSS Files --}}
     <link rel="stylesheet" href="{{ asset('css/frontend/app.css') }}?v={{ time() }}">
@@ -312,6 +313,26 @@
             animation: spin 1s linear infinite;
         }
 
+
+                .footer-payment {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pay-icon {
+            height: 26px;
+            object-fit: contain;
+            filter: grayscale(0%);
+            transition: 0.3s ease;
+        }
+
+        .pay-icon:hover {
+            transform: scale(1.05);
+        }
+
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -391,9 +412,9 @@
                     <div class="recent-searches">
                         <h5>{{ __('Suggested Destinations') }}</h5>
                         <div class="tags">
-                            <span class="tag">Egypt</span>
-                            <span class="tag">Dubai</span>
-                            <span class="tag">Saudi Arabia</span>
+                            <span class="tag">{{ __('Egypt') }}</span>
+                            <span class="tag">{{ __('Dubai') }}</span>
+                            <span class="tag">{{ __('Saudi Arabia') }}</span>
                         </div>
                     </div>
                 </div>
@@ -519,7 +540,7 @@
             clearTimeout(searchTimeout);
 
             if (query.length < 2) {
-                resultsContainer.innerHTML = '<p class="text-center text-muted">Start typing to explore...</p>';
+                resultsContainer.innerHTML = '<p class="text-center text-muted">{{ __("Start typing to explore...") }}</p>';
                 return;
             }
 
@@ -540,6 +561,74 @@
                 });
             }, 400); // ينتظر 400 مللي ثانية بعد توقف المستخدم عن الكتابة
         });
+    </script>
+
+    {{-- User dropdown toggle --}}
+    <script>
+        (function () {
+            const toggleBtn = document.getElementById('userDropdownToggle');
+            const menu = document.getElementById('userDropdownMenu');
+            if (toggleBtn && menu) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+                });
+                document.addEventListener('click', function () {
+                    menu.style.display = 'none';
+                });
+            }
+        })();
+
+        // Global Favorite Toggle Logic
+        function toggleFavorite(btn) {
+            const tripId = btn.dataset.tripId;
+            const icon = btn.querySelector('i') || btn.querySelector('svg');
+
+            @guest
+                window.location.href = '{{ route("login") }}';
+                return;
+            @endguest
+
+            btn.disabled = true;
+
+            fetch(`{{ url('customer/favorites') }}/${tripId}/toggle`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'added') {
+                    btn.classList.add('active');
+                    if (icon.tagName.toLowerCase() === 'i') {
+                        icon.className = 'fas fa-heart';
+                    } else {
+                        // For SVG buttons (like in trip-card)
+                        btn.style.color = '#ef4444';
+                        btn.style.fill = '#ef4444';
+                    }
+                } else {
+                    btn.classList.remove('active');
+                    if (icon.tagName.toLowerCase() === 'i') {
+                        icon.className = 'far fa-heart';
+                    } else {
+                        // For SVG buttons
+                        btn.style.color = '';
+                        btn.style.fill = 'none';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (error.status === 401) window.location.href = '{{ route("login") }}';
+            })
+            .finally(() => {
+                btn.disabled = false;
+            });
+        }
     </script>
 </body>
 </html>
