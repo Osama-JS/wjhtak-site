@@ -1,27 +1,237 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+@extends('frontend.layouts.app')
+
+@section('title', __('تأكيد كلمة المرور'))
+
+@push('styles')
+<style>
+/* ─── Auth Page Styles ─── */
+.auth-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px var(--space-4);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+.auth-card * {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+.auth-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.12);
+    width: 100%;
+    max-width: 460px;
+    padding: var(--space-10) var(--space-8);
+    animation: fadeInUp .4s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card .auth-logo {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.auth-card .auth-logo img {
+    height: 60px;
+    object-fit: contain;
+}
+
+.auth-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--text-primary, #1a2537);
+    margin-bottom: .3rem;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: var(--text-muted, #6b7280);
+    font-size: .9rem;
+    margin-bottom: var(--space-6);
+    line-height: 1.5;
+}
+
+.auth-input-group {
+    margin-bottom: var(--space-6);
+}
+
+.auth-input-group label {
+    display: block;
+    font-weight: 600;
+    font-size: .85rem;
+    margin-bottom: .4rem;
+    color: var(--text-secondary, #374151);
+}
+
+.auth-input-group .input-wrap {
+    position: relative;
+}
+
+.auth-input-group .input-wrap i.field-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: .9rem;
+}
+
+html[dir="ltr"] .auth-input-group .input-wrap i.field-icon { left: 14px; }
+html[dir="rtl"] .auth-input-group .input-wrap i.field-icon { right: 14px; }
+
+.auth-input-group input {
+    width: 100%;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 11px 16px 11px 42px;
+    font-size: .9rem;
+    outline: none;
+    transition: border .2s;
+    background: #fafafa;
+}
+
+html[dir="rtl"] .auth-input-group input { padding: 11px 42px 11px 16px; }
+
+.auth-input-group input:focus {
+    border-color: var(--accent-color, #e8532e);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(232,83,46,.1);
+}
+
+.auth-input-group .error-msg {
+    color: #ef4444;
+    font-size: .8rem;
+    margin-top: .3rem;
+}
+
+.btn-auth-submit {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent-color, #e8532e);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    letter-spacing: .02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-auth-submit:hover { background: #d04525; }
+.btn-auth-submit:active { transform: scale(.99); }
+.btn-auth-submit:disabled { opacity: .7; cursor: not-allowed; }
+
+.btn-toggle-pwd {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 0 12px;
+}
+
+html[dir="ltr"] .btn-toggle-pwd { right: 0; }
+html[dir="rtl"] .btn-toggle-pwd { left: 0; }
+
+.alert-auth {
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: var(--space-4);
+    font-size: .88rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-auth-error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+}
+</style>
+@endpush
+
+@section('content')
+<div class="auth-page-wrapper">
+    <div class="auth-card">
+
+        {{-- Logo --}}
+        <div class="auth-logo">
+            <a href="{{ url('/') }}">
+                <img src="{{ asset(\App\Models\Setting::get('site_logo', 'images/logo-full.png')) }}" alt="{{ config('app.name') }}">
+            </a>
+        </div>
+
+        <h2 class="auth-title">{{ __('تأكيد كلمة المرور') }}</h2>
+        <p class="auth-subtitle">{{ __('هذه منطقة آمنة من التطبيق. يرجى تأكيد كلمة المرور الخاصة بك قبل المتابعة.') }}</p>
+
+        {{-- Errors --}}
+        @if ($errors->any())
+            <div class="alert-auth alert-auth-error">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('password.confirm') }}" id="confirmPasswordForm">
+            @csrf
+
+            {{-- Password --}}
+            <div class="auth-input-group">
+                <label for="password">{{ __('كلمة المرور') }}</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock field-icon"></i>
+                    <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+                    <button type="button" class="btn-toggle-pwd" onclick="togglePwd()">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Submit --}}
+            <button type="submit" class="btn-auth-submit" id="submitBtn">
+                <span>{{ __('تأكيد') }}</span>
+                <i class="fas fa-check-circle"></i>
+            </button>
+        </form>
+
     </div>
+</div>
+@endsection
 
-    <form method="POST" action="{{ route('password.confirm') }}">
-        @csrf
+@push('scripts')
+<script>
+function togglePwd() {
+    const pwd = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        pwd.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
 
-        <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+document.getElementById('confirmPasswordForm').addEventListener('submit', function () {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span>{{ __("جاري التحقق...") }}</span>';
+});
+</script>
+@endpush

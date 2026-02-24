@@ -147,7 +147,7 @@ class TripController extends Controller
 
         $trips = $query->with(['images', 'toCountry', 'toCity', 'categories'])
             ->latest()
-            ->paginate(10);
+            ->paginate($request->per_page ?? 10);
 
         // Get user favorites if logged in
         $userFavoriteIds = [];
@@ -450,6 +450,20 @@ class TripController extends Controller
                 description: "The language of the response (ar, en)",
                 required: false,
                 schema: new OA\Schema(type: "string", default: "en", enum: ["en", "ar"])
+            ),
+            new OA\Parameter(
+                name: "page",
+                in: "query",
+                description: "Page number",
+                required: false,
+                schema: new OA\Schema(type: "integer", default: 1)
+            ),
+            new OA\Parameter(
+                name: "per_page",
+                in: "query",
+                description: "Number of items per page",
+                required: false,
+                schema: new OA\Schema(type: "integer", default: 10)
             )
         ],
         responses: [
@@ -474,13 +488,23 @@ class TripController extends Controller
                                     new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
                                 ])
                             ]
-                        ))
+                        )),
+                        new OA\Property(property: "pagination", type: "object", properties: [
+                            new OA\Property(property: "pageNumber", type: "integer", example: 1),
+                            new OA\Property(property: "pageSize", type: "integer", example: 10),
+                            new OA\Property(property: "count", type: "integer", example: 50),
+                            new OA\Property(property: "totalPages", type: "integer", example: 5),
+                            new OA\Property(property: "hasNextPage", type: "boolean", example: true),
+                            new OA\Property(property: "hasPreviousPage", type: "boolean", example: false),
+                            new OA\Property(property: "nextPage", type: "string", example: "http://example.com/api/v1/my-bookings?page=2"),
+                            new OA\Property(property: "previousPage", type: "string", example: null),
+                        ])
                     ]
                 )
             )
         ]
     )]
-    public function myBookings(): JsonResponse
+    public function myBookings(Request $request): JsonResponse
     {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
@@ -490,7 +514,7 @@ class TripController extends Controller
         $bookings = TripBooking::with(['trip.toCountry', 'trip.toCity'])
             ->where('user_id', $user->id)
             ->latest()
-            ->get();
+            ->paginate($request->per_page ?? 10);
 
         return $this->apiResponse(false, __('Bookings retrieved successful'), $bookings);
     }
@@ -580,6 +604,20 @@ class TripController extends Controller
                 description: "The language of the response (ar, en)",
                 required: false,
                 schema: new OA\Schema(type: "string", default: "en", enum: ["en", "ar"])
+            ),
+            new OA\Parameter(
+                name: "page",
+                in: "query",
+                description: "Page number",
+                required: false,
+                schema: new OA\Schema(type: "integer", default: 1)
+            ),
+            new OA\Parameter(
+                name: "per_page",
+                in: "query",
+                description: "Number of items per page",
+                required: false,
+                schema: new OA\Schema(type: "integer", default: 10)
             )
         ],
         responses: [
@@ -600,13 +638,23 @@ class TripController extends Controller
                                 new OA\Property(property: "to_city", type: "string", example: "Paris"),
                                 new OA\Property(property: "is_favorite", type: "boolean", example: true),
                             ]
-                        ))
+                        )),
+                        new OA\Property(property: "pagination", type: "object", properties: [
+                            new OA\Property(property: "pageNumber", type: "integer", example: 1),
+                            new OA\Property(property: "pageSize", type: "integer", example: 10),
+                            new OA\Property(property: "count", type: "integer", example: 50),
+                            new OA\Property(property: "totalPages", type: "integer", example: 5),
+                            new OA\Property(property: "hasNextPage", type: "boolean", example: true),
+                            new OA\Property(property: "hasPreviousPage", type: "boolean", example: false),
+                            new OA\Property(property: "nextPage", type: "string", example: "http://example.com/api/v1/favorites?page=2"),
+                            new OA\Property(property: "previousPage", type: "string", example: null),
+                        ])
                     ]
                 )
             )
         ]
     )]
-    public function getFavorites(): JsonResponse
+    public function getFavorites(Request $request): JsonResponse
     {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
@@ -615,11 +663,10 @@ class TripController extends Controller
 
         $favorites = Favorite::with(['trip.images', 'trip.toCountry', 'trip.toCity'])
             ->where('user_id', $user->id)
-            ->get()
-            ->pluck('trip');
+            ->paginate($request->per_page ?? 10);
 
-        // Optional: Transform trips data like in index() if needed
-        $transformedData = $favorites->map(function ($trip) {
+        $favorites->getCollection()->transform(function ($favorite) {
+            $trip = $favorite->trip;
             if (!$trip) return null;
             return [
                 'id' => $trip->id,
@@ -630,9 +677,9 @@ class TripController extends Controller
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
                 'is_favorite' => true,
             ];
-        })->filter();
+        });
 
-        return $this->apiResponse(false, __('Favorites retrieved successfully'), $transformedData);
+        return $this->apiResponse(false, __('Favorites retrieved successfully'), $favorites);
     }
 
     /**
@@ -866,6 +913,20 @@ class TripController extends Controller
                 description: "The language of the response (ar, en)",
                 required: false,
                 schema: new OA\Schema(type: "string", default: "en", enum: ["en", "ar"])
+            ),
+            new OA\Parameter(
+                name: "page",
+                in: "query",
+                description: "Page number",
+                required: false,
+                schema: new OA\Schema(type: "integer", default: 1)
+            ),
+            new OA\Parameter(
+                name: "per_page",
+                in: "query",
+                description: "Number of items per page",
+                required: false,
+                schema: new OA\Schema(type: "integer", default: 10)
             )
         ],
         responses: [
@@ -885,29 +946,39 @@ class TripController extends Controller
                                 new OA\Property(property: "to_country", type: "string", example: "France"),
                                 new OA\Property(property: "to_city", type: "string", example: "Paris"),
                             ]
-                        ))
+                        )),
+                        new OA\Property(property: "pagination", type: "object", properties: [
+                            new OA\Property(property: "pageNumber", type: "integer", example: 1),
+                            new OA\Property(property: "pageSize", type: "integer", example: 10),
+                            new OA\Property(property: "count", type: "integer", example: 50),
+                            new OA\Property(property: "totalPages", type: "integer", example: 5),
+                            new OA\Property(property: "hasNextPage", type: "boolean", example: true),
+                            new OA\Property(property: "hasPreviousPage", type: "boolean", example: false),
+                            new OA\Property(property: "nextPage", type: "string", example: "http://example.com/api/v1/trips/featured?page=2"),
+                            new OA\Property(property: "previousPage", type: "string", example: null),
+                        ])
                     ]
                 )
             )
         ]
     )]
-    public function featured(): JsonResponse
+    public function featured(Request $request): JsonResponse
     {
         $trips = Trip::active()->where('is_featured', true)
             ->with(['images', 'toCountry', 'toCity'])
             ->latest()
-            ->take(10)
-            ->get()
-            ->map(function ($trip) {
-                return [
-                    'id' => $trip->id,
-                    'title' => $trip->title,
-                    'price' => $trip->price,
-                    'image' => $trip->image_url,
-                    'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
-                    'to_city' => $trip->toCity ? $trip->toCity->name : null,
-                ];
-            });
+            ->paginate($request->per_page ?? 10);
+
+        $trips->getCollection()->transform(function ($trip) {
+            return [
+                'id' => $trip->id,
+                'title' => $trip->title,
+                'price' => $trip->price,
+                'image' => $trip->image_url,
+                'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
+                'to_city' => $trip->toCity ? $trip->toCity->name : null,
+            ];
+        });
 
         return $this->apiResponse(false, __('Featured trips retrieved successfully'), $trips);
     }

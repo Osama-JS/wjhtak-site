@@ -61,7 +61,7 @@ Route::post('/flights/order-ticket', [FlightController::class, 'orderTicket']);
 Route::post('/flights/trip-details', [FlightController::class, 'getTripDetails']);
 
 // Protected Routes (Sanctum for Mobile, Web for Site)
-Route::middleware(['web', 'auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
     Route::get('/check-token', [AuthController::class, 'checkToken']);
