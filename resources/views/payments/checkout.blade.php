@@ -268,7 +268,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @if(in_array($method, ['mada', 'visa_master', 'apple_pay']) && isset($checkout_id))
-    <script>
+    <script src="https://{{ config('hyperpay.test_mode') ? 'eu-test.oppwa.com' : 'oppwa.com' }}/v1/paymentWidgets.js?checkoutId={{ $checkout_id }}"></script>
+    <script type="text/javascript">
         var wpwlOptions = {
             paymentTarget: "_top",
             locale: "ar",
@@ -281,7 +282,6 @@
             }
         };
     </script>
-    <script src="https://{{ config('hyperpay.test_mode') ? 'eu-test.oppwa.com' : 'oppwa.com' }}/v1/paymentWidgets.js?checkoutId={{ $checkout_id }}"></script>
 @endif
 
 <script>

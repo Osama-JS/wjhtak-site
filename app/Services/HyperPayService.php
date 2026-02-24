@@ -41,7 +41,7 @@ class HyperPayService
 
         $params = [
             'entityId' => $entityId,
-            'amount' => number_format($amount, 2, '.', ''),
+            'amount' => $this->testMode ? number_format(round($amount), 2, '.', '') : number_format($amount, 2, '.', ''),
             'currency' => config('hyperpay.currency', 'SAR'),
             'paymentType' => 'DB',
         ];
@@ -50,6 +50,7 @@ class HyperPayService
         if ($this->testMode) {
             $params['testMode'] = 'EXTERNAL';
             $params['customParameters[3DS2_enrolled]'] = 'true';
+            $params['integrity'] = 'true';
         }
 
         // Merge additional params (merchantTransactionId, billing, customer, etc.)

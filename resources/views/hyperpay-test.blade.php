@@ -184,13 +184,13 @@
                 showStatus('success', 'تم إنشاء Checkout بنجاح! ID: ' + data.id);
 
                 // Load HyperPay payment widget
-                const wpwlScript = document.createElement('script');
-                wpwlScript.textContent = 'var wpwlOptions = { paymentTarget: "_top", locale: "ar" };';
-                document.head.appendChild(wpwlScript);
-
                 const script = document.createElement('script');
                 script.src = 'https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=' + data.id;
                 script.onload = function() {
+                    const wpwlScript = document.createElement('script');
+                    wpwlScript.textContent = 'var wpwlOptions = { paymentTarget: "_top", locale: "ar" };';
+                    document.head.appendChild(wpwlScript);
+
                     document.getElementById('payment-widget-container').style.display = 'block';
                     document.getElementById('form-card').style.display = 'none';
                 };
