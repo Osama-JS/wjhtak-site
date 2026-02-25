@@ -318,12 +318,38 @@ class TripsController extends Controller
             $data['percentage_profit_margin'] = 0;
         }
 
+        $oldPrice = $trip->price;
         $trip->update($data);
+        $newPrice = $trip->price;
 
         if ($request->has('category_ids')) {
             $trip->categories()->sync($request->category_ids);
         } else {
             $trip->categories()->detach();
+        }
+
+        // Send Notification to Favoriting Users if Price Dropped
+        if ($newPrice < $oldPrice) {
+            $favoritingUsers = \App\Models\User::whereHas('favorites', function ($query) use ($trip) {
+                $query->where('trip_id', $trip->id);
+            })->get();
+
+            if ($favoritingUsers->isNotEmpty()) {
+                $notificationService = app(\App\Services\NotificationService::class);
+                foreach ($favoritingUsers as $user) {
+                    $notificationService->sendToUser(
+                        $user,
+                        \App\Models\Notification::TYPE_FAVORITE_TRIP_UPDATE,
+                        __('Price Drop Alert! 🎉'),
+                        __('Great news! The price for your favorite trip ":trip" has dropped to :price.', [
+                            'trip' => $trip->title,
+                            'price' => $newPrice
+                        ]),
+                        ['trip_id' => $trip->id],
+                        true
+                    );
+                }
+            }
         }
 
         if ($request->ajax()) {

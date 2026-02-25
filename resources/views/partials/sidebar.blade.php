@@ -125,6 +125,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="{{ route('admin.payments.index') }}">{{ __('Payment Records') }}</a></li>
+                    <li><a href="{{ route('admin.bank-transfers.index') }}">{{ __('Bank Transfer Review') }}</a></li>
                 </ul>
             </li>
 

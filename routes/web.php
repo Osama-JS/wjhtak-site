@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'payments', 'as' => 'payments.web.'], function () {
     Route::get('/checkout/{booking_id}/{method}', [PaymentWebController::class, 'checkout'])->name('checkout');
     Route::post('/initiate', [PaymentWebController::class, 'initiateRedirect'])->name('initiate');
+    Route::post('/bank-transfer', [PaymentWebController::class, 'submitBankTransfer'])->name('bank_transfer');
     Route::get('/success', [PaymentWebController::class, 'success'])->name('success');
     Route::get('/failure', [PaymentWebController::class, 'failure'])->name('failure');
 
@@ -213,6 +214,8 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     // Trip Bookings Management
     Route::get('trip-bookings/data', [App\Http\Controllers\Admin\TripBookingController::class, 'getData'])->name('trip-bookings.data');
     Route::post('trip-bookings/{id}/update-status', [App\Http\Controllers\Admin\TripBookingController::class, 'updateStatus'])->name('trip-bookings.update-status');
+    Route::post('trip-bookings/{id}/upload-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'uploadTicket'])->name('trip-bookings.upload-ticket');
+    Route::post('trip-bookings/{id}/send-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'sendTicket'])->name('trip-bookings.send-ticket');
     Route::resource('trip-bookings', App\Http\Controllers\Admin\TripBookingController::class);
 
     // Notifications Management
@@ -225,6 +228,14 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     // Payments Management
     Route::get('payments', [App\Http\Controllers\Admin\PaymentLogController::class, 'index'])->name('payments.index');
     Route::get('payments/{id}', [App\Http\Controllers\Admin\PaymentLogController::class, 'show'])->name('payments.show');
+
+    // Bank Transfers Review
+    Route::get('bank-transfers', [App\Http\Controllers\Admin\BankTransferController::class, 'index'])->name('bank-transfers.index');
+    Route::get('bank-transfers/data', [App\Http\Controllers\Admin\BankTransferController::class, 'getData'])->name('bank-transfers.data');
+    Route::get('bank-transfers/{id}', [App\Http\Controllers\Admin\BankTransferController::class, 'show'])->name('bank-transfers.show');
+    // We use POST for actions to be safe
+    Route::post('bank-transfers/{id}/approve', [App\Http\Controllers\Admin\BankTransferController::class, 'approve'])->name('bank-transfers.approve');
+    Route::post('bank-transfers/{id}/reject', [App\Http\Controllers\Admin\BankTransferController::class, 'reject'])->name('bank-transfers.reject');
 
     // Subscribers
     Route::get('/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');

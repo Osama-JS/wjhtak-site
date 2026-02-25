@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\TripBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use App\Notifications\TicketUploadedNotification;
 
 class TripBookingController extends Controller
 {
@@ -91,8 +93,9 @@ class TripBookingController extends Controller
      */
     public function show($id)
     {
-        $booking = TripBooking::with(['user', 'trip', 'passengers'])->findOrFail($id);
-        return view('admin.trip_bookings.show', compact('booking'));
+        $booking = TripBooking::with(['user', 'trip', 'passengers', 'payment', 'payments', 'bankTransfers'])->findOrFail($id);
+        $latestBankTransfer = $booking->bankTransfers->sortByDesc('created_at')->first();
+        return view('admin.trip_bookings.show', compact('booking', 'latestBankTransfer'));
     }
 
     /**
@@ -116,5 +119,57 @@ class TripBookingController extends Controller
         $booking->delete();
 
         return redirect()->route('admin.trip-bookings.index')->with('success', __('Booking deleted successfully.'));
+    }
+    /**
+     * Upload ticket for a booking
+     */
+    public function uploadTicket(Request $request, $id)
+    {
+        $booking = TripBooking::with('user', 'trip')->findOrFail($id);
+
+        $request->validate([
+            'ticket_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // Max 5MB
+            'send_email' => 'nullable|boolean'
+        ]);
+
+        if ($request->hasFile('ticket_file')) {
+            // Delete old ticket if exists
+            if ($booking->ticket_file_path && Storage::disk('public')->exists($booking->ticket_file_path)) {
+                Storage::disk('public')->delete($booking->ticket_file_path);
+            }
+
+            $path = $request->file('ticket_file')->store('tickets', 'public');
+            $booking->update(['ticket_file_path' => $path]);
+
+            // Optional: send email to customer
+            if ($request->has('send_email') && $booking->user) {
+                $booking->user->notify(new TicketUploadedNotification($booking));
+                return redirect()->back()->with('success', __('Ticket uploaded and sent to customer successfully.'));
+            }
+
+            return redirect()->back()->with('success', __('Ticket uploaded successfully.'));
+        }
+
+        return redirect()->back()->with('error', __('Failed to upload ticket.'));
+    }
+
+    /**
+     * Manually re-send an already uploaded ticket to the customer via email.
+     */
+    public function sendTicket($id)
+    {
+        $booking = TripBooking::with('user', 'trip')->findOrFail($id);
+
+        if (!$booking->ticket_file_path) {
+            return redirect()->back()->with('error', __('No ticket has been uploaded for this booking yet.'));
+        }
+
+        if (!$booking->user) {
+            return redirect()->back()->with('error', __('The customer account no longer exists.'));
+        }
+
+        $booking->user->notify(new TicketUploadedNotification($booking));
+
+        return redirect()->back()->with('success', __('Ticket sent to customer successfully.'));
     }
 }

@@ -2,28 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class BankTransfer extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'trip_booking_id',
         'user_id',
-        'payment_gateway',
-        'payment_method',
-        'transaction_id',
-        'amount',
-        'currency',
+        'receipt_number',
+        'sender_name',
+        'receipt_image',
+        'notes',
         'status',
-        'raw_response',
-        'invoice_path',
+        'rejection_reason',
+        'reviewed_by',
+        'reviewed_at',
     ];
 
     protected $casts = [
-        'raw_response' => 'array',
+        'reviewed_at' => 'datetime',
     ];
 
     public function booking()
@@ -34,5 +31,10 @@ class Payment extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

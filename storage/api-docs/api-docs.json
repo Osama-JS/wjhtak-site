@@ -2251,21 +2251,37 @@
                                                 },
                                                 "pagination": {
                                                     "properties": {
-                                                        "current_page": {
+                                                        "pageNumber": {
                                                             "type": "integer",
                                                             "example": 1
                                                         },
-                                                        "last_page": {
-                                                            "type": "integer",
-                                                            "example": 5
-                                                        },
-                                                        "per_page": {
+                                                        "pageSize": {
                                                             "type": "integer",
                                                             "example": 20
                                                         },
-                                                        "total": {
+                                                        "count": {
                                                             "type": "integer",
                                                             "example": 95
+                                                        },
+                                                        "totalPages": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "hasNextPage": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "hasPreviousPage": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "nextPage": {
+                                                            "type": "string",
+                                                            "example": "http://example.com/api/v1/notifications?page=2"
+                                                        },
+                                                        "previousPage": {
+                                                            "type": "string",
+                                                            "example": null
                                                         }
                                                     },
                                                     "type": "object"
@@ -2618,6 +2634,73 @@
                                 }
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Booking already confirmed"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payment/bank-transfer": {
+            "post": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Submit a new bank transfer receipt",
+                "description": "Allows the mobile app user to upload their bank transfer receipt for a specific booking.\n\n**Instructions for Mobile Devs:**\n1. Display the 'bank_transfer' method in the checkout based on the `/api/payment/methods` API.\n2. When selected by the user, present a form to upload the receipt image/pdf, enter sender name, and optional receipt number.\n3. Send the data to this endpoint via `multipart/form-data`.\n4. If successful, the API returns a success message and sets the booking payment status to 'pending verification'. Admin will manually approve/reject.\n5. You do NOT need to call `/api/payment/initiate` or `/api/payment/verify` for Bank Transfers.",
+                "operationId": "0109769e93f34c72ed46e641cdce98ee",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "booking_id",
+                                    "receipt_image",
+                                    "sender_name"
+                                ],
+                                "properties": {
+                                    "booking_id": {
+                                        "description": "The Trip Booking ID",
+                                        "type": "integer"
+                                    },
+                                    "receipt_image": {
+                                        "description": "Image or PDF of the bank receipt",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "sender_name": {
+                                        "description": "Name of the sender on the bank account",
+                                        "type": "string"
+                                    },
+                                    "receipt_number": {
+                                        "description": "Optional reference number",
+                                        "type": "string"
+                                    },
+                                    "notes": {
+                                        "description": "Any extra notes",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bank transfer submitted successfully"
                     },
                     "400": {
                         "description": "Booking already confirmed"
@@ -3292,14 +3375,6 @@
                                                     "name": {
                                                         "type": "string",
                                                         "example": "Economy"
-                                                    },
-                                                    "name_ar": {
-                                                        "type": "string",
-                                                        "example": "اقتصادي"
-                                                    },
-                                                    "name_en": {
-                                                        "type": "string",
-                                                        "example": "Economy"
                                                     }
                                                 },
                                                 "type": "object"
@@ -3439,6 +3514,10 @@
                                                     "is_favorite": {
                                                         "type": "boolean",
                                                         "example": false
+                                                    },
+                                                    "is_featured": {
+                                                        "type": "boolean",
+                                                        "example": true
                                                     },
                                                     "base_capacity": {
                                                         "type": "integer",
@@ -3793,6 +3872,26 @@
                                 "ar"
                             ]
                         }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
                     }
                 ],
                 "responses": {
@@ -3859,6 +3958,43 @@
                                                 },
                                                 "type": "object"
                                             }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "pageNumber": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "pageSize": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "count": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "totalPages": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "hasNextPage": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "hasPreviousPage": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "nextPage": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/my-bookings?page=2"
+                                                },
+                                                "previousPage": {
+                                                    "type": "string",
+                                                    "example": null
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -3967,6 +4103,26 @@
                                 "ar"
                             ]
                         }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
                     }
                 ],
                 "responses": {
@@ -4019,6 +4175,43 @@
                                                 },
                                                 "type": "object"
                                             }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "pageNumber": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "pageSize": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "count": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "totalPages": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "hasNextPage": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "hasPreviousPage": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "nextPage": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/favorites?page=2"
+                                                },
+                                                "previousPage": {
+                                                    "type": "string",
+                                                    "example": null
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -4295,7 +4488,7 @@
                     "Trips"
                 ],
                 "summary": "Get featured trips",
-                "description": "Retrieve a list of featured trips.",
+                "description": "Retrieve a list of featured trips with the same full details as the trips list.",
                 "operationId": "getFeaturedTrips",
                 "parameters": [
                     {
@@ -4310,6 +4503,26 @@
                                 "en",
                                 "ar"
                             ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
                         }
                     }
                 ],
@@ -4344,6 +4557,19 @@
                                                         "type": "number",
                                                         "example": 1500
                                                     },
+                                                    "price_before_discount": {
+                                                        "type": "number",
+                                                        "example": 1800,
+                                                        "nullable": true
+                                                    },
+                                                    "duration": {
+                                                        "type": "string",
+                                                        "example": "5 Days"
+                                                    },
+                                                    "tickets": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
                                                     "image": {
                                                         "type": "string",
                                                         "example": "http://example.com/trips/1.jpg"
@@ -4355,10 +4581,72 @@
                                                     "to_city": {
                                                         "type": "string",
                                                         "example": "Paris"
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "expiry_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-12-31"
+                                                    },
+                                                    "is_favorite": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "is_featured": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "base_capacity": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "extra_passenger_price": {
+                                                        "type": "number",
+                                                        "example": 100
                                                     }
                                                 },
                                                 "type": "object"
                                             }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "pageNumber": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "pageSize": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "count": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "totalPages": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "hasNextPage": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "hasPreviousPage": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "nextPage": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/trips/featured?page=2"
+                                                },
+                                                "previousPage": {
+                                                    "type": "string",
+                                                    "example": null
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"

@@ -145,4 +145,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Favorite::class);
     }
+
+    /**
+     * Get user bank transfers.
+     */
+    public function bankTransfers()
+    {
+        return $this->hasMany(BankTransfer::class);
+    }
 }

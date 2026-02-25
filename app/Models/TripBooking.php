@@ -16,8 +16,20 @@ class TripBooking extends Model
         'total_price',
         'booking_date',
         'tickets_count',
-        'notes'
+        'notes',
+        'cancellation_reason',
+        'ticket_file_path'
     ];
+
+    /**
+     * Get the full URL to the uploaded ticket file.
+     *
+     * @return string|null
+     */
+    public function getTicketUrlAttribute()
+    {
+        return $this->ticket_file_path ? asset('storage/' . $this->ticket_file_path) : null;
+    }
 
     protected $casts = [
         'booking_date' => 'date',
@@ -43,5 +55,15 @@ class TripBooking extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class, 'trip_booking_id');
+    }
+
+    public function bankTransfers()
+    {
+        return $this->hasMany(BankTransfer::class, 'trip_booking_id');
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class, 'trip_booking_id')->latest();
     }
 }

@@ -135,7 +135,7 @@
         }
         .wpwl-button-pay:active { transform: translateY(0) !important; }
 
-        /* Redirect Button (Tabby/Tamara/Tap) */
+        /* Redirect Button (Tamara) */
         .btn-redirect {
             display: flex;
             align-items: center;
@@ -218,8 +218,6 @@
                     'visa_master' => 'https://t3.ftcdn.net/jpg/03/33/21/62/240_F_333216210_HjHUw1jjcYdGr3rRtYm3W1DIXAElEFJL.jpg',
                     'apple_pay' => 'https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg',
                     'tamara' => 'https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg',
-                    'tabby' => 'https://uaelogos.ae/storage/1950/conversions/Tabby-thumb.png',
-                    'tap' => 'https://www.tap.company/content/images/2021/04/Tap-Logo-1.png',
                     default => null
                 };
             @endphp
@@ -241,7 +239,7 @@
                 </div>
             @endif
         @else
-            <!-- Tamara / Tabby / Tap Logic -->
+            <!-- Tamara Logic -->
             <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center; margin-bottom: 24px;">
                 سيتم توجيهك الآن إلى صفحة الدفع الرسمية لإكمال العملية بأمان.
             </p>

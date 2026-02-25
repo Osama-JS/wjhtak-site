@@ -75,6 +75,7 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
     Route::prefix('payment')->group(function () {
         Route::post('/initiate', [PaymentController::class, 'initiate']);
         Route::post('/verify', [PaymentController::class, 'verify']);
+        Route::post('/bank-transfer', [PaymentController::class, 'submitBankTransfer']);
     });
 
     Route::post('/logout', [AuthController::class, 'logout']);

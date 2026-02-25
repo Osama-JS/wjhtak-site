@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\TripBooking;
 use App\Models\Payment;
+use App\Models\BankTransfer;
 use App\Services\HyperPayService;
 use App\Services\TabbyPaymentService;
 use App\Services\TamaraPaymentService;
@@ -91,22 +92,16 @@ class PaymentController extends Controller
                 'icon' => asset('assets/img/payments/visa.png')
             ],
             [
-                'key' => 'tabby',
-                'name' => __('Tabby (Installments)'),
-                'type' => 'redirect',
-                'icon' => asset('assets/img/payments/tabby.png')
-            ],
-            [
                 'key' => 'tamara',
                 'name' => __('Tamara'),
                 'type' => 'redirect',
                 'icon' => asset('assets/img/payments/tamara.png')
             ],
             [
-                'key' => 'apple_pay',
-                'name' => __('Apple Pay'),
-                'type' => 'digital_wallet',
-                'icon' => asset('assets/img/payments/apple-pay.png')
+                'key' => 'bank_transfer',
+                'name' => __('Bank Transfer'),
+                'type' => 'manual',
+                'icon' => asset('assets/img/payments/bank-transfer.png')
             ]
         ];
 
@@ -154,7 +149,7 @@ class PaymentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'booking_id' => 'required|exists:trip_bookings,id',
-            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tabby,stc_pay,tamara,tap',
+            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,stc_pay,tamara',
         ]);
 
         if ($validator->fails()) {
@@ -184,6 +179,80 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             Log::error("Payment Initiation Error: " . $e->getMessage());
             return $this->apiResponse(true, __('Failed to generate payment link: ') . $e->getMessage(), null, null, 500);
+        }
+    }
+
+    #[OA\Post(
+        path: '/api/payment/bank-transfer',
+        summary: 'Submit a new bank transfer receipt',
+        description: "Allows the mobile app user to upload their bank transfer receipt for a specific booking.\n\n**Instructions for Mobile Devs:**\n1. Display the 'bank_transfer' method in the checkout based on the `/api/payment/methods` API.\n2. When selected by the user, present a form to upload the receipt image/pdf, enter sender name, and optional receipt number.\n3. Send the data to this endpoint via `multipart/form-data`.\n4. If successful, the API returns a success message and sets the booking payment status to 'pending verification'. Admin will manually approve/reject.\n5. You do NOT need to call `/api/payment/initiate` or `/api/payment/verify` for Bank Transfers.",
+        tags: ['Payment'],
+        security: [["bearerAuth" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(
+                    required: ['booking_id', 'receipt_image', 'sender_name'],
+                    properties: [
+                        new OA\Property(property: 'booking_id', type: 'integer', description: 'The Trip Booking ID'),
+                        new OA\Property(property: 'receipt_image', type: 'string', format: 'binary', description: 'Image or PDF of the bank receipt'),
+                        new OA\Property(property: 'sender_name', type: 'string', description: 'Name of the sender on the bank account'),
+                        new OA\Property(property: 'receipt_number', type: 'string', description: 'Optional reference number'),
+                        new OA\Property(property: 'notes', type: 'string', description: 'Any extra notes'),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Bank transfer submitted successfully"),
+            new OA\Response(response: 400, description: "Booking already confirmed"),
+            new OA\Response(response: 422, description: "Validation Error"),
+            new OA\Response(response: 500, description: "Server Error")
+        ]
+    )]
+    public function submitBankTransfer(\Illuminate\Http\Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'booking_id' => 'required|exists:trip_bookings,id',
+            'receipt_image' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'sender_name' => 'required|string|max:255',
+            'receipt_number' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->apiResponse(true, __('Validation failed.'), $validator->errors(), null, 422);
+        }
+
+        try {
+            $user = $request->user();
+            $booking = TripBooking::where('user_id', $user->id)->findOrFail($request->booking_id);
+
+            // Check if already paid or under review
+            if (in_array($booking->status, ['confirmed'])) {
+                return $this->apiResponse(true, __('Booking is already confirmed/paid.'), null, null, 400);
+            }
+
+            // Handle File Upload
+            $path = $request->file('receipt_image')->store('bank_transfers', 'public');
+
+            // Create record
+            $bankTransfer = BankTransfer::create([
+                'trip_booking_id' => $booking->id,
+                'user_id' => $booking->user_id,
+                'receipt_number' => $request->receipt_number,
+                'sender_name' => $request->sender_name,
+                'receipt_image' => $path,
+                'notes' => $request->notes,
+                'status' => 'pending'
+            ]);
+
+            return $this->apiResponse(false, __('Bank transfer submitted successfully. It will be reviewed by admin soon.'), $bankTransfer);
+
+        } catch (\Exception $e) {
+            Log::error("Bank Transfer Submission Error: " . $e->getMessage());
+            return $this->apiResponse(true, __('Failed to submit transfer: ') . $e->getMessage(), null, null, 500);
         }
     }
 
@@ -389,10 +458,10 @@ class PaymentController extends Controller
     {
         Log::info('Payment verification started', $request->all());
         $validator = Validator::make($request->all(), [
-            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tabby,tamara,tap',
+            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tamara',
             'id' => 'required_without_all:checkout_id,payment_id', // Fallback for WebView
             'checkout_id' => 'required_without_all:id,payment_id|required_if:payment_type,mada,visa_master,apple_pay',
-            'payment_id' => 'required_without_all:id,checkout_id|required_if:payment_type,tabby,tamara',
+            'payment_id' => 'required_without_all:id,checkout_id|required_if:payment_type,tamara',
         ]);
 
         if ($validator->fails()) {

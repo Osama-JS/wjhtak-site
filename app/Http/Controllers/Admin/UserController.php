@@ -68,14 +68,20 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(Request $request, User $user)
     {
-        return response()->json([
-            'success' => true,
-            'user' => $user,
-            'photo_url' => $user->profile_photo_url,
-            'created_at' => $user->created_at->format('Y-m-d H:i')
-        ]);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+                'photo_url' => $user->profile_photo_url,
+                'created_at' => $user->created_at->format('Y-m-d H:i')
+            ]);
+        }
+
+        // Return the profile view for standard web requests
+        $user->load(['bookings.trip']);
+        return view('admin.users.profile', compact('user'));
     }
 
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\TripBooking;
+use App\Models\BankTransfer;
 use App\Services\HyperPayService;
 use App\Services\TabbyPaymentService;
 use App\Services\TamaraPaymentService;
@@ -83,7 +84,7 @@ class PaymentWebController extends Controller
     {
         $request->validate([
             'booking_id' => 'required|exists:trip_bookings,id',
-            'method' => 'required|string|in:tabby,tamara,tap',
+            'method' => 'required|string|in:tamara',
             'source' => 'nullable|string',
         ]);
 
@@ -229,6 +230,48 @@ class PaymentWebController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    public function submitBankTransfer(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|exists:trip_bookings,id',
+            'receipt_image' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            'sender_name' => 'required|string|max:255',
+            'receipt_number' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            $booking = TripBooking::with('user')->findOrFail($request->booking_id);
+
+            // Check if already paid or under review
+            if (in_array($booking->status, ['confirmed'])) {
+                return response()->json(['error' => true, 'message' => __('Booking is already confirmed.')], 400);
+            }
+
+            // Handle File Upload
+            $path = $request->file('receipt_image')->store('bank_transfers', 'public');
+
+            // Create record
+            BankTransfer::create([
+                'trip_booking_id' => $booking->id,
+                'user_id' => $booking->user_id,
+                'receipt_number' => $request->receipt_number,
+                'sender_name' => $request->sender_name,
+                'receipt_image' => $path,
+                'notes' => $request->notes,
+                'status' => 'pending'
+            ]);
+
+            return response()->json([
+                'error' => false,
+                'message' => __('Bank transfer submitted successfully. It will be reviewed by admin soon.')
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+        }
     }
 
     public function success(Request $request)

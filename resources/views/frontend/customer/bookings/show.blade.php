@@ -282,6 +282,35 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
 </a>
 
 {{-- Status Timeline --}}
+@php
+    $latestTransfer = $booking->bankTransfers()->latest()->first();
+@endphp
+
+@if(request()->has('bank_transfer_submitted'))
+    <div style="background:#f0fdf4; color:#15803d; padding:15px 20px; border-radius:10px; margin-bottom:20px; border:1px solid #bbf7d0;">
+        <i class="fas fa-check-circle"></i> <strong>{{ __('Success!') }}</strong> {{ __('Your bank transfer receipt has been submitted and is under review. You will be notified once approved.') }}
+    </div>
+@endif
+
+@if($latestTransfer)
+    @if($latestTransfer->status === 'pending')
+        <div style="background:#fffbeb; color:#b45309; padding:15px 20px; border-radius:10px; margin-bottom:20px; border:1px solid #fde68a;">
+            <i class="fas fa-clock"></i> <strong>{{ __('Transfer Under Review') }}</strong>: {{ __('Your bank transfer submitted on :date is currently being reviewed by our team.', ['date' => $latestTransfer->created_at->format('d/m/Y H:i')]) }}
+        </div>
+    @elseif($latestTransfer->status === 'rejected')
+        <div style="background:#fef2f2; color:#b91c1c; padding:15px 20px; border-radius:10px; margin-bottom:20px; border:1px solid #fecaca;">
+            <i class="fas fa-exclamation-triangle"></i> <strong>{{ __('Transfer Rejected') }}</strong><br>
+            {{ __('Your previous bank transfer was rejected for the following reason:') }}
+            <div style="margin-top:5px; padding:10px; background:#fff; border-radius:6px; font-size:0.9rem;">
+                {{ $latestTransfer->rejection_reason ?? __('No reason provided.') }}
+            </div>
+            <div style="margin-top:10px; font-size: 0.85rem;">
+                {{ __('Please try paying again with a valid receipt or another payment method.') }}
+            </div>
+        </div>
+    @endif
+@endif
+
 <div class="timeline" style="background:#fff;border-radius:14px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:20px;">
     @php
         $steps = [
@@ -353,6 +382,12 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                         </span>
                     </span>
                 </div>
+                @if($booking->status === 'cancelled' && $booking->cancellation_reason)
+                    <div class="info-row" style="background-color: #fef2f2; border-radius: 8px; padding: 12px; margin-top: 10px; border: 1px solid #fecaca;">
+                        <span class="info-label" style="color: #b91c1c; font-weight: 700;"><i class="fas fa-exclamation-circle"></i> {{ __('Cancellation Reason') }}:</span>
+                        <span class="info-value" style="color: #b91c1c; font-size: 0.9rem;">{{ $booking->cancellation_reason }}</span>
+                    </div>
+                @endif
                 @if($booking->notes)
                     <div class="info-row">
                         <span class="info-label">{{ __('Notes') }}</span>
@@ -424,9 +459,15 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
 
         {{-- Actions --}}
         @if($booking->status === 'pending')
-            <a href="{{ route('customer.payments.checkout', $booking->id) }}" class="action-btn action-btn-primary">
-                <i class="fas fa-credit-card"></i> {{ __('Complete Payment Now') }}
-            </a>
+            @if(!$latestTransfer || $latestTransfer->status === 'rejected')
+                <a href="{{ route('customer.payments.checkout', $booking->id) }}" class="action-btn action-btn-primary">
+                    <i class="fas fa-credit-card"></i> {{ __('Complete Payment Now') }}
+                </a>
+            @else
+                <button class="action-btn" style="background:#e5e7eb; color:#6b7280; cursor:not-allowed;" disabled>
+                    <i class="fas fa-clock"></i> {{ __('Payment Under Review') }}
+                </button>
+            @endif
 
             <form method="POST" action="{{ route('customer.bookings.cancel', $booking->id) }}"
                   onsubmit="return confirm('{{ __('Are you sure you want to cancel this booking?') }}')">
@@ -436,7 +477,12 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                 </button>
             </form>
         @elseif($booking->status === 'confirmed')
-            <a href="{{ route('customer.bookings.invoice', $booking->id) }}" class="action-btn action-btn-outline">
+            @if($booking->ticket_url)
+                <a href="{{ $booking->ticket_url }}" target="_blank" class="action-btn" style="background: #10b981; color: #fff;">
+                    <i class="fas fa-ticket-alt"></i> {{ __('Download Tickets') }}
+                </a>
+            @endif
+            <a href="{{ $booking->ticket_url ? '#' : route('customer.bookings.invoice', $booking->id) }}" class="action-btn action-btn-outline" {!! $booking->ticket_url ? 'style="display:none;"' : '' !!}>
                 <i class="fas fa-file-pdf"></i> {{ __('Download Invoice') }}
             </a>
         @endif

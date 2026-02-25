@@ -364,8 +364,6 @@ class DiscoveryController extends Controller
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "name", type: "string", example: "Economy"),
-                                new OA\Property(property: "name_ar", type: "string", example: "اقتصادي"),
-                                new OA\Property(property: "name_en", type: "string", example: "Economy"),
                             ]
                         ))
                     ]
@@ -378,9 +376,7 @@ class DiscoveryController extends Controller
         $categories = \App\Models\TripCategory::all()->map(function ($category) {
             return [
                 'id' => $category->id,
-                'name' => $category->name_attribute,
-                'name_ar' => $category->name_ar,
-                'name_en' => $category->name_en,
+                'name' => app()->getLocale() === 'ar' ? $category->name_ar : $category->name_en,
             ];
         });
 

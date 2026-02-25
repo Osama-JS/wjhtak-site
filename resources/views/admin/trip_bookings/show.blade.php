@@ -19,8 +19,15 @@
                 <div>
                      <h4 class="card-title">{{ __('Booking Information') }}</h4>
                      <p class="mb-0 text-muted">{{ __('Booking Date') }}: {{ $booking->booking_date->format('Y-m-d') }}</p>
+
+                     @if($booking->status == 'cancelled' && $booking->cancellation_reason)
+                     <div class="alert alert-danger mt-3 mb-0">
+                         <strong><i class="fas fa-exclamation-circle me-1"></i> {{ __('Cancellation Reason') }}:</strong>
+                         {{ $booking->cancellation_reason }}
+                     </div>
+                     @endif
                 </div>
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center mt-3 mt-sm-0">
                     @if($booking->status == 'pending')
                         <span class="badge badge-warning me-2">{{ __('Pending') }}</span>
                     @elseif($booking->status == 'confirmed')
@@ -43,19 +50,19 @@
                             @endif
 
                             @if($booking->status != 'cancelled')
-                            <form action="{{ route('admin.trip-bookings.update-status', $booking->id) }}" method="POST" class="d-inline confirm-action" data-confirm-message="{{ __('Cancel this booking?') }}">
-                                @csrf
-                                <input type="hidden" name="status" value="cancelled">
-                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-times me-2"></i> {{ __('Cancel') }}</button>
-                            </form>
+                                <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                    <i class="fas fa-times me-2"></i> {{ __('Cancel') }}
+                                </button>
                             @endif
 
-                            <div class="dropdown-divider"></div>
-                             <form action="{{ route('admin.trip-bookings.destroy', $booking->id) }}" method="POST" class="d-inline confirm-action" data-confirm-message="{{ __('Delete this booking?') }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash me-2"></i> {{ __('Delete') }}</button>
-                            </form>
+                            @if($booking->status != 'confirmed')
+                                <div class="dropdown-divider"></div>
+                                <form action="{{ route('admin.trip-bookings.destroy', $booking->id) }}" method="POST" class="d-inline confirm-action" data-confirm-message="{{ __('Delete this booking?') }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash me-2"></i> {{ __('Delete') }}</button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -144,7 +151,7 @@
 
     <div class="col-xl-3 col-lg-4">
         <!-- Customer Info -->
-        <div class="card">
+        <div class="card h-auto mb-4">
             <div class="card-header border-bottom">
                  <h5 class="card-title mb-0">{{ __('Customer') }}</h5>
             </div>
@@ -181,7 +188,7 @@
         </div>
 
         <!-- Payment Info -->
-        <div class="card">
+        <div class="card h-auto">
             <div class="card-header border-bottom">
                  <h5 class="card-title mb-0">{{ __('Payment Summary') }}</h5>
             </div>
@@ -200,10 +207,23 @@
                     @endif
                 </div>
                 <hr>
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="h5 mb-0">{{ __('Total') }}</span>
                     <span class="h4 text-primary mb-0">{{ number_format($booking->total_price, 2) }} <small>{{ __('SAR') }}</small></span>
                 </div>
+
+                @if($booking->payment)
+                    <div class="alert alert-secondary py-2 px-3 mb-0" style="font-size: 0.85rem">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span><strong>{{ __('Method') }}:</strong></span>
+                            <span>{{ strtoupper(str_replace('_', ' ', $booking->payment->payment_gateway)) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span><strong>{{ __('Txn ID') }}:</strong></span>
+                            <span class="text-break">{{ $booking->payment->transaction_id ?? 'N/A' }}</span>
+                        </div>
+                    </div>
+                @endif
 
                 <div class="mt-4">
                     <div class="d-grid gap-2">
@@ -218,8 +238,157 @@
                 </div>
             </div>
         </div>
+
+        {{-- Bank Transfer Card --}}
+        @if($latestBankTransfer)
+            <div class="card h-auto mb-4 border-{{ $latestBankTransfer->status === 'approved' ? 'success' : ($latestBankTransfer->status === 'rejected' ? 'danger' : 'warning') }}">
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-university me-2"></i>{{ __('Bank Transfer Details') }}
+                    </h5>
+                    @php
+                        $badgeClass = ['pending' => 'warning', 'approved' => 'success', 'rejected' => 'danger'][$latestBankTransfer->status] ?? 'secondary';
+                    @endphp
+                    <span class="badge badge-{{ $badgeClass }}">{{ strtoupper(__($latestBankTransfer->status)) }}</span>
+                </div>
+                <div class="card-body">
+                    {{-- Receipt Image --}}
+                    @if($latestBankTransfer->receipt_image)
+                        <div class="text-center mb-3">
+                            <a href="{{ asset('storage/' . $latestBankTransfer->receipt_image) }}" target="_blank">
+                                <img src="{{ asset('storage/' . $latestBankTransfer->receipt_image) }}"
+                                     class="img-fluid rounded border"
+                                     style="max-height: 200px; object-fit: contain;"
+                                     alt="{{ __('Receipt') }}">
+                            </a>
+                            <p class="text-muted small mt-1">{{ __('Click to view full image') }}</p>
+                        </div>
+                    @endif
+
+                    {{-- Transfer Details --}}
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">{{ __('Sender Name') }}</span>
+                            <strong>{{ $latestBankTransfer->sender_name }}</strong>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">{{ __('Receipt / Ref No.') }}</span>
+                            <strong>{{ $latestBankTransfer->receipt_number ?? '—' }}</strong>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">{{ __('Submitted On') }}</span>
+                            <strong>{{ $latestBankTransfer->created_at->format('Y-m-d H:i') }}</strong>
+                        </li>
+                        @if($latestBankTransfer->reviewed_at)
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">{{ __('Reviewed On') }}</span>
+                            <strong>{{ $latestBankTransfer->reviewed_at->format('Y-m-d H:i') }}</strong>
+                        </li>
+                        @endif
+                        @if($latestBankTransfer->notes)
+                        <li class="list-group-item px-0">
+                            <span class="text-muted d-block mb-1">{{ __('Customer Notes') }}</span>
+                            <em>{{ $latestBankTransfer->notes }}</em>
+                        </li>
+                        @endif
+                        @if($latestBankTransfer->status === 'rejected' && $latestBankTransfer->rejection_reason)
+                        <li class="list-group-item px-0">
+                            <span class="text-danger d-block mb-1"><i class="fas fa-times-circle me-1"></i>{{ __('Rejection Reason') }}</span>
+                            <em>{{ $latestBankTransfer->rejection_reason }}</em>
+                        </li>
+                        @endif
+                    </ul>
+
+                    {{-- Action Button --}}
+                    <div class="mt-3">
+                        <a href="{{ route('admin.bank-transfers.show', $latestBankTransfer->id) }}"
+                           class="btn btn-sm btn-outline-primary btn-block">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            {{ $latestBankTransfer->status === 'pending' ? __('Review Transfer') : __('View Transfer Details') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Ticket Upload Section for Confirmed/Completed Bookings --}}
+
+        @if(in_array($booking->status, ['confirmed', 'completed']))
+            <div class="card h-auto mb-4 border-primary">
+                <div class="card-header border-bottom bg-primary-light">
+                     <h5 class="card-title mb-0 text-primary"><i class="fas fa-ticket-alt me-2"></i>{{ __('Booking Tickets') }}</h5>
+                </div>
+                <div class="card-body">
+                    @if($booking->ticket_url)
+                        <div class="alert alert-success d-flex flex-column align-items-center mb-4">
+                            <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+                            <strong>{{ __('Ticket Uploaded') }}</strong>
+                            <div class="d-flex gap-2 justify-content-center mt-2">
+                                <a href="{{ $booking->ticket_url }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-eye me-1"></i> {{ __('View Ticket') }}
+                                </a>
+                                <form action="{{ route('admin.trip-bookings.send-ticket', $booking->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="fas fa-paper-plane me-1"></i> {{ __('Send to Customer') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('admin.trip-bookings.upload-ticket', $booking->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label font-w600">{{ __('Upload New Ticket') }} <small class="text-muted">(PDF, JPG, PNG)</small></label>
+                            <input type="file" name="ticket_file" class="form-control" accept=".pdf, .jpg, .jpeg, .png" required>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="send_email" value="1" id="sendEmailCheck" checked>
+                            <label class="form-check-label text-muted" for="sendEmailCheck">
+                                {{ __('Notify customer and send ticket via email') }}
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-upload me-1"></i> {{ __('Upload & Save') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
+
+{{-- Cancel Modal --}}
+@if($booking->status != 'cancelled')
+<div class="modal fade" id="cancelModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('Cancel Booking') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('admin.trip-bookings.update-status', $booking->id) }}" method="POST">
+                @csrf
+                <input type="hidden" name="status" value="cancelled">
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i> {{ __('Are you sure you want to cancel this booking?') }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label mb-2">{{ __('Reason for cancellation') }} <span class="text-danger">*</span></label>
+                        <textarea name="cancellation_reason" class="form-control" rows="4" required placeholder="{{ __('Explain why the booking was cancelled...') }}"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                    <button type="submit" class="btn btn-danger">{{ __('Cancel Booking') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 
 @endsection
 

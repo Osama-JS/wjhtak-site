@@ -229,7 +229,7 @@
                 <i class="fas fa-credit-card"></i> {{ __('Select Payment Method') }}
             </div>
             <div class="checkout-card-body">
-                <form id="paymentForm">
+                    <form id="paymentForm" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="booking_id" value="{{ $booking->id }}">
                     <input type="hidden" name="method" id="selectedMethod" value="">
@@ -259,16 +259,6 @@
                             </label>
                         </div>
 
-                        {{-- Tabby --}}
-                        <div class="payment-method-option">
-                            <input type="radio" name="method" id="m_tabby" value="tabby" onchange="setMethod('tabby')">
-                            <label for="m_tabby" class="payment-method-label">
-                                <img src="https://uaelogos.ae/storage/1950/conversions/Tabby-thumb.png" alt="Tabby">
-                                <span class="method-name">Tabby</span>
-                                <span class="method-desc">{{ __('4 Installments') }}</span>
-                            </label>
-                        </div>
-
                         {{-- Tamara --}}
                         <div class="payment-method-option">
                             <input type="radio" name="method" id="m_tamara" value="tamara" onchange="setMethod('tamara')">
@@ -279,16 +269,51 @@
                             </label>
                         </div>
 
-                        {{-- Tap --}}
+                        {{-- Bank Transfer --}}
                         <div class="payment-method-option">
-                            <input type="radio" name="method" id="m_tap" value="tap" onchange="setMethod('tap')">
-                            <label for="m_tap" class="payment-method-label">
-                                <img src="https://www.tap.company/content/images/2021/04/Tap-Logo-1.png" alt="Tap">
-                                <span class="method-name">Tap</span>
-                                <span class="method-desc">{{ __('Card Payment') }}</span>
+                            <input type="radio" name="method" id="m_bank_transfer" value="bank_transfer" onchange="setMethod('bank_transfer')">
+                            <label for="m_bank_transfer" class="payment-method-label">
+                                <i class="fas fa-university" style="font-size: 24px; color: #4b5563;"></i>
+                                <span class="method-name">{{ __('Bank Transfer') }}</span>
+                                <span class="method-desc">{{ __('Manual Review') }}</span>
                             </label>
                         </div>
 
+                    </div>
+
+                    {{-- Bank Transfer Form (Hidden by default) --}}
+                    <div id="bankTransferForm" style="display:none; margin-top:20px; padding:15px; border:1px solid #e5e7eb; border-radius:10px; background:#f9fafb;">
+                        <h4 style="font-size: 0.95rem; margin-bottom: 12px; color: #374151;">
+                            <i class="fas fa-info-circle"></i> {{ __('Bank Transfer Details') }}
+                        </h4>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="receipt_image" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:5px;">
+                                {{ __('Upload Receipt Copy') }} <span style="color:red">*</span>
+                            </label>
+                            <input type="file" name="receipt_image" id="receipt_image" accept="image/*,.pdf" style="width:100%; padding:8px; background:#fff; border:1px solid #d1d5db; border-radius:6px;" required disabled>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="sender_name" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:5px;">
+                                {{ __('Sender / Account Name') }} <span style="color:red">*</span>
+                            </label>
+                            <input type="text" name="sender_name" id="sender_name" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" placeholder="{{ __('Name matching the bank account') }}" required disabled>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="receipt_number" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:5px;">
+                                {{ __('Reference / Receipt Number') }}
+                            </label>
+                            <input type="text" name="receipt_number" id="receipt_number" class="form-control" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" placeholder="{{ __('Optional reference number') }}" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:5px;">
+                                {{ __('Notes') }}
+                            </label>
+                            <textarea name="notes" id="notes" class="form-control" rows="2" style="width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px;" placeholder="{{ __('Any additional information') }}" disabled></textarea>
+                        </div>
                     </div>
 
                     <div id="methodError" style="display:none;margin-top:14px;padding:10px 14px;background:#fef2f2;border-radius:8px;color:#b91c1c;font-size:.85rem;">
@@ -356,11 +381,29 @@ function setMethod(method) {
     selectedMethod = method;
     document.getElementById('selectedMethod').value = method;
     document.getElementById('methodError').style.display = 'none';
+
+    // Toggle Bank Transfer Form
+    const bankTransferForm = document.getElementById('bankTransferForm');
+    const b_inputs = bankTransferForm.querySelectorAll('input, textarea');
+
+    if (method === 'bank_transfer') {
+        bankTransferForm.style.display = 'block';
+        b_inputs.forEach(el => el.disabled = false);
+    } else {
+        bankTransferForm.style.display = 'none';
+        b_inputs.forEach(el => el.disabled = true);
+    }
 }
 
 function submitPayment() {
     if (!selectedMethod) {
         document.getElementById('methodError').style.display = 'block';
+        return;
+    }
+
+    const formElement = document.getElementById('paymentForm');
+    if (selectedMethod === 'bank_transfer' && !formElement.checkValidity()) {
+        formElement.reportValidity();
         return;
     }
 
@@ -370,8 +413,39 @@ function submitPayment() {
 
     const bookingId = {{ $booking->id }};
 
-    // For redirect-based methods (Tabby, Tamara, Tap)
-    if (['tabby', 'tamara', 'tap'].includes(selectedMethod)) {
+    // Bank Transfer (Multipart form data)
+    if (selectedMethod === 'bank_transfer') {
+        const formData = new FormData(formElement);
+
+        fetch('{{ route("payments.web.bank_transfer") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error === false) {
+                // Redirect to success or booking details
+                window.location.href = '{{ route("customer.bookings.show", $booking->id) }}?bank_transfer_submitted=1';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> {{ __("Pay Now") }}';
+                alert(data.message || '{{ __("An error occurred, please try again.") }}');
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-lock"></i> {{ __("Pay Now") }}';
+            alert('{{ __("Connection error, please try again.") }}');
+        });
+        return;
+    }
+
+    // For redirect-based methods (Tamara)
+    if (['tamara'].includes(selectedMethod)) {
         fetch('{{ route("payments.web.initiate") }}', {
             method: 'POST',
             headers: {

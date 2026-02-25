@@ -74,10 +74,14 @@ class NotificationController extends Controller
                             )),
                             new OA\Property(property: "unread_count", type: "integer", example: 3),
                             new OA\Property(property: "pagination", type: "object", properties: [
-                                new OA\Property(property: "current_page", type: "integer", example: 1),
-                                new OA\Property(property: "last_page", type: "integer", example: 5),
-                                new OA\Property(property: "per_page", type: "integer", example: 20),
-                                new OA\Property(property: "total", type: "integer", example: 95),
+                                new OA\Property(property: "pageNumber", type: "integer", example: 1),
+                                new OA\Property(property: "pageSize", type: "integer", example: 20),
+                                new OA\Property(property: "count", type: "integer", example: 95),
+                                new OA\Property(property: "totalPages", type: "integer", example: 5),
+                                new OA\Property(property: "hasNextPage", type: "boolean", example: true),
+                                new OA\Property(property: "hasPreviousPage", type: "boolean", example: false),
+                                new OA\Property(property: "nextPage", type: "string", example: "http://example.com/api/v1/notifications?page=2"),
+                                new OA\Property(property: "previousPage", type: "string", example: null),
                             ])
                         ])
                     ]
@@ -119,10 +123,14 @@ class NotificationController extends Controller
             }),
             'unread_count' => $unreadCount,
             'pagination' => [
-                'current_page' => $notifications->currentPage(),
-                'last_page' => $notifications->lastPage(),
-                'per_page' => $notifications->perPage(),
-                'total' => $notifications->total(),
+                'pageNumber' => $notifications->currentPage(),
+                'pageSize' => $notifications->perPage(),
+                'count' => $notifications->total(),
+                'totalPages' => $notifications->lastPage(),
+                'hasNextPage' => $notifications->hasMorePages(),
+                'hasPreviousPage' => $notifications->currentPage() > 1,
+                'nextPage' => $notifications->nextPageUrl(),
+                'previousPage' => $notifications->previousPageUrl(),
             ],
         ]);
     }

@@ -97,6 +97,7 @@ class TripController extends Controller
                                 new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
                                 new OA\Property(property: "to_country", type: "string", example: "France"),
                                 new OA\Property(property: "is_favorite", type: "boolean", example: false),
+                                new OA\Property(property: "is_featured", type: "boolean", example: true),
                                 new OA\Property(property: "base_capacity", type: "integer", example: 2),
                                 new OA\Property(property: "extra_passenger_price", type: "number", example: 100.00),
                             ]
@@ -904,7 +905,7 @@ class TripController extends Controller
         path: "/api/v1/trips/featured",
         summary: "Get featured trips",
         operationId: "getFeaturedTrips",
-        description: "Retrieve a list of featured trips.",
+        description: "Retrieve a list of featured trips with the same full details as the trips list.",
         tags: ["Trips"],
         parameters: [
             new OA\Parameter(
@@ -942,9 +943,18 @@ class TripController extends Controller
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "title", type: "string", example: "Amazing Paris"),
                                 new OA\Property(property: "price", type: "number", example: 1500.00),
+                                new OA\Property(property: "price_before_discount", type: "number", example: 1800.00, nullable: true),
+                                new OA\Property(property: "duration", type: "string", example: "5 Days"),
+                                new OA\Property(property: "tickets", type: "integer", example: 10),
                                 new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
                                 new OA\Property(property: "to_country", type: "string", example: "France"),
                                 new OA\Property(property: "to_city", type: "string", example: "Paris"),
+                                new OA\Property(property: "is_active", type: "boolean", example: true),
+                                new OA\Property(property: "expiry_date", type: "string", format: "date", example: "2024-12-31"),
+                                new OA\Property(property: "is_favorite", type: "boolean", example: false),
+                                new OA\Property(property: "is_featured", type: "boolean", example: true),
+                                new OA\Property(property: "base_capacity", type: "integer", example: 2),
+                                new OA\Property(property: "extra_passenger_price", type: "number", example: 100.00),
                             ]
                         )),
                         new OA\Property(property: "pagination", type: "object", properties: [
@@ -965,18 +975,41 @@ class TripController extends Controller
     public function featured(Request $request): JsonResponse
     {
         $trips = Trip::active()->where('is_featured', true)
-            ->with(['images', 'toCountry', 'toCity'])
+            ->with(['images', 'toCountry', 'toCity', 'categories'])
             ->latest()
             ->paginate($request->per_page ?? 10);
 
-        $trips->getCollection()->transform(function ($trip) {
+        // Get user favorites if logged in (for identical structure to index)
+        $userFavoriteIds = [];
+        $user = Auth::guard('sanctum')->user();
+        if ($user) {
+            $userFavoriteIds = Favorite::where('user_id', $user->id)->pluck('trip_id')->toArray();
+        }
+
+        $trips->getCollection()->transform(function ($trip) use ($userFavoriteIds) {
             return [
                 'id' => $trip->id,
                 'title' => $trip->title,
+                'description' => $trip->description,
                 'price' => $trip->price,
+                'price_before_discount' => $trip->price_before_discount,
+                'duration' => $trip->duration,
+                'tickets' => $trip->tickets,
                 'image' => $trip->image_url,
                 'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
+                'is_active' => $trip->active,
+                'expiry_date' => $trip->expiry_date,
+                'is_favorite' => in_array($trip->id, $userFavoriteIds),
+                'is_featured' => (bool)$trip->is_featured,
+                'base_capacity' => $trip->base_capacity ?? 2,
+                'extra_passenger_price' => $trip->extra_passenger_price ?? 0,
+                'categories' => $trip->categories->map(function ($cat) {
+                    return [
+                        'id' => $cat->id,
+                        'name' => $cat->name_attribute,
+                    ];
+                }),
             ];
         });
 

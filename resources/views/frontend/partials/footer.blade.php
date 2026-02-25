@@ -130,10 +130,6 @@
 
                 <!-- Tamara -->
                 <img src="https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg" alt="Tamara" class="pay-icon">
-
-                <!-- Tabby -->
-                <img src="https://uaelogos.ae/storage/1950/conversions/Tabby-thumb.png" alt="Tabby" class="pay-icon">
-
             </div>
         </div>
     </div>
