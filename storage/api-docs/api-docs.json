@@ -4348,6 +4348,53 @@
                                                         },
                                                         "type": "object"
                                                     }
+                                                },
+                                                "booking_state": {
+                                                    "type": "string",
+                                                    "example": "preparing"
+                                                },
+                                                "booking_state_label": {
+                                                    "type": "string",
+                                                    "example": "Preparing Tickets"
+                                                },
+                                                "ticket_url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com/ticket.pdf",
+                                                    "nullable": true
+                                                },
+                                                "payment_details": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "method": {
+                                                                "type": "string",
+                                                                "example": "mada"
+                                                            },
+                                                            "amount": {
+                                                                "type": "number",
+                                                                "example": 600
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "paid"
+                                                            },
+                                                            "transaction_id": {
+                                                                "type": "string",
+                                                                "example": "TX123"
+                                                            },
+                                                            "date": {
+                                                                "type": "string",
+                                                                "example": "2024-05-20 14:00:00"
+                                                            },
+                                                            "receipt_url": {
+                                                                "description": "Only available for bank transfers",
+                                                                "type": "string",
+                                                                "example": "https://example.com/storage/receipts/img.jpg",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
                                                 }
                                             },
                                             "type": "object"
@@ -4360,6 +4407,72 @@
                     },
                     "404": {
                         "description": "Booking not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings/{id}/invoice": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Download booking invoice",
+                "description": "Generate and get the URL to download the PDF invoice for a confirmed booking.",
+                "operationId": "downloadInvoice",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invoice retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "invoice_url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com/storage/invoices/invoice_1_1234.pdf"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    },
+                    "403": {
+                        "description": "Invoice not available for this booking status"
                     },
                     "401": {
                         "description": "Unauthenticated"

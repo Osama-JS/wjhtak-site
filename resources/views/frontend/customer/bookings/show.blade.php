@@ -313,29 +313,41 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
 
 <div class="timeline" style="background:#fff;border-radius:14px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:20px;">
     @php
-        $steps = [
-            'pending'   => __('Booked'),
-            'payment'   => __('Awaiting Payment'),
-            'confirmed' => __('Confirmed'),
+        $currentState = $booking->booking_state ?? 'received';
+        $isCancelled = $booking->status === 'cancelled' || $currentState === 'cancelled';
+
+        $states = [
+            'received' => ['icon' => 'fa-inbox', 'label' => __('Order Received')],
+            'preparing' => ['icon' => 'fa-cogs', 'label' => __('Preparing Tickets')],
+            'confirmed' => ['icon' => 'fa-check-circle', 'label' => __('Confirmed')],
+            'tickets_sent' => ['icon' => 'fa-ticket-alt', 'label' => __('Tickets Sent')]
         ];
-        $currentStatus = $booking->status;
-        $activeReached = false;
+
+        $stateKeys = array_keys($states);
+        $currentIndex = array_search($currentState, $stateKeys);
+        if ($currentIndex === false) $currentIndex = -1;
     @endphp
 
-    <div class="timeline-step {{ in_array($currentStatus, ['pending','confirmed']) ? 'done' : '' }}">
-        <div class="step-dot"><i class="fas fa-check"></i></div>
-        <div class="step-label">{{ __('Booked') }}</div>
-    </div>
-
-    <div class="timeline-step {{ $currentStatus === 'pending' ? 'active' : ($currentStatus === 'confirmed' ? 'done' : '') }}">
-        <div class="step-dot"><i class="fas fa-credit-card"></i></div>
-        <div class="step-label">{{ __('Awaiting Payment') }}</div>
-    </div>
-
-    <div class="timeline-step {{ $currentStatus === 'confirmed' ? 'done active' : '' }}">
-        <div class="step-dot"><i class="fas fa-check-circle"></i></div>
-        <div class="step-label">{{ __('Confirmed') }}</div>
-    </div>
+    @if($isCancelled)
+        <div class="timeline-step done active" style="flex: 1;">
+            <div class="step-dot" style="border-color:#b91c1c; background:#b91c1c; color:#fff;">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="step-label" style="color:#b91c1c;">{{ __('Cancelled') }}</div>
+        </div>
+    @else
+        @foreach($states as $key => $data)
+            @php
+                $stepIndex = array_search($key, $stateKeys);
+                $isDone = $stepIndex <= $currentIndex;
+                $isActive = $stepIndex === $currentIndex;
+            @endphp
+            <div class="timeline-step {{ $isDone ? 'done' : '' }} {{ $isActive ? 'active' : '' }}">
+                <div class="step-dot"><i class="fas {{ $data['icon'] }}"></i></div>
+                <div class="step-label">{{ $data['label'] }}</div>
+            </div>
+        @endforeach
+    @endif
 </div>
 
 <div class="booking-detail-grid">
@@ -375,10 +387,14 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                     <span class="info-value">{{ $booking->tickets_count }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">{{ __('Status') }}</span>
+                    <span class="info-label">{{ __('Booking State') }}</span>
                     <span class="info-value">
                         <span class="status-badge status-{{ $booking->status }}">
-                            {{ $booking->status === 'pending' ? __('Pending') : ($booking->status === 'confirmed' ? __('Confirmed') : __('Cancelled')) }}
+                            @if($isCancelled)
+                                {{ __('Cancelled') }}
+                            @else
+                                {{ $states[$currentState]['label'] ?? ucfirst($currentState) }}
+                            @endif
                         </span>
                     </span>
                 </div>
@@ -467,6 +483,11 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                 <button class="action-btn" style="background:#e5e7eb; color:#6b7280; cursor:not-allowed;" disabled>
                     <i class="fas fa-clock"></i> {{ __('Payment Under Review') }}
                 </button>
+                @if($latestTransfer->receipt_image)
+                    <a href="{{ asset('storage/' . $latestTransfer->receipt_image) }}" target="_blank" class="action-btn mt-2" style="background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc;">
+                        <i class="fas fa-file-invoice"></i> {{ __('View Receipt') }}
+                    </a>
+                @endif
             @endif
 
             <form method="POST" action="{{ route('customer.bookings.cancel', $booking->id) }}"
@@ -480,6 +501,11 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
             @if($booking->ticket_url)
                 <a href="{{ $booking->ticket_url }}" target="_blank" class="action-btn" style="background: #10b981; color: #fff;">
                     <i class="fas fa-ticket-alt"></i> {{ __('Download Tickets') }}
+                </a>
+            @endif
+            @if($latestTransfer && $latestTransfer->status === 'approved' && $latestTransfer->receipt_image)
+                <a href="{{ asset('storage/' . $latestTransfer->receipt_image) }}" target="_blank" class="action-btn mt-2" style="background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc;">
+                    <i class="fas fa-file-invoice"></i> {{ __('View Receipt') }}
                 </a>
             @endif
             <a href="{{ $booking->ticket_url ? '#' : route('customer.bookings.invoice', $booking->id) }}" class="action-btn action-btn-outline" {!! $booking->ticket_url ? 'style="display:none;"' : '' !!}>

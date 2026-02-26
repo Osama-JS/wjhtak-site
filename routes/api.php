@@ -32,6 +32,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/my-bookings', [\App\Http\Controllers\Api\V1\TripController::class, 'myBookings']);
         Route::get('/bookings/{id}', [\App\Http\Controllers\Api\V1\TripController::class, 'bookingDetails']);
+        Route::get('/bookings/{id}/invoice', [\App\Http\Controllers\Api\V1\TripController::class, 'downloadInvoice']);
         Route::post('/bookings/{id}/cancel', [\App\Http\Controllers\Api\V1\TripController::class, 'cancelBooking']);
         Route::get('/favorites', [\App\Http\Controllers\Api\V1\TripController::class, 'getFavorites']);
         Route::post('/trips/{id}/favorite', [\App\Http\Controllers\Api\V1\TripController::class, 'toggleFavorite']);

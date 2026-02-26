@@ -44,7 +44,9 @@ class BookingController extends Controller
      */
     public function show($id)
     {
-        $booking = TripBooking::with(['trip.images', 'trip.toCountry', 'trip.toCity', 'passengers', 'payments'])
+        $booking = TripBooking::with(['trip.images', 'trip.toCountry', 'trip.toCity', 'passengers', 'payments', 'bankTransfers', 'histories' => function($q) {
+            $q->orderBy('created_at', 'asc');
+        }])
             ->where('user_id', Auth::id())
             ->findOrFail($id);
 

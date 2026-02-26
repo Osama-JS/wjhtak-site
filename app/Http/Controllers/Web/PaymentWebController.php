@@ -264,6 +264,15 @@ class PaymentWebController extends Controller
                 'status' => 'pending'
             ]);
 
+            \App\Models\BookingHistory::create([
+                'trip_booking_id' => $booking->id,
+                'user_id' => $booking->user_id,
+                'action' => 'bank_transfer_submitted',
+                'description' => __('Bank transfer receipt uploaded and pending review.'),
+                'previous_state' => null,
+                'new_state' => \App\Models\TripBooking::STATE_RECEIVED,
+            ]);
+
             return response()->json([
                 'error' => false,
                 'message' => __('Bank transfer submitted successfully. It will be reviewed by admin soon.')

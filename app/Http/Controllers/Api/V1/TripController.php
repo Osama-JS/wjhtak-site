@@ -734,6 +734,19 @@ class TripController extends Controller
                                     new OA\Property(property: "passport_number", type: "string", example: "A1234567"),
                                     new OA\Property(property: "nationality", type: "string", example: "USA"),
                                 ]
+                            )),
+                            new OA\Property(property: "booking_state", type: "string", example: "preparing"),
+                            new OA\Property(property: "booking_state_label", type: "string", example: "Preparing Tickets"),
+                            new OA\Property(property: "ticket_url", type: "string", nullable: true, example: "https://example.com/ticket.pdf"),
+                            new OA\Property(property: "payment_details", type: "array", items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: "method", type: "string", example: "mada"),
+                                    new OA\Property(property: "amount", type: "number", example: 600.00),
+                                    new OA\Property(property: "status", type: "string", example: "paid"),
+                                    new OA\Property(property: "transaction_id", type: "string", example: "TX123"),
+                                    new OA\Property(property: "date", type: "string", example: "2024-05-20 14:00:00"),
+                                    new OA\Property(property: "receipt_url", type: "string", nullable: true, example: "https://example.com/storage/receipts/img.jpg", description: "Only available for bank transfers"),
+                                ]
                             ))
                         ])
                     ]
@@ -750,7 +763,7 @@ class TripController extends Controller
             return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
         }
 
-        $booking = TripBooking::with(['trip.toCountry', 'trip.toCity', 'trip.images', 'passengers'])
+        $booking = TripBooking::with(['trip.toCountry', 'trip.toCity', 'trip.images', 'passengers', 'payments', 'bankTransfers'])
             ->where('user_id', $user->id)
             ->find($id);
 
@@ -787,7 +800,109 @@ class TripController extends Controller
             }),
         ];
 
+        $states = [
+            'received' => __('Order Received'),
+            'preparing' => __('Preparing Tickets'),
+            'confirmed' => __('Confirmed'),
+            'tickets_sent' => __('Tickets Sent'),
+            'cancelled' => __('Cancelled')
+        ];
+        $data['booking_state'] = $booking->booking_state ?? 'received';
+        $data['booking_state_label'] = $states[$data['booking_state']] ?? ucfirst($data['booking_state']);
+        $data['ticket_url'] = $booking->ticket_url;
+
+        $data['payment_details'] = $booking->payments->map(function ($p) {
+            return [
+                'method' => $p->payment_gateway,
+                'amount' => $p->amount,
+                'status' => $p->status,
+                'transaction_id' => $p->transaction_id,
+                'date' => $p->created_at->format('Y-m-d H:i:s'),
+                'receipt_url' => null,
+            ];
+        })->concat($booking->bankTransfers->map(function ($b) {
+            return [
+                'method' => 'bank_transfer',
+                'amount' => null,
+                'status' => $b->status,
+                'transaction_id' => $b->receipt_number,
+                'date' => $b->created_at->format('Y-m-d H:i:s'),
+                'receipt_url' => $b->receipt_image ? asset('storage/' . $b->receipt_image) : null,
+            ];
+        }))->values()->all();
+
         return $this->apiResponse(false, __('Booking details retrieved successfully'), $data);
+    }
+
+    /**
+     * Download booking invoice
+     */
+    #[OA\Get(
+        path: "/api/v1/bookings/{id}/invoice",
+        summary: "Download booking invoice",
+        operationId: "downloadInvoice",
+        description: "Generate and get the URL to download the PDF invoice for a confirmed booking.",
+        tags: ["Trips"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "Booking ID",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Success",
+                content: new OA\MediaType(
+                    mediaType: "application/json",
+                    schema: new OA\Schema(
+                        properties: [
+                            new OA\Property(property: "error", type: "boolean", example: false),
+                            new OA\Property(property: "message", type: "string", example: "Invoice retrieved successfully"),
+                            new OA\Property(property: "data", type: "object", properties: [
+                                new OA\Property(property: "invoice_url", type: "string", example: "https://example.com/storage/invoices/invoice_1_1234.pdf")
+                            ])
+                        ]
+                    )
+                )
+            ),
+            new OA\Response(response: 404, description: "Booking not found"),
+            new OA\Response(response: 403, description: "Invoice not available for this booking status"),
+            new OA\Response(response: 401, description: "Unauthenticated")
+        ]
+    )]
+    public function downloadInvoice($id, \App\Services\InvoiceService $invoiceService): JsonResponse
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
+        }
+
+        $booking = TripBooking::where('user_id', $user->id)->find($id);
+
+        if (!$booking) {
+            return $this->apiResponse(true, __('Booking not found'), null, null, 404);
+        }
+
+        if ($booking->status !== 'confirmed') {
+             return $this->apiResponse(true, __('Invoice is only available for confirmed bookings'), null, null, 403);
+        }
+
+        try {
+            $path = $invoiceService->generateInvoice($booking);
+            if ($path) {
+                $fileUrl = asset('storage/' . $path);
+                return $this->apiResponse(false, __('Invoice retrieved successfully'), ['invoice_url' => $fileUrl]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Invoice Generation Failed: ' . $e->getMessage());
+        }
+
+        return $this->apiResponse(true, __('Failed to generate invoice'), null, null, 500);
     }
 
     /**

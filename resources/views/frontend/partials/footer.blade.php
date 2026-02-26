@@ -77,7 +77,7 @@
 
             {{-- Contact Info --}}
             @php
-                                  $contactPhone = "+966920031822  +966536844469";
+                $contactPhone = "+966920031822  +966536844469";
                 $contactEmail = "contact@wjhtak.com";
             @endphp
             <div class="footer-column">

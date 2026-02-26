@@ -214,6 +214,7 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     // Trip Bookings Management
     Route::get('trip-bookings/data', [App\Http\Controllers\Admin\TripBookingController::class, 'getData'])->name('trip-bookings.data');
     Route::post('trip-bookings/{id}/update-status', [App\Http\Controllers\Admin\TripBookingController::class, 'updateStatus'])->name('trip-bookings.update-status');
+    Route::post('trip-bookings/{id}/update-state', [App\Http\Controllers\Admin\TripBookingController::class, 'updateBookingState'])->name('trip-bookings.update-state');
     Route::post('trip-bookings/{id}/upload-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'uploadTicket'])->name('trip-bookings.upload-ticket');
     Route::post('trip-bookings/{id}/send-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'sendTicket'])->name('trip-bookings.send-ticket');
     Route::resource('trip-bookings', App\Http\Controllers\Admin\TripBookingController::class);

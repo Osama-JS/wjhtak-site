@@ -104,9 +104,49 @@ class TripBookingController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $booking = TripBooking::findOrFail($id);
+
+        $oldState = $booking->booking_state;
         $booking->update(['status' => $request->status]);
 
+        if ($request->status == 'cancelled') {
+            $booking->update(['booking_state' => TripBooking::STATE_CANCELLED]);
+            \App\Models\BookingHistory::create([
+                'trip_booking_id' => $booking->id,
+                'user_id' => auth()->id(),
+                'action' => 'booking_cancelled',
+                'description' => __('Booking was cancelled by admin.'),
+                'previous_state' => $oldState,
+                'new_state' => TripBooking::STATE_CANCELLED,
+            ]);
+        }
+
         return redirect()->back()->with('success', __('Booking status updated successfully.'));
+    }
+
+    /**
+     * Update Booking State (Received, Preparing, etc)
+     */
+    public function updateBookingState(Request $request, $id)
+    {
+        $booking = TripBooking::findOrFail($id);
+        $request->validate([
+            'booking_state' => 'required|in:received,preparing,confirmed,tickets_sent,cancelled'
+        ]);
+
+        $oldState = $booking->booking_state;
+        $newState = $request->booking_state;
+        $booking->update(['booking_state' => $newState]);
+
+        \App\Models\BookingHistory::create([
+            'trip_booking_id' => $booking->id,
+            'user_id' => auth()->id(),
+            'action' => 'state_changed',
+            'description' => __('Booking state manually updated to :state by admin.', ['state' => __($newState)]),
+            'previous_state' => $oldState,
+            'new_state' => $newState,
+        ]);
+
+        return redirect()->back()->with('success', __('Booking state updated successfully.'));
     }
 
     /**
@@ -139,7 +179,21 @@ class TripBookingController extends Controller
             }
 
             $path = $request->file('ticket_file')->store('tickets', 'public');
-            $booking->update(['ticket_file_path' => $path]);
+
+            $oldState = $booking->booking_state;
+            $booking->update([
+                'ticket_file_path' => $path,
+                'booking_state' => \App\Models\TripBooking::STATE_TICKETS_SENT
+            ]);
+
+            \App\Models\BookingHistory::create([
+                'trip_booking_id' => $booking->id,
+                'user_id' => auth()->id(),
+                'action' => 'ticket_uploaded',
+                'description' => __('Tickets file uploaded by admin.'),
+                'previous_state' => $oldState,
+                'new_state' => \App\Models\TripBooking::STATE_TICKETS_SENT,
+            ]);
 
             // Optional: send email to customer
             if ($request->has('send_email') && $booking->user) {

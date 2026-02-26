@@ -81,6 +81,10 @@
                                 </div>
                             @endif
                             <div>
+                                <span class="badge badge-light text-dark mb-2">
+                                    <i class="fas fa-layer-group me-1"></i> {{ __('State') }}:
+                                    <span class="text-primary">{{ __($booking->booking_state ?? 'received') }}</span>
+                                </span>
                                 @if($booking->trip)
                                     <h4 class="mb-1"><a href="{{ route('trips.show', $booking->trip->id) }}" target="_blank">{{ $booking->trip->title }}</a></h4>
                                     <p class="mb-1 text-muted">{{ Str::limit($booking->trip->description, 150) }}</p>
@@ -149,7 +153,29 @@
         </div>
     </div>
 
+    <!-- Right Sidebar -->
     <div class="col-xl-3 col-lg-4">
+        <!-- Update Booking State -->
+        <div class="card h-auto mb-4 border-info">
+            <div class="card-header border-bottom bg-info-light">
+                 <h5 class="card-title mb-0 text-info"><i class="fas fa-exchange-alt me-2"></i>{{ __('Update State') }}</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('admin.trip-bookings.update-state', $booking->id) }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <select name="booking_state" class="form-control" required>
+                            <option value="received" {{ ($booking->booking_state ?? '') == 'received' ? 'selected' : '' }}>{{ __('Received') }}</option>
+                            <option value="preparing" {{ $booking->booking_state == 'preparing' ? 'selected' : '' }}>{{ __('Preparing Tickets') }}</option>
+                            <option value="confirmed" {{ $booking->booking_state == 'confirmed' ? 'selected' : '' }}>{{ __('Confirmed') }}</option>
+                            <option value="tickets_sent" {{ $booking->booking_state == 'tickets_sent' ? 'selected' : '' }}>{{ __('Tickets Sent') }}</option>
+                            <option value="cancelled" {{ $booking->booking_state == 'cancelled' ? 'selected' : '' }}>{{ __('Cancelled') }}</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-info btn-block w-100"><i class="fas fa-save me-1"></i> {{ __('Update') }}</button>
+                </form>
+            </div>
+        </div>
         <!-- Customer Info -->
         <div class="card h-auto mb-4">
             <div class="card-header border-bottom">
@@ -356,6 +382,55 @@
                 </div>
             </div>
         @endif
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <!-- Booking History Logs -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4 class="card-title"><i class="fas fa-history me-2"></i>{{ __('Booking History Log') }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped text-sm">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>{{ __('Date') }}</th>
+                                <th>{{ __('User') }}</th>
+                                <th>{{ __('Action') }}</th>
+                                <th>{{ __('State Transition') }}</th>
+                                <th>{{ __('Description') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($booking->histories()->with('user')->latest()->get() as $log)
+                            <tr>
+                                <td style="white-space:nowrap">{{ $log->created_at->format('Y-m-d H:i') }}</td>
+                                <td>{{ $log->user ? $log->user->full_name : __('System') }}</td>
+                                <td><span class="badge badge-light text-dark">{{ $log->action }}</span></td>
+                                <td>
+                                    @if($log->previous_state || $log->new_state)
+                                        <span class="text-muted">{{ $log->previous_state ? __($log->previous_state) : '-' }}</span>
+                                        <i class="fas fa-arrow-left mx-1 text-primary" style="font-size: 0.8rem"></i>
+                                        <strong>{{ $log->new_state ? __($log->new_state) : '-' }}</strong>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>{{ $log->description }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center">{{ __('No history logs available.') }}</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

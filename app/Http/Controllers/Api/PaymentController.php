@@ -248,6 +248,15 @@ class PaymentController extends Controller
                 'status' => 'pending'
             ]);
 
+            \App\Models\BookingHistory::create([
+                'trip_booking_id' => $booking->id,
+                'user_id' => $user->id,
+                'action' => 'bank_transfer_submitted',
+                'description' => __('Bank transfer receipt uploaded and pending review.'),
+                'previous_state' => null,
+                'new_state' => TripBooking::STATE_RECEIVED,
+            ]);
+
             return $this->apiResponse(false, __('Bank transfer submitted successfully. It will be reviewed by admin soon.'), $bankTransfer);
 
         } catch (\Exception $e) {
@@ -684,7 +693,18 @@ class PaymentController extends Controller
             // Update Booking
             $booking->update([
                 'status' => 'confirmed',
+                'booking_state' => TripBooking::STATE_RECEIVED,
                 'updated_at' => now(),
+            ]);
+
+            // Create Booking History
+            \App\Models\BookingHistory::create([
+                'trip_booking_id' => $booking->id,
+                'user_id' => null, // System action
+                'action' => 'payment_confirmed',
+                'description' => __('Payment successful via :gateway. Booking state set to Received.', ['gateway' => $gateway]),
+                'previous_state' => null,
+                'new_state' => TripBooking::STATE_RECEIVED,
             ]);
 
             // Record or Update Payment

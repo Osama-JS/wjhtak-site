@@ -9,6 +9,13 @@ class TripBooking extends Model
 {
     use HasFactory;
 
+    // Booking states
+    public const STATE_RECEIVED = 'received';
+    public const STATE_PREPARING = 'preparing';
+    public const STATE_CONFIRMED = 'confirmed';
+    public const STATE_TICKETS_SENT = 'tickets_sent';
+    public const STATE_CANCELLED = 'cancelled';
+
     protected $fillable = [
         'user_id',
         'trip_id',
@@ -18,7 +25,8 @@ class TripBooking extends Model
         'tickets_count',
         'notes',
         'cancellation_reason',
-        'ticket_file_path'
+        'ticket_file_path',
+        'booking_state',
     ];
 
     /**
@@ -65,5 +73,10 @@ class TripBooking extends Model
     public function payment()
     {
         return $this->hasOne(Payment::class, 'trip_booking_id')->latest();
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(BookingHistory::class, 'trip_booking_id');
     }
 }
