@@ -77,8 +77,8 @@
 
             {{-- Contact Info --}}
             @php
-                $contactPhone = \App\Models\Setting::get('contact_phone');
-                $contactEmail = \App\Models\Setting::get('contact_email');
+                                  $contactPhone = "+966920031822  +966536844469";
+                $contactEmail = "contact@wjhtak.com";
             @endphp
             <div class="footer-column">
                 <h4 class="footer-title">{{ __('Contact Us') }}</h4>
