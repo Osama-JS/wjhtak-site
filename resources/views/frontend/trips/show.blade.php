@@ -1246,21 +1246,6 @@
         });
     }
 
-    // Dynamic Passenger Fields
-    function updatePassengerFields() {
-        const container = document.getElementById('passengerDetailsContainer');
-        if (!container) return;
-
-        const count = parseInt(document.getElementById('travelersCount').value);
-        const currentCount = container.querySelectorAll('.passenger-card').length;
-
-        if (count > currentCount) {
-            // Add fields
-            for (let i = currentCount + 1; i <= count; i++) {
-                const card = document.createElement('div');
-                card.className = 'passenger-card animate__animated animate__fadeInUp';
-                card.innerHTML = `
-                    <div class="passenger-card-title">
-    {{-- No additional JS needed for simplified booking action --}}
+    // No additional JS needed for simplified booking action
 </script>
 @endpush

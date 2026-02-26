@@ -44,6 +44,7 @@
                 console.log("FlutterBridge not found");
             }
         }
+        sendResultToWjhtakApp();
     </script>
 </body>
 </html>
