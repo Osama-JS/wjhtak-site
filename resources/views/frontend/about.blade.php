@@ -48,7 +48,7 @@
         <div class="container">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-12); align-items: center;">
                 {{-- Image --}}
-                <div class="scroll-animate" style="position: relative;">
+                <!-- <div class="scroll-animate" style="position: relative;">
                     <img
                         src="{{ asset('images/about/team.jpg') }}"
                         alt="{{ __('Our Team') }}"
@@ -58,7 +58,7 @@
                     {{-- Decoration --}}
                     <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: var(--gradient-accent); border-radius: var(--radius-2xl); z-index: -1;"></div>
                     <div style="position: absolute; bottom: -20px; left: -20px; width: 150px; height: 150px; background: var(--gradient-primary); border-radius: var(--radius-2xl); z-index: -1; opacity: 0.3;"></div>
-                </div>
+                </div> -->
                 @php
                     $story = \App\Models\Setting::get('story_' . app()->getLocale(), config('app.name'));
                     $mission = \App\Models\Setting::get('mission_' . app()->getLocale(), config('app.name'));
