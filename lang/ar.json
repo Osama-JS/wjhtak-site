@@ -1,5 +1,7 @@
 {
     "Dashboard": "لوحة التحكم",
+    "Tickets have not been uploaded yet": "لم يتم رفع التذاكر بعد",
+    "Ticket retrieved successfully": "تم جلب التذكرة بنجاح",
     "Main Menu": "القائمة الرئيسية",
     "Security & Access": "الأمن والوصول",
     "User Management": "إدارة المستخدمين",
