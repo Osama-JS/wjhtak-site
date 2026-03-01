@@ -11,10 +11,11 @@
         <a href="{{ route('home') }}" class="navbar-logo">
             @if($siteLogo)
                 <img src="{{ asset($siteLogo) }}" alt="{{ $siteName }}" onerror="this.src='{{ asset('images/logo-full.png') }}'">
+                <span class="navbar-logo-text d-none d-lg-inline-block opacity-75 ms-2" style="font-size: 0.9rem;">{{ $siteName }}</span>
             @else
                 <img src="{{ asset('images/logo-full.png') }}" alt="{{ $siteName }}">
+                <span class="navbar-logo-text">{{ $siteName }}</span>
             @endif
-            <span class="navbar-logo-text">{{ $siteName }}</span>
         </a>
 
         {{-- Navigation Links --}}
@@ -107,10 +108,10 @@
                     </div>
                 </div>
             @else
-                <a href="{{ route('login') }}" class="btn btn-outline-sm" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border:1.5px solid var(--accent-color,#e8532e);border-radius:8px;color:var(--accent-color,#e8532e);text-decoration:none;font-weight:700;font-size:.82rem;transition:all .2s;" onmouseover="this.style.background='var(--accent-color,#e8532e)';this.style.color='#fff'" onmouseout="this.style.background='';this.style.color='var(--accent-color,#e8532e)'">
+                <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm nav-btn d-none d-lg-inline-flex">
                     <i class="fas fa-sign-in-alt"></i> {{ __('Login') }}
                 </a>
-                <a href="{{ route('register') }}" class="btn btn-accent-sm" style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;background:var(--accent-color,#e8532e);border-radius:8px;color:#fff;text-decoration:none;font-weight:700;font-size:.82rem;transition:all .2s;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='var(--accent-color,#e8532e)'">
+                <a href="{{ route('register') }}" class="btn btn-primary btn-sm nav-btn d-none d-lg-inline-flex">
                     <i class="fas fa-user-plus"></i> {{ __('Register') }}
                 </a>
             @endauth

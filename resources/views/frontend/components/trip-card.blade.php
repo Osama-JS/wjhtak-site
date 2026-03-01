@@ -70,6 +70,22 @@
             </span>
         </div>
 
+        {{-- Company --}}
+        @if($trip->company)
+            <div class="trip-card-company mb-2 d-flex align-items-center gap-2">
+                <div class="company-logo-mini rounded-circle overflow-hidden shadow-sm" style="width: 24px; height: 24px; flex-shrink: 0; background: var(--color-surface-hover);">
+                    @if($trip->company->logo)
+                        <img src="{{ $trip->company->logo_url }}" alt="{{ $trip->company->name }}" class="w-100 h-100" style="object-fit: cover;">
+                    @else
+                        <i class="fas fa-building text-primary" style="font-size: 10px; display: flex; align-items: center; justify-content: center; height: 100%;"></i>
+                    @endif
+                </div>
+                <span style="font-size: var(--text-xs); font-weight: var(--font-semibold); color: var(--color-text-secondary);">
+                    {{ app()->getLocale() == 'en' && $trip->company->en_name ? $trip->company->en_name : $trip->company->name }}
+                </span>
+            </div>
+        @endif
+
         {{-- Title --}}
         <h3 class="trip-card-title">
             <a href="{{ route('trips.show', $trip->id) }}">{{ $trip->title }}</a>

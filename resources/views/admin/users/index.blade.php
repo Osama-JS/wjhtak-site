@@ -48,9 +48,11 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">{{ __('Admin Management') }}</h4>
+                    @can('manage users')
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal" onclick="resetForm()">
                          <i class="fa fa-plus me-2"></i> {{ __('Add Admin') }}
                      </button>
+                    @endcan
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

@@ -183,7 +183,7 @@
             <div class="profile-card-header">
                 <div class="profile-avatar-wrap">
                     <img id="avatarPreview" src="{{ $user->profile_photo_url }}" class="profile-avatar" alt="">
-                    <label for="photoInput" class="profile-avatar-edit" title="{{ __('تغيير الصورة') }}">
+                    <label for="photoInput" class="profile-avatar-edit" title="{{ __('Change Photo') }}">
                         <i class="fas fa-camera"></i>
                     </label>
                 </div>

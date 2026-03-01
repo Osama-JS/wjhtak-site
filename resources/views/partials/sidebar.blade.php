@@ -2,13 +2,16 @@
 <div class="dlabnav">
     <div class="dlabnav-scroll">
         <ul class="metismenu" id="menu">
+            @can('view dashboard')
             <li>
                 <a href="{{ route('admin.dashboard') }}" aria-expanded="false">
                     <i class="flaticon-025-dashboard"></i>
                     <span class="nav-text">{{ __('Dashboard') }}</span>
                 </a>
             </li>
+            @endcan
 
+            @canany(['manage countries', 'manage cities', 'manage locations'])
             {{-- Content Management --}}
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
@@ -16,11 +19,13 @@
                     <span class="nav-text">{{ __('Locations') }}</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="{{ route('admin.countries.index') }}">{{ __('Countries') }}</a></li>
-                    <li><a href="{{ route('admin.cities.index') }}">{{ __('Cities') }}</a></li>
+                    @can('manage countries')<li><a href="{{ route('admin.countries.index') }}">{{ __('Countries') }}</a></li>@endcan
+                    @can('manage cities')<li><a href="{{ route('admin.cities.index') }}">{{ __('Cities') }}</a></li>@endcan
                 </ul>
             </li>
+            @endcanany
 
+            @can('manage companies')
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-home"></i>
@@ -31,7 +36,9 @@
                     <li><a href="{{ route('admin.company-codes.index') }}">{{ __('Company Codes') }}</a></li>
                 </ul>
             </li>
+            @endcan
 
+            @canany(['view trips', 'manage trips'])
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="fa fa-plane"></i>
@@ -39,30 +46,37 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="{{ route('admin.trips.index') }}">{{ __('Trips') }}</a></li>
-                    <li><a href="{{ route('admin.trip-categories.index') }}">{{ __('Trip Categories') }}</a></li>
+                    @can('manage trip_categories')<li><a href="{{ route('admin.trip-categories.index') }}">{{ __('Trip Categories') }}</a></li>@endcan
                 </ul>
             </li>
+            @endcanany
 
+            @can('view bookings')
             <li>
                 <a href="{{ route('admin.trip-bookings.index') }}" aria-expanded="false">
                     <i class="flaticon-381-calendar-1"></i>
                     <span class="nav-text">{{ __('Bookings') }}</span>
                 </a>
             </li>
+            @endcan
 
+            @can('manage banners')
             <li>
                 <a href="{{ route('admin.banners.index') }}" aria-expanded="false">
                     <i class="flaticon-381-picture"></i>
                     <span class="nav-text">{{ __('Banners') }}</span>
                 </a>
             </li>
+            @endcan
 
+            @can('manage pages')
             <li>
                 <a href="{{ route('admin.pages.index') }}" aria-expanded="false">
                     <i class="flaticon-381-file"></i>
                     <span class="nav-text">{{ __('Pages Management') }}</span>
                 </a>
             </li>
+            @endcan
 
             {{-- Hotel & Flight Categories --}}
             <!-- <li>
@@ -97,26 +111,34 @@
                     <li><a href="{{ route('admin.subscribers.index') }}"></a></li>
                 </ul>
             </li> -->
+            @can('manage subscribers')
               <li>
                 <a href="{{ route('admin.subscribers.index') }}" class="" aria-expanded="false">
                     <i class="fas fa-users-cog"></i>
                     <span class="nav-text">{{ __('Manage Subscribers') }}</span>
                 </a>
             </li>
+            @endcan
+
+            @canany(['view notifications', 'send notifications'])
             <li>
                 <a href="{{ route('admin.notifications.index') }}" class="" aria-expanded="false">
                     <i class="fas fa-bell"></i>
                     <span class="nav-text">{{ __('Notifications') }}</span>
                 </a>
             </li>
+            @endcanany
 
+            @can('manage settings')
             <li>
                 <a href="{{ route('admin.settings.index') }}" aria-expanded="false">
                     <i class="flaticon-381-settings-2"></i>
                     <span class="nav-text">{{ __('Platform Settings') }}</span>
                 </a>
             </li>
+            @endcan
 
+            @canany(['view payments', 'view bank_transfers'])
             {{-- Financial Management --}}
             <li>
                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
@@ -124,10 +146,11 @@
                     <span class="nav-text">{{ __('Financial Management') }}</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="{{ route('admin.payments.index') }}">{{ __('Payment Records') }}</a></li>
-                    <li><a href="{{ route('admin.bank-transfers.index') }}">{{ __('Bank Transfer Review') }}</a></li>
+                    @can('view payments')<li><a href="{{ route('admin.payments.index') }}">{{ __('Payment Records') }}</a></li>@endcan
+                    @can('view bank_transfers')<li><a href="{{ route('admin.bank-transfers.index') }}">{{ __('Bank Transfer Review') }}</a></li>@endcan
                 </ul>
             </li>
+            @endcanany
 
             @can('view users')
             <li>

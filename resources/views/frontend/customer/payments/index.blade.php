@@ -120,7 +120,7 @@
 
             <div class="payment-info">
                 <div class="payment-trip-name">
-                    {{ $payment->booking?->trip?->title ?? __('رحلة') }}
+                    {{ $payment->booking?->trip?->title ?? __('Trip') }}
                 </div>
                 <div class="payment-meta">
                     {{ $payment->created_at->format('d/m/Y H:i') }}
@@ -134,7 +134,7 @@
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
                 <div class="payment-amount">
                     {{ number_format($payment->amount, 2) }}
-                    <span class="currency">{{ __('ر.س') }}</span>
+                    <span class="currency">{{ __('SAR') }}</span>
                 </div>
                 <span class="status-badge badge-{{ $payment->status === 'paid' ? 'success' : ($payment->status === 'pending' ? 'pending' : 'failed') }}">
                     @if($payment->status === 'paid') <i class="fas fa-check-circle"></i> {{ __('Paid') }}

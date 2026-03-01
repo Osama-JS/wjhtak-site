@@ -41,7 +41,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <x-forms.select name="company_id" :label="__('Company')" :options="$companies" searchable required />
+                                        <x-forms.select name="company_id" :label="__('Company')" :options="$companies" optionLabel="localized_name" searchable required />
                                     </div>
                                     <div class="col-md-6">
                                         <x-forms.input-text name="duration" :label="__('Duration')" placeholder="e.g. 5 Days" icon="fa fa-clock" />
