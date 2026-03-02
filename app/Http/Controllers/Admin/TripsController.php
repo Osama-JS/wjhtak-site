@@ -126,38 +126,46 @@ class TripsController extends Controller
             'data' => $trips->map(function ($trip) {
                 $isExpired = $trip->expiry_date && $trip->expiry_date < now()->format('Y-m-d');
 
-                $actionButtons = '
-                        <a href="'.route('admin.trips.edit', $trip->id).'" class="btn btn-sm btn-primary" title="'.__('Edit').'">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="'.route('admin.trips.itinerary', $trip->id).'" class="btn btn-sm btn-info" title="'.__('Itinerary').'">
-                            <i class="fas fa-list-ul"></i>
-                        </a>
-                        <button class="btn btn-sm btn-secondary" onclick="openImageUpload('.$trip->id.', \''.addslashes($trip->title).'\')" title="'.__('Upload Images').'">
-                            <i class="fas fa-camera"></i>
-                        </button>';
+                $actionButtons = '';
+                if (auth()->user()->can('edit trips')) {
+                    $actionButtons .= '
+                            <a href="'.route('admin.trips.edit', $trip->id).'" class="btn btn-sm btn-primary" title="'.__('Edit').'">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="'.route('admin.trips.itinerary', $trip->id).'" class="btn btn-sm btn-info" title="'.__('Itinerary').'">
+                                <i class="fas fa-list-ul"></i>
+                            </a>
+                            <button class="btn btn-sm btn-secondary" onclick="openImageUpload('.$trip->id.', \''.addslashes($trip->title).'\')" title="'.__('Upload Images').'">
+                                <i class="fas fa-camera"></i>
+                            </button>';
 
-                if ($isExpired) {
-                    $actionButtons .= '
-                        <button class="btn btn-sm btn-success" onclick="renewTrip('.$trip->id.')" title="تجديد الرحلة">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>';
-                } else {
-                    $actionButtons .= '
-                        <button class="btn btn-sm btn-warning" onclick="toggleTripStatus('.$trip->id.')">
-                            <i class="fas fa-ban"></i>
-                        </button>';
+                    if ($isExpired) {
+                        $actionButtons .= '
+                            <button class="btn btn-sm btn-success" onclick="renewTrip('.$trip->id.')" title="تجديد الرحلة">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>';
+                    } else {
+                        $actionButtons .= '
+                            <button class="btn btn-sm btn-warning" onclick="toggleTripStatus('.$trip->id.')">
+                                <i class="fas fa-ban"></i>
+                            </button>';
+                    }
                 }
 
-                $actionButtons .= '
-                        <button class="btn btn-sm btn-danger" onclick="deleteTrip('.$trip->id.')" title="'.__('Delete').'">
-                            <i class="fas fa-trash"></i>
-                        </button>';
+                if (auth()->user()->can('delete trips')) {
+                    $actionButtons .= '
+                            <button class="btn btn-sm btn-danger" onclick="deleteTrip('.$trip->id.')" title="'.__('Delete').'">
+                                <i class="fas fa-trash"></i>
+                            </button>';
+                }
 
                 return [
                     'title'    => $trip->title,
                     'company' => $trip->company
-                          ?  '<span>'. $trip->company->name .'</span>' : '...',
+                          ?  '<div class="d-flex align-items-center gap-2">
+                                <img src="' . $trip->company->logo_url . '" class="rounded-circle" width="30" height="30" alt="">
+                                <span>'. (app()->getLocale() == 'en' && $trip->company->en_name ? $trip->company->en_name : $trip->company->name) .'</span>
+                              </div>' : '...',
                     'fromCountry' => $trip->fromCountry
                           ?  '<span>'. $trip->fromCountry->name .'</span>' : '...',
                     'toCountry' => $trip->toCountry

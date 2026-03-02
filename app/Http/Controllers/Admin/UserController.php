@@ -52,12 +52,12 @@ class UserController extends Controller
                     'phone' => ($user->country_code ? $user->country_code . ' ' : '') . $user->phone,
                     'status' => $statusBadge,
                     'verified' => $verifiedBadge,
-                    'actions' => '
+                    'actions' => auth()->user()->can('manage users') ? '
                         <div class="d-flex">
                             <button onclick="editUser(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></button>
                             <button onclick="toggleUserStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-ban"></i></button>
                             <button onclick="deleteUser(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
-                        </div>'
+                        </div>' : ''
                 ];
             })
         ]);

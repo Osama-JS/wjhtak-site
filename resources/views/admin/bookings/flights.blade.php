@@ -71,7 +71,7 @@
                                 <td><strong>01</strong></td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ asset('images/profile/pic1.jpg') }}" class="rounded-lg me-2" width="24" alt=""/>
+                                        <img src="{{ asset('images/avatar/1.png') }}" class="rounded-lg me-2" width="24" alt=""/>
                                         <span class="w-space-no">John Doe</span>
                                     </div>
                                 </td>
@@ -95,7 +95,7 @@
                                 <td><strong>02</strong></td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ asset('images/profile/pic1.jpg') }}" class="rounded-lg me-2" width="24" alt=""/>
+                                        <img src="{{ asset('images/avatar/1.png') }}" class="rounded-lg me-2" width="24" alt=""/>
                                         <span class="w-space-no">Ahmed Ali</span>
                                     </div>
                                 </td>
@@ -119,7 +119,7 @@
                                 <td><strong>03</strong></td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ asset('images/profile/pic1.jpg') }}" class="rounded-lg me-2" width="24" alt=""/>
+                                        <img src="{{ asset('images/avatar/1.png') }}" class="rounded-lg me-2" width="24" alt=""/>
                                         <span class="w-space-no">Sarah Connor</span>
                                     </div>
                                 </td>

@@ -3,292 +3,340 @@
 @section('title', __('My Favorites'))
 @section('page-title', __('My Favorites'))
 
+@section('content')
 @push('styles')
 <style>
-.fav-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-}
+    :root {
+        --accent-color: #e8532e;
+        --accent-soft: rgba(232, 83, 46, 0.08);
+        --accent-hover: #d14424;
+    }
 
-.fav-card {
-    background: #fff;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,.06);
-    transition: transform .2s, box-shadow .2s;
-    display: flex;
-    flex-direction: column;
-}
+    .favorites-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+    }
 
-.fav-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0,0,0,.1);
-}
+    .favorite-card {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
 
-.fav-img-wrap {
-    position: relative;
-    height: 180px;
-    overflow: hidden;
-}
+    .favorite-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        border-color: var(--accent-soft);
+    }
 
-.fav-img-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform .4s;
-}
+    .favorite-image {
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+    }
 
-.fav-card:hover .fav-img-wrap img { transform: scale(1.06); }
+    .favorite-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
 
-.fav-img-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    color: #94a3b8;
-}
+    .favorite-card:hover .favorite-image img {
+        transform: scale(1.1);
+    }
 
-.fav-remove-btn {
-    position: absolute;
-    top: 10px;
-    inset-inline-end: 10px;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.9);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ef4444;
-    font-size: .9rem;
-    transition: all .2s;
-    backdrop-filter: blur(4px);
-}
+    .remove-fav-btn {
+        position: absolute;
+        top: 15px;
+        inset-inline-end: 15px;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.9);
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+        z-index: 10;
+        backdrop-filter: blur(4px);
+    }
 
-.fav-remove-btn:hover {
-    background: #ef4444;
-    color: #fff;
-}
+    .remove-fav-btn:hover {
+        background: #ef4444;
+        color: #fff;
+        transform: scale(1.1);
+    }
 
-.fav-body {
-    padding: 16px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
+    .favorite-body {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
-.fav-title {
-    font-weight: 700;
-    font-size: .95rem;
-    color: #111827;
-    margin-bottom: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+    .fav-trip-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 12px;
+        line-height: 1.4;
+        text-decoration: none;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 
-.fav-meta {
-    font-size: .78rem;
-    color: #6b7280;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 12px;
-}
+    .fav-trip-title:hover {
+        color: var(--accent-color);
+    }
 
-.fav-meta span { display: flex; align-items: center; gap: 4px; }
+    .fav-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
 
-.fav-footer {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+    .fav-meta-item {
+        font-size: 0.82rem;
+        color: #64748b;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-.fav-price {
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--accent-color, #e8532e);
-}
+    .fav-meta-item i {
+        color: var(--accent-color);
+    }
 
-.fav-price small { font-size: .72rem; color: #9ca3af; font-weight: 400; }
+    .fav-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 1px solid #f1f5f9;
+    }
 
-.btn-view {
-    padding: 7px 15px;
-    background: #f1f5f9;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #374151;
-    font-size: .8rem;
-    font-weight: 600;
-    transition: all .2s;
-}
+    .fav-price-box .p-label {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-weight: 700;
+        display: block;
+        text-transform: uppercase;
+    }
 
-.btn-view:hover {
-    background: var(--accent-color, #e8532e);
-    color: #fff;
-}
+    .fav-price-box .p-value {
+        font-size: 1.2rem;
+        font-weight: 900;
+        color: #1e293b;
+    }
 
-.empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.06);
-    grid-column: 1 / -1;
-}
+    .btn-view-trip {
+        padding: 8px 18px;
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        color: #475569;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
 
-.empty-state .empty-icon { font-size: 4rem; color: #e2e8f0; margin-bottom: 16px; }
-.empty-state h3 { font-size: 1.1rem; font-weight: 700; color: #374151; margin-bottom: 8px; }
-.empty-state p { color: #9ca3af; font-size: .9rem; margin-bottom: 20px; }
+    .btn-view-trip:hover {
+        background: var(--accent-color);
+        color: #fff;
+        border-color: var(--accent-color);
+    }
 
-.btn-accent-sm {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 22px;
-    background: var(--accent-color, #e8532e);
-    color: #fff;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: .88rem;
-    transition: background .2s;
-}
+    /* Empty State */
+    .fav-empty {
+        background: #fff;
+        border-radius: 30px;
+        padding: 80px 30px;
+        text-align: center;
+        border: 1px dashed #e2e8f0;
+        grid-column: 1 / -1;
+    }
 
-.btn-accent-sm:hover { background: #d04525; color: #fff; }
+    .fav-empty-icon {
+        width: 90px;
+        height: 90px;
+        background: #fef2f2;
+        color: #fca5a5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        font-size: 2.8rem;
+    }
 
-.fav-toast {
-    position: fixed;
-    bottom: 24px;
-    inset-inline-start: 24px;
-    background: #111827;
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: .88rem;
-    font-weight: 600;
-    display: none;
-    align-items: center;
-    gap: 8px;
-    z-index: 9999;
-    box-shadow: 0 8px 24px rgba(0,0,0,.2);
-    animation: slideUp .3s ease;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
+    .btn-accent-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        background: var(--accent-color);
+        color: #fff;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+    .btn-accent-main:hover {
+        background: var(--accent-hover);
+        transform: scale(1.05);
+        color: #fff;
+    }
 </style>
 @endpush
 
-@section('content')
+<div class="dash-header-row mb-4">
+    <h4 style="margin:0;font-weight:900;color:#1e293b;font-size:1.4rem;">{{ __('My Favorite Trips') }}</h4>
+    <p class="text-muted" style="font-size: 0.9rem;">{{ __('Trips you have saved to visit later.') }}</p>
+</div>
 
-@if($favorites->isEmpty())
-    <div class="fav-grid">
-        <div class="empty-state">
-            <div class="empty-icon"><i class="fas fa-heart"></i></div>
-            <h3>{{ __('No favorite trips') }}</h3>
-            <p>{{ __('Add trips you like to your favorites to find them here easily.') }}</p>
-            <a href="{{ route('trips.index') }}" class="btn-accent-sm">
-                <i class="fas fa-search"></i> {{ __('Explore Trips') }}
-            </a>
-        </div>
-    </div>
-@else
-    <div class="fav-grid">
-        @foreach($favorites as $fav)
-            @php $trip = $fav->trip; $img = $trip?->images?->first(); @endphp
-            <div class="fav-card" id="fav-card-{{ $trip?->id }}">
-                <div class="fav-img-wrap">
-                    @if($img)
-                        <img src="{{ asset('storage/' . $img->image_path) }}" alt="{{ $trip->title }}">
-                    @else
-                        <div class="fav-img-placeholder"><i class="fas fa-map-marked-alt"></i></div>
-                    @endif
+@if($favorites->count() > 0)
+    <div class="favorites-grid" id="favoritesGrid">
+        @foreach($favorites as $favorite)
+            @php
+                $trip = $favorite->trip;
+                $image = $trip?->images?->first();
+            @endphp
+            @if($trip)
+                <div class="favorite-card" id="fav-card-{{ $trip->id }}">
+                    <div class="favorite-image">
+                        @if($image)
+                            <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $trip->title }}">
+                        @else
+                            <div style="width:100%; height:100%; background:#f8fafc; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:3rem;">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </div>
+                        @endif
 
-                    <button class="fav-remove-btn" onclick="removeFavorite({{ $trip?->id }}, this)" title="{{ __('Remove from favorites') }}">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                </div>
-                <div class="fav-body">
-                    <div class="fav-title">{{ $trip?->title }}</div>
-                    <div class="fav-meta">
-                        @if($trip?->toCountry)
-                            <span><i class="fas fa-globe-asia"></i> {{ $trip->toCountry->name }}</span>
-                        @endif
-                        @if($trip?->duration_days)
-                            <span><i class="fas fa-clock"></i> {{ $trip->duration_days }} {{ __('Day') }}</span>
-                        @endif
+                        <button class="remove-fav-btn" onclick="removeFavorite({{ $trip->id }})" title="{{ __('Remove from favorites') }}">
+                            <i class="fas fa-heart"></i>
+                        </button>
                     </div>
-                    <div class="fav-footer">
-                        <div class="fav-price">
-                            {{ number_format($trip?->price ?? 0, 0) }} {{ __('ر.س') }}
-                            <small>/{{ __('للشخص') }}</small>
-                        </div>
-                        <a href="{{ route('trips.show', $trip?->id) }}" class="btn-view">
-                            {{ __('عرض') }} <i class="fas fa-arrow-{{ app()->isLocale('ar') ? 'left' : 'right' }}"></i>
+
+                    <div class="favorite-body">
+                        <a href="{{ route('trips.show', $trip->id) }}" class="fav-trip-title">
+                            {{ $trip->title }}
                         </a>
+
+                        <div class="fav-meta">
+                            @if($trip->toCountry)
+                                <div class="fav-meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ $trip->toCountry->name }}
+                                </div>
+                            @endif
+                            @if($trip->duration)
+                                <div class="fav-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    {{ $trip->duration }}
+                                </div>
+                            @endif
+                            @if($trip->company)
+                                <div class="fav-meta-item">
+                                    <i class="fas fa-building"></i>
+                                    {{ $trip->company->name }}
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="fav-footer">
+                            <div class="fav-price-box">
+                                <span class="p-label">{{ __('Price') }}</span>
+                                <span class="p-value">{{ number_format($trip->price, 0) }} <small style="font-size:0.6em;">{{ __('SAR') }}</small></span>
+                            </div>
+                            <a href="{{ route('trips.show', $trip->id) }}" class="btn-view-trip">
+                                {{ __('View Details') }} <i class="fas fa-chevron-{{ app()->isLocale('ar') ? 'left' : 'right' }} ms-1" style="font-size:0.75rem;"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
         @endforeach
     </div>
 
-    {{-- Pagination --}}
     @if($favorites->hasPages())
-        <div style="margin-top: 24px; display: flex; justify-content: center;">
+        <div class="mt-5 d-flex justify-content-center">
             {{ $favorites->links() }}
         </div>
     @endif
+@else
+    <div class="fav-empty">
+        <div class="fav-empty-icon">
+            <i class="far fa-heart"></i>
+        </div>
+        <h3 style="font-weight:900; color:#1e293b; margin-bottom:10px;">{{ __('Your wishlist is empty') }}</h3>
+        <p style="color:#64748b; margin-bottom:30px; max-width:400px; margin-inline:auto;">{{ __("You haven't added any trips to your favorites yet. Start exploring and save the ones you love!") }}</p>
+        <a href="{{ route('trips.index') }}" class="btn-accent-main">
+            {{ __('Explore Trips') }}
+        </a>
+    </div>
 @endif
 
-<div class="fav-toast" id="favToast">
-    <i class="fas fa-check-circle" style="color:#10b981;"></i>
-    <span id="favToastMsg"></span>
-</div>
-
-@endsection
-
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-const favToggleUrl = '{{ route("customer.favorites.toggle", ":id") }}';
-const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-function removeFavorite(tripId, btn) {
-    const url = favToggleUrl.replace(':id', tripId);
-    btn.disabled = true;
+function removeFavorite(tripId) {
+    const url = '{{ route("customer.favorites.toggle", ":id") }}'.replace(':id', tripId);
 
     fetch(url, {
         method: 'POST',
-        headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (!data.error && !data.is_favorite) {
-            const card = document.getElementById('fav-card-' + tripId);
-            card.style.transition = 'opacity .3s, transform .3s';
-            card.style.opacity = '0';
-            card.style.transform = 'scale(.9)';
-            setTimeout(() => card.remove(), 300);
-            showToast(data.message);
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
         }
     })
-    .catch(() => { btn.disabled = false; });
-}
+    .then(response => response.json())
+    .then(data => {
+        if (!data.error && !data.is_favorite) {
+            // Smoothly remove from UI
+            const card = document.getElementById(`fav-card-${tripId}`);
+            card.style.transition = 'all 0.3s ease';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
 
-function showToast(msg) {
-    const t = document.getElementById('favToast');
-    document.getElementById('favToastMsg').textContent = msg;
-    t.style.display = 'flex';
-    setTimeout(() => { t.style.display = 'none'; }, 3000);
+            setTimeout(() => {
+                card.remove();
+                if (document.querySelectorAll('.favorite-card').length === 0) {
+                    location.reload(); // Show empty state
+                }
+            }, 300);
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+            Toast.fire({
+                icon: 'success',
+                title: data.message
+            });
+        }
+    });
 }
 </script>
 @endpush
+
+@endsection

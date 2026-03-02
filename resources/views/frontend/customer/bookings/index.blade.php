@@ -238,7 +238,7 @@
                     @if($trip?->toCountry)
                         <span><i class="fas fa-globe"></i> {{ $trip->toCountry->name }}</span>
                     @endif
-                    <span><i class="fas fa-users"></i> {{ $booking->tickets_count }} {{ __('Passenger') }}</span>
+                    <span><i class="fas fa-users"></i> {{ $booking->tickets_count }} {{ $booking->tickets_count > 1 ? __('Passengers') : __('Passenger') }}</span>
                     <span><i class="fas fa-calendar"></i> {{ $booking->booking_date?->format('d/m/Y') ?? now()->format('d/m/Y') }}</span>
                 </div>
             </div>

@@ -18,6 +18,7 @@ class User extends Authenticatable
     // User Types Constants
     const TYPE_ADMIN = 'admin';
     const TYPE_CUSTOMER = 'customer';
+    const TYPE_AGENT = 'agent';
 
     /**
      * The attributes that are mass assignable.
@@ -30,6 +31,7 @@ class User extends Authenticatable
         'email',
         'password',
         'user_type',
+        'company_id',
         'profile_photo',
         'phone',
         'country_code',
@@ -86,7 +88,7 @@ class User extends Authenticatable
     {
         return $this->profile_photo
             ? asset('storage/' . $this->profile_photo)
-            : asset('images/profile/pic1.jpg');
+            : asset('images/avatar/1.png');
     }
 
     /**
@@ -136,6 +138,22 @@ class User extends Authenticatable
     public function isCustomer(): bool
     {
         return $this->user_type === self::TYPE_CUSTOMER;
+    }
+
+    /**
+     * Check if user is agent
+     */
+    public function isAgent(): bool
+    {
+        return $this->user_type === self::TYPE_AGENT;
+    }
+
+    /**
+     * Get user company
+     */
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 
     /**

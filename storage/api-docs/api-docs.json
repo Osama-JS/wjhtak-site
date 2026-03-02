@@ -4485,6 +4485,69 @@
                 ]
             }
         },
+        "/api/v1/bookings/{id}/ticket": {
+            "get": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Download booking ticket",
+                "description": "Get the URL to download the travel ticket for a confirmed booking. If the ticket has not been uploaded by the admin yet, an error message is returned.",
+                "operationId": "downloadTicket",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ticket retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "ticket_url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com/storage/tickets/ticket_123.pdf"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found or Ticket not yet uploaded"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/bookings/{id}/cancel": {
             "post": {
                 "tags": [

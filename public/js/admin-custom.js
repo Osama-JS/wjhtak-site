@@ -171,11 +171,39 @@
                 const requiredFields = form.querySelectorAll("[required]");
                 let isValid = true;
 
+                // Clear previous frontend empty field errors
+                form.querySelectorAll(
+                    ".invalid-feedback.frontend-error",
+                ).forEach((el) => el.remove());
+
                 requiredFields.forEach(function (field) {
-                    if (!field.value.trim()) {
+                    if (!field.value.trim() && field.type !== "hidden") {
                         isValid = false;
                         field.classList.add("is-invalid");
                         field.classList.remove("is-valid");
+
+                        // Inject error text
+                        let errorMsg = document.createElement("div");
+                        errorMsg.className =
+                            "invalid-feedback d-block frontend-error";
+                        errorMsg.innerHTML =
+                            '<i class="fas fa-exclamation-circle me-1"></i> ' +
+                            ((window.Translations &&
+                                window.Translations.required_field) ||
+                                "This field is required");
+
+                        if (
+                            field.parentElement.classList.contains(
+                                "input-wrapper",
+                            ) ||
+                            field.parentElement.classList.contains(
+                                "input-group",
+                            )
+                        ) {
+                            field.parentElement.after(errorMsg);
+                        } else {
+                            field.after(errorMsg);
+                        }
                     } else {
                         field.classList.remove("is-invalid");
                         field.classList.add("is-valid");
@@ -219,7 +247,7 @@
         });
 
         // Live validation
-        const inputs = document.querySelectorAll(".form-control");
+        const inputs = document.querySelectorAll(".form-control, .form-select");
         inputs.forEach(function (input) {
             input.addEventListener("blur", function () {
                 if (this.hasAttribute("required") && !this.value.trim()) {
@@ -232,8 +260,122 @@
 
             input.addEventListener("input", function () {
                 this.classList.remove("is-invalid");
+                this.classList.remove("is-valid");
+                // Remove sibling frontend or ajax errors
+                let wrapper = this.parentElement;
+                if (
+                    wrapper.classList.contains("input-wrapper") ||
+                    wrapper.classList.contains("input-group")
+                ) {
+                    if (
+                        wrapper.nextElementSibling &&
+                        wrapper.nextElementSibling.classList.contains(
+                            "invalid-feedback",
+                        )
+                    ) {
+                        wrapper.nextElementSibling.remove();
+                    }
+                } else if (
+                    this.nextElementSibling &&
+                    this.nextElementSibling.classList.contains(
+                        "invalid-feedback",
+                    )
+                ) {
+                    this.nextElementSibling.remove();
+                }
             });
         });
+
+        // Global AJAX Handlers for Forms
+        if (typeof jQuery !== "undefined") {
+            jQuery(document).ajaxComplete(function (event, xhr, settings) {
+                // Reset loading buttons
+                document
+                    .querySelectorAll('button[type="submit"][disabled]')
+                    .forEach(function (btn) {
+                        if (
+                            btn.hasAttribute("data-original-html") ||
+                            btn.dataset.originalHtml
+                        ) {
+                            btn.innerHTML = btn.dataset.originalHtml;
+                            btn.disabled = false;
+                            delete btn.dataset.originalHtml;
+                        }
+                    });
+            });
+
+            jQuery(document).ajaxError(
+                function (event, jqxhr, settings, thrownError) {
+                    if (
+                        jqxhr.status === 422 &&
+                        jqxhr.responseJSON &&
+                        jqxhr.responseJSON.errors
+                    ) {
+                        let errors = jqxhr.responseJSON.errors;
+
+                        // Clear previous AJAX errors
+                        jQuery(".is-invalid").removeClass("is-invalid");
+                        jQuery(".invalid-feedback.ajax-error").remove();
+
+                        let firstErrorField = null;
+
+                        Object.keys(errors).forEach(function (key) {
+                            let inputName = key;
+                            if (inputName.includes(".")) {
+                                let parts = inputName.split(".");
+                                inputName =
+                                    parts[0] +
+                                    "[" +
+                                    parts.slice(1).join("][") +
+                                    "]";
+                            }
+
+                            let input = jQuery(
+                                '[name="' +
+                                    inputName +
+                                    '"], [name="' +
+                                    inputName +
+                                    '[]"]',
+                            );
+                            if (input.length) {
+                                input.addClass("is-invalid");
+                                let errorMsg = jQuery(
+                                    '<div class="invalid-feedback d-block ajax-error"><i class="fas fa-exclamation-circle me-1"></i> ' +
+                                        errors[key][0] +
+                                        "</div>",
+                                );
+
+                                if (
+                                    input.parent().hasClass("input-wrapper") ||
+                                    input.parent().hasClass("input-group")
+                                ) {
+                                    input.parent().after(errorMsg);
+                                } else {
+                                    input.after(errorMsg);
+                                }
+
+                                if (!firstErrorField) firstErrorField = input;
+                            } else {
+                                if (typeof toastr !== "undefined") {
+                                    toastr.error(errors[key][0]);
+                                }
+                            }
+                        });
+
+                        if (firstErrorField && firstErrorField.length) {
+                            jQuery("html, body").animate(
+                                {
+                                    scrollTop:
+                                        firstErrorField.offset().top - 100,
+                                },
+                                500,
+                            );
+                            firstErrorField.focus();
+                        }
+                    }
+                },
+            );
+        }
     }
 
     // ============================================

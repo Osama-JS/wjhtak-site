@@ -20,6 +20,7 @@ use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Customer\CustomerPaymentController;
 use App\Http\Controllers\Customer\NotificationController as CustomerNotificationController;
+use App\Http\Controllers\CompanyProfileController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -71,11 +72,10 @@ Route::get('lang/{locale}', function ($locale) {
 // Homepage
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 
-// Trips
-Route::get('/trips', [FrontendController::class, 'trips'])->name('trips.index');
-Route::get('/trips/{id}', [FrontendController::class, 'tripShow'])->name('trips.show');
+// Company Profile
+Route::get('/company/{company}', [CompanyProfileController::class, 'show'])->name('company.profile');
 
-// banner
+// Trips
 Route::get('/trips', [FrontendController::class, 'trips'])->name('trips.index');
 Route::get('/trips/{id}', [FrontendController::class, 'tripShow'])->name('trips.show');
 
@@ -98,13 +98,6 @@ Route::get('/search', [FrontendController::class, 'search'])->name('search');
 // Search Model
 Route::get('/searchModel', [FrontendController::class, 'searchModel'])->name('searchModel');
 
-// Default dashboard - redirect based on user type
-Route::get('/dashboard', function () {
-    if (auth()->user()->isAdmin()) {
-        return redirect()->route('admin.dashboard');
-    }
-    return redirect()->route('customer.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -115,17 +108,21 @@ Route::middleware('auth')->group(function () {
 // Admin Routes - Protected by isAdmin middleware
 Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('permission:view dashboard');
 
     // User Management
-    Route::get('users/data', [UserController::class, 'getData'])->name('users.data');
-    Route::get('users/{user}/profile', [UserController::class, 'profile'])->name('users.profile');
-    Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
-    Route::resource('users', UserController::class);
+    Route::middleware('permission:manage users')->group(function () {
+        Route::get('users/data', [UserController::class, 'getData'])->name('users.data');
+        Route::get('users/{user}/profile', [UserController::class, 'profile'])->name('users.profile');
+        Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::resource('users', UserController::class);
+    });
 
     // Role Management
-    Route::get('roles/data', [RoleController::class, 'getData'])->name('roles.data');
-    Route::resource('roles', RoleController::class);
+    Route::middleware('permission:manage roles')->group(function () {
+        Route::get('roles/data', [RoleController::class, 'getData'])->name('roles.data');
+        Route::resource('roles', RoleController::class);
+    });
 
     // Bookings
     Route::group(['prefix' => 'bookings', 'as' => 'bookings.'], function() {
@@ -145,61 +142,82 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     });
 
     // Countries Management
-    Route::get('countries/data', [App\Http\Controllers\Admin\CountryController::class, 'getData'])->name('countries.data');
-    Route::get('countries/active', [App\Http\Controllers\Admin\CountryController::class, 'getActiveCountries'])->name('countries.active');
-    Route::post('countries/{country}/toggle-status', [App\Http\Controllers\Admin\CountryController::class, 'toggleStatus'])->name('countries.toggle-status');
-    Route::resource('countries', App\Http\Controllers\Admin\CountryController::class);
+    Route::middleware('permission:manage countries')->group(function() {
+        Route::get('countries/data', [App\Http\Controllers\Admin\CountryController::class, 'getData'])->name('countries.data');
+        Route::get('countries/active', [App\Http\Controllers\Admin\CountryController::class, 'getActiveCountries'])->name('countries.active');
+        Route::post('countries/{country}/toggle-status', [App\Http\Controllers\Admin\CountryController::class, 'toggleStatus'])->name('countries.toggle-status');
+        Route::resource('countries', App\Http\Controllers\Admin\CountryController::class);
+    });
 
     // Cities Management
-    Route::get('cities/data', [App\Http\Controllers\Admin\CityController::class, 'getData'])->name('cities.data');
-    Route::get('cities/by-country/{country}', [App\Http\Controllers\Admin\CityController::class, 'byCountry'])->name('cities.by-country');
-    Route::post('cities/{city}/toggle-status', [App\Http\Controllers\Admin\CityController::class, 'toggleStatus'])->name('cities.toggle-status');
-    Route::resource('cities', App\Http\Controllers\Admin\CityController::class);
+    Route::middleware('permission:manage cities')->group(function() {
+        Route::get('cities/data', [App\Http\Controllers\Admin\CityController::class, 'getData'])->name('cities.data');
+        Route::get('cities/by-country/{country}', [App\Http\Controllers\Admin\CityController::class, 'byCountry'])->name('cities.by-country');
+        Route::post('cities/{city}/toggle-status', [App\Http\Controllers\Admin\CityController::class, 'toggleStatus'])->name('cities.toggle-status');
+        Route::resource('cities', App\Http\Controllers\Admin\CityController::class);
+    });
 
 
     // companies Management
-    Route::get('companies/data', [App\Http\Controllers\Admin\CompanyController::class, 'getData'])->name('companies.data');
-    Route::get('companies/active', [App\Http\Controllers\Admin\CompanyController::class, 'getActivecompanies'])->name('companies.active');
-    Route::post('companies/{company}/toggle-status', [App\Http\Controllers\Admin\CompanyController::class, 'toggleStatus'])->name('companies.toggle-status');
-    Route::resource('companies', App\Http\Controllers\Admin\CompanyController::class);
+    Route::middleware('permission:manage companies')->group(function() {
+        Route::get('companies/data', [App\Http\Controllers\Admin\CompanyController::class, 'getData'])->name('companies.data');
+        Route::get('companies/active', [App\Http\Controllers\Admin\CompanyController::class, 'getActivecompanies'])->name('companies.active');
+        Route::post('companies/{company}/toggle-status', [App\Http\Controllers\Admin\CompanyController::class, 'toggleStatus'])->name('companies.toggle-status');
 
+        // Agent Management for Company
+        Route::get('companies/{company}/agents', [App\Http\Controllers\Admin\CompanyAgentController::class, 'index'])->name('companies.agents');
+        Route::get('companies/{company}/agents/data', [App\Http\Controllers\Admin\CompanyAgentController::class, 'getData'])->name('companies.agents.data');
+        Route::post('companies/{company}/agents', [App\Http\Controllers\Admin\CompanyAgentController::class, 'store'])->name('companies.agents.store');
+        Route::get('agents/{user}/edit', [App\Http\Controllers\Admin\CompanyAgentController::class, 'edit'])->name('companies.agents.edit');
+        Route::put('agents/{user}', [App\Http\Controllers\Admin\CompanyAgentController::class, 'update'])->name('companies.agents.update');
+        Route::post('agents/{user}/toggle-status', [App\Http\Controllers\Admin\CompanyAgentController::class, 'toggleStatus'])->name('companies.agents.toggle-status');
+        Route::delete('agents/{user}', [App\Http\Controllers\Admin\CompanyAgentController::class, 'destroy'])->name('companies.agents.destroy');
 
-    Route::get('company-codes/data', [App\Http\Controllers\Admin\Company_CodesController::class, 'getData'])->name('company-codes.data');
-    Route::post('company-codes/{company_code}/toggle-status', [App\Http\Controllers\Admin\Company_CodesController::class, 'toggleStatus'])->name('company-codes.toggle-status');
-    Route::resource('company-codes', App\Http\Controllers\Admin\Company_CodesController::class);
+        Route::resource('companies', App\Http\Controllers\Admin\CompanyController::class);
+
+        Route::get('company-codes/data', [App\Http\Controllers\Admin\Company_CodesController::class, 'getData'])->name('company-codes.data');
+        Route::post('company-codes/{company_code}/toggle-status', [App\Http\Controllers\Admin\Company_CodesController::class, 'toggleStatus'])->name('company-codes.toggle-status');
+        Route::resource('company-codes', App\Http\Controllers\Admin\Company_CodesController::class);
+    });
 
 
     // Banners Management
-    Route::get('banners/data', [App\Http\Controllers\Admin\BannerController::class, 'getData'])->name('banners.data');
-    Route::post('banners/{banner}/toggle-status', [App\Http\Controllers\Admin\BannerController::class, 'toggleStatus'])->name('banners.toggle-status');
-    Route::post('banners/reorder', [App\Http\Controllers\Admin\BannerController::class, 'reorder'])->name('banners.reorder');
-    Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
+    Route::middleware('permission:manage banners')->group(function() {
+        Route::get('banners/data', [App\Http\Controllers\Admin\BannerController::class, 'getData'])->name('banners.data');
+        Route::post('banners/{banner}/toggle-status', [App\Http\Controllers\Admin\BannerController::class, 'toggleStatus'])->name('banners.toggle-status');
+        Route::post('banners/reorder', [App\Http\Controllers\Admin\BannerController::class, 'reorder'])->name('banners.reorder');
+        Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
+    });
 
     // Trips Management
-    Route::get('trips/data', [App\Http\Controllers\Admin\TripsController::class, 'getData'])->name('trips.data');
-    Route::post('trips/{trip}/toggle-status', [App\Http\Controllers\Admin\TripsController::class, 'toggleStatus'])->name('trips.toggle-status');
-    Route::post('/trips/{trip}/renew', [App\Http\Controllers\Admin\TripsController::class, 'renew'])->name('trips.renew');
-    Route::resource('trips', App\Http\Controllers\Admin\TripsController::class);
-    Route::post('/trips/{trip}/images', [App\Http\Controllers\Admin\TripsController::class, 'imagestore'])->name('trips.images-store');
-    Route::get('/trips/{id}/get-images', [App\Http\Controllers\Admin\TripsController::class, 'getImages'])->name('trips.get-images');
-    Route::delete('/trips/{image}/destroyimages', [App\Http\Controllers\Admin\TripsController::class, 'imagedestroy'])->name('trips.images-destroy');
+    Route::middleware('permission:manage trips')->group(function() {
+        Route::get('trips/data', [App\Http\Controllers\Admin\TripsController::class, 'getData'])->name('trips.data');
+        Route::post('trips/{trip}/toggle-status', [App\Http\Controllers\Admin\TripsController::class, 'toggleStatus'])->name('trips.toggle-status');
+        Route::post('/trips/{trip}/renew', [App\Http\Controllers\Admin\TripsController::class, 'renew'])->name('trips.renew');
+        Route::resource('trips', App\Http\Controllers\Admin\TripsController::class);
+        Route::post('/trips/{trip}/images', [App\Http\Controllers\Admin\TripsController::class, 'imagestore'])->name('trips.images-store');
+        Route::get('/trips/{id}/get-images', [App\Http\Controllers\Admin\TripsController::class, 'getImages'])->name('trips.get-images');
+        Route::delete('/trips/{image}/destroyimages', [App\Http\Controllers\Admin\TripsController::class, 'imagedestroy'])->name('trips.images-destroy');
 
-    // Trip Itinerary
-    Route::get('/trips/{trip}/itinerary', [TripsController::class, 'itinerary'])->name('trips.itinerary');
-    Route::post('/trips/{trip}/itinerary', [TripsController::class, 'storeItinerary'])->name('trips.itinerary.store');
-    Route::put('/trips/itinerary/{itinerary}', [TripsController::class, 'updateItinerary'])->name('trips.itinerary.update');
-    Route::post('/trips/itinerary/reorder', [TripsController::class, 'reorderItinerary'])->name('trips.itinerary.reorder');
-    Route::delete('/trips/itinerary/{itinerary}', [TripsController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
+        // Trip Itinerary
+        Route::get('/trips/{trip}/itinerary', [TripsController::class, 'itinerary'])->name('trips.itinerary');
+        Route::post('/trips/{trip}/itinerary', [TripsController::class, 'storeItinerary'])->name('trips.itinerary.store');
+        Route::put('/trips/itinerary/{itinerary}', [TripsController::class, 'updateItinerary'])->name('trips.itinerary.update');
+        Route::post('/trips/itinerary/reorder', [TripsController::class, 'reorderItinerary'])->name('trips.itinerary.reorder');
+        Route::delete('/trips/itinerary/{itinerary}', [TripsController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
 
-    // Trip Categories
-    Route::get('trip-categories/data', [TripCategoryController::class, 'getData'])->name('trip-categories.data');
-    Route::get('trip-categories', [TripCategoryController::class, 'index'])->name('trip-categories.index');
-    Route::get('trip-categories/all', [TripCategoryController::class, 'getAll'])->name('trip-categories.all');
-    Route::resource('trip-categories', TripCategoryController::class)->except(['index']);
+        // Trip Categories
+        Route::get('trip-categories/data', [TripCategoryController::class, 'getData'])->name('trip-categories.data');
+        Route::get('trip-categories', [TripCategoryController::class, 'index'])->name('trip-categories.index');
+        Route::get('trip-categories/all', [TripCategoryController::class, 'getAll'])->name('trip-categories.all');
+        Route::resource('trip-categories', TripCategoryController::class)->except(['index']);
+    });
 
     // Settings
-    Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
-    Route::post('settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    Route::middleware('permission:manage settings')->group(function() {
+        Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::post('settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    });
 
     // Profile Management
     Route::get('profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
@@ -208,49 +226,73 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::post('profile/photo', [App\Http\Controllers\Admin\ProfileController::class, 'updatePhoto'])->name('profile.photo');
 
     // Permission Management
-    Route::get('permissions/data', [PermissionController::class, 'getData'])->name('permissions.data');
-    Route::resource('permissions', PermissionController::class);
+    Route::middleware('permission:manage permissions')->group(function() {
+        Route::get('permissions/data', [PermissionController::class, 'getData'])->name('permissions.data');
+        Route::resource('permissions', PermissionController::class);
+    });
 
     // Trip Bookings Management
-    Route::get('trip-bookings/data', [App\Http\Controllers\Admin\TripBookingController::class, 'getData'])->name('trip-bookings.data');
-    Route::post('trip-bookings/{id}/update-status', [App\Http\Controllers\Admin\TripBookingController::class, 'updateStatus'])->name('trip-bookings.update-status');
-    Route::post('trip-bookings/{id}/update-state', [App\Http\Controllers\Admin\TripBookingController::class, 'updateBookingState'])->name('trip-bookings.update-state');
-    Route::post('trip-bookings/{id}/upload-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'uploadTicket'])->name('trip-bookings.upload-ticket');
-    Route::post('trip-bookings/{id}/send-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'sendTicket'])->name('trip-bookings.send-ticket');
-    Route::resource('trip-bookings', App\Http\Controllers\Admin\TripBookingController::class);
+    Route::middleware('permission:view bookings')->group(function() {
+        Route::get('trip-bookings/data', [App\Http\Controllers\Admin\TripBookingController::class, 'getData'])->name('trip-bookings.data');
+        Route::get('trip-bookings', [App\Http\Controllers\Admin\TripBookingController::class, 'index'])->name('trip-bookings.index');
+        Route::get('trip-bookings/{trip_booking}', [App\Http\Controllers\Admin\TripBookingController::class, 'show'])->name('trip-bookings.show');
+    });
+
+    Route::middleware('permission:manage bookings')->group(function() {
+        Route::post('trip-bookings/{id}/update-status', [App\Http\Controllers\Admin\TripBookingController::class, 'updateStatus'])->name('trip-bookings.update-status');
+        Route::post('trip-bookings/{id}/update-state', [App\Http\Controllers\Admin\TripBookingController::class, 'updateBookingState'])->name('trip-bookings.update-state');
+        Route::post('trip-bookings/{id}/upload-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'uploadTicket'])->name('trip-bookings.upload-ticket');
+        Route::post('trip-bookings/{id}/send-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'sendTicket'])->name('trip-bookings.send-ticket');
+        Route::resource('trip-bookings', App\Http\Controllers\Admin\TripBookingController::class)->except(['index', 'show']);
+    });
 
     // Notifications Management
-    Route::get('notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
-    Route::get('notifications/data', [AdminNotificationController::class, 'getData'])->name('notifications.data');
-    Route::get('notifications/search-users', [AdminNotificationController::class, 'searchUsers'])->name('notifications.search-users');
-    Route::post('notifications/send', [AdminNotificationController::class, 'send'])->name('notifications.send');
-    Route::delete('notifications/{id}', [AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::middleware('permission:send notifications')->group(function() {
+        Route::get('notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
+        Route::get('notifications/data', [AdminNotificationController::class, 'getData'])->name('notifications.data');
+        Route::get('notifications/search-users', [AdminNotificationController::class, 'searchUsers'])->name('notifications.search-users');
+        Route::post('notifications/send', [AdminNotificationController::class, 'send'])->name('notifications.send');
+        Route::delete('notifications/{id}', [AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
+    });
 
     // Payments Management
-    Route::get('payments', [App\Http\Controllers\Admin\PaymentLogController::class, 'index'])->name('payments.index');
-    Route::get('payments/{id}', [App\Http\Controllers\Admin\PaymentLogController::class, 'show'])->name('payments.show');
+    Route::middleware('permission:view payments')->group(function() {
+        Route::get('payments', [App\Http\Controllers\Admin\PaymentLogController::class, 'index'])->name('payments.index');
+        Route::get('payments/{id}', [App\Http\Controllers\Admin\PaymentLogController::class, 'show'])->name('payments.show');
+    });
 
     // Bank Transfers Review
-    Route::get('bank-transfers', [App\Http\Controllers\Admin\BankTransferController::class, 'index'])->name('bank-transfers.index');
-    Route::get('bank-transfers/data', [App\Http\Controllers\Admin\BankTransferController::class, 'getData'])->name('bank-transfers.data');
-    Route::get('bank-transfers/{id}', [App\Http\Controllers\Admin\BankTransferController::class, 'show'])->name('bank-transfers.show');
-    // We use POST for actions to be safe
-    Route::post('bank-transfers/{id}/approve', [App\Http\Controllers\Admin\BankTransferController::class, 'approve'])->name('bank-transfers.approve');
-    Route::post('bank-transfers/{id}/reject', [App\Http\Controllers\Admin\BankTransferController::class, 'reject'])->name('bank-transfers.reject');
+    Route::middleware('permission:view bank_transfers')->group(function() {
+        Route::get('bank-transfers', [App\Http\Controllers\Admin\BankTransferController::class, 'index'])->name('bank-transfers.index');
+        Route::get('bank-transfers/data', [App\Http\Controllers\Admin\BankTransferController::class, 'getData'])->name('bank-transfers.data');
+        Route::get('bank-transfers/{id}', [App\Http\Controllers\Admin\BankTransferController::class, 'show'])->name('bank-transfers.show');
+    });
+
+    Route::middleware('permission:approve bank_transfers')->group(function() {
+        Route::post('bank-transfers/{id}/approve', [App\Http\Controllers\Admin\BankTransferController::class, 'approve'])->name('bank-transfers.approve');
+    });
+
+    Route::middleware('permission:reject bank_transfers')->group(function() {
+        Route::post('bank-transfers/{id}/reject', [App\Http\Controllers\Admin\BankTransferController::class, 'reject'])->name('bank-transfers.reject');
+    });
 
     // Subscribers
-    Route::get('/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
-    Route::get('/subscribers/data', [SubscriberController::class, 'getData'])->name('subscribers.data');
-    Route::get('/subscribers/profile/{id}', [SubscriberController::class, 'profile'])->name('subscribers.profile');
-    Route::post('/subscribers', [SubscriberController::class, 'store'])->name('subscribers.store');
-    Route::get('/subscribers/{id}', [SubscriberController::class, 'show'])->name('subscribers.show');
-    Route::put('/subscribers/{id}', [SubscriberController::class, 'update'])->name('subscribers.update');
-    Route::post('/subscribers/{id}/toggle-status', [SubscriberController::class, 'toggleStatus'])->name('subscribers.toggle-status');
-    Route::delete('/subscribers/{id}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
+    Route::middleware('permission:manage subscribers')->group(function() {
+        Route::get('/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
+        Route::get('/subscribers/data', [SubscriberController::class, 'getData'])->name('subscribers.data');
+        Route::get('/subscribers/profile/{id}', [SubscriberController::class, 'profile'])->name('subscribers.profile');
+        Route::post('/subscribers', [SubscriberController::class, 'store'])->name('subscribers.store');
+        Route::get('/subscribers/{id}', [SubscriberController::class, 'show'])->name('subscribers.show');
+        Route::put('/subscribers/{id}', [SubscriberController::class, 'update'])->name('subscribers.update');
+        Route::post('/subscribers/{id}/toggle-status', [SubscriberController::class, 'toggleStatus'])->name('subscribers.toggle-status');
+        Route::delete('/subscribers/{id}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
+    });
 
     // Pages Management
-    Route::get('pages/data', [App\Http\Controllers\Admin\PageController::class, 'getData'])->name('pages.data');
-    Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
+    Route::middleware('permission:manage pages')->group(function() {
+        Route::get('pages/data', [App\Http\Controllers\Admin\PageController::class, 'getData'])->name('pages.data');
+        Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
+    });
 });
 
 // Public Page Display
@@ -258,11 +300,6 @@ Route::get('/page/{slug}', [App\Http\Controllers\Web\PageController::class, 'sho
 
 // Customer Routes
 Route::middleware(['auth'])->prefix('customer')->name('customer.')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return view('customer.dashboard');
-    })->name('dashboard');
-
     Route::get('/profile', [\App\Http\Controllers\Customer\ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\Customer\ProfileController::class, 'update'])->name('profile.update');
 });
@@ -455,46 +492,95 @@ Route::get('/tabby-test/result', function (\Illuminate\Http\Request $request) {
 })->name('tabby.result');
 
 // =============================================================================
+// AGENT ROUTES
+// =============================================================================
+Route::middleware(['auth', 'isAgent'])->prefix('agent')->name('agent.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\Agent\AgentDashboardController::class, 'index'])->name('dashboard');
+
+    // Profile
+    Route::get('/profile', [\App\Http\Controllers\Agent\AgentProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [\App\Http\Controllers\Agent\AgentProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/photo', [\App\Http\Controllers\Agent\AgentProfileController::class, 'updatePhoto'])->name('profile.photo');
+    Route::post('/profile/password', [\App\Http\Controllers\Agent\AgentProfileController::class, 'changePassword'])->name('profile.password');
+
+    // Trips (Company-scoped)
+    Route::get('/trips', [\App\Http\Controllers\Agent\AgentTripController::class, 'index'])->name('trips.index');
+
+    Route::get('/trips/create', [\App\Http\Controllers\Agent\AgentTripController::class, 'create'])->name('trips.create');
+    Route::post('/trips', [\App\Http\Controllers\Agent\AgentTripController::class, 'store'])->name('trips.store');
+    Route::get('/trips/{trip}/edit', [\App\Http\Controllers\Agent\AgentTripController::class, 'edit'])->name('trips.edit');
+    Route::put('/trips/{trip}', [\App\Http\Controllers\Agent\AgentTripController::class, 'update'])->name('trips.update');
+    Route::delete('/trips/{trip}', [\App\Http\Controllers\Agent\AgentTripController::class, 'destroy'])->name('trips.destroy');
+
+    // Trip Show / Details
+    Route::get('/trips/{trip}/show', [\App\Http\Controllers\Agent\AgentTripController::class, 'show'])->name('trips.show');
+
+    // Trip Images
+    Route::post('/trips/{trip_id}/images', [\App\Http\Controllers\Agent\AgentTripController::class, 'imageStore'])->name('trips.images.store');
+    Route::delete('/trips/images/{image}', [\App\Http\Controllers\Agent\AgentTripController::class, 'imageDestroy'])->name('trips.images.destroy');
+    Route::get('/trips/{trip_id}/images', [\App\Http\Controllers\Agent\AgentTripController::class, 'getImages'])->name('trips.images.get');
+
+    // Trip Itinerary
+    Route::post('/trips/{trip}/itinerary', [\App\Http\Controllers\Agent\AgentTripController::class, 'storeItinerary'])->name('trips.itinerary.store');
+    Route::post('/trips/itinerary/reorder', [\App\Http\Controllers\Agent\AgentTripController::class, 'reorderItinerary'])->name('trips.itinerary.reorder');
+    Route::post('/trips/itinerary/{itinerary}', [\App\Http\Controllers\Agent\AgentTripController::class, 'updateItinerary'])->name('trips.itinerary.update');
+    Route::delete('/trips/itinerary/{itinerary}', [\App\Http\Controllers\Agent\AgentTripController::class, 'destroyItinerary'])->name('trips.itinerary.destroy');
+
+    // Bookings (Company-scoped)
+    Route::get('/bookings', [\App\Http\Controllers\Agent\AgentBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [\App\Http\Controllers\Agent\AgentBookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{booking}/tickets', [\App\Http\Controllers\Agent\AgentBookingController::class, 'uploadTickets'])->name('bookings.tickets');
+
+    // Favorites
+    Route::get('/favorites', [\App\Http\Controllers\Agent\AgentFavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/{tripId}/toggle', [\App\Http\Controllers\Agent\AgentFavoriteController::class, 'toggle'])->name('favorites.toggle');
+});
+
+// =============================================================================
 // CUSTOMER (USER) ROUTES
 // =============================================================================
 Route::middleware(['auth', 'isCustomer'])->prefix('customer')->name('customer.')->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Customer\CustomerDashboardController::class, 'index'])->name('dashboard');
 
     // Bookings
-    Route::get('/bookings', [CustomerBookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/create/{trip_id}', [CustomerBookingController::class, 'create'])->name('bookings.create');
-    Route::get('/bookings/{id}', [CustomerBookingController::class, 'show'])->name('bookings.show');
-    Route::post('/bookings', [CustomerBookingController::class, 'store'])->name('bookings.store');
-    Route::post('/bookings/{id}/cancel', [CustomerBookingController::class, 'cancel'])->name('bookings.cancel');
-    Route::get('/bookings/{id}/invoice', [CustomerBookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+    Route::get('/bookings', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/create/{trip_id}', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'create'])->name('bookings.create');
+    Route::get('/bookings/{id}', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'store'])->name('bookings.store');
+    Route::post('/bookings/{id}/cancel', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('/bookings/{id}/invoice', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'downloadInvoice'])->name('bookings.invoice');
 
     // Favorites
-    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
-    Route::post('/favorites/{tripId}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::get('/favorites', [\App\Http\Controllers\Customer\FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/{tripId}/toggle', [\App\Http\Controllers\Customer\FavoriteController::class, 'toggle'])->name('favorites.toggle');
 
     // Profile
-    Route::get('/profile', [CustomerProfileController::class, 'index'])->name('profile');
-    Route::put('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/photo', [CustomerProfileController::class, 'updatePhoto'])->name('profile.photo');
-    Route::post('/profile/password', [CustomerProfileController::class, 'changePassword'])->name('profile.password');
+    Route::get('/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/photo', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'updatePhoto'])->name('profile.photo');
+    Route::post('/profile/password', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'changePassword'])->name('profile.password');
 
     // Payments & Invoices
-    Route::get('/payments', [CustomerPaymentController::class, 'index'])->name('payments.index');
-    Route::get('/payments/checkout/{bookingId}', [CustomerPaymentController::class, 'checkout'])->name('payments.checkout');
-    Route::get('/payments/{bookingId}/invoice', [CustomerPaymentController::class, 'downloadInvoice'])->name('payments.invoice');
+    Route::get('/payments', [\App\Http\Controllers\Customer\CustomerPaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/checkout/{bookingId}', [\App\Http\Controllers\Customer\CustomerPaymentController::class, 'checkout'])->name('payments.checkout');
+    Route::get('/payments/{bookingId}/invoice', [\App\Http\Controllers\Customer\CustomerPaymentController::class, 'downloadInvoice'])->name('payments.invoice');
 
     // Notifications
-    Route::get('/notifications', [CustomerNotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [CustomerNotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [CustomerNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::get('/notifications', [\App\Http\Controllers\Customer\CustomerNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Customer\CustomerNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\Customer\CustomerNotificationController::class, 'markAllRead'])->name('notifications.read-all');
 });
 
-// Alias: redirect old /dashboard -> customer.dashboard
+// Alias: redirect old /dashboard -> respective dashboard
 Route::get('/dashboard', function () {
-    if (auth()->check() && auth()->user()->isAdmin()) {
+    $user = auth()->user();
+    if ($user->isAdmin()) {
         return redirect()->route('admin.dashboard');
+    } elseif ($user->isAgent()) {
+        return redirect()->route('agent.dashboard');
     }
     return redirect()->route('customer.dashboard');
 })->middleware('auth')->name('dashboard');

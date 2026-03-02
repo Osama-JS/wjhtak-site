@@ -48,7 +48,9 @@
                         <table id="Companys-table" class="display" style="min-width: 845px">
                             <thead>
                                 <tr>
+                                    <th>{{ __('Logo') }}</th>
                                     <th>{{ __('Name') }}</th>
+                                    <th>{{ __('English Name') }}</th>
                                     <th>{{ __('Email') }}</th>
                                     <th>{{ __('Phone') }}</th>
                                     <th>{{ __('Notes') }}</th>
@@ -92,31 +94,43 @@
             <form id="addCompanyForm">
                 @csrf
                 <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <label class="form-label d-block">{{ __('Company Logo') }}</label>
+                        <div class="mb-2">
+                            <img id="logoPreviewAdd" src="{{ asset('images/demo/company-placeholder.jpg') }}" class="rounded-circle border" width="100" height="100" style="object-fit: cover;">
+                        </div>
+                        <input type="file" name="logo" class="form-control" accept="image/*" onchange="previewImage(this, 'logoPreviewAdd')">
+                    </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">{{ __('Name') }}</label>
                             <input type="text" name="name"  class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ __('Email') }}</label>
-                            <input type="email" name="email"  class="form-control" required>
+                            <label class="form-label">{{ __('English Name') }}</label>
+                            <input type="text" name="en_name"  class="form-control">
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('Email') }}</label>
+                        <input type="email" name="email"  class="form-control" required>
+                    </div>
                     <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ __('Code') }}</label>
+                            <input type="text" name="phone_code" class="form-control" placeholder="966">
+                        </div>
                         <div class="col-md-8 mb-3">
                             <label class="form-label">{{ __('Phone') }}</label>
                             <input type="text" name="phone"  class="form-control">
                         </div>
-
                     </div>
-              
+
                      <div class="mb-3">
-                            <div class="col-md-4 mb-3">
-                            <label class="form-label">{{ __('notes') }}</label>
-                            <input type="text" name="notes"  class="form-control" >
+                        <label class="form-label">{{ __('Notes') }}</label>
+                        <textarea name="notes" class="form-control" rows="2"></textarea>
                     </div>
                     <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">{{ __('Close') }}</button>
@@ -140,17 +154,32 @@
                 @method('PUT')
                 <input type="hidden" id="edit_Company_id">
                 <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <label class="form-label d-block">{{ __('Company Logo') }}</label>
+                        <div class="mb-2">
+                            <img id="logoPreviewEdit" src="{{ asset('images/demo/company-placeholder.jpg') }}" class="rounded-circle border" width="100" height="100" style="object-fit: cover;">
+                        </div>
+                        <input type="file" name="logo" class="form-control" accept="image/*" onchange="previewImage(this, 'logoPreviewEdit')">
+                    </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">{{ __('Name') }}</label>
-                            <input type="text" name="name" id="edit_name" class="form-control">
+                            <input type="text" name="name" id="edit_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('English Name') }}</label>
+                            <input type="text" name="en_name" id="edit_en_name" class="form-control">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('Email') }}</label>
-                        <input type="email" name="email" id="edit_email" class="form-control">
+                        <input type="email" name="email" id="edit_email" class="form-control" required>
                     </div>
                     <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ __('Code') }}</label>
+                            <input type="text" name="phone_code" id="edit_phone_code" class="form-control" placeholder="966">
+                        </div>
                         <div class="col-md-8 mb-3">
                             <label class="form-label">{{ __('Phone') }}</label>
                             <input type="text" name="phone" id="edit_phone" class="form-control">
@@ -158,7 +187,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('Notes') }}</label>
-                        <input type="text" name="notes" id="edit_notes" class="form-control">
+                        <textarea name="notes" id="edit_notes" class="form-control" rows="2"></textarea>
                     </div>
                     <div class="mb-3">
                         <x-forms.checkbox  id="edit_active" name="active" :label="__('Active status')" type="switch" />
@@ -185,7 +214,9 @@ $(document).ready(function() {
             serverSide: false, // Set to true if huge data
             ajax: CompanysDataUrl,
             columns: [
+                { data: 'logo', orderable: false, searchable: false },
                 { data: 'name' },
+                { data: 'en_name' },
                 { data: 'email' },
                 { data: 'phone' },
                 { data: 'notes' },
@@ -216,15 +247,18 @@ $(document).ready(function() {
 
         $('#addCompanyForm').on('submit', function (e) {
             e.preventDefault();
+            let formData = new FormData(this);
             $.ajax({
                 url: "{{ route('admin.companies.store') }}",
                 type: "POST",
-                data: $(this).serialize(),
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function (response) {
                     if (response.success) {
-                        console.log(response);
                         $('#addCompanyModal').modal('hide');
                         $('#addCompanyForm')[0].reset();
+                        $('#logoPreviewAdd').attr('src', "{{ asset('images/demo/company-placeholder.jpg') }}");
                         CompanysTable.ajax.reload(null, false);
                         toastr.success(response.message);
                     }
@@ -246,12 +280,15 @@ $(document).ready(function() {
             e.preventDefault();
             const id = $('#edit_Company_id').val();
             const url = updateCompanyUrl.replace(':id', id);
-            const formData = $(this).serialize() + '&_method=PUT';
+            let formData = new FormData(this);
+            formData.append('_method', 'PUT');
 
             $.ajax({
                 url: url,
                 method: 'POST',
                 data: formData,
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     if (response.success) {
                         $('#editCompanyModal').modal('hide');
@@ -286,10 +323,13 @@ $(document).ready(function() {
                 const company = response.Company;
                 $('#edit_Company_id').val(company.id);
                 $('#edit_name').val(company.name);
+                $('#edit_en_name').val(company.en_name);
                 $('#edit_email').val(company.email);
+                $('#edit_phone_code').val(company.phone_code);
                 $('#edit_phone').val(company.phone);
                 $('#edit_notes').val(company.notes);
                 $('#edit_active').prop('checked', company.active);
+                $('#logoPreviewEdit').attr('src', response.logo_url);
                 $('#editCompanyModal').modal('show');
             }
         });
@@ -363,8 +403,19 @@ $(document).ready(function() {
 
 
 <script>
+    function previewImage(input, previewId) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#' + previewId).attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 
-
-
+    function resetForm() {
+        $('#addCompanyForm')[0].reset();
+        $('#logoPreviewAdd').attr('src', "{{ asset('images/demo/company-placeholder.jpg') }}");
+    }
 </script>
 @endsection

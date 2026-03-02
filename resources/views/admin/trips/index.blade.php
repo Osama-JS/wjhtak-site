@@ -122,7 +122,7 @@
                             <select id="company_id" class="form-control default-select">
                                 <option value="">{{ __('All Companies') }}</option>
                                 @foreach($companies as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                    <option value="{{ $company->id }}">{{ $company->localized_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -164,9 +164,11 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">{{ __('Trips List') }}</h4>
+                    @can('create trips')
                     <a href="{{ route('admin.trips.create') }}" class="btn btn-primary btn-rounded">
                          <i class="fa fa-plus me-2"></i> {{ __('Add New Trip') }}
                     </a>
+                    @endcan
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

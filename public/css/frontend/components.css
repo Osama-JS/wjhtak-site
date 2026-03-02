@@ -160,6 +160,17 @@
     color: var(--color-white);
 }
 
+.nav-btn {
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--space-5) !important;
+    font-weight: var(--font-bold);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-lg);
+}
+
 /* Language Switcher */
 .lang-switch {
     display: flex;
@@ -210,11 +221,23 @@
     height: 44px;
     gap: 6px;
     cursor: pointer;
+    background: transparent;
+    border: none;
+    z-index: var(--z-fixed);
 }
 
 @media (min-width: 1024px) {
     .mobile-menu-toggle {
         display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .nav-btn {
+        display: none !important;
+    }
+    .nav-links {
+        display: none !important;
     }
 }
 
@@ -414,6 +437,7 @@
     background-image: radial-gradient(var(--color-border) 2px, transparent 2px);
     background-size: 20px 20px;
     opacity: 0.3;
+    z-index: -1; /* Ensure it's behind text */
 }
 
 .hero-container {
@@ -1806,7 +1830,7 @@
     box-shadow: none !important;
     border: none !important;
     padding: 0 !important;
-    margin-top: var(--space-8);
+    margin-top: var(--space-12); /* Increased space from hero content */
 }
 
 .search-box-premium {
@@ -2079,22 +2103,29 @@
 
 @media (max-width: 1024px) {
     .search-box-premium {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         padding: var(--space-4);
         gap: var(--space-2);
         width: 100%;
+        display: flex;
+        flex-direction: column;
     }
     .search-segment {
         padding: var(--space-3) var(--space-4);
+        width: 100%;
+        justify-content: flex-start;
     }
     .search-segment-divider {
         display: none;
     }
     .btn-search-premium {
         width: 100%;
-        margin: 0;
+        margin: var(--space-4) 0 0 0 !important;
         justify-content: center;
         padding: var(--space-4);
+    }
+    [dir="rtl"] .btn-search-premium {
+        margin: var(--space-4) 0 0 0 !important;
     }
 }
 

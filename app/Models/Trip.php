@@ -29,6 +29,7 @@ class Trip extends Model
        'to_country_id',
        'to_city_id',
        'admin_id',
+       'user_id',
        'profit',
        'percentage_profit_margin',
        'active',
@@ -65,6 +66,14 @@ class Trip extends Model
 
     public function fromCity() {
         return $this->belongsTo(City::class, 'from_city_id');
+    }
+
+    /**
+     * Get the user (agent/admin) who created the trip.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function scopeDeactivateExpired($query)
@@ -104,6 +113,11 @@ class Trip extends Model
     public function categories()
     {
         return $this->belongsToMany(TripCategory::class, 'trip_category_trip');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(TripBooking::class, 'trip_id');
     }
 
     /**

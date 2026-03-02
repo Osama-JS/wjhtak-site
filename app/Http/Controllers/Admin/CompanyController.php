@@ -23,20 +23,26 @@ class CompanyController extends Controller
 
     public function getData(Request $request)
     {
-        $companies = Company::all(); // أو where حسب حاجتك
+        $companies = Company::all();
 
         return response()->json([
             'data' => $companies->map(function ($company) {
                 return [
-                    'name' => $company->name,
+                    'id'    => $company->id,
+                    'logo'  => '<img src="' . $company->logo_url . '" class="rounded-circle" width="35" height="35" alt="">',
+                    'name'  => $company->name,
+                    'en_name' => $company->en_name,
                     'email' => $company->email,
-                    'phone' => $company->phone,
+                    'phone' => ($company->phone_code ? '+'.$company->phone_code.' ' : '') . $company->phone,
                     'notes' => $company->notes,
                     'status' => $company->active
                         ? '<span class="badge bg-success">'.__('Active').'</span>'
                         : '<span class="badge bg-danger">'.__('Inactive').'</span>',
                     'actions' => '
                         <div class="d-flex">
+                            <a href="' . route('admin.companies.agents', $company->id) . '" class="btn btn-info btn-xs me-1" title="' . __('Manage Agents') . '">
+                                <i class="fas fa-users"></i>
+                            </a>
                             <button onclick="editCompany('.$company->id.')" class="btn btn-primary btn-xs me-1">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
@@ -67,13 +73,19 @@ class CompanyController extends Controller
     {
         $validated = $request->validate([
             'name'   => 'required|string|max:100',
+            'en_name' => 'nullable|string|max:100',
+            'logo'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'email'  => 'required|email|',
             'phone'  => 'nullable|string|max:100',
-            'notes'  => 'required|',
+            'phone_code' => 'nullable|string|max:10',
+            'notes'  => 'nullable|string',
             'active' => 'sometimes|boolean',
         ]);
 
-        
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('companies/logos', 'public');
+        }
+
         Company::create($validated);
 
         return response()->json([
@@ -91,6 +103,7 @@ class CompanyController extends Controller
          return response()->json([
             'success' => true,
             'Company' => $company,
+            'logo_url' => $company->logo_url
         ]);
     }
 
@@ -107,17 +120,26 @@ class CompanyController extends Controller
      */
     public function update(Request $request, Company $company)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:100',
+            'en_name' => 'nullable|string|max:100',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'email' => 'nullable|email|',
             'phone' => 'nullable|',
+            'phone_code' => 'nullable|string|max:10',
             'notes' => 'nullable',
-            'active' => 'boolean',
+            'active' => 'sometimes|boolean',
         ]);
 
-        $data = $request->only(['name', 'email', 'phone', 'notes']);
-        $data['active'] = $request->boolean('active', true);
-        $company->update($data);
+        if ($request->hasFile('logo')) {
+            if ($company->logo) {
+                \Storage::disk('public')->delete($company->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('companies/logos', 'public');
+        }
+
+        $validated['active'] = $request->boolean('active', true);
+        $company->update($validated);
 
         return response()->json([
             'success' => true,
@@ -136,7 +158,7 @@ class CompanyController extends Controller
             'success' => true,
             'message' => $company->active ? __('company activated') : __('company deactivated'),
         ]);
-        
+
     }
 
     /**

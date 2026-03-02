@@ -22,43 +22,31 @@ class RoleSeeder extends Seeder
         // Super Admin gets all permissions
         $superAdmin->givePermissionTo(Permission::all());
 
-        // Admin gets most permissions except permission management
+        // Admin gets most permissions except role/permission management
         $admin->givePermissionTo([
-            'manage users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'manage roles',
+            'view dashboard',
+            'manage users', 'view users', 'create users', 'edit users',
             'view roles',
-            'view bookings',
-            'manage bookings',
-            'create bookings',
-            'edit bookings',
-            'delete bookings',
-            'cancel bookings',
-            'manage hotels',
-            'view hotels',
-            'create hotels',
-            'edit hotels',
-            'delete hotels',
-            'manage flights',
-            'view flights',
-            'create flights',
-            'edit flights',
-            'delete flights',
+            'manage trips', 'view trips', 'create trips', 'edit trips',
+            'manage trip_categories', 'manage trip_itinerary',
+            'manage bookings', 'view bookings', 'edit bookings', 'cancel bookings', 'upload tickets', 'send tickets',
+            'view payments', 'view bank_transfers', 'approve bank_transfers', 'reject bank_transfers',
+            'manage banners', 'manage pages', 'manage locations', 'manage countries', 'manage cities',
+            'manage companies', 'manage company_codes',
+            'view subscribers', 'manage subscribers',
+            'view notifications', 'send notifications',
+            'view questions', 'manage questions',
+            'manage settings',
         ]);
 
-        // Manager gets limited permissions
+        // Manager gets operational permissions
         $manager->givePermissionTo([
-            'view users',
-            'view roles',
-            'view bookings',
-            'manage bookings',
-            'create bookings',
-            'edit bookings',
-            'view hotels',
-            'view flights',
+            'view dashboard',
+            'view trips', 'manage trips',
+            'view bookings', 'manage bookings', 'upload tickets',
+            'view bank_transfers',
+            'view subscribers',
+            'send notifications',
         ]);
     }
 }

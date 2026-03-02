@@ -906,6 +906,65 @@ class TripController extends Controller
     }
 
     /**
+     * Download booking ticket
+     */
+    #[OA\Get(
+        path: "/api/v1/bookings/{id}/ticket",
+        summary: "Download booking ticket",
+        operationId: "downloadTicket",
+        description: "Get the URL to download the travel ticket for a confirmed booking. If the ticket has not been uploaded by the admin yet, an error message is returned.",
+        tags: ["Trips"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "Booking ID",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Success",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ticket retrieved successfully"),
+                        new OA\Property(property: "data", type: "object", properties: [
+                            new OA\Property(property: "ticket_url", type: "string", example: "https://example.com/storage/tickets/ticket_123.pdf")
+                        ])
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: "Booking not found or Ticket not yet uploaded"),
+            new OA\Response(response: 401, description: "Unauthenticated")
+        ]
+    )]
+    public function downloadTicket($id): JsonResponse
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
+        }
+
+        $booking = TripBooking::where('user_id', $user->id)->find($id);
+
+        if (!$booking) {
+            return $this->apiResponse(true, __('Booking not found'), null, null, 404);
+        }
+
+        if (!$booking->ticket_file_path) {
+            return $this->apiResponse(true, __('Tickets have not been uploaded yet'), null, null, 404);
+        }
+
+        $fileUrl = asset('storage/' . $booking->ticket_file_path);
+
+        return $this->apiResponse(false, __('Ticket retrieved successfully'), ['ticket_url' => $fileUrl]);
+    }
+
+    /**
      * Cancel a pending (unpaid) booking.
      */
     #[OA\Post(

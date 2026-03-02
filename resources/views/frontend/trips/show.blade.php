@@ -60,7 +60,7 @@
                             {{-- Badge Info --}}
                             <div class="gallery-badge-info">
                                 <span class="badge-glass">
-                                    <i class="fas fa-camera me-1"></i> {{ count($trip->images) }} {{ __('Photos') }}
+                                    <i class="fas fa-camera me-1"></i> {{ count($trip->images) > 0 ? count($trip->images) : 1 }} {{ __('Photos') }}
                                 </span>
                             </div>
                         </div>
@@ -172,7 +172,7 @@
                                         <path d="M5 21V7l8-4v18"/>
                                         <path d="M19 21V11l-6-4"/>
                                     </svg>
-                                    <span>{{ $trip->company->name }}</span>
+                                    <a href="{{ route('company.profile', $trip->company->id) }}" style="color: inherit; text-decoration: none; font-weight: 600;">{{ app()->getLocale() == 'en' && $trip->company->en_name ? $trip->company->en_name : $trip->company->name }}</a>
                                 </div>
                             @endif
                         </div>
@@ -481,8 +481,10 @@
         display: grid;
         grid-template-columns: 1fr 180px;
         gap: 15px;
-        height: 560px;
+        height: 600px;
+        max-height: 80vh;
         margin-bottom: var(--space-4);
+        overflow: hidden; /* Prevent overflow of large images */
     }
 
     .gallery-main-col {
@@ -496,6 +498,7 @@
     .main-trip-slider {
         width: 100%;
         height: 100%;
+        max-height: 600px; /* Force height constraint */
         border-radius: var(--radius-2xl);
         overflow: hidden;
         position: relative;
@@ -558,7 +561,30 @@
     /* Thumbnails - Vertical */
     .thumbnails-trip-slider {
         height: 100%;
+        max-height: 600px; /* Constrain sidebar height */
         width: 100%;
+        padding-inline-end: 5px;
+        overflow-y: auto !important; /* Enable scroll if slides overflow */
+    }
+
+    /* Professional Scrollbar for Thumbnails */
+    .thumbnails-trip-slider .swiper-wrapper {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-primary) transparent;
+    }
+
+    .thumbnails-trip-slider::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .thumbnails-trip-slider::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .thumbnails-trip-slider::-webkit-scrollbar-thumb {
+        background-color: var(--color-primary);
+        border-radius: 20px;
+        border: 2px solid transparent;
     }
 
     .thumbnails-trip-slider .swiper-slide {
@@ -568,15 +594,7 @@
         opacity: 0.6;
         cursor: pointer;
         transition: all 0.3s ease;
-    }
-
-    .thumbnails-trip-slider .swiper-slide-thumb-active {
-        opacity: 1;
-        transform: translateX(-10px);
-    }
-
-    [dir="rtl"] .thumbnails-trip-slider .swiper-slide-thumb-active {
-        transform: translateX(10px);
+        margin-bottom: 10px;
     }
 
     .thumb-inner {

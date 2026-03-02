@@ -88,6 +88,7 @@
 
                 @if($transfer->status === 'pending')
                     <div class="mt-4">
+                        @can('approve bank_transfers')
                         <form id="approveTransferForm"
                               action="{{ route('admin.bank-transfers.approve', $transfer->id) }}"
                               method="POST"
@@ -98,16 +99,21 @@
                                 <i class="fas fa-check-circle me-1"></i> {{ __('Approve Transfer') }}
                             </button>
                         </form>
+                        @endcan
 
+                        @can('reject bank_transfers')
                         <button type="button" class="btn btn-danger btn-block" data-bs-toggle="modal" data-bs-target="#rejectModal">
                             <i class="fas fa-times-circle me-1"></i> {{ __('Reject Transfer') }}
                         </button>
+                        @endcan
                     </div>
                 @endif
 
+                @can('view bookings')
                 <a href="{{ route('admin.trip-bookings.show', $transfer->trip_booking_id) }}" class="btn btn-outline-primary btn-block mt-3">
                     <i class="fas fa-calendar-check me-1"></i> {{ __('View Booking Details') }}
                 </a>
+                @endcan
             </div>
         </div>
     </div>

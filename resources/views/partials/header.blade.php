@@ -57,7 +57,7 @@
 											<li>
 												<div class="timeline-panel">
 													<div class="media me-2">
-														<img alt="image" width="50" src="images/avatar/1.jpg">
+														<img alt="image" width="50" src="{{ asset('images/avatar/1.png') }}">
 													</div>
 													<div class="media-body">
 														<h6 class="mb-1">Dr sultads Send you Photo</h6>
@@ -90,7 +90,7 @@
 											 <li>
 												<div class="timeline-panel">
 													<div class="media me-2">
-														<img alt="image" width="50" src="images/avatar/1.jpg">
+														<img alt="image" width="50" src="{{ asset('images/avatar/1.png') }}">
 													</div>
 													<div class="media-body">
 														<h6 class="mb-1">{{ __('Notification Title Placeholder') }}</h6>
