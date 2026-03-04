@@ -93,17 +93,19 @@ class NotificationController extends Controller
         }
 
         $users = User::where(function ($q) use ($query) {
-            $q->where('name', 'like', "%{$query}%")
+            $q->where('first_name', 'like', "%{$query}%")
+              ->orWhere('last_name', 'like', "%{$query}%")
+              ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$query}%"])
               ->orWhere('email', 'like', "%{$query}%")
               ->orWhere('phone', 'like', "%{$query}%");
         })
-        ->select('id', 'name', 'email', 'phone', 'fcm_token')
+        ->select('id', 'first_name', 'last_name', 'email', 'phone', 'fcm_token')
         ->limit(20)
         ->get()
         ->map(function ($user) {
             return [
                 'id' => $user->id,
-                'name' => $user->name,
+                'name' => $user->full_name,
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'has_fcm' => !empty($user->fcm_token),

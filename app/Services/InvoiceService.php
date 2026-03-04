@@ -27,6 +27,7 @@ class InvoiceService
                 'margin_right' => 10,
                 'margin_top' => 10,
                 'margin_bottom' => 10,
+                'tempDir' => storage_path('framework/cache')
             ]);
 
             // Set RTL for Arabic support
@@ -37,6 +38,11 @@ class InvoiceService
 
             $fileName = 'invoice_' . $booking->id . '_' . time() . '.pdf';
             $filePath = 'invoices/' . $fileName;
+
+            // Ensure the directory exists
+            if (!Storage::disk('public')->exists('invoices')) {
+                Storage::disk('public')->makeDirectory('invoices');
+            }
 
             Storage::disk('public')->put($filePath, $mpdf->Output('', 'S'));
 
