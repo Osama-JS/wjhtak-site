@@ -31,7 +31,7 @@ class TripBookingController extends Controller
     public function getData()
     {
         try {
-            $bookings = TripBooking::with(['user', 'trip'])->latest()->get();
+            $bookings = TripBooking::with(['user', 'trip.company'])->latest()->get();
 
             $data = $bookings->map(function ($booking) {
                 $stateLabels = [
@@ -52,6 +52,7 @@ class TripBookingController extends Controller
                     'id' => $booking->id,
                     'user' => $booking->user ? $booking->user->full_name . '<br><small class="text-muted">' . $booking->user->phone . '</small>' : __('Guest'),
                     'trip' => $booking->trip ? $booking->trip->title . '<br><small class="text-muted">' . $booking->booking_date->format('Y-m-d') . '</small>' : __('Deleted Trip'),
+                    'company' => $booking->trip && $booking->trip->company ? $booking->trip->company->name : '---',
                     'price' => number_format($booking->total_price, 2) . ' ' . __('SAR'),
                     'tickets' => '<span class="badge badge-info">' . $booking->tickets_count . '</span>',
                     'status' => $statusBadge,
@@ -77,19 +78,15 @@ class TripBookingController extends Controller
         $statusBtns = '';
         if (auth()->user()->can('manage bookings')) {
             if ($booking->booking_state == TripBooking::STATE_AWAITING_PAYMENT) {
-                // Only allow cancellation if awaiting payment (Confirmation is automatic)
-                $statusBtns .= '<form action="' . route('admin.trip-bookings.update-status', $booking->id) . '" method="POST" class="d-inline confirm-action" data-confirm-message="' . __('Are you sure you want to cancel this booking?') . '">
-                ' . csrf_field() . '
-                <input type="hidden" name="status" value="cancelled">
-                <button type="submit" class="btn btn-danger btn-sm me-1" title="' . __('Cancel') . '"><i class="fas fa-times"></i></button>
-                </form>';
+                // Cancellation is now handled in show page only as requested
             }
 
-            $statusBtns .= '<form action="' . route('admin.trip-bookings.destroy', $booking->id) . '" method="POST" class="d-inline confirm-action" data-confirm-message="' . __('Are you sure you want to delete this booking?') . '">
-                ' . csrf_field() . '
-                ' . method_field('DELETE') . '
-                <button type="submit" class="btn btn-danger btn-sm" title="' . __('Delete') . '"><i class="fas fa-trash"></i></button>
-            </form>';
+            $statusBtns .= '<button type="button" class="btn btn-danger btn-sm open-delete-modal"
+                data-id="' . $booking->id . '"
+                data-url="' . route('admin.trip-bookings.destroy', $booking->id) . '"
+                title="' . __('Delete') . '">
+                <i class="fas fa-trash"></i>
+            </button>';
         }
 
         return '<div class="d-flex">' . $showBtn . $statusBtns . '</div>';
@@ -106,28 +103,38 @@ class TripBookingController extends Controller
     }
 
     /**
-     * Update status
+     * Update status (Used for cancellation)
      */
     public function updateStatus(Request $request, $id)
     {
         $booking = TripBooking::findOrFail($id);
 
+        $request->validate([
+            'status' => 'required|in:cancelled',
+            'cancellation_reason' => 'required|string|max:1000'
+        ]);
+
         $oldState = $booking->booking_state;
-        $booking->update(['status' => $request->status]);
 
-        if ($request->status == 'cancelled') {
-            $booking->update(['booking_state' => TripBooking::STATE_CANCELLED]);
-            \App\Models\BookingHistory::create([
-                'trip_booking_id' => $booking->id,
-                'user_id' => auth()->id(),
-                'action' => 'booking_cancelled',
-                'description' => __('Booking was cancelled by admin.'),
-                'previous_state' => $oldState,
-                'new_state' => TripBooking::STATE_CANCELLED,
-            ]);
-        }
+        // Update state and reason, but keep 'status' logic if needed
+        $booking->update([
+            'booking_state' => TripBooking::STATE_CANCELLED,
+            'cancellation_reason' => $request->cancellation_reason,
+            // 'status' => 'cancelled' // User asked to keep status as is? "تبق على الحقل booking_status وليس على ال status"
+            // Actually, if we cancel, it should probably reflect in the status too unless they use it for something else.
+            // But per request I will focus on booking_state.
+        ]);
 
-        return redirect()->back()->with('success', __('Booking status updated successfully.'));
+        \App\Models\BookingHistory::create([
+            'trip_booking_id' => $booking->id,
+            'user_id' => auth()->id(),
+            'action' => 'booking_cancelled',
+            'description' => __('Booking was cancelled by admin. Reason: :reason', ['reason' => $request->cancellation_reason]),
+            'previous_state' => $oldState,
+            'new_state' => TripBooking::STATE_CANCELLED,
+        ]);
+
+        return redirect()->back()->with('success', __('Booking has been cancelled successfully.'));
     }
 
     /**
@@ -137,14 +144,19 @@ class TripBookingController extends Controller
     {
         $booking = TripBooking::findOrFail($id);
         $request->validate([
-            'booking_state' => 'required|in:awaiting_payment,preparing,issuing_tickets,tickets_uploaded,completed,cancelled'
+            'booking_state' => 'required|in:awaiting_payment,preparing,issuing_tickets,tickets_uploaded,completed'
         ]);
 
-        // Prevent manual move to preparing or awaiting payment unless it's a cancellation
-        if (in_array($request->booking_state, [TripBooking::STATE_AWAITING_PAYMENT, TripBooking::STATE_PREPARING]) && $request->booking_state !== TripBooking::STATE_CANCELLED) {
-             if ($booking->booking_state !== $request->booking_state) {
+        // Prevent admin from changing state if it's awaiting payment
+        if ($booking->booking_state === TripBooking::STATE_AWAITING_PAYMENT) {
+            return redirect()->back()->with('error', __('This booking is awaiting payment. You can only cancel it using the Cancel button or wait for payment.'));
+        }
+
+        // Prevent manual move to preparing or awaiting payment
+        if (in_array($request->booking_state, [TripBooking::STATE_AWAITING_PAYMENT, TripBooking::STATE_PREPARING])) {
+            if ($booking->booking_state !== $request->booking_state) {
                  return redirect()->back()->with('error', __('This state transition must happen automatically.'));
-             }
+            }
         }
 
         $oldState = $booking->booking_state;
@@ -174,8 +186,23 @@ class TripBookingController extends Controller
      */
     public function destroy($id)
     {
-        $booking = TripBooking::findOrFail($id);
+        $booking = TripBooking::with(['payments', 'bankTransfers'])->findOrFail($id);
+
+        // Strict Deletion Rules
+        if ($booking->status === 'confirmed') {
+            return redirect()->back()->with('error', __('Cannot delete a confirmed booking. Please cancel it first if needed (if allowed).'));
+        }
+
+        if ($booking->payments()->whereIn('status', ['paid', 'approved', 'completed'])->exists()) {
+            return redirect()->back()->with('error', __('Cannot delete a booking with successful payments.'));
+        }
+
+        if ($booking->bankTransfers()->whereIn('status', ['approved', 'pending'])->exists()) {
+            return redirect()->back()->with('error', __('Cannot delete a booking with active or pending bank transfers.'));
+        }
+
         $booking->passengers()->delete();
+        $booking->histories()->delete();
         $booking->delete();
 
         return redirect()->route('admin.trip-bookings.index')->with('success', __('Booking deleted successfully.'));

@@ -265,6 +265,13 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
         Route::get('payments/{id}', [App\Http\Controllers\Admin\PaymentLogController::class, 'show'])->name('payments.show');
     });
 
+    // Hotel Bookings Management (TBO)
+    Route::prefix('hotel-bookings')->name('hotel-bookings.')->group(function () {
+        Route::get('/',         [App\Http\Controllers\Admin\HotelBookingController::class, 'index'])->name('index');
+        Route::get('/{id}',     [App\Http\Controllers\Admin\HotelBookingController::class, 'show'])->name('show');
+        Route::post('/{id}/cancel', [App\Http\Controllers\Admin\HotelBookingController::class, 'cancel'])->name('cancel');
+    });
+
     // Bank Transfers Review
     Route::middleware('permission:view bank_transfers')->group(function() {
         Route::get('bank-transfers', [App\Http\Controllers\Admin\BankTransferController::class, 'index'])->name('bank-transfers.index');

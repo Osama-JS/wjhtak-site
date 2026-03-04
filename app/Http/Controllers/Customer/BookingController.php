@@ -127,8 +127,12 @@ class BookingController extends Controller
     /**
      * Cancel a pending booking.
      */
-    public function cancel($id)
+    public function cancel(Request $request, $id)
     {
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:1000'
+        ]);
+
         $booking = TripBooking::where('user_id', Auth::id())->findOrFail($id);
 
         if ($booking->booking_state !== TripBooking::STATE_AWAITING_PAYMENT) {
@@ -136,8 +140,8 @@ class BookingController extends Controller
         }
 
         $booking->update([
-            'status' => 'cancelled',
-            'booking_state' => TripBooking::STATE_CANCELLED
+            'booking_state' => TripBooking::STATE_CANCELLED,
+            'cancellation_reason' => $request->cancellation_reason
         ]);
 
         return redirect()->route('customer.bookings.index')

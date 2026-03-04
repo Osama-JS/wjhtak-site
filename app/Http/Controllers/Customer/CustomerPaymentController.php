@@ -43,14 +43,9 @@ class CustomerPaymentController extends Controller
             ->where('user_id', Auth::id())
             ->findOrFail($bookingId);
 
-        if ($booking->status === 'confirmed') {
+        if ($booking->status !== 'pending' && $booking->status !== 'failed') {
             return redirect()->route('customer.bookings.show', $bookingId)
-                ->with('info', __('هذا الحجز مدفوع بالفعل.'));
-        }
-
-        if ($booking->status === 'cancelled') {
-            return redirect()->route('customer.bookings.show', $bookingId)
-                ->with('error', __('لا يمكن الدفع لحجز ملغى.'));
+                ->with('error', __('لا يمكن الدفع لهذا الحجز. قد يكون مدفوعاً بالفعل أو قيد المراجعة.'));
         }
 
         return view('frontend.customer.payments.checkout', compact('booking'));

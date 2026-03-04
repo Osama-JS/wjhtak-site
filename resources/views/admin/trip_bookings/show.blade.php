@@ -167,7 +167,6 @@
                             <option value="issuing_tickets" {{ $booking->booking_state == 'issuing_tickets' ? 'selected' : '' }}>{{ __('Issuing Tickets') }}</option>
                             <option value="tickets_uploaded" {{ $booking->booking_state == 'tickets_uploaded' ? 'selected' : '' }}>{{ __('Tickets Uploaded') }}</option>
                             <option value="completed" {{ $booking->booking_state == 'completed' ? 'selected' : '' }}>{{ __('Completed') }}</option>
-                            <option value="cancelled" {{ $booking->booking_state == 'cancelled' ? 'selected' : '' }}>{{ __('Cancelled') }}</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-info btn-block w-100"><i class="fas fa-save me-1"></i> {{ __('Update') }}</button>

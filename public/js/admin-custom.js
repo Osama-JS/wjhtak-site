@@ -223,7 +223,8 @@
                         if (
                             submitBtn &&
                             !submitBtn.disabled &&
-                            !submitBtn.classList.contains("no-loading")
+                            !submitBtn.classList.contains("no-loading") &&
+                            !form.classList.contains("confirm-action") // Don't show loading if it's a confirm action (handled by confirm)
                         ) {
                             const text =
                                 submitBtn.dataset.loadingText ||
@@ -244,6 +245,34 @@
                     }
                 }
             });
+        });
+
+        // ============================================
+        // GLOBAL CONFIRMATION HANDLER
+        // ============================================
+        // Use delegated handler to support dynamically added elements (like DataTables)
+        jQuery(document).on("submit", ".confirm-action", function (e) {
+            const $form = jQuery(this);
+
+            // If already confirmed, let it proceed
+            if ($form.attr("data-confirmed") === "true") {
+                return true;
+            }
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            const message =
+                $form.attr("data-confirm-message") ||
+                (window.Translations && window.Translations.confirm_message) ||
+                "هل أنت متأكد من تنفيذ هذا الإجراء؟";
+
+            window.WJHTAKAdmin.confirm(message, function () {
+                $form.attr("data-confirmed", "true");
+                $form.trigger("submit");
+            });
+
+            return false;
         });
 
         // Live validation
@@ -482,8 +511,11 @@
                         callback();
                     }
                 });
-            } else if (confirm(message)) {
-                callback();
+            } else {
+                // Fallback to native confirm if SweetAlert is missing
+                if (confirm(message)) {
+                    if (callback) callback();
+                }
             }
         },
 

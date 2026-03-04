@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AppSettingController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\FlightController;
+use App\Http\Controllers\Api\HotelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +79,22 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
         Route::post('/initiate', [PaymentController::class, 'initiate']);
         Route::post('/verify', [PaymentController::class, 'verify']);
         Route::post('/bank-transfer', [PaymentController::class, 'submitBankTransfer']);
+
+        // Hotel Payment Routes
+        Route::post('/hotel/initiate', [PaymentController::class, 'initiateHotel']);
+        Route::post('/hotel/verify', [PaymentController::class, 'verifyHotel']);
+    });
+
+    // Hotel Routes
+    Route::prefix('hotels')->group(function () {
+        Route::get('/cities', [HotelController::class, 'cities']);
+        Route::post('/search', [HotelController::class, 'search']);
+        Route::get('/{hotelCode}/rooms', [HotelController::class, 'rooms']);
+        Route::post('/pre-book', [HotelController::class, 'preBook']);
+        Route::post('/book', [HotelController::class, 'book']);
+        Route::get('/bookings', [HotelController::class, 'myBookings']);
+        Route::get('/bookings/{id}', [HotelController::class, 'bookingDetail']);
+        Route::post('/bookings/{id}/cancel', [HotelController::class, 'cancel']);
     });
 
     Route::post('/logout', [AuthController::class, 'logout']);

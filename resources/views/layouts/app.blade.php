@@ -133,6 +133,7 @@
             confirm_title: "{{ __('Confirmation') }}",
             confirm_yes: "{{ __('Yes') }}",
             confirm_cancel: "{{ __('Cancel') }}",
+            confirm_message: "{{ __('Are you sure you want to perform this action?') }}",
             loading_text: "{{ __('Loading...') }}",
         };
     </script>
