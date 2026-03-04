@@ -422,6 +422,7 @@ class TripController extends Controller
             'tickets_count' => $passengersCount,
             'total_price' => $totalPrice,
             'status' => 'pending',
+            'booking_state' => TripBooking::STATE_AWAITING_PAYMENT,
             'notes' => $request->notes,
             'booking_date' => now(),
         ]);
@@ -481,7 +482,8 @@ class TripController extends Controller
                                 new OA\Property(property: "trip_id", type: "integer", example: 1),
                                 new OA\Property(property: "tickets_count", type: "integer", example: 2),
                                 new OA\Property(property: "total_price", type: "number", example: 3000.00),
-                                new OA\Property(property: "status", type: "string", example: "pending"),
+                                new OA\Property(property: "booking_state", type: "string", enum: ["awaiting_payment", "preparing", "issuing_tickets", "tickets_uploaded", "completed", "cancelled"], example: "awaiting_payment"),
+                                new OA\Property(property: "booking_state_label", type: "string", example: "Awaiting Payment"),
                                 new OA\Property(property: "booking_date", type: "string", format: "date-time", example: "2024-05-20 10:00:00"),
                                 new OA\Property(property: "trip", type: "object", properties: [
                                     new OA\Property(property: "id", type: "integer", example: 1),
@@ -516,6 +518,23 @@ class TripController extends Controller
             ->where('user_id', $user->id)
             ->latest()
             ->paginate($request->per_page ?? 10);
+
+        $bookings->getCollection()->transform(function ($booking) {
+            return [
+                'id' => $booking->id,
+                'trip_id' => $booking->trip_id,
+                'tickets_count' => $booking->tickets_count,
+                'total_price' => $booking->total_price,
+                'booking_state' => $booking->booking_state,
+                'booking_state_label' => __($booking->booking_state),
+                'booking_date' => $booking->booking_date ? $booking->booking_date->format('Y-m-d H:i:s') : null,
+                'trip' => $booking->trip ? [
+                    'id' => $booking->trip->id,
+                    'title' => $booking->trip->title,
+                    'image' => $booking->trip->image_url,
+                ] : null,
+            ];
+        });
 
         return $this->apiResponse(false, __('Bookings retrieved successful'), $bookings);
     }
@@ -735,8 +754,8 @@ class TripController extends Controller
                                     new OA\Property(property: "nationality", type: "string", example: "USA"),
                                 ]
                             )),
-                            new OA\Property(property: "booking_state", type: "string", example: "preparing"),
-                            new OA\Property(property: "booking_state_label", type: "string", example: "Preparing Tickets"),
+                            new OA\Property(property: "booking_state", type: "string", enum: ["awaiting_payment", "preparing", "issuing_tickets", "tickets_uploaded", "completed", "cancelled"], example: "preparing"),
+                            new OA\Property(property: "booking_state_label", type: "string", example: "Preparing"),
                             new OA\Property(property: "ticket_url", type: "string", nullable: true, example: "https://example.com/ticket.pdf"),
                             new OA\Property(property: "payment_details", type: "array", items: new OA\Items(
                                 properties: [
@@ -801,14 +820,15 @@ class TripController extends Controller
         ];
 
         $states = [
-            'received' => __('Order Received'),
-            'preparing' => __('Preparing Tickets'),
-            'confirmed' => __('Confirmed'),
-            'tickets_sent' => __('Tickets Sent'),
+            'awaiting_payment' => __('Awaiting Payment'),
+            'preparing' => __('Preparing'),
+            'issuing_tickets' => __('Issuing Tickets'),
+            'tickets_uploaded' => __('Tickets Uploaded'),
+            'completed' => __('Completed'),
             'cancelled' => __('Cancelled')
         ];
-        $data['booking_state'] = $booking->booking_state ?? 'received';
-        $data['booking_state_label'] = $states[$data['booking_state']] ?? ucfirst($data['booking_state']);
+        $data['booking_state'] = $booking->booking_state ?? 'awaiting_payment';
+        $data['booking_state_label'] = $states[$data['booking_state']] ?? __($data['booking_state']);
         $data['ticket_url'] = $booking->ticket_url;
 
         $data['payment_details'] = $booking->payments->map(function ($p) {

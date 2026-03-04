@@ -84,7 +84,8 @@ class BankTransferController extends Controller
             // 2. Update Booking Status
             $booking = $transfer->booking;
             $booking->update([
-                'status' => 'confirmed'
+                'status' => 'confirmed',
+                'booking_state' => \App\Models\TripBooking::STATE_PREPARING
             ]);
 
             // 3. Create Payment Record

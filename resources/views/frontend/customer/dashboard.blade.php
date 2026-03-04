@@ -295,7 +295,7 @@
             <i class="fas fa-clock"></i>
         </div>
         <div class="stat-info">
-            <div class="stat-label">{{ __('Pending') }}</div>
+            <div class="stat-label">{{ __('Awaiting Payment') }}</div>
             <div class="stat-value">{{ $pendingBookings }}</div>
         </div>
     </div>
@@ -342,13 +342,24 @@
                     <div class="booking-info">
                         <div class="booking-title">{{ $booking->trip->title ?? __('Trip') }}</div>
                         <div class="booking-meta">
-                            <span class="status-badge status-{{ $booking->status }}">
-                                {{ $booking->status === 'pending' ? __('Pending') : ($booking->status === 'confirmed' ? __('Confirmed') : __('Cancelled')) }}
+                            @php
+                                $stateColors = [
+                                    'awaiting_payment' => 'pending',
+                                    'preparing' => 'confirmed',
+                                    'issuing_tickets' => 'confirmed',
+                                    'tickets_uploaded' => 'confirmed',
+                                    'completed' => 'confirmed',
+                                    'cancelled' => 'cancelled',
+                                ];
+                                $stateClass = $stateColors[$booking->booking_state] ?? 'pending';
+                            @endphp
+                            <span class="status-badge status-{{ $stateClass }}">
+                                {{ __($booking->booking_state) }}
                             </span>
                             · {{ $booking->tickets_count }} {{ __('Passenger') }}
                         </div>
                     </div>
-                    <div class="booking-price">{{ number_format($booking->total_price, 0) }} {{ __('SAR') }}</div>
+                    <div class="booking-price">{{ number_format($booking->total_price, 0) }} <span class="currency-label">{{ __('SAR') }}</span></div>
                 </div>
             @empty
                 <div class="empty-state">

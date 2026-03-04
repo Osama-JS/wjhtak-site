@@ -234,7 +234,7 @@
                                 <h3 class="trip-card-title"><a href="#">{{ [__('Luxury Beach Resort'), __('Ancient Wonders Tour'), __('Cultural Heritage Trip')][$i % 3] }}</a></h3>
                                 <div class="trip-card-meta">
                                     <div class="trip-card-meta-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>{{ rand(3, 10) }} {{ __('Days') }}</span></div>
-                                    <div class="trip-card-price"><span class="trip-card-price-old">${{ rand(800, 1200) }}</span><span class="trip-card-price-current">${{ rand(500, 799) }}<span class="trip-card-price-unit">/ {{ __('person') }}</span></span></div>
+                                    <div class="trip-card-price"><span class="trip-card-price-old">{{ rand(800, 1200) }} <small>{{ __('SAR') }}</small></span><span class="trip-card-price-current">{{ rand(500, 799) }} <span class="currency-label">{{ __('SAR') }}</span><span class="trip-card-price-unit">/ {{ __('person') }}</span></span></div>
                                 </div>
                             </div>
                         </article>

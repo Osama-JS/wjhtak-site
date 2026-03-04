@@ -16,9 +16,9 @@ class CustomerDashboardController extends Controller
 
         // Booking stats
         $totalBookings     = TripBooking::where('user_id', $user->id)->count();
-        $pendingBookings   = TripBooking::where('user_id', $user->id)->where('status', 'pending')->count();
-        $confirmedBookings = TripBooking::where('user_id', $user->id)->where('status', 'confirmed')->count();
-        $cancelledBookings = TripBooking::where('user_id', $user->id)->where('status', 'cancelled')->count();
+        $pendingBookings   = TripBooking::where('user_id', $user->id)->where('booking_state', TripBooking::STATE_AWAITING_PAYMENT)->count();
+        $confirmedBookings = TripBooking::where('user_id', $user->id)->whereNotIn('booking_state', [TripBooking::STATE_AWAITING_PAYMENT, TripBooking::STATE_CANCELLED])->count();
+        $cancelledBookings = TripBooking::where('user_id', $user->id)->where('booking_state', TripBooking::STATE_CANCELLED)->count();
 
         // Upcoming bookings (closest 3 confirmed)
         $upcomingBookings = TripBooking::with(['trip.images'])

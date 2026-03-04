@@ -3929,9 +3929,21 @@
                                                         "type": "number",
                                                         "example": 3000
                                                     },
-                                                    "status": {
+                                                    "booking_state": {
                                                         "type": "string",
-                                                        "example": "pending"
+                                                        "enum": [
+                                                            "awaiting_payment",
+                                                            "preparing",
+                                                            "issuing_tickets",
+                                                            "tickets_uploaded",
+                                                            "completed",
+                                                            "cancelled"
+                                                        ],
+                                                        "example": "awaiting_payment"
+                                                    },
+                                                    "booking_state_label": {
+                                                        "type": "string",
+                                                        "example": "Awaiting Payment"
                                                     },
                                                     "booking_date": {
                                                         "type": "string",
@@ -4351,11 +4363,19 @@
                                                 },
                                                 "booking_state": {
                                                     "type": "string",
+                                                    "enum": [
+                                                        "awaiting_payment",
+                                                        "preparing",
+                                                        "issuing_tickets",
+                                                        "tickets_uploaded",
+                                                        "completed",
+                                                        "cancelled"
+                                                    ],
                                                     "example": "preparing"
                                                 },
                                                 "booking_state_label": {
                                                     "type": "string",
-                                                    "example": "Preparing Tickets"
+                                                    "example": "Preparing"
                                                 },
                                                 "ticket_url": {
                                                     "type": "string",

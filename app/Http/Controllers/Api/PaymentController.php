@@ -693,7 +693,7 @@ class PaymentController extends Controller
             // Update Booking
             $booking->update([
                 'status' => 'confirmed',
-                'booking_state' => TripBooking::STATE_RECEIVED,
+                'booking_state' => TripBooking::STATE_PREPARING,
                 'updated_at' => now(),
             ]);
 
@@ -702,9 +702,9 @@ class PaymentController extends Controller
                 'trip_booking_id' => $booking->id,
                 'user_id' => null, // System action
                 'action' => 'payment_confirmed',
-                'description' => __('Payment successful via :gateway. Booking state set to Received.', ['gateway' => $gateway]),
+                'description' => __('Payment successful via :gateway. Booking state set to Preparing.', ['gateway' => $gateway]),
                 'previous_state' => null,
-                'new_state' => TripBooking::STATE_RECEIVED,
+                'new_state' => TripBooking::STATE_PREPARING,
             ]);
 
             // Record or Update Payment

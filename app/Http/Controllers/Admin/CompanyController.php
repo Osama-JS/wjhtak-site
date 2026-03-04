@@ -34,6 +34,7 @@ class CompanyController extends Controller
                     'en_name' => $company->en_name,
                     'email' => $company->email,
                     'phone' => ($company->phone_code ? '+'.$company->phone_code.' ' : '') . $company->phone,
+                    'commission' => $company->commission_rate . '%',
                     'notes' => $company->notes,
                     'status' => $company->active
                         ? '<span class="badge bg-success">'.__('Active').'</span>'
@@ -80,6 +81,7 @@ class CompanyController extends Controller
             'phone_code' => 'nullable|string|max:10',
             'notes'  => 'nullable|string',
             'active' => 'sometimes|boolean',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -129,6 +131,7 @@ class CompanyController extends Controller
             'phone_code' => 'nullable|string|max:10',
             'notes' => 'nullable',
             'active' => 'sometimes|boolean',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
         if ($request->hasFile('logo')) {

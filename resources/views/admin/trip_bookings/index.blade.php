@@ -21,16 +21,16 @@
         </div>
         <div class="col-xl-3 col-sm-6">
             <x-stats-card
-                :label="__('Confirmed')"
-                :value="$stats['confirmed']"
-                icon="fas fa-check-circle"
+                :label="__('Awaiting Payment')"
+                :value="$stats['awaiting_payment']"
+                icon="fas fa-clock"
             />
         </div>
         <div class="col-xl-3 col-sm-6">
             <x-stats-card
-                :label="__('Pending')"
-                :value="$stats['pending']"
-                icon="fas fa-clock"
+                :label="__('Preparing')"
+                :value="$stats['preparing']"
+                icon="fas fa-cogs"
             />
         </div>
         <div class="col-xl-3 col-sm-6">

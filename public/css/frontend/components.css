@@ -2192,3 +2192,18 @@
     overflow: hidden;
     pointer-events: none;
 }
+
+/* =============================================================================
+   CURRENCY LABEL - PREMIUM SAR
+   ============================================================================= */
+.currency-label {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-inline-start: 2px;
+    opacity: 0.9;
+}
+
+[dir="rtl"] .currency-label {
+    font-family: var(--font-arabic);
+}

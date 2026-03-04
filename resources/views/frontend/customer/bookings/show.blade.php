@@ -317,10 +317,11 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
         $isCancelled = $booking->status === 'cancelled' || $currentState === 'cancelled';
 
         $states = [
-            'received' => ['icon' => 'fa-inbox', 'label' => __('Order Received')],
-            'preparing' => ['icon' => 'fa-cogs', 'label' => __('Preparing Tickets')],
-            'confirmed' => ['icon' => 'fa-check-circle', 'label' => __('Confirmed')],
-            'tickets_sent' => ['icon' => 'fa-ticket-alt', 'label' => __('Tickets Sent')]
+            'awaiting_payment' => ['icon' => 'fa-clock', 'label' => __('Awaiting Payment')],
+            'preparing' => ['icon' => 'fa-cogs', 'label' => __('Preparing')],
+            'issuing_tickets' => ['icon' => 'fa-ticket-alt', 'label' => __('Issuing Tickets')],
+            'tickets_uploaded' => ['icon' => 'fa-upload', 'label' => __('Tickets Uploaded')],
+            'completed' => ['icon' => 'fa-check-double', 'label' => __('Completed')]
         ];
 
         $stateKeys = array_keys($states);
@@ -389,12 +390,19 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                 <div class="info-row">
                     <span class="info-label">{{ __('Booking State') }}</span>
                     <span class="info-value">
-                        <span class="status-badge status-{{ $booking->status }}">
-                            @if($isCancelled)
-                                {{ __('Cancelled') }}
-                            @else
-                                {{ $states[$currentState]['label'] ?? ucfirst($currentState) }}
-                            @endif
+                        @php
+                            $stateColors = [
+                                'awaiting_payment' => 'pending',
+                                'preparing' => 'confirmed',
+                                'issuing_tickets' => 'confirmed',
+                                'tickets_uploaded' => 'confirmed',
+                                'completed' => 'confirmed',
+                                'cancelled' => 'cancelled',
+                            ];
+                            $badgeClass = $stateColors[$currentState] ?? 'pending';
+                        @endphp
+                        <span class="status-badge status-{{ $badgeClass }}">
+                            {{ $states[$currentState]['label'] ?? __($currentState) }}
                         </span>
                     </span>
                 </div>
@@ -453,7 +461,7 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                         </div>
                         <div class="info-row">
                             <span class="info-label">{{ __('Amount Paid') }}</span>
-                            <span class="info-value" style="color:#16a34a;">{{ number_format($payment->amount, 2) }} {{ __('SAR') }}</span>
+                            <span class="info-value" style="color:#16a34a;">{{ number_format($payment->amount, 2) }} <span class="currency-label">{{ __('SAR') }}</span></span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">{{ __('Payment Date') }}</span>
@@ -469,12 +477,12 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
     <div>
         {{-- Price Summary --}}
         <div class="summary-total">
-            <div class="amount">{{ number_format($booking->total_price, 0) }} <small style="font-size:1rem;">{{ __('SAR') }}</small></div>
+            <div class="amount">{{ number_format($booking->total_price, 0) }} <span class="currency-label" style="font-size:1rem;">{{ __('SAR') }}</span></div>
             <div class="amount-label">{{ __('Total Price') }}</div>
         </div>
 
         {{-- Actions --}}
-        @if($booking->status === 'pending')
+        @if($booking->booking_state === 'awaiting_payment')
             @if(!$latestTransfer || $latestTransfer->status === 'rejected')
                 <a href="{{ route('customer.payments.checkout', $booking->id) }}" class="action-btn action-btn-primary">
                     <i class="fas fa-credit-card"></i> {{ __('Complete Payment Now') }}
@@ -497,7 +505,7 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                     <i class="fas fa-times"></i> {{ __('Cancel Booking') }}
                 </button>
             </form>
-        @elseif($booking->status === 'confirmed')
+        @elseif($booking->status === 'confirmed' || $booking->booking_state !== 'awaiting_payment')
             @if($booking->ticket_url)
                 <a href="{{ $booking->ticket_url }}" target="_blank" class="action-btn" style="background: #10b981; color: #fff;">
                     <i class="fas fa-ticket-alt"></i> {{ __('Download Tickets') }}

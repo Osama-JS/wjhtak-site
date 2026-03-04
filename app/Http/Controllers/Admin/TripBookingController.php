@@ -18,9 +18,9 @@ class TripBookingController extends Controller
     {
         $stats = [
             'total' => TripBooking::count(),
-            'confirmed' => TripBooking::where('status', 'confirmed')->count(),
-            'pending' => TripBooking::where('status', 'pending')->count(),
-            'cancelled' => TripBooking::where('status', 'cancelled')->count(),
+            'awaiting_payment' => TripBooking::where('booking_state', TripBooking::STATE_AWAITING_PAYMENT)->count(),
+            'preparing' => TripBooking::where('booking_state', TripBooking::STATE_PREPARING)->count(),
+            'cancelled' => TripBooking::where('booking_state', TripBooking::STATE_CANCELLED)->count(),
         ];
         return view('admin.trip_bookings.index', compact('stats'));
     }
@@ -34,12 +34,19 @@ class TripBookingController extends Controller
             $bookings = TripBooking::with(['user', 'trip'])->latest()->get();
 
             $data = $bookings->map(function ($booking) {
-                $statusBadge = '<span class="badge badge-warning">' . __('Pending') . '</span>';
-                if ($booking->status == 'confirmed') {
-                    $statusBadge = '<span class="badge badge-success">' . __('Confirmed') . '</span>';
-                } elseif ($booking->status == 'cancelled') {
-                    $statusBadge = '<span class="badge badge-danger">' . __('Cancelled') . '</span>';
-                }
+                $stateLabels = [
+                    TripBooking::STATE_AWAITING_PAYMENT => ['label' => __('Awaiting Payment'), 'class' => 'warning'],
+                    TripBooking::STATE_PREPARING => ['label' => __('Preparing'), 'class' => 'info'],
+                    TripBooking::STATE_ISSUING_TICKETS => ['label' => __('Issuing Tickets'), 'class' => 'primary'],
+                    TripBooking::STATE_TICKETS_UPLOADED => ['label' => __('Tickets Uploaded'), 'class' => 'success'],
+                    TripBooking::STATE_COMPLETED => ['label' => __('Completed'), 'class' => 'dark'],
+                    TripBooking::STATE_CANCELLED => ['label' => __('Cancelled'), 'class' => 'danger'],
+                ];
+
+                $state = $booking->booking_state ?? TripBooking::STATE_AWAITING_PAYMENT;
+                $stateData = $stateLabels[$state] ?? ['label' => __($state), 'class' => 'secondary'];
+
+                $statusBadge = '<span class="badge badge-'. $stateData['class'] .'">' . $stateData['label'] . '</span>';
 
                 return [
                     'id' => $booking->id,
@@ -69,13 +76,8 @@ class TripBookingController extends Controller
         // Status Buttons
         $statusBtns = '';
         if (auth()->user()->can('manage bookings')) {
-            if ($booking->status == 'pending') {
-                $statusBtns .= '<form action="' . route('admin.trip-bookings.update-status', $booking->id) . '" method="POST" class="d-inline confirm-action" data-confirm-message="' . __('Are you sure you want to confirm this booking?') . '">
-                    ' . csrf_field() . '
-                    <input type="hidden" name="status" value="confirmed">
-                    <button type="submit" class="btn btn-success btn-sm me-1" title="' . __('Confirm') . '"><i class="fas fa-check"></i></button>
-                </form>';
-
+            if ($booking->booking_state == TripBooking::STATE_AWAITING_PAYMENT) {
+                // Only allow cancellation if awaiting payment (Confirmation is automatic)
                 $statusBtns .= '<form action="' . route('admin.trip-bookings.update-status', $booking->id) . '" method="POST" class="d-inline confirm-action" data-confirm-message="' . __('Are you sure you want to cancel this booking?') . '">
                 ' . csrf_field() . '
                 <input type="hidden" name="status" value="cancelled">
@@ -135,12 +137,25 @@ class TripBookingController extends Controller
     {
         $booking = TripBooking::findOrFail($id);
         $request->validate([
-            'booking_state' => 'required|in:received,preparing,confirmed,tickets_sent,cancelled'
+            'booking_state' => 'required|in:awaiting_payment,preparing,issuing_tickets,tickets_uploaded,completed,cancelled'
         ]);
+
+        // Prevent manual move to preparing or awaiting payment unless it's a cancellation
+        if (in_array($request->booking_state, [TripBooking::STATE_AWAITING_PAYMENT, TripBooking::STATE_PREPARING]) && $request->booking_state !== TripBooking::STATE_CANCELLED) {
+             if ($booking->booking_state !== $request->booking_state) {
+                 return redirect()->back()->with('error', __('This state transition must happen automatically.'));
+             }
+        }
 
         $oldState = $booking->booking_state;
         $newState = $request->booking_state;
-        $booking->update(['booking_state' => $newState]);
+
+        $updateData = ['booking_state' => $newState];
+        if ($newState == TripBooking::STATE_CANCELLED) {
+            $updateData['status'] = 'cancelled';
+        }
+
+        $booking->update($updateData);
 
         \App\Models\BookingHistory::create([
             'trip_booking_id' => $booking->id,
@@ -188,7 +203,7 @@ class TripBookingController extends Controller
             $oldState = $booking->booking_state;
             $booking->update([
                 'ticket_file_path' => $path,
-                'booking_state' => \App\Models\TripBooking::STATE_TICKETS_SENT
+                'booking_state' => \App\Models\TripBooking::STATE_TICKETS_UPLOADED
             ]);
 
             \App\Models\BookingHistory::create([
