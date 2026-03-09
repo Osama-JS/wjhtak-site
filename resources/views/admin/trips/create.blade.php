@@ -78,20 +78,20 @@
                                         <x-forms.input-text name="price_before_discount" :label="__('Old Price')" icon="fa fa-tag" />
                                     </div>
                                     <div class="col-md-4">
-                                        <x-forms.input-text name="tickets" :label="__('Tickets')" required icon="fa fa-ticket-alt" />
+                                        <x-forms.input-text name="tickets" :label="__('Tickets')" value="{{ old('tickets') ?? 0 }}" required icon="fa fa-ticket-alt" />
                                     </div>
                                     <div class="col-md-4">
-                                        <x-forms.input-text name="personnel_capacity" :label="__('Max Capacity')" icon="fa fa-users" />
+                                        <x-forms.input-text name="personnel_capacity" :label="__('Max Capacity')" value="{{ old('personnel_capacity') ?? 0 }}" icon="fa fa-users" />
                                     </div>
                                     <div class="col-md-4">
-                                        <x-forms.input-text name="base_capacity" :label="__('Base Capacity')" icon="fa fa-user-plus" />
+                                        <x-forms.input-text name="base_capacity" :label="__('Base Capacity')" value="{{ old('base_capacity') ?? 0 }}"  icon="fa fa-user-plus" />
                                     </div>
                                     <div class="col-md-4">
-                                        <x-forms.input-text name="extra_passenger_price" :label="__('Extra Pax Price')" icon="fa fa-money-bill-wave" />
+                                        <x-forms.input-text name="extra_passenger_price" :label="__('Extra Pax Price')" value="{{ old('extra_passenger_price') ?? 0 }}" icon="fa fa-money-bill-wave" />
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label font-w600">{{ __('Expiry Date') }} <span class="text-danger">*</span></label>
-                                        <input type="date" name="expiry_date" class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}" value="{{ old('expiry_date') }}" required>
+                                        <input type="date" name="expiry_date" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('expiry_date') }}" class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}" value="{{ old('expiry_date') }}" required>
                                         @error('expiry_date')
                                             <div class="invalid-feedback d-block">
                                                 <i class="fas fa-exclamation-circle me-1"></i>

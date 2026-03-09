@@ -141,6 +141,23 @@ class Trip extends Model
     }
 
     /**
+     * Check if the trip is expired.
+     */
+    public function isExpired()
+    {
+        return $this->expiry_date && $this->expiry_date->isPast();
+    }
+
+    /**
+     * Scope for expired trips
+     */
+    public function scopeExpired($query)
+    {
+        return $query->whereNotNull('expiry_date')
+                     ->where('expiry_date', '<', now()->toDateString());
+    }
+
+    /**
      * Scope for active trips
      */
     public function scopeActive($query)

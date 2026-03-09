@@ -71,6 +71,15 @@
         .modal-xl { max-width: 1200px; }
         .border-dashed { border-style: dashed !important; }
 
+        /* Highlight Expired Trips */
+        .table-light-danger {
+            background-color: rgba(255, 103, 114, 0.05) !important;
+            border-left: 4px solid #ff6772 !important;
+        }
+        .table-light-danger td {
+            color: #b91c1c !important;
+        }
+
         /* Fix for RTL if needed, but assuming LTR for now as per code items */
         .ms-auto { margin-right: 0 !important; margin-left: auto !important; }
     </style>
