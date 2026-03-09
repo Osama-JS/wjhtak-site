@@ -54,7 +54,7 @@
 								<div class="dropdown-menu dropdown-menu-end">
 									<div id="DZ_W_Notification1" class="widget-media dlab-scroll p-3" style="height:380px;">
 										<ul class="timeline">
-											<li>
+											<!-- <li>
 												<div class="timeline-panel">
 													<div class="media me-2">
 														<img alt="image" width="50" src="{{ asset('images/avatar/1.png') }}">
@@ -64,62 +64,8 @@
 														<small class="d-block">29 July 2020 - 02:26 PM</small>
 													</div>
 												</div>
-											</li>
-											<li>
-												<div class="timeline-panel">
-													<div class="media me-2 media-info">
-														KG
-													</div>
-													<div class="media-body">
-														<h6 class="mb-1">Resport created successfully</h6>
-														<small class="d-block">29 July 2020 - 02:26 PM</small>
-													</div>
-												</div>
-											</li>
-											<li>
-												<div class="timeline-panel">
-													<div class="media me-2 media-success">
-														<i class="fa fa-home"></i>
-													</div>
-													<div class="media-body">
-														<h6 class="mb-1">Reminder : Treatment Time!</h6>
-														<small class="d-block">29 July 2020 - 02:26 PM</small>
-													</div>
-												</div>
-											</li>
-											 <li>
-												<div class="timeline-panel">
-													<div class="media me-2">
-														<img alt="image" width="50" src="{{ asset('images/avatar/1.png') }}">
-													</div>
-													<div class="media-body">
-														<h6 class="mb-1">{{ __('Notification Title Placeholder') }}</h6>
-														<small class="d-block">{{ date('d M Y - H:i A') }}</small>
-													</div>
-												</div>
-											</li>
-											<li>
-												<div class="timeline-panel">
-													<div class="media me-2 media-danger">
-														KG
-													</div>
-													<div class="media-body">
-														<h6 class="mb-1">Resport created successfully</h6>
-														<small class="d-block">29 July 2020 - 02:26 PM</small>
-													</div>
-												</div>
-											</li>
-											<li>
-												<div class="timeline-panel">
-													<div class="media me-2 media-primary">
-														<i class="fa fa-home"></i>
-													</div>
-													<div class="media-body">
-														<h6 class="mb-1">Reminder : Treatment Time!</h6>
-														<small class="d-block">29 July 2020 - 02:26 PM</small>
-													</div>
-												</div>
-											</li>
+											</li> -->
+
 										</ul>
 									</div>
 									<a class="all-notification" href="javascript:void(0);">{{ __('See all notifications') }} <i class="ti-arrow-end"></i></a>
@@ -137,54 +83,14 @@
 								<div class="dropdown-menu dropdown-menu-end">
 									<div id="DZ_W_TimeLine02" class="widget-timeline dlab-scroll style-1 ps ps--active-y p-3 height370">
 									<ul class="timeline">
-										<li>
+										<!-- <li>
 											<div class="timeline-badge primary"></div>
 											<a class="timeline-panel text-muted" href="javascript:void(0);">
 												<span>10 minutes ago</span>
 												<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong class="text-primary">$500</strong>.</h6>
 											</a>
-										</li>
-										<li>
-											<div class="timeline-badge info">
-											</div>
-											<a class="timeline-panel text-muted" href="javascript:void(0);">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-												<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge danger">
-											</div>
-											<a class="timeline-panel text-muted" href="javascript:void(0);">
-												<span>30 minutes ago</span>
-												<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell $250</strong></h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge success">
-											</div>
-											<a class="timeline-panel text-muted" href="javascript:void(0);">
-												<span>15 minutes ago</span>
-												<h6 class="mb-0">StumbleUpon is acquired by eBay. </h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge warning">
-											</div>
-											<a class="timeline-panel text-muted" href="javascript:void(0);">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge dark">
-											</div>
-											<a class="timeline-panel text-muted" href="javascript:void(0);">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-											</a>
-										</li>
+										</li> -->
+
 									</ul>
 								</div>
 								</div>

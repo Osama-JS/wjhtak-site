@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SubscriberController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\TripsController;
 use App\Http\Controllers\Admin\TripCategoryController;
+use App\Http\Controllers\Admin\UserNoteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\Web\PaymentWebController;
@@ -304,6 +305,10 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
         Route::get('pages/data', [App\Http\Controllers\Admin\PageController::class, 'getData'])->name('pages.data');
         Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
     });
+
+    // User Notes
+    Route::get('user-notes/data', [UserNoteController::class, 'index'])->name('user-notes.data');
+    Route::resource('user-notes', UserNoteController::class);
 });
 
 // Public Page Display

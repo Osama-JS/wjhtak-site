@@ -38,7 +38,13 @@
                                     <div class="col-md-12">
                                         <div class="form-group mb-3">
                                             <label class="form-label font-w600">{{ __('Description') }} <span class="text-danger">*</span></label>
-                                            <textarea id="description" name="description" class="form-control" rows="10">{!! $trip->description !!}</textarea>
+                                            <textarea id="description" name="description" class="form-control {{ $errors->has('description') ? 'is-invalid' : '' }}" rows="10">{!! old('description', $trip->description) !!}</textarea>
+                                            @error('description')
+                                                <div class="invalid-feedback d-block">
+                                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -86,7 +92,13 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label font-w600">{{ __('Expiry Date') }} <span class="text-danger">*</span></label>
-                                        <input type="date" name="expiry_date" class="form-control" value="{{ $trip->expiry_date ? \Carbon\Carbon::parse($trip->expiry_date)->format('Y-m-d') : '' }}" required>
+                                        <input type="date" name="expiry_date" class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}" value="{{ old('expiry_date', $trip->expiry_date ? \Carbon\Carbon::parse($trip->expiry_date)->format('Y-m-d') : '') }}" required>
+                                        @error('expiry_date')
+                                            <div class="invalid-feedback d-block">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
 
@@ -148,7 +160,7 @@
                     citySelect.empty();
                     citySelect.append('<option value="">{{ __("Select City") }}</option>');
                     $.each(data, function(key, value) {
-                        citySelect.append('<option value="' + value.id + '">' + value.name + '</option>');
+                        citySelect.append('<option value="' + value.id + '">' + value.title + '</option>');
                     });
                     if ($.fn.niceSelect) citySelect.niceSelect('update');
                     if ($.fn.select2) citySelect.trigger('change.select2');

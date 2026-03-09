@@ -39,7 +39,7 @@ class TBOHotelService
             'UserName'     => $this->username,
             'Password'     => $this->password,
             'ClientCode'   => $this->clientCode,
-            'EndUserIp'    => request()->ip() ?: '127.0.0.1',
+            'EndUserIp'    => (request()->ip() && request()->ip() !== '::1') ? request()->ip() : '172.16.10.10',
         ];
     }
 
@@ -85,7 +85,8 @@ class TBOHotelService
     {
         return Cache::remember('tbo_city_list', 60 * 24, function () {
             $response = $this->post('CityList', []);
-            return $response['CityList'] ?? [];
+            // TBO V2.1 might return it under 'CityList' or 'CityListResult' or directly
+            return $response['CityList'] ?? $response['CityListResult'] ?? $response ?? [];
         });
     }
 

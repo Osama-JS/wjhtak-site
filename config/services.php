@@ -71,7 +71,7 @@ return [
         'username'    => env('TBO_USERNAME'),
         'password'    => env('TBO_PASSWORD'),
         'client_code' => env('TBO_CLIENT_CODE'),
-        'base_url'    => env('TBO_BASE_URL', 'http://api.tbotechnology.in/HotelAPI_V5/'),
+        'base_url'    => env('TBO_BASE_URL', 'https://api.tbotechnology.in/HotelAPI_V5/'),
         'access'      => env('TBO_ACCESS', 'Test'),
     ],
 

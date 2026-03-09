@@ -168,6 +168,21 @@
 
         forms.forEach(function (form) {
             form.addEventListener("submit", function (e) {
+                // Update CKEditor instances before validation
+                if (
+                    window.editor ||
+                    document.querySelector(".ck-editor__editable")
+                ) {
+                    const editors = document.querySelectorAll(
+                        ".ck-editor__editable",
+                    );
+                    editors.forEach((el) => {
+                        if (el.ckeditorInstance) {
+                            el.ckeditorInstance.updateSourceElement();
+                        }
+                    });
+                }
+
                 const requiredFields = form.querySelectorAll("[required]");
                 let isValid = true;
 
@@ -214,8 +229,6 @@
                     e.preventDefault();
                     e.stopPropagation();
                 } else {
-                    // Form is valid - Check if we should apply loading state
-                    // Only apply if the event hasn't been prevented (standard submit)
                     if (!e.defaultPrevented) {
                         const submitBtn = form.querySelector(
                             'button[type="submit"]',
@@ -224,7 +237,7 @@
                             submitBtn &&
                             !submitBtn.disabled &&
                             !submitBtn.classList.contains("no-loading") &&
-                            !form.classList.contains("confirm-action") // Don't show loading if it's a confirm action (handled by confirm)
+                            !form.classList.contains("confirm-action")
                         ) {
                             const text =
                                 submitBtn.dataset.loadingText ||
@@ -232,14 +245,12 @@
                                     window.Translations.loading_text) ||
                                 "Loading...";
 
-                            // Preserve width to avoid layout jump
                             const w = submitBtn.offsetWidth;
                             submitBtn.style.minWidth = w + "px";
 
                             submitBtn.dataset.originalHtml =
                                 submitBtn.innerHTML;
                             submitBtn.disabled = true;
-                            // Add Spinner
                             submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> ${text}`;
                         }
                     }
@@ -250,11 +261,9 @@
         // ============================================
         // GLOBAL CONFIRMATION HANDLER
         // ============================================
-        // Use delegated handler to support dynamically added elements (like DataTables)
         jQuery(document).on("submit", ".confirm-action", function (e) {
             const $form = jQuery(this);
 
-            // If already confirmed, let it proceed
             if ($form.attr("data-confirmed") === "true") {
                 return true;
             }
@@ -290,7 +299,6 @@
             input.addEventListener("input", function () {
                 this.classList.remove("is-invalid");
                 this.classList.remove("is-valid");
-                // Remove sibling frontend or ajax errors
                 let wrapper = this.parentElement;
                 if (
                     wrapper.classList.contains("input-wrapper") ||
@@ -318,7 +326,6 @@
         // Global AJAX Handlers for Forms
         if (typeof jQuery !== "undefined") {
             jQuery(document).ajaxComplete(function (event, xhr, settings) {
-                // Reset loading buttons
                 document
                     .querySelectorAll('button[type="submit"][disabled]')
                     .forEach(function (btn) {
@@ -342,7 +349,6 @@
                     ) {
                         let errors = jqxhr.responseJSON.errors;
 
-                        // Clear previous AJAX errors
                         jQuery(".is-invalid").removeClass("is-invalid");
                         jQuery(".invalid-feedback.ajax-error").remove();
 
@@ -384,6 +390,25 @@
                                 }
 
                                 if (!firstErrorField) firstErrorField = input;
+
+                                if (
+                                    input.hasClass("select2-hidden-accessible")
+                                ) {
+                                    input
+                                        .next(".select2-container")
+                                        .find(".select2-selection")
+                                        .addClass("is-invalid");
+                                }
+
+                                if (
+                                    input.attr("id") === "description" ||
+                                    input.hasClass("ckeditor")
+                                ) {
+                                    input
+                                        .next(".ck-editor")
+                                        .find(".ck-editor__main > .ck-content")
+                                        .addClass("is-invalid");
+                                }
                             } else {
                                 if (typeof toastr !== "undefined") {
                                     toastr.error(errors[key][0]);
@@ -411,7 +436,6 @@
     // TOOLTIPS & POPOVERS
     // ============================================
     function initTooltips() {
-        // Initialize Bootstrap tooltips if available
         if (typeof bootstrap !== "undefined") {
             const tooltipTriggerList = [].slice.call(
                 document.querySelectorAll('[data-bs-toggle="tooltip"]'),
@@ -433,7 +457,6 @@
     // SCROLL ANIMATIONS
     // ============================================
     function initAnimations() {
-        // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
             anchor.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -448,7 +471,6 @@
             });
         });
 
-        // Counter animation for stat cards
         const counters = document.querySelectorAll(".stat-value[data-count]");
 
         counters.forEach(function (counter) {
@@ -467,7 +489,6 @@
                 }
             };
 
-            // Start animation when visible
             const observer = new IntersectionObserver(function (entries) {
                 if (entries[0].isIntersecting) {
                     updateCounter();
@@ -480,10 +501,22 @@
     }
 
     // ============================================
-    // UTILITY FUNCTIONS
+    // PUBLIC API (WJHTAKAdmin)
     // ============================================
     window.WJHTAKAdmin = {
-        // Show toast notification
+        /**
+         * Get full path considering subfolder base URL
+         */
+        url: function (path) {
+            const baseUrl =
+                jQuery('meta[name="base-url"]').attr("content") || "";
+            const cleanBase = baseUrl.endsWith("/")
+                ? baseUrl.slice(0, -1)
+                : baseUrl;
+            const cleanPath = path.startsWith("/") ? path : "/" + path;
+            return cleanBase + cleanPath;
+        },
+
         toast: function (message, type) {
             type = type || "success";
             if (typeof toastr !== "undefined") {
@@ -493,33 +526,38 @@
             }
         },
 
-        // Confirm dialog
         confirm: function (message, callback) {
             if (typeof Swal !== "undefined") {
                 Swal.fire({
-                    title: window.Translations.confirm_title || "Confirmation",
+                    title:
+                        (window.Translations &&
+                            window.Translations.confirm_title) ||
+                        "Confirmation",
                     text: message,
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#135846",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: window.Translations.confirm_yes || "Yes",
+                    confirmButtonText:
+                        (window.Translations &&
+                            window.Translations.confirm_yes) ||
+                        "Yes",
                     cancelButtonText:
-                        window.Translations.confirm_cancel || "Cancel",
+                        (window.Translations &&
+                            window.Translations.confirm_cancel) ||
+                        "Cancel",
                 }).then(function (result) {
                     if (result.isConfirmed && callback) {
                         callback();
                     }
                 });
             } else {
-                // Fallback to native confirm if SweetAlert is missing
                 if (confirm(message)) {
                     if (callback) callback();
                 }
             }
         },
 
-        // Format currency
         formatCurrency: function (amount, currency) {
             currency = currency || "SAR";
             return new Intl.NumberFormat("ar-SA", {
@@ -528,7 +566,6 @@
             }).format(amount);
         },
 
-        // Format date
         formatDate: function (date) {
             return new Intl.DateTimeFormat("ar-SA", {
                 year: "numeric",
@@ -537,12 +574,6 @@
             }).format(new Date(date));
         },
 
-        /**
-         * Set button loading state
-         * @param {jQuery|HTMLElement} btn
-         * @param {boolean} isLoading
-         * @param {string} loadingText
-         */
         btnLoading: function (btn, isLoading, loadingText) {
             const $btn = jQuery(btn);
             if (isLoading) {
@@ -551,18 +582,203 @@
                 $btn.prop("disabled", true);
                 const text =
                     loadingText ||
-                    window.Translations.loading_text ||
+                    (window.Translations && window.Translations.loading_text) ||
                     "Loading...";
                 $btn.html(
                     `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> ${text}`,
                 );
             } else {
                 const originalContent = $btn.data("original-content");
-                if (originalContent) {
-                    $btn.html(originalContent);
-                }
+                if (originalContent) $btn.html(originalContent);
                 $btn.prop("disabled", false);
             }
         },
+
+        // USER NOTES MANAGEMENT
+        toggleNoteForm: function () {
+            jQuery("#addNoteForm").slideToggle();
+            jQuery("#noteContent").focus();
+        },
+
+        saveNote: function () {
+            const content = jQuery("#noteContent").val();
+            if (!content.trim()) return;
+
+            const btn = jQuery("#addNoteForm button");
+            const originalHtml = btn.html();
+            btn.html('<i class="fas fa-spinner fa-spin"></i>').prop(
+                "disabled",
+                true,
+            );
+
+            jQuery.ajax({
+                url: this.url("admin/user-notes"),
+                method: "POST",
+                data: {
+                    content: content,
+                    _token: jQuery('meta[name="csrf-token"]').attr("content"),
+                },
+                success: function (response) {
+                    if (response.success) {
+                        jQuery("#noteContent").val("");
+                        jQuery("#addNoteForm").slideUp();
+                        jQuery(".no-notes-msg").remove();
+
+                        const note = response.note;
+                        const date = new Date(
+                            note.created_at,
+                        ).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                        });
+
+                        const noteHtml = `
+                            <li id="note-item-${note.id}" style="display: none;">
+                                <div class="d-flex bd-highlight">
+                                    <div class="user_info">
+                                        <span class="note-content-text">${note.content}</span>
+                                        <p>${date}</p>
+                                    </div>
+                                    <div class="ms-auto flex-shrink-0">
+                                        <a href="javascript:void(0);" onclick="WJHTAKAdmin.editNote(${note.id}, \`${note.content.replace(/`/g, "\\`")}\`)" class="btn btn-primary btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
+                                        <a href="javascript:void(0);" onclick="WJHTAKAdmin.deleteNote(${note.id})" class="btn btn-danger btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                        jQuery("#userNotesList").prepend(noteHtml);
+                        jQuery(`#note-item-${note.id}`).fadeIn();
+
+                        if (typeof toastr !== "undefined") {
+                            toastr.success(response.message);
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    if (typeof toastr !== "undefined") {
+                        toastr.error("Failed to save note");
+                    }
+                },
+                complete: function () {
+                    btn.html(originalHtml).prop("disabled", false);
+                },
+            });
+        },
+
+        editNote: function (id, oldContent) {
+            if (typeof Swal !== "undefined") {
+                Swal.fire({
+                    title: "Edit Note",
+                    input: "textarea",
+                    inputValue: oldContent,
+                    showCancelButton: true,
+                    confirmButtonText: "Update",
+                    confirmButtonColor: "#135846",
+                    preConfirm: (newContent) => {
+                        if (!newContent) {
+                            Swal.showValidationMessage(
+                                "Note content cannot be empty",
+                            );
+                        }
+                        return newContent;
+                    },
+                }).then((result) => {
+                    if (result.value) {
+                        jQuery.ajax({
+                            url: this.url(`admin/user-notes/${id}`),
+                            method: "PUT",
+                            data: {
+                                content: result.value,
+                                _token: jQuery('meta[name="csrf-token"]').attr(
+                                    "content",
+                                ),
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    jQuery(
+                                        `#note-item-${id} .note-content-text`,
+                                    ).text(result.value);
+                                    if (typeof toastr !== "undefined") {
+                                        toastr.success(response.message);
+                                    }
+                                }
+                            },
+                        });
+                    }
+                });
+            } else {
+                const newContent = prompt("Edit Note:", oldContent);
+                if (newContent !== null && newContent.trim() !== "") {
+                    jQuery.ajax({
+                        url: this.url(`admin/user-notes/${id}`),
+                        method: "PUT",
+                        data: {
+                            content: newContent,
+                            _token: jQuery('meta[name="csrf-token"]').attr(
+                                "content",
+                            ),
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                jQuery(
+                                    `#note-item-${id} .note-content-text`,
+                                ).text(newContent);
+                            }
+                        },
+                    });
+                }
+            }
+        },
+
+        deleteNote: function (id) {
+            if (typeof Swal !== "undefined") {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This note will be deleted permanently.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!",
+                }).then((result) => {
+                    if (result.value) {
+                        this.performDeleteNote(id);
+                    }
+                });
+            } else if (confirm("Are you sure you want to delete this note?")) {
+                this.performDeleteNote(id);
+            }
+        },
+
+        performDeleteNote: function (id) {
+            jQuery.ajax({
+                url: this.url(`admin/user-notes/${id}`),
+                method: "DELETE",
+                data: {
+                    _token: jQuery('meta[name="csrf-token"]').attr("content"),
+                },
+                success: function (response) {
+                    if (response.success) {
+                        jQuery(`#note-item-${id}`).fadeOut(function () {
+                            jQuery(this).remove();
+                            if (jQuery("#userNotesList li").length === 0) {
+                                jQuery("#userNotesList").append(`
+                                    <li class="no-notes-msg">
+                                        <div class="text-center p-3 text-muted">No notes found</div>
+                                    </li>
+                                `);
+                            }
+                        });
+                        if (typeof toastr !== "undefined") {
+                            toastr.success(response.message);
+                        }
+                    }
+                },
+            });
+        },
     };
+
+    // Expose for global use
+    window.AdminApp = window.WJHTAKAdmin;
 })();
