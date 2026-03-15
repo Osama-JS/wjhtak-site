@@ -24,5 +24,15 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
             return $user->hasRole('super-admin') ? true : null;
         });
+
+        // View Composer for nav-header to load user notes
+        view()->composer('partials.nav-header', function ($view) {
+            if (auth()->check()) {
+                $notes = \App\Models\UserNote::where('user_id', auth()->id())
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+                $view->with('userNotes', $notes);
+            }
+        });
     }
 }

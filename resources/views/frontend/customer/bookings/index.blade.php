@@ -115,9 +115,12 @@
     font-weight: 600;
 }
 
-.status-pending   { background: #fff7ed; color: #c2410c; }
-.status-confirmed { background: #f0fdf4; color: #15803d; }
-.status-cancelled { background: #fef2f2; color: #b91c1c; }
+.status-awaiting_payment { background: #fff7ed; color: #c2410c; }
+.status-preparing        { background: #eff6ff; color: #1d4ed8; }
+.status-issuing_tickets  { background: #faf5ff; color: #7e22ce; }
+.status-tickets_uploaded { background: #f0fdf4; color: #15803d; }
+.status-completed        { background: #f0fdf4; color: #15803d; }
+.status-cancelled        { background: #fef2f2; color: #b91c1c; }
 
 .booking-card-footer {
     border-top: 1px solid #f3f4f6;
@@ -202,16 +205,25 @@
 
 {{-- Filter Bar --}}
 <div class="filter-bar">
-    <a href="{{ route('customer.bookings.index') }}" class="filter-btn {{ !request('status') ? 'active' : '' }}">
+    <a href="{{ route('customer.bookings.index') }}" class="filter-btn {{ !request('state') ? 'active' : '' }}">
         {{ __('All') }}
     </a>
-    <a href="{{ route('customer.bookings.index', ['status' => 'pending']) }}" class="filter-btn {{ request('status') === 'pending' ? 'active' : '' }}">
-        <i class="fas fa-clock"></i> {{ __('Pending') }}
+    <a href="{{ route('customer.bookings.index', ['state' => \App\Models\TripBooking::STATE_AWAITING_PAYMENT]) }}" class="filter-btn {{ request('state') === \App\Models\TripBooking::STATE_AWAITING_PAYMENT ? 'active' : '' }}">
+        <i class="fas fa-clock"></i> {{ __('Awaiting Payment') }}
     </a>
-    <a href="{{ route('customer.bookings.index', ['status' => 'confirmed']) }}" class="filter-btn {{ request('status') === 'confirmed' ? 'active' : '' }}">
-        <i class="fas fa-check-circle"></i> {{ __('Confirmed') }}
+    <a href="{{ route('customer.bookings.index', ['state' => \App\Models\TripBooking::STATE_PREPARING]) }}" class="filter-btn {{ request('state') === \App\Models\TripBooking::STATE_PREPARING ? 'active' : '' }}">
+        <i class="fas fa-tasks"></i> {{ __('Preparing') }}
     </a>
-    <a href="{{ route('customer.bookings.index', ['status' => 'cancelled']) }}" class="filter-btn {{ request('status') === 'cancelled' ? 'active' : '' }}">
+    <a href="{{ route('customer.bookings.index', ['state' => \App\Models\TripBooking::STATE_ISSUING_TICKETS]) }}" class="filter-btn {{ request('state') === \App\Models\TripBooking::STATE_ISSUING_TICKETS ? 'active' : '' }}">
+        <i class="fas fa-ticket-alt"></i> {{ __('Issuing') }}
+    </a>
+    <a href="{{ route('customer.bookings.index', ['state' => \App\Models\TripBooking::STATE_TICKETS_UPLOADED]) }}" class="filter-btn {{ request('state') === \App\Models\TripBooking::STATE_TICKETS_UPLOADED ? 'active' : '' }}">
+        <i class="fas fa-file-export"></i> {{ __('Uploaded') }}
+    </a>
+    <a href="{{ route('customer.bookings.index', ['state' => \App\Models\TripBooking::STATE_COMPLETED]) }}" class="filter-btn {{ request('state') === \App\Models\TripBooking::STATE_COMPLETED ? 'active' : '' }}">
+        <i class="fas fa-star"></i> {{ __('Completed') }}
+    </a>
+    <a href="{{ route('customer.bookings.index', ['state' => \App\Models\TripBooking::STATE_CANCELLED]) }}" class="filter-btn {{ request('state') === \App\Models\TripBooking::STATE_CANCELLED ? 'active' : '' }}">
         <i class="fas fa-times-circle"></i> {{ __('Cancelled') }}
     </a>
 </div>
@@ -245,12 +257,18 @@
 
             {{-- Right side --}}
             <div class="booking-right">
-                <div class="booking-price">{{ number_format($booking->total_price, 0) }} {{ __('SAR') }}</div>
-                <span class="status-badge status-{{ $booking->status }}">
-                    @if($booking->status === 'pending')
-                        <i class="fas fa-clock"></i> {{ __('Pending') }}
-                    @elseif($booking->status === 'confirmed')
-                        <i class="fas fa-check-circle"></i> {{ __('Confirmed') }}
+                <div class="booking-price">{{ number_format($booking->total_price, 0) }} <span class="currency-label">{{ __('SAR') }}</span></div>
+                <span class="status-badge status-{{ $booking->booking_state }}">
+                    @if($booking->booking_state === \App\Models\TripBooking::STATE_AWAITING_PAYMENT)
+                        <i class="fas fa-clock"></i> {{ __('Awaiting Payment') }}
+                    @elseif($booking->booking_state === \App\Models\TripBooking::STATE_PREPARING)
+                        <i class="fas fa-tasks"></i> {{ __('Preparing') }}
+                    @elseif($booking->booking_state === \App\Models\TripBooking::STATE_ISSUING_TICKETS)
+                        <i class="fas fa-ticket-alt"></i> {{ __('Issuing Tickets') }}
+                    @elseif($booking->booking_state === \App\Models\TripBooking::STATE_TICKETS_UPLOADED)
+                        <i class="fas fa-check-circle"></i> {{ __('Tickets Uploaded') }}
+                    @elseif($booking->booking_state === \App\Models\TripBooking::STATE_COMPLETED)
+                        <i class="fas fa-star"></i> {{ __('Completed') }}
                     @else
                         <i class="fas fa-times-circle"></i> {{ __('Cancelled') }}
                     @endif
@@ -266,11 +284,11 @@
                 <a href="{{ route('customer.bookings.show', $booking->id) }}" class="btn-sm btn-outline">
                     <i class="fas fa-eye"></i> {{ __('Details') }}
                 </a>
-                @if($booking->status === 'pending')
+                @if($booking->booking_state === \App\Models\TripBooking::STATE_AWAITING_PAYMENT)
                     <a href="{{ route('customer.payments.checkout', $booking->id) }}" class="btn-sm btn-accent">
                         <i class="fas fa-credit-card"></i> {{ __('Complete Payment') }}
                     </a>
-                @elseif($booking->status === 'confirmed')
+                @elseif($booking->status === 'confirmed' || $booking->booking_state !== \App\Models\TripBooking::STATE_AWAITING_PAYMENT)
                     <a href="{{ route('customer.bookings.invoice', $booking->id) }}" class="btn-sm btn-outline">
                         <i class="fas fa-file-pdf"></i> {{ __('Invoice') }}
                     </a>

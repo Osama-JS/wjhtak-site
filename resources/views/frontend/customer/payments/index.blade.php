@@ -134,7 +134,7 @@
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
                 <div class="payment-amount">
                     {{ number_format($payment->amount, 2) }}
-                    <span class="currency">{{ __('SAR') }}</span>
+                    <span class="currency-label">{{ __('SAR') }}</span>
                 </div>
                 <span class="status-badge badge-{{ $payment->status === 'paid' ? 'success' : ($payment->status === 'pending' ? 'pending' : 'failed') }}">
                     @if($payment->status === 'paid') <i class="fas fa-check-circle"></i> {{ __('Paid') }}

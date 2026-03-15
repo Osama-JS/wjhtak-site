@@ -164,17 +164,6 @@
                                 </div>
                             @endif
 
-                            {{-- Company --}}
-                            @if($trip->company)
-                                <div class="flex items-center gap-2">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M3 21h18"/>
-                                        <path d="M5 21V7l8-4v18"/>
-                                        <path d="M19 21V11l-6-4"/>
-                                    </svg>
-                                    <a href="{{ route('company.profile', $trip->company->id) }}" style="color: inherit; text-decoration: none; font-weight: 600;">{{ app()->getLocale() == 'en' && $trip->company->en_name ? $trip->company->en_name : $trip->company->name }}</a>
-                                </div>
-                            @endif
                         </div>
                     </div>
 
@@ -293,18 +282,17 @@
                 {{-- Booking Sidebar --}}
                 <aside>
                     <div class="booking-card">
-                        {{-- Price --}}
                         <div class="booking-price-wrapper">
                             @if($trip->price_before_discount && $trip->price_before_discount > $trip->price)
                                 <span class="booking-price-old">
-                                    ${{ number_format($trip->price_before_discount) }}
+                                    {{ number_format($trip->price_before_discount) }} {{ __('SAR') }}
                                 </span>
                                 <span class="booking-price-badge">
                                     {{ round((($trip->price_before_discount - $trip->price) / $trip->price_before_discount) * 100) }}% {{ __('Off') }}
                                 </span>
                             @endif
                             <div class="booking-price-current">
-                                ${{ number_format($trip->price) }}
+                                {{ number_format($trip->price) }} <span class="currency-label">{{ __('SAR') }}</span>
                                 <span class="booking-price-unit">
                                     / {{ __('person') }}
                                 </span>

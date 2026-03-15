@@ -631,7 +631,12 @@ class AuthController extends Controller
     )]
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+
+        // Clear FCM token on logout to prevent notifications to this device
+        $user->update(['fcm_token' => null]);
+
+        $user->currentAccessToken()->delete();
 
         return $this->apiResponse(false, __('Logged out successfully.'));
     }

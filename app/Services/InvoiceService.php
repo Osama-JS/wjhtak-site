@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\TripBooking;
+use App\Models\HotelBooking;
 use Mpdf\Mpdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -12,13 +13,21 @@ class InvoiceService
     /**
      * Generate invoice for a booking
      *
-     * @param TripBooking $booking
+     * @param mixed $booking TripBooking or HotelBooking
      * @return string|false Path to the generated PDF
      */
-    public function generateInvoice(TripBooking $booking)
+    public function generateInvoice($booking)
     {
         try {
-            $booking->load(['user', 'trip.toCountry', 'trip.toCity', 'passengers']);
+            $isHotel = ($booking instanceof HotelBooking);
+
+            if ($isHotel) {
+                $booking->load(['user', 'guests']);
+                $view = 'invoices.hotel_booking';
+            } else {
+                $booking->load(['user', 'trip.toCountry', 'trip.toCity', 'passengers']);
+                $view = 'invoices.trip_booking';
+            }
 
             $mpdf = new Mpdf([
                 'mode' => 'utf-8',
@@ -27,16 +36,23 @@ class InvoiceService
                 'margin_right' => 10,
                 'margin_top' => 10,
                 'margin_bottom' => 10,
+                'tempDir' => storage_path('framework/cache')
             ]);
 
             // Set RTL for Arabic support
             $mpdf->SetDirectionality('rtl');
 
-            $html = view('invoices.trip_booking', compact('booking'))->render();
+            $html = view($view, compact('booking'))->render();
             $mpdf->WriteHTML($html);
 
-            $fileName = 'invoice_' . $booking->id . '_' . time() . '.pdf';
+            $prefix = $isHotel ? 'hotel_inv_' : 'invoice_';
+            $fileName = $prefix . $booking->id . '_' . time() . '.pdf';
             $filePath = 'invoices/' . $fileName;
+
+            // Ensure the directory exists
+            if (!Storage::disk('public')->exists('invoices')) {
+                Storage::disk('public')->makeDirectory('invoices');
+            }
 
             Storage::disk('public')->put($filePath, $mpdf->Output('', 'S'));
 

@@ -13,15 +13,18 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'users' => \App\Models\User::count(),
-            'countries' => \App\Models\Country::count(),
-            'cities' => \App\Models\City::count(),
-            'banners' => \App\Models\Banner::count(),
-            'companies' => \App\Models\Company::count(),
-            'company_codes' => \App\Models\Company_Codes::count(),
-            'hotel_requests' => 0, // Placeholder if no model found yet
-            'flight_requests' => 0, // Placeholder
+            'users_total' => \App\Models\User::count(),
+            'users_new_today' => \App\Models\User::whereDate('created_at', today())->count(),
+            'trips_active' => \App\Models\Trip::active()->count(),
+            'trips_expired' => \App\Models\Trip::expired()->count(),
+            'bookings_total' => \App\Models\TripBooking::count(),
+            'bookings_pending' => \App\Models\TripBooking::where('booking_state', \App\Models\TripBooking::STATE_AWAITING_PAYMENT)->count(),
+            'revenue_total' => \App\Models\TripBooking::where('booking_state', \App\Models\TripBooking::STATE_COMPLETED)->sum('total_price'),
+            'companies_count' => \App\Models\Company::count(),
         ];
+
+        $greeting = $this->getGreeting();
+        $adminName = auth()->user()->name;
 
         // Chart Data: Monthly Users (Current Year)
         $monthlyData = \App\Models\User::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
@@ -45,7 +48,20 @@ class DashboardController extends Controller
         }
 
         $latestUsers = \App\Models\User::latest()->take(5)->get();
+        $recentBookings = \App\Models\TripBooking::with(['user', 'trip'])->latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('stats','chartLabels', 'chartData', 'latestUsers'));
+        return view('admin.dashboard', compact('stats', 'chartLabels', 'chartData', 'latestUsers', 'greeting', 'adminName', 'recentBookings'));
+    }
+
+    private function getGreeting()
+    {
+        $hour = date('H');
+        if ($hour < 12) {
+            return __('Good Morning');
+        } elseif ($hour < 17) {
+            return __('Good Afternoon');
+        } else {
+            return __('Good Evening');
+        }
     }
 }

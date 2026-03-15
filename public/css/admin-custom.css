@@ -558,3 +558,28 @@
     background-color: rgba(255, 255, 255, 0.4) !important;
     height: 4px !important;
 }
+
+/* ============================================
+   VALIDATION ENHANCEMENTS (Select2 & CKEditor)
+   ============================================ */
+
+/* Select2 Validation */
+.is-invalid + .select2-container .select2-selection,
+select.is-invalid + .select2-container .select2-selection {
+    border-color: var(--wjhtak-danger) !important;
+}
+
+/* CKEditor Validation */
+.is-invalid + .ck-editor .ck-editor__main > .ck-content {
+    border-color: var(--wjhtak-danger) !important;
+}
+
+/* Ensure invalid-feedback is visible after hidden elements */
+.is-invalid ~ .invalid-feedback {
+    display: block !important;
+}
+
+/* Input Group Validation */
+.input-group .is-invalid {
+    z-index: 3;
+}

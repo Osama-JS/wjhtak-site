@@ -37,7 +37,13 @@
                                     <div class="col-md-12">
                                         <div class="form-group mb-3">
                                             <label class="form-label font-w600">{{ __('Description') }} <span class="text-danger">*</span></label>
-                                            <textarea id="description" name="description" class="form-control" rows="10"></textarea>
+                                            <textarea id="description" name="description" class="form-control {{ $errors->has('description') ? 'is-invalid' : '' }}" rows="10">{{ old('description') }}</textarea>
+                                            @error('description')
+                                                <div class="invalid-feedback d-block">
+                                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -72,20 +78,26 @@
                                         <x-forms.input-text name="price_before_discount" :label="__('Old Price')" icon="fa fa-tag" />
                                     </div>
                                     <div class="col-md-4">
-                                        <x-forms.input-text name="tickets" :label="__('Tickets')" required icon="fa fa-ticket-alt" />
+                                        <x-forms.input-text name="tickets" :label="__('Tickets')" value="{{ old('tickets') ?? 0 }}" required icon="fa fa-ticket-alt" />
                                     </div>
                                     <div class="col-md-4">
-                                        <x-forms.input-text name="personnel_capacity" :label="__('Max Capacity')" icon="fa fa-users" />
+                                        <x-forms.input-text name="personnel_capacity" :label="__('Max Capacity')" value="{{ old('personnel_capacity') ?? 0 }}" icon="fa fa-users" />
                                     </div>
                                     <div class="col-md-4">
-                                        <x-forms.input-text name="base_capacity" :label="__('Base Capacity')" icon="fa fa-user-plus" />
+                                        <x-forms.input-text name="base_capacity" :label="__('Base Capacity')" value="{{ old('base_capacity') ?? 0 }}"  icon="fa fa-user-plus" />
                                     </div>
                                     <div class="col-md-4">
-                                        <x-forms.input-text name="extra_passenger_price" :label="__('Extra Pax Price')" icon="fa fa-money-bill-wave" />
+                                        <x-forms.input-text name="extra_passenger_price" :label="__('Extra Pax Price')" value="{{ old('extra_passenger_price') ?? 0 }}" icon="fa fa-money-bill-wave" />
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label font-w600">{{ __('Expiry Date') }} <span class="text-danger">*</span></label>
-                                        <input type="date" name="expiry_date" class="form-control" required>
+                                        <input type="date" name="expiry_date" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('expiry_date') }}" class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}" value="{{ old('expiry_date') }}" required>
+                                        @error('expiry_date')
+                                            <div class="invalid-feedback d-block">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
 
@@ -148,7 +160,7 @@
                     citySelect.empty();
                     citySelect.append('<option value="">{{ __("Select City") }}</option>');
                     $.each(data, function(key, value) {
-                        citySelect.append('<option value="' + value.id + '">' + value.name + '</option>');
+                        citySelect.append('<option value="' + value.id + '">' + value.title + '</option>');
                     });
                     if ($.fn.niceSelect) citySelect.niceSelect('update');
                     if ($.fn.select2) citySelect.trigger('change.select2');

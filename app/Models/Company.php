@@ -18,6 +18,7 @@ class Company extends Model
         'phone_code',
         'notes',
         'active',
+        'commission_rate',
     ];
 
 

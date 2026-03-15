@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SubscriberController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\TripsController;
 use App\Http\Controllers\Admin\TripCategoryController;
+use App\Http\Controllers\Admin\UserNoteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\Web\PaymentWebController;
@@ -72,8 +73,8 @@ Route::get('lang/{locale}', function ($locale) {
 // Homepage
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 
-// Company Profile
-Route::get('/company/{company}', [CompanyProfileController::class, 'show'])->name('company.profile');
+// Company Profile (Restricted to Admins)
+Route::get('/company/{company}', [CompanyProfileController::class, 'show'])->name('company.profile')->middleware(['auth', 'isAdmin']);
 
 // Trips
 Route::get('/trips', [FrontendController::class, 'trips'])->name('trips.index');
@@ -236,6 +237,10 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
         Route::get('trip-bookings/data', [App\Http\Controllers\Admin\TripBookingController::class, 'getData'])->name('trip-bookings.data');
         Route::get('trip-bookings', [App\Http\Controllers\Admin\TripBookingController::class, 'index'])->name('trip-bookings.index');
         Route::get('trip-bookings/{trip_booking}', [App\Http\Controllers\Admin\TripBookingController::class, 'show'])->name('trip-bookings.show');
+
+        // Earnings Report
+        Route::get('earnings-report', [App\Http\Controllers\Admin\EarningsReportController::class, 'index'])->name('earnings.index');
+        Route::get('earnings-report/data', [App\Http\Controllers\Admin\EarningsReportController::class, 'getData'])->name('earnings.data');
     });
 
     Route::middleware('permission:manage bookings')->group(function() {
@@ -259,6 +264,13 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::middleware('permission:view payments')->group(function() {
         Route::get('payments', [App\Http\Controllers\Admin\PaymentLogController::class, 'index'])->name('payments.index');
         Route::get('payments/{id}', [App\Http\Controllers\Admin\PaymentLogController::class, 'show'])->name('payments.show');
+    });
+
+    // Hotel Bookings Management (TBO)
+    Route::prefix('hotel-bookings')->name('hotel-bookings.')->group(function () {
+        Route::get('/',         [App\Http\Controllers\Admin\HotelBookingController::class, 'index'])->name('index');
+        Route::get('/{id}',     [App\Http\Controllers\Admin\HotelBookingController::class, 'show'])->name('show');
+        Route::post('/{id}/cancel', [App\Http\Controllers\Admin\HotelBookingController::class, 'cancel'])->name('cancel');
     });
 
     // Bank Transfers Review
@@ -293,6 +305,10 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
         Route::get('pages/data', [App\Http\Controllers\Admin\PageController::class, 'getData'])->name('pages.data');
         Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
     });
+
+    // User Notes
+    Route::get('user-notes/data', [UserNoteController::class, 'index'])->name('user-notes.data');
+    Route::resource('user-notes', UserNoteController::class);
 });
 
 // Public Page Display
@@ -546,22 +562,22 @@ Route::middleware(['auth', 'isCustomer'])->prefix('customer')->name('customer.')
     Route::get('/dashboard', [\App\Http\Controllers\Customer\CustomerDashboardController::class, 'index'])->name('dashboard');
 
     // Bookings
-    Route::get('/bookings', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/create/{trip_id}', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'create'])->name('bookings.create');
-    Route::get('/bookings/{id}', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'show'])->name('bookings.show');
-    Route::post('/bookings', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'store'])->name('bookings.store');
-    Route::post('/bookings/{id}/cancel', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'cancel'])->name('bookings.cancel');
-    Route::get('/bookings/{id}/invoice', [\App\Http\Controllers\Customer\CustomerBookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+    Route::get('/bookings', [CustomerBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/create/{trip_id}', [CustomerBookingController::class, 'create'])->name('bookings.create');
+    Route::get('/bookings/{id}', [CustomerBookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings', [CustomerBookingController::class, 'store'])->name('bookings.store');
+    Route::post('/bookings/{id}/cancel', [CustomerBookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('/bookings/{id}/invoice', [CustomerBookingController::class, 'downloadInvoice'])->name('bookings.invoice');
 
     // Favorites
     Route::get('/favorites', [\App\Http\Controllers\Customer\FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/{tripId}/toggle', [\App\Http\Controllers\Customer\FavoriteController::class, 'toggle'])->name('favorites.toggle');
 
     // Profile
-    Route::get('/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'index'])->name('profile');
-    Route::put('/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/photo', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'updatePhoto'])->name('profile.photo');
-    Route::post('/profile/password', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'changePassword'])->name('profile.password');
+    Route::get('/profile', [CustomerProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/photo', [CustomerProfileController::class, 'updatePhoto'])->name('profile.photo');
+    Route::post('/profile/password', [CustomerProfileController::class, 'changePassword'])->name('profile.password');
 
     // Payments & Invoices
     Route::get('/payments', [\App\Http\Controllers\Customer\CustomerPaymentController::class, 'index'])->name('payments.index');
@@ -569,9 +585,9 @@ Route::middleware(['auth', 'isCustomer'])->prefix('customer')->name('customer.')
     Route::get('/payments/{bookingId}/invoice', [\App\Http\Controllers\Customer\CustomerPaymentController::class, 'downloadInvoice'])->name('payments.invoice');
 
     // Notifications
-    Route::get('/notifications', [\App\Http\Controllers\Customer\CustomerNotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Customer\CustomerNotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [\App\Http\Controllers\Customer\CustomerNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::get('/notifications', [CustomerNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [CustomerNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [CustomerNotificationController::class, 'markAllRead'])->name('notifications.read-all');
 });
 
 // Alias: redirect old /dashboard -> respective dashboard

@@ -317,10 +317,11 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
         $isCancelled = $booking->status === 'cancelled' || $currentState === 'cancelled';
 
         $states = [
-            'received' => ['icon' => 'fa-inbox', 'label' => __('Order Received')],
-            'preparing' => ['icon' => 'fa-cogs', 'label' => __('Preparing Tickets')],
-            'confirmed' => ['icon' => 'fa-check-circle', 'label' => __('Confirmed')],
-            'tickets_sent' => ['icon' => 'fa-ticket-alt', 'label' => __('Tickets Sent')]
+            'awaiting_payment' => ['icon' => 'fa-clock', 'label' => __('Awaiting Payment')],
+            'preparing' => ['icon' => 'fa-cogs', 'label' => __('Preparing')],
+            'issuing_tickets' => ['icon' => 'fa-ticket-alt', 'label' => __('Issuing Tickets')],
+            'tickets_uploaded' => ['icon' => 'fa-upload', 'label' => __('Tickets Uploaded')],
+            'completed' => ['icon' => 'fa-check-double', 'label' => __('Completed')]
         ];
 
         $stateKeys = array_keys($states);
@@ -389,12 +390,19 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                 <div class="info-row">
                     <span class="info-label">{{ __('Booking State') }}</span>
                     <span class="info-value">
-                        <span class="status-badge status-{{ $booking->status }}">
-                            @if($isCancelled)
-                                {{ __('Cancelled') }}
-                            @else
-                                {{ $states[$currentState]['label'] ?? ucfirst($currentState) }}
-                            @endif
+                        @php
+                            $stateColors = [
+                                'awaiting_payment' => 'pending',
+                                'preparing' => 'confirmed',
+                                'issuing_tickets' => 'confirmed',
+                                'tickets_uploaded' => 'confirmed',
+                                'completed' => 'confirmed',
+                                'cancelled' => 'cancelled',
+                            ];
+                            $badgeClass = $stateColors[$currentState] ?? 'pending';
+                        @endphp
+                        <span class="status-badge status-{{ $badgeClass }}">
+                            {{ $states[$currentState]['label'] ?? __($currentState) }}
                         </span>
                     </span>
                 </div>
@@ -441,23 +449,63 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                 <div class="detail-card-header">
                     <i class="fas fa-receipt"></i> {{ __('Payment Information') }}
                 </div>
-                <div class="detail-card-body">
+                <div class="detail-card-body" style="padding: 0;">
                     @foreach($booking->payments as $payment)
-                        <div class="info-row">
-                            <span class="info-label">{{ __('Payment Gateway') }}</span>
-                            <span class="info-value">{{ strtoupper($payment->payment_gateway) }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">{{ __('Transaction No') }}</span>
-                            <span class="info-value" style="font-size:.8rem;">{{ $payment->transaction_id ?? '—' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">{{ __('Amount Paid') }}</span>
-                            <span class="info-value" style="color:#16a34a;">{{ number_format($payment->amount, 2) }} {{ __('SAR') }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">{{ __('Payment Date') }}</span>
-                            <span class="info-value">{{ $payment->created_at->format('d/m/Y H:i') }}</span>
+                        <div style="padding: 20px 22px; {{ !$loop->last ? 'border-bottom: 2px dashed #f1f5f9;' : '' }} {{ $payment->status === 'failed' || $payment->status === 'rejected' ? 'background: #fffcfc;' : '' }}">
+                            <div class="info-row">
+                                <span class="info-label">{{ __('Payment Gateway') }}</span>
+                                <span class="info-value">{{ strtoupper($payment->payment_gateway) }} ({{ __($payment->payment_method) }})</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">{{ __('Transaction No') }}</span>
+                                <span class="info-value" style="font-size:.8rem;">{{ $payment->transaction_id ?? '—' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">{{ __('Amount') }}</span>
+                                <span class="info-value" style="{{ $payment->status === 'paid' ? 'color:#16a34a;' : '' }}">
+                                    {{ number_format($payment->amount, 2) }} <span class="currency-label">{{ __('SAR') }}</span>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">{{ __('Payment Date') }}</span>
+                                <span class="info-value">{{ $payment->created_at->format('d/m/Y H:i') }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">{{ __('Status') }}</span>
+                                <span class="info-value">
+                                    @if($payment->status === 'paid' || $payment->status === 'approved' || $payment->status === 'completed')
+                                        <span class="status-badge status-confirmed">
+                                            <i class="fas fa-check-circle"></i> {{ __('Successful') }}
+                                        </span>
+                                    @elseif($payment->status === 'failed' || $payment->status === 'rejected')
+                                        <span class="status-badge status-cancelled">
+                                            <i class="fas fa-times-circle"></i> {{ __('Failed') }}
+                                        </span>
+                                    @else
+                                        <span class="status-badge status-pending">{{ __($payment->status) }}</span>
+                                    @endif
+                                </span>
+                            </div>
+                            @php
+                                $reason = null;
+                                if ($payment->status === 'failed' || $payment->status === 'rejected') {
+                                    if (!empty($payment->raw_response['result']['description'])) {
+                                        $reason = $payment->raw_response['result']['description'];
+                                    } elseif (!empty($payment->raw_response['message'])) {
+                                        $reason = $payment->raw_response['message'];
+                                    }
+                                }
+                            @endphp
+                            @if($reason)
+                            <div style="margin-top: 10px; padding: 12px; background: #fff1f2; border: 1px solid #fee2e2; border-radius: 8px;">
+                                <div style="color: #b91c1c; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px;">
+                                    <i class="fas fa-exclamation-circle"></i> {{ __('Failure Reason') }}
+                                </div>
+                                <div style="color: #991b1b; font-size: 0.85rem; line-height: 1.4;">
+                                    {{ $reason }}
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -469,12 +517,12 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
     <div>
         {{-- Price Summary --}}
         <div class="summary-total">
-            <div class="amount">{{ number_format($booking->total_price, 0) }} <small style="font-size:1rem;">{{ __('SAR') }}</small></div>
+            <div class="amount">{{ number_format($booking->total_price, 0) }} <span class="currency-label" style="font-size:1rem;">{{ __('SAR') }}</span></div>
             <div class="amount-label">{{ __('Total Price') }}</div>
         </div>
 
         {{-- Actions --}}
-        @if($booking->status === 'pending')
+        @if($booking->booking_state === 'awaiting_payment')
             @if(!$latestTransfer || $latestTransfer->status === 'rejected')
                 <a href="{{ route('customer.payments.checkout', $booking->id) }}" class="action-btn action-btn-primary">
                     <i class="fas fa-credit-card"></i> {{ __('Complete Payment Now') }}
@@ -497,7 +545,7 @@ html[dir="rtl"] .timeline-step::after { right: 50%; }
                     <i class="fas fa-times"></i> {{ __('Cancel Booking') }}
                 </button>
             </form>
-        @elseif($booking->status === 'confirmed')
+        @elseif($booking->status === 'confirmed' || $booking->booking_state !== 'awaiting_payment')
             @if($booking->ticket_url)
                 <a href="{{ $booking->ticket_url }}" target="_blank" class="action-btn" style="background: #10b981; color: #fff;">
                     <i class="fas fa-ticket-alt"></i> {{ __('Download Tickets') }}

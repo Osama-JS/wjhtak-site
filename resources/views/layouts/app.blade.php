@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ url('/') }}">
 
     <title>@yield('title', config('app.name', 'My Trip')) - Admin Dashboard</title>
 
@@ -133,6 +134,7 @@
             confirm_title: "{{ __('Confirmation') }}",
             confirm_yes: "{{ __('Yes') }}",
             confirm_cancel: "{{ __('Cancel') }}",
+            confirm_message: "{{ __('Are you sure you want to perform this action?') }}",
             loading_text: "{{ __('Loading...') }}",
         };
     </script>

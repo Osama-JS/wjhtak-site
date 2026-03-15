@@ -100,15 +100,15 @@
                     <div style="background: #f8fafc; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                             <span style="color: #64748b; font-size: 0.9rem;">{{ __('Price per traveler') }}</span>
-                            <span style="font-weight: 700;">${{ number_format($trip->price) }}</span>
+                            <span style="font-weight: 700;">{{ number_format($trip->price) }} {{ __('SAR') }}</span>
                         </div>
                         <div id="extraChargesRow" style="display: none; justify-content: space-between; margin-bottom: 15px;">
                             <span style="color: #64748b; font-size: 0.9rem;">{{ __('Extra charges') }}</span>
-                            <span style="font-weight: 700; color: #ef4444;" id="extraPriceValue">$0</span>
+                            <span style="font-weight: 700; color: #ef4444;" id="extraPriceValue">0 {{ __('SAR') }}</span>
                         </div>
                         <div style="padding-top: 15px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-weight: 800; font-size: 1.1rem;">{{ __('Total Amount') }}</span>
-                            <span style="font-weight: 800; font-size: 1.4rem; color: var(--color-primary);" id="totalPriceDisplay">${{ number_format($trip->price) }}</span>
+                            <span style="font-weight: 800; font-size: 1.4rem; color: var(--color-primary);" id="totalPriceDisplay">{{ number_format($trip->price) }} {{ __('SAR') }}</span>
                         </div>
                     </div>
 
@@ -266,12 +266,12 @@
             extraTotal = (count - baseCapacity) * extraPrice;
             total += extraTotal;
             document.getElementById('extraChargesRow').style.display = 'flex';
-            document.getElementById('extraPriceValue').textContent = '$' + extraTotal.toLocaleString();
+            document.getElementById('extraPriceValue').textContent = extraTotal.toLocaleString() + ' ' + '{{ __("SAR") }}';
         } else {
             document.getElementById('extraChargesRow').style.display = 'none';
         }
 
-        document.getElementById('totalPriceDisplay').textContent = '$' + total.toLocaleString();
+        document.getElementById('totalPriceDisplay').textContent = total.toLocaleString() + ' ' + '{{ __("SAR") }}';
     }
 
     document.addEventListener('DOMContentLoaded', function() {

@@ -356,7 +356,7 @@
 
             <div class="order-total">
                 <span class="total-label">{{ __('Total') }}</span>
-                <span class="total-amount">{{ number_format($booking->total_price, 0) }} {{ __('SAR') }}</span>
+                <span class="total-amount">{{ number_format($booking->total_price, 0) }} <span class="currency-label" style="font-size: 0.9rem;">{{ __('SAR') }}</span></span>
             </div>
 
             <button class="btn-pay" id="payBtn" onclick="submitPayment()" type="button">

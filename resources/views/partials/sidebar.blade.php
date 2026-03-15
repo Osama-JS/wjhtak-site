@@ -148,6 +148,7 @@
                 <ul aria-expanded="false">
                     @can('view payments')<li><a href="{{ route('admin.payments.index') }}">{{ __('Payment Records') }}</a></li>@endcan
                     @can('view bank_transfers')<li><a href="{{ route('admin.bank-transfers.index') }}">{{ __('Bank Transfer Review') }}</a></li>@endcan
+                    @can('view bookings')<li><a href="{{ route('admin.earnings.index') }}">{{ __('Platform Earnings') }}</a></li>@endcan
                 </ul>
             </li>
             @endcanany

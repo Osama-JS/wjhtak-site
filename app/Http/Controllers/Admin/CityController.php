@@ -88,12 +88,12 @@ class CityController extends Controller
         }
 
         $data = $request->only(['country_id', 'title']);
-        
+
         $data['active'] = $request->boolean('active', true);
-       
+
        City::create($data);
-        
-        
+
+
         return response()->json([
             'success' => true,
             'message' => __('City added successfully'),
@@ -171,7 +171,7 @@ class CityController extends Controller
      */
     public function byCountry(Country $country)
     {
-        $cities = $country->cities()->active()->orderBy('name_' . app()->getLocale())->get(['id', 'name_ar', 'name_en']);
+        $cities = $country->cities()->active()->orderBy('title')->get(['id', 'title']);
 
         return response()->json($cities);
     }

@@ -2137,6 +2137,682 @@
                 }
             }
         },
+        "/api/hotels/cities": {
+            "get": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Get available cities for hotel search",
+                "description": "Returns a list of cities supported by TBO Hotel API. Results are cached for 24 hours. Supports search by city name.",
+                "operationId": "hotelCities",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query (city name)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "City list returned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "CityCode": {
+                                                        "type": "string",
+                                                        "example": "RUH"
+                                                    },
+                                                    "CityName": {
+                                                        "type": "string",
+                                                        "example": "Riyadh"
+                                                    },
+                                                    "CountryCode": {
+                                                        "type": "string",
+                                                        "example": "SA"
+                                                    },
+                                                    "CountryName": {
+                                                        "type": "string",
+                                                        "example": "Saudi Arabia"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/search": {
+            "post": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Search for available hotels",
+                "operationId": "hotelSearch",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "city_code",
+                                    "check_in",
+                                    "check_out",
+                                    "adults",
+                                    "rooms"
+                                ],
+                                "properties": {
+                                    "city_code": {
+                                        "description": "TBO City Code (from /api/hotels/cities)",
+                                        "type": "string",
+                                        "example": "RUH"
+                                    },
+                                    "check_in": {
+                                        "description": "Check-in date (Y-m-d)",
+                                        "type": "string",
+                                        "example": "2026-04-01"
+                                    },
+                                    "check_out": {
+                                        "description": "Check-out date (Y-m-d)",
+                                        "type": "string",
+                                        "example": "2026-04-05"
+                                    },
+                                    "adults": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "children": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "children_ages": {
+                                        "description": "Ages of children (required if children > 0)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": []
+                                    },
+                                    "rooms": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "nationality": {
+                                        "description": "Guest nationality (ISO 2-letter)",
+                                        "type": "string",
+                                        "example": "SA"
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "SAR"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Hotels found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "session_id": {
+                                                    "description": "Session ID required for room listing and pre-book",
+                                                    "type": "string"
+                                                },
+                                                "hotels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "count": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "TBO API Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/{hotelCode}/rooms": {
+            "get": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Get available rooms for a specific hotel",
+                "operationId": "hotelRooms",
+                "parameters": [
+                    {
+                        "name": "hotelCode",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "session_id",
+                        "in": "query",
+                        "description": "Session ID from /search",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Room list returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "hotel_name": {
+                                                    "type": "string"
+                                                },
+                                                "address": {
+                                                    "type": "string"
+                                                },
+                                                "rooms": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/pre-book": {
+            "post": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Validate price and availability before booking (MANDATORY step)",
+                "description": "**MANDATORY:** Must be called before /api/hotels/book to validate the price is still available.\n\nReturns a `result_token` (BookingCode) and the final `total_price`. If the price changes, show the user the updated price before proceeding.",
+                "operationId": "hotelPreBook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "session_id",
+                                    "room_index",
+                                    "rate_plan_code"
+                                ],
+                                "properties": {
+                                    "session_id": {
+                                        "description": "Session ID from /search",
+                                        "type": "string"
+                                    },
+                                    "room_index": {
+                                        "description": "Room index number from /rooms response",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "rate_plan_code": {
+                                        "description": "RatePlanCode from selected room",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pre-book successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "available": {
+                                                    "type": "boolean"
+                                                },
+                                                "result_token": {
+                                                    "description": "Use this in /book request",
+                                                    "type": "string"
+                                                },
+                                                "total_price": {
+                                                    "type": "number"
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "SAR"
+                                                },
+                                                "cancellation_policy": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Pre-book failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/book": {
+            "post": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Create a hotel booking (Draft — awaits payment)",
+                "description": "Creates a draft booking record in the database. **Does NOT confirm with TBO yet.** Confirmation happens after payment via `/api/payment/hotel/verify`.\n\nCall `/api/payment/hotel/initiate` next to start payment.",
+                "operationId": "hotelBook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "result_token",
+                                    "hotel_code",
+                                    "hotel_name",
+                                    "city_name",
+                                    "country_code",
+                                    "room_type_code",
+                                    "room_type_name",
+                                    "check_in",
+                                    "check_out",
+                                    "adults",
+                                    "rooms",
+                                    "total_price",
+                                    "guests"
+                                ],
+                                "properties": {
+                                    "result_token": {
+                                        "description": "BookingCode from /pre-book",
+                                        "type": "string"
+                                    },
+                                    "session_id": {
+                                        "type": "string"
+                                    },
+                                    "hotel_code": {
+                                        "type": "string"
+                                    },
+                                    "hotel_name": {
+                                        "type": "string"
+                                    },
+                                    "hotel_name_ar": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "hotel_address": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "city_name": {
+                                        "type": "string"
+                                    },
+                                    "country_code": {
+                                        "type": "string",
+                                        "example": "SA"
+                                    },
+                                    "room_type_code": {
+                                        "type": "string"
+                                    },
+                                    "room_type_name": {
+                                        "type": "string"
+                                    },
+                                    "check_in": {
+                                        "type": "string",
+                                        "example": "2026-04-01"
+                                    },
+                                    "check_out": {
+                                        "type": "string",
+                                        "example": "2026-04-05"
+                                    },
+                                    "adults": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "children": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "rooms": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "total_price": {
+                                        "type": "number",
+                                        "example": 1200
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "SAR"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "guests": {
+                                        "description": "List of guests",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "title",
+                                                "first_name",
+                                                "last_name",
+                                                "type"
+                                            ],
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Mr",
+                                                        "Mrs",
+                                                        "Ms",
+                                                        "Mstr"
+                                                    ]
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "last_name": {
+                                                    "type": "string"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "adult",
+                                                        "child"
+                                                    ]
+                                                },
+                                                "nationality": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "passport_number": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "passport_expiry": {
+                                                    "type": "string",
+                                                    "example": "2030-01-01",
+                                                    "nullable": true
+                                                },
+                                                "dob": {
+                                                    "type": "string",
+                                                    "example": "1990-05-20",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Draft booking created — proceed to payment",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "hotel_booking_id": {
+                                                    "description": "Use this ID in /api/payment/hotel/initiate",
+                                                    "type": "integer"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "draft"
+                                                },
+                                                "total_price": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/bookings": {
+            "get": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Get authenticated user hotel bookings",
+                "operationId": "myHotelBookings",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "pending",
+                                "confirmed",
+                                "cancelled",
+                                "failed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookings list"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/bookings/{id}": {
+            "get": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Get single hotel booking details",
+                "operationId": "hotelBookingDetail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking detail"
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/bookings/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Cancel a hotel booking",
+                "operationId": "cancelHotelBooking",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "reason": {
+                                        "description": "Optional cancellation reason",
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Booking cancelled successfully"
+                    },
+                    "400": {
+                        "description": "Cannot cancel this booking"
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/notifications": {
             "get": {
                 "tags": [
@@ -2875,6 +3551,188 @@
                     },
                     "500": {
                         "description": "Server Error — gateway unreachable or internal failure"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payment/hotel/initiate": {
+            "post": {
+                "tags": [
+                    "Hotels",
+                    "Payment"
+                ],
+                "summary": "Initiate hotel booking payment (WebView Flow)",
+                "description": "Generates a checkout WebView URL for hotel booking payment.\n\n**Flow:**\n1. Call `POST /api/hotels/book` → get `hotel_booking_id`\n2. Call this endpoint → get `payment_url`\n3. Open `payment_url` in WebView\n4. Monitor URL for success/failure pattern\n5. On success, call `/api/payment/hotel/verify`\n\n- **Success URL:** `/payments/success?hotel_booking_id={id}`\n- **Failure URL:** `/payments/failure?error={msg}`",
+                "operationId": "initiateHotelPayment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "hotel_booking_id",
+                                    "payment_type"
+                                ],
+                                "properties": {
+                                    "hotel_booking_id": {
+                                        "description": "ID from /api/hotels/book",
+                                        "type": "integer"
+                                    },
+                                    "payment_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "mada",
+                                            "visa_master",
+                                            "apple_pay",
+                                            "tamara",
+                                            "tabby"
+                                        ],
+                                        "example": "visa_master"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment URL generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "payment_url": {
+                                                    "type": "string"
+                                                },
+                                                "hotel_booking_id": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Booking already paid"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payment/hotel/verify": {
+            "post": {
+                "tags": [
+                    "Hotels",
+                    "Payment"
+                ],
+                "summary": "Verify hotel payment and confirm booking with TBO",
+                "description": "After successful gateway payment, this endpoint:\n1. Verifies payment status with the gateway\n2. Calls TBO `HotelBook` to confirm the reservation\n3. Stores TBO booking ID and raw response\n4. Sets booking status to `confirmed`\n5. Generates invoice\n6. Sends push notification to user",
+                "operationId": "verifyHotelPayment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "hotel_booking_id",
+                                    "payment_type"
+                                ],
+                                "properties": {
+                                    "hotel_booking_id": {
+                                        "type": "integer"
+                                    },
+                                    "payment_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "mada",
+                                            "visa_master",
+                                            "apple_pay",
+                                            "tamara",
+                                            "tabby"
+                                        ]
+                                    },
+                                    "checkout_id": {
+                                        "description": "Required for HyperPay (mada, visa_master, apple_pay)",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "payment_id": {
+                                        "description": "Required for Tabby / Tamara",
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment verified and booking confirmed with TBO",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "hotel_booking_id": {
+                                                    "type": "integer"
+                                                },
+                                                "tbo_booking_id": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "confirmed"
+                                                },
+                                                "invoice_url": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Payment failed"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Gateway or TBO error"
                     }
                 },
                 "security": [
@@ -3929,9 +4787,21 @@
                                                         "type": "number",
                                                         "example": 3000
                                                     },
-                                                    "status": {
+                                                    "booking_state": {
                                                         "type": "string",
-                                                        "example": "pending"
+                                                        "enum": [
+                                                            "awaiting_payment",
+                                                            "preparing",
+                                                            "issuing_tickets",
+                                                            "tickets_uploaded",
+                                                            "completed",
+                                                            "cancelled"
+                                                        ],
+                                                        "example": "awaiting_payment"
+                                                    },
+                                                    "booking_state_label": {
+                                                        "type": "string",
+                                                        "example": "Awaiting Payment"
                                                     },
                                                     "booking_date": {
                                                         "type": "string",
@@ -4351,11 +5221,19 @@
                                                 },
                                                 "booking_state": {
                                                     "type": "string",
+                                                    "enum": [
+                                                        "awaiting_payment",
+                                                        "preparing",
+                                                        "issuing_tickets",
+                                                        "tickets_uploaded",
+                                                        "completed",
+                                                        "cancelled"
+                                                    ],
                                                     "example": "preparing"
                                                 },
                                                 "booking_state_label": {
                                                     "type": "string",
-                                                    "example": "Preparing Tickets"
+                                                    "example": "Preparing"
                                                 },
                                                 "ticket_url": {
                                                     "type": "string",
@@ -4862,6 +5740,10 @@
         {
             "name": "Flights",
             "description": "Flights"
+        },
+        {
+            "name": "Hotels",
+            "description": "Hotels"
         },
         {
             "name": "Notifications",

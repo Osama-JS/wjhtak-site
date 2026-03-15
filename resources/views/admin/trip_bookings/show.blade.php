@@ -28,28 +28,25 @@
                      @endif
                 </div>
                 <div class="d-flex align-items-center mt-3 mt-sm-0">
-                    @if($booking->status == 'pending')
-                        <span class="badge badge-warning me-2">{{ __('Pending') }}</span>
-                    @elseif($booking->status == 'confirmed')
-                        <span class="badge badge-success me-2">{{ __('Confirmed') }}</span>
-                    @elseif($booking->status == 'cancelled')
-                        <span class="badge badge-danger me-2">{{ __('Cancelled') }}</span>
-                    @endif
+                    @php
+                        $stateClasses = [
+                            'awaiting_payment' => 'warning',
+                            'preparing' => 'info',
+                            'issuing_tickets' => 'primary',
+                            'tickets_uploaded' => 'success',
+                            'completed' => 'dark',
+                            'cancelled' => 'danger',
+                        ];
+                        $stateClass = $stateClasses[$booking->booking_state] ?? 'secondary';
+                    @endphp
+                    <span class="badge badge-{{ $stateClass }} me-2">{{ __($booking->booking_state) }}</span>
 
                     <div class="dropdown ms-2">
                         <button class="btn btn-primary light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             {{ __('Actions') }}
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">
-                            @if($booking->status != 'confirmed')
-                            <form action="{{ route('admin.trip-bookings.update-status', $booking->id) }}" method="POST" class="d-inline confirm-action" data-confirm-message="{{ __('Confirm this booking?') }}">
-                                @csrf
-                                <input type="hidden" name="status" value="confirmed">
-                                <button type="submit" class="dropdown-item text-success"><i class="fas fa-check me-2"></i> {{ __('Confirm') }}</button>
-                            </form>
-                            @endif
-
-                            @if($booking->status != 'cancelled')
+                            @if($booking->booking_state != \App\Models\TripBooking::STATE_CANCELLED)
                                 <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
                                     <i class="fas fa-times me-2"></i> {{ __('Cancel') }}
                                 </button>
@@ -165,11 +162,11 @@
                     @csrf
                     <div class="mb-3">
                         <select name="booking_state" class="form-control" required>
-                            <option value="received" {{ ($booking->booking_state ?? '') == 'received' ? 'selected' : '' }}>{{ __('Received') }}</option>
-                            <option value="preparing" {{ $booking->booking_state == 'preparing' ? 'selected' : '' }}>{{ __('Preparing Tickets') }}</option>
-                            <option value="confirmed" {{ $booking->booking_state == 'confirmed' ? 'selected' : '' }}>{{ __('Confirmed') }}</option>
-                            <option value="tickets_sent" {{ $booking->booking_state == 'tickets_sent' ? 'selected' : '' }}>{{ __('Tickets Sent') }}</option>
-                            <option value="cancelled" {{ $booking->booking_state == 'cancelled' ? 'selected' : '' }}>{{ __('Cancelled') }}</option>
+                            <option value="awaiting_payment" {{ $booking->booking_state == 'awaiting_payment' ? 'selected' : '' }} disabled>{{ __('Awaiting Payment') }} ({{ __('Auto') }})</option>
+                            <option value="preparing" {{ $booking->booking_state == 'preparing' ? 'selected' : '' }} disabled>{{ __('Preparing') }} ({{ __('Auto') }})</option>
+                            <option value="issuing_tickets" {{ $booking->booking_state == 'issuing_tickets' ? 'selected' : '' }}>{{ __('Issuing Tickets') }}</option>
+                            <option value="tickets_uploaded" {{ $booking->booking_state == 'tickets_uploaded' ? 'selected' : '' }}>{{ __('Tickets Uploaded') }}</option>
+                            <option value="completed" {{ $booking->booking_state == 'completed' ? 'selected' : '' }}>{{ __('Completed') }}</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-info btn-block w-100"><i class="fas fa-save me-1"></i> {{ __('Update') }}</button>

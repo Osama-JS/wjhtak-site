@@ -62,24 +62,44 @@
         position: absolute;
         z-index: 1050;
         width: 100%;
-        max-height: 250px;
+        max-height: 350px;
         overflow-y: auto;
         background: #fff;
         border: 1px solid #d0d7de;
         border-radius: 8px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         display: none;
     }
     .search-results-dropdown .search-item {
-        padding: 10px 14px;
+        padding: 12px 16px;
         cursor: pointer;
         border-bottom: 1px solid #f0f0f0;
-        transition: background 0.15s;
+        transition: all 0.2s ease;
     }
-    .search-results-dropdown .search-item:hover { background: #f6f8fa; }
+    .search-results-dropdown .search-item:hover { background: #f8f9fa; transform: translateY(-1px); }
     .search-results-dropdown .search-item:last-child { border-bottom: none; }
-    .search-results-dropdown .search-item .user-info { font-weight: 500; }
-    .search-results-dropdown .search-item .user-meta { font-size: 0.8rem; color: #656d76; }
+
+    .search-item-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #3b82f6);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .highlight-match {
+        background-color: #fef08a;
+        padding: 0 2px;
+        border-radius: 2px;
+        font-weight: 600;
+        color: #1e293b;
+    }
 
     .char-counter { font-size: 0.8rem; color: #656d76; text-align: left; }
     .char-counter.warning { color: #cf222e; }
@@ -362,6 +382,12 @@
         });
 
         // ─── User Search ────────────────────────────────────
+        function highlightMatch(text, query) {
+            if (!text) return '';
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.toString().replace(regex, '<span class="highlight-match">$1</span>');
+        }
+
         $('#userSearchInput').on('input', function() {
             const query = $(this).val().trim();
             clearTimeout(searchTimeout);
@@ -377,17 +403,37 @@
                     dropdown.empty();
 
                     if (users.length === 0) {
-                        dropdown.append(`<div class="search-item text-muted text-center">{{ __('No users found') }}</div>`);
+                        dropdown.append(`
+                            <div class="search-item text-muted text-center py-3">
+                                <i class="fas fa-search mb-2" style="font-size: 1.5rem; color: #cbd5e1;"></i><br>
+                                {{ __('No users found matching:') }} "<strong>${query}</strong>"
+                            </div>
+                        `);
                     } else {
                         users.forEach(user => {
                             if (!selectedUsers[user.id]) {
                                 const fcmIcon = user.has_fcm
-                                    ? '<span class="badge bg-success" style="font-size:0.65rem;">FCM ✓</span>'
-                                    : '<span class="badge bg-secondary" style="font-size:0.65rem;">No FCM</span>';
+                                    ? '<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-1" style="font-size:0.7rem;"><i class="fas fa-check-circle me-1"></i>FCM</span>'
+                                    : '<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-2 py-1" style="font-size:0.7rem;"><i class="fas fa-times-circle me-1"></i>No FCM</span>';
+
+                                const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
+                                const highlightedName = highlightMatch(user.name, query);
+                                const highlightedEmail = highlightMatch(user.email, query);
+                                const highlightedPhone = user.phone ? highlightMatch(user.phone, query) : '-';
+
                                 dropdown.append(`
-                                    <div class="search-item" onclick="addUser(${user.id}, '${user.name.replace(/'/g, "\\'")}', ${user.has_fcm})">
-                                        <div class="user-info">${user.name} ${fcmIcon}</div>
-                                        <div class="user-meta">${user.email} · ${user.phone || '-'}</div>
+                                    <div class="search-item d-flex align-items-center gap-3" onclick="addUser(${user.id}, '${user.name.replace(/'/g, "\\'")}', ${user.has_fcm})">
+                                        <div class="search-item-avatar">${initial}</div>
+                                        <div class="flex-grow-1" style="min-width: 0;">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <h6 class="mb-0 text-truncate fw-bold text-dark" style="font-size: 0.95rem;">${highlightedName}</h6>
+                                                ${fcmIcon}
+                                            </div>
+                                            <div class="text-muted text-truncate" style="font-size: 0.85rem;">
+                                                <span class="me-3" title="Email"><i class="fas fa-envelope text-primary opacity-50 me-1"></i> ${highlightedEmail}</span>
+                                                <span title="Phone"><i class="fas fa-phone text-success opacity-50 me-1"></i> ${highlightedPhone}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 `);
                             }
@@ -463,7 +509,7 @@
                 confirmButtonText: '{{ __("Yes, Send it!") }}',
                 cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
-                if (result.isConfirmed) {
+                if (result.value) {
                     const btn = $('#sendBtn');
                     const originalHtml = btn.html();
                     btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> {{ __("Sending...") }}');
@@ -665,7 +711,7 @@
             confirmButtonText: '{{ __("Yes, delete it!") }}',
             cancelButtonText: '{{ __("Cancel") }}'
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (result.value) {
                 $.ajax({
                     url: "{{ route('admin.notifications.destroy', ':id') }}".replace(':id', id),
                     method: 'POST',

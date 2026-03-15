@@ -53,6 +53,7 @@
                                     <th>{{ __('English Name') }}</th>
                                     <th>{{ __('Email') }}</th>
                                     <th>{{ __('Phone') }}</th>
+                                    <th>{{ __('Commission (%)') }}</th>
                                     <th>{{ __('Notes') }}</th>
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Actions') }}</th>
@@ -126,9 +127,15 @@
                         </div>
                     </div>
 
-                     <div class="mb-3">
-                        <label class="form-label">{{ __('Notes') }}</label>
-                        <textarea name="notes" class="form-control" rows="2"></textarea>
+                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Commission Rate (%)') }}</label>
+                            <input type="number" name="commission_rate" class="form-control" step="0.01" min="0" max="100" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Notes') }}</label>
+                            <textarea name="notes" class="form-control" rows="1"></textarea>
+                        </div>
                     </div>
                     <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
                 </div>
@@ -185,9 +192,15 @@
                             <input type="text" name="phone" id="edit_phone" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('Notes') }}</label>
-                        <textarea name="notes" id="edit_notes" class="form-control" rows="2"></textarea>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Commission Rate (%)') }}</label>
+                            <input type="number" name="commission_rate" id="edit_commission_rate" class="form-control" step="0.01" min="0" max="100">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Notes') }}</label>
+                            <textarea name="notes" id="edit_notes" class="form-control" rows="1"></textarea>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <x-forms.checkbox  id="edit_active" name="active" :label="__('Active status')" type="switch" />
@@ -219,6 +232,7 @@ $(document).ready(function() {
                 { data: 'en_name' },
                 { data: 'email' },
                 { data: 'phone' },
+                { data: 'commission' },
                 { data: 'notes' },
                 { data: 'status' },
                 { data: 'actions', orderable: false, searchable: false }
@@ -327,6 +341,7 @@ $(document).ready(function() {
                 $('#edit_email').val(company.email);
                 $('#edit_phone_code').val(company.phone_code);
                 $('#edit_phone').val(company.phone);
+                $('#edit_commission_rate').val(company.commission_rate);
                 $('#edit_notes').val(company.notes);
                 $('#edit_active').prop('checked', company.active);
                 $('#logoPreviewEdit').attr('src', response.logo_url);

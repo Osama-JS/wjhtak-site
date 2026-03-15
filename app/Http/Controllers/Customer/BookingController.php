@@ -29,9 +29,16 @@ class BookingController extends Controller
             ->where('user_id', Auth::id())
             ->latest();
 
-        // Filter by status
-        if ($request->filled('status') && in_array($request->status, ['pending', 'confirmed', 'cancelled'])) {
-            $query->where('status', $request->status);
+        // Filter by state
+        if ($request->filled('state') && in_array($request->state, [
+            TripBooking::STATE_AWAITING_PAYMENT,
+            TripBooking::STATE_PREPARING,
+            TripBooking::STATE_ISSUING_TICKETS,
+            TripBooking::STATE_TICKETS_UPLOADED,
+            TripBooking::STATE_COMPLETED,
+            TripBooking::STATE_CANCELLED
+        ])) {
+            $query->where('booking_state', $request->state);
         }
 
         $bookings = $query->paginate(10)->withQueryString();
@@ -104,6 +111,7 @@ class BookingController extends Controller
             'tickets_count'  => $passengersCount,
             'total_price'    => $totalPrice,
             'status'         => 'pending',
+            'booking_state'  => TripBooking::STATE_AWAITING_PAYMENT,
             'notes'          => $request->notes,
             'booking_date'   => now(),
         ]);
@@ -119,16 +127,22 @@ class BookingController extends Controller
     /**
      * Cancel a pending booking.
      */
-    public function cancel($id)
+    public function cancel(Request $request, $id)
     {
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:1000'
+        ]);
+
         $booking = TripBooking::where('user_id', Auth::id())->findOrFail($id);
 
-        if ($booking->status !== 'pending') {
+        if ($booking->booking_state !== TripBooking::STATE_AWAITING_PAYMENT) {
             return back()->with('error', __('لا يمكن إلغاء حجز تم تأكيده أو دفعه.'));
         }
 
-        $booking->passengers()->delete();
-        $booking->update(['status' => 'cancelled']);
+        $booking->update([
+            'booking_state' => TripBooking::STATE_CANCELLED,
+            'cancellation_reason' => $request->cancellation_reason
+        ]);
 
         return redirect()->route('customer.bookings.index')
             ->with('success', __('تم إلغاء الحجز بنجاح.'));
