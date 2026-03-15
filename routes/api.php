@@ -63,8 +63,16 @@ Route::post('/flights/book', [FlightController::class, 'book']);
 Route::post('/flights/order-ticket', [FlightController::class, 'orderTicket']);
 Route::post('/flights/trip-details', [FlightController::class, 'getTripDetails']);
 
-// Protected Routes (Sanctum for Mobile, Web for Site)
-Route::middleware(['web', 'auth:sanctum'])->group(function () {
+// Public Hotel Routes
+Route::prefix('hotels')->group(function () {
+    Route::get('/cities', [HotelController::class, 'cities']);
+    Route::post('/search', [HotelController::class, 'search']);
+    Route::get('/{hotelCode}/rooms', [HotelController::class, 'rooms']);
+    Route::post('/pre-book', [HotelController::class, 'preBook']);
+});
+
+// Protected Routes (Sanctum)
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
     Route::get('/check-token', [AuthController::class, 'checkToken']);
@@ -85,12 +93,8 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
         Route::post('/hotel/verify', [PaymentController::class, 'verifyHotel']);
     });
 
-    // Hotel Routes
+    // Protected Hotel Routes (Booking related)
     Route::prefix('hotels')->group(function () {
-        Route::get('/cities', [HotelController::class, 'cities']);
-        Route::post('/search', [HotelController::class, 'search']);
-        Route::get('/{hotelCode}/rooms', [HotelController::class, 'rooms']);
-        Route::post('/pre-book', [HotelController::class, 'preBook']);
         Route::post('/book', [HotelController::class, 'book']);
         Route::get('/bookings', [HotelController::class, 'myBookings']);
         Route::get('/bookings/{id}', [HotelController::class, 'bookingDetail']);

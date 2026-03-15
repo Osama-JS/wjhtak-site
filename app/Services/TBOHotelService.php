@@ -17,12 +17,17 @@ class TBOHotelService
 
     public function __construct()
     {
-        $this->clientId   = config('services.tbo.client_id', '');
-        $this->username   = config('services.tbo.username', '');
-        $this->password   = config('services.tbo.password', '');
-        $this->clientCode = config('services.tbo.client_code', '');
-        $this->baseUrl    = rtrim(config('services.tbo.base_url', ''), '/');
+        $this->clientId   = config('services.tbo.client_id');
+        $this->username   = config('services.tbo.username');
+        $this->password   = config('services.tbo.password');
+        $this->clientCode = config('services.tbo.client_code');
+        $this->baseUrl    = rtrim(config('services.tbo.base_url', 'https://api.tbotechnology.in/HotelAPI_V5/'), '/');
         $this->access     = config('services.tbo.access', 'Test');
+
+        // Validate that essential keys are present
+        if (empty($this->clientId) || empty($this->username) || empty($this->password) || empty($this->clientCode)) {
+            Log::error('TBO API: Missing credentials in .env. Please ensure TBO_CLIENT_ID, TBO_USERNAME, TBO_PASSWORD, and TBO_CLIENT_CODE are set.');
+        }
     }
 
     // =============================================
@@ -64,6 +69,13 @@ class TBOHotelService
 
             if ($response->failed()) {
                 throw new \Exception("TBO API HTTP Error {$response->status()}: " . $response->body());
+            }
+
+            // Check for internal TBO error codes in the response body
+            $internalStatus = $json['Status']['Code'] ?? $json['Status'] ?? null;
+            if ($internalStatus && !in_array($internalStatus, [200, 100, 0, 'Success'])) {
+                $description = $json['Status']['Description'] ?? 'Internal TBO Error';
+                throw new \Exception("TBO API Error [{$internalStatus}]: {$description}");
             }
 
             return $json ?? [];
@@ -137,7 +149,8 @@ class TBOHotelService
             ];
 
             if (!empty($criteria['children_ages'])) {
-                $room['ChildrenAges'] = array_slice($criteria['children_ages'], $i * $room['Children'], $room['Children']);
+                // TBO V2.1 uses 'ChildAge' for children ages array in PaxRooms
+                $room['ChildAge'] = array_slice($criteria['children_ages'], $i * $room['Children'], $room['Children']);
             }
 
             $roomGuests[] = $room;
@@ -309,13 +322,23 @@ class TBOHotelService
      */
     protected function formatGuestList(array $guests): array
     {
-        return array_map(function ($guest) {
+        return array_map(function ($guest, $index) {
             $g = [
                 'Title'     => $guest['title'],
                 'FirstName' => $guest['first_name'],
                 'LastName'  => $guest['last_name'],
                 'Type'      => ucfirst($guest['type'] ?? 'Adult'), // Adult or Child
+                'IsLeadPax' => ($index === 0), // First guest is the lead passenger
             ];
+
+            // TBO V2.1 requires Age for all guests
+            if (!empty($guest['dob'])) {
+                $g['DateOfBirth'] = $guest['dob'];
+                $g['Age'] = (int) \Carbon\Carbon::parse($guest['dob'])->age;
+            } else {
+                // Default ages if DOB is missing (should be collected in UI)
+                $g['Age'] = ($guest['type'] === 'child') ? 10 : 30;
+            }
 
             if (!empty($guest['passport_number'])) {
                 $g['PassportNumber'] = $guest['passport_number'];
@@ -323,12 +346,8 @@ class TBOHotelService
                 $g['Nationality']    = $guest['nationality'];
             }
 
-            if (!empty($guest['dob'])) {
-                $g['DateOfBirth'] = $guest['dob'];
-            }
-
             return $g;
-        }, $guests);
+        }, $guests, array_keys($guests));
     }
 
     // =============================================
