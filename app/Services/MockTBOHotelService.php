@@ -164,32 +164,26 @@ class MockTBOHotelService
     public function countryList(): array
     {
         return [
-            "Status" => [
-                "Code" => 200,
-                "Description" => "Success"
-            ],
-            "CountryList" => [
                 [
-                    "Code" => "SA",
-                    "Name" => "Saudi Arabia"
+                    "CountryCode" => "SA",
+                    "CountryName" => "Saudi Arabia"
                 ],
                 [
-                    "Code" => "AE",
-                    "Name" => "United Arab Emirates"
+                    "CountryCode" => "AE",
+                    "CountryName" => "United Arab Emirates"
                 ],
                 [
-                    "Code" => "EG",
-                    "Name" => "Egypt"
+                    "CountryCode" => "EG",
+                    "CountryName" => "Egypt"
                 ],
                 [
-                    "Code" => "TR",
-                    "Name" => "Turkey"
+                    "CountryCode" => "TR",
+                    "CountryName" => "Turkey"
                 ],
                 [
-                    "Code" => "FR",
-                    "Name" => "France"
+                    "CountryCode" => "FR",
+                    "CountryName" => "France"
                 ]
-            ]
         ];
     }
 

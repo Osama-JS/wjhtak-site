@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\TripItinerary;
+use App\Services\LocationService;
 
 class TripsController extends Controller
 {
@@ -22,6 +23,9 @@ class TripsController extends Controller
     {
         $trips = Trip::all();
         $companies = Company::all();
+        
+        app(LocationService::class)->syncLocationsFromApi();
+
         $countries = Country::all();
         $cities = City::all();
         $categories = \App\Models\TripCategory::all();
@@ -187,12 +191,20 @@ class TripsController extends Controller
     public function create()
     {
         $companies = Company::active()->get();
+        
+        app(LocationService::class)->syncLocationsFromApi();
+
         $countries = Country::active()->get();
         $cities = City::active()->get();
         $categories = \App\Models\TripCategory::all();
 
         return view('admin.trips.create', compact('companies', 'countries', 'cities', 'categories'));
     }
+
+    
+
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -272,6 +284,9 @@ class TripsController extends Controller
     public function edit(Trip $trip)
     {
         $companies = Company::active()->get();
+
+        app(LocationService::class)->syncLocationsFromApi();
+
         $countries = Country::active()->get();
         $cities = City::active()->get();
         $categories = \App\Models\TripCategory::all();
@@ -502,5 +517,4 @@ class TripsController extends Controller
 
         return response()->json($data);
     }
-
 }

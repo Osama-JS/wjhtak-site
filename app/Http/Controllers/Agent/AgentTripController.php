@@ -10,6 +10,7 @@ use App\Models\City;
 use App\Models\TripCategory;
 use App\Models\TripImage;
 use App\Models\TripItinerary;
+use App\Services\LocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,8 @@ class AgentTripController extends Controller
             ->latest()
             ->paginate(10);
 
+        app(LocationService::class)->syncLocationsFromApi();
+
         $countries = Country::active()->get();
         $cities = City::active()->get();
 
@@ -59,6 +62,8 @@ class AgentTripController extends Controller
 
     public function create()
     {
+        app(LocationService::class)->syncLocationsFromApi();
+
         $countries = Country::active()->get();
         $cities = City::active()->get();
         $categories = TripCategory::all();
@@ -114,6 +119,8 @@ class AgentTripController extends Controller
     public function edit(Trip $trip)
     {
         $this->authorizeAgent($trip);
+
+        app(LocationService::class)->syncLocationsFromApi();
 
         $countries = Country::active()->get();
         $cities = City::active()->get();
