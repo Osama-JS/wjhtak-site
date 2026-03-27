@@ -96,15 +96,22 @@ Route::get('/faq', [FrontendController::class, 'faq'])->name('faq');
 // Search
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
 
-// Search Model
+// Hotels
+Route::get('/hotels', [App\Http\Controllers\HotelController::class, 'index'])->name('hotels.index');
+Route::get('/hotels/{hotelCode}', [App\Http\Controllers\HotelController::class, 'show'])->name('hotels.show');
+Route::get('/hotels/booking/create', [App\Http\Controllers\HotelBookingController::class, 'create'])->name('hotels.booking.create');
+Route::post('/hotels/booking/store', [App\Http\Controllers\HotelBookingController::class, 'store'])->name('hotels.booking.store');
+
+// Search Model (Ajax)
 Route::get('/searchModel', [FrontendController::class, 'searchModel'])->name('searchModel');
 
+Route::middleware(['auth'])->group(function () {
 
-Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 
 // Admin Routes - Protected by isAdmin middleware
 Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(function () {

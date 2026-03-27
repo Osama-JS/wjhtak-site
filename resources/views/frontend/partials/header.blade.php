@@ -26,6 +26,10 @@
             <a href="{{ route('trips.index') }}" class="nav-link {{ request()->routeIs('trips.*') ? 'active' : '' }}">
                 {{ __('Trips') }}
             </a>
+            <a href="{{ route('hotels.index') }}" class="nav-link {{ request()->routeIs('hotels.*') ? 'active' : '' }}">
+                {{ __('Hotels') }}
+            </a>
+
             <a href="{{ route('destinations') }}" class="nav-link {{ request()->routeIs('destinations') ? 'active' : '' }}">
                 {{ __('Destinations') }}
             </a>
