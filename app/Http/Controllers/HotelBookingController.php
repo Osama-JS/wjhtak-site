@@ -151,6 +151,7 @@ class HotelBookingController extends Controller
                 'description'      => 'تم إنشاء الحجز (مسودة) في انتظار الدفع.',
                 'new_state'        => HotelBooking::STATE_AWAITING_PAYMENT,
             ]);
+             
 
             DB::commit();
 

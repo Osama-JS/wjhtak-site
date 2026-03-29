@@ -100,7 +100,7 @@ Route::get('/search', [FrontendController::class, 'search'])->name('search');
 Route::get('/hotels', [App\Http\Controllers\HotelController::class, 'index'])->name('hotels.index');
 Route::get('/hotels/{hotelCode}', [App\Http\Controllers\HotelController::class, 'show'])->name('hotels.show');
 Route::get('/hotels/booking/create', [App\Http\Controllers\HotelBookingController::class, 'create'])->name('hotels.booking.create');
-Route::post('/hotels/booking/store', [App\Http\Controllers\HotelBookingController::class, 'store'])->name('hotels.booking.store');
+Route::post('/hotels/booking/store', [App\Http\Controllers\HotelBookingController::class, 'store'])->name('hotels.booking.store')->middleware('auth');
 
 // Search Model (Ajax)
 Route::get('/searchModel', [FrontendController::class, 'searchModel'])->name('searchModel');
