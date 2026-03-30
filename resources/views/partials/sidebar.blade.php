@@ -53,10 +53,14 @@
 
             @can('view bookings')
             <li>
-                <a href="{{ route('admin.trip-bookings.index') }}" aria-expanded="false">
+                <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-calendar-1"></i>
                     <span class="nav-text">{{ __('Bookings') }}</span>
                 </a>
+                <ul aria-expanded="false">
+                    <li><a href="{{ route('admin.trip-bookings.index') }}">{{ __('Trip Bookings') }}</a></li>
+                    <li><a href="{{ route('admin.hotel-bookings.index') }}">{{ __('Hotel Bookings') }}</a></li>
+                </ul>
             </li>
             @endcan
 

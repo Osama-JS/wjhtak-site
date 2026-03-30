@@ -33,6 +33,7 @@ class HotelBooking extends Model
         'hotel_name_ar',
         'hotel_address',
         'star_rating',
+        'hotel_image',
         'city_id',
         'city_name',
         'country_code',

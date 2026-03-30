@@ -334,6 +334,7 @@ class HotelController extends Controller
                     new OA\Property(property: 'hotel_name',      type: 'string'),
                     new OA\Property(property: 'hotel_name_ar',   type: 'string', nullable: true),
                     new OA\Property(property: 'hotel_address',   type: 'string', nullable: true),
+                    new OA\Property(property: 'hotel_image',     type: 'string', nullable: true),
                     new OA\Property(property: 'city_name',       type: 'string'),
                     new OA\Property(property: 'country_code',    type: 'string', example: 'SA'),
                     new OA\Property(property: 'room_type_code',  type: 'string'),
@@ -382,6 +383,7 @@ class HotelController extends Controller
             'result_token'   => 'required|string',
             'hotel_code'     => 'required|string',
             'hotel_name'     => 'required|string',
+            'hotel_image'    => 'nullable|string',
             'city_name'      => 'required|string',
             'country_code'   => 'required|string|size:2',
             'room_type_code' => 'required|string',
@@ -424,6 +426,7 @@ class HotelController extends Controller
                 'hotel_name'     => $request->hotel_name,
                 'hotel_name_ar'  => $request->hotel_name_ar,
                 'hotel_address'  => $request->hotel_address,
+                'hotel_image'    => $request->hotel_image,
                 'city_name'      => $request->city_name,
                 'country_code'   => $request->country_code,
                 'room_type_code' => $request->room_type_code,
@@ -497,7 +500,26 @@ class HotelController extends Controller
             new OA\Parameter(name: 'per_page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 10)),
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Bookings list'),
+            new OA\Response(
+                response: 200,
+                description: 'Hotel bookings list retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'message', type: 'string', example: 'Hotel bookings retrieved.'),
+                        new OA\Property(property: 'data', type: 'array', items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'hotel_name', type: 'string'),
+                                new OA\Property(property: 'hotel_image', type: 'string', nullable: true),
+                                new OA\Property(property: 'check_in_date', type: 'string', format: 'date'),
+                                new OA\Property(property: 'total_price', type: 'number'),
+                                new OA\Property(property: 'booking_state_label', type: 'string'),
+                            ]
+                        )),
+                    ]
+                )
+            ),
         ]
     )]
     public function myBookings(Request $request)
@@ -509,6 +531,29 @@ class HotelController extends Controller
                 ->latest();
 
             $bookings = $query->paginate($request->get('per_page', 10));
+
+            $bookings->getCollection()->transform(function ($booking) {
+                return [
+                    'id'                  => $booking->id,
+                    'hotel_code'          => $booking->hotel_code,
+                    'hotel_name'          => $booking->hotel_name,
+                    'hotel_name_ar'       => $booking->hotel_name_ar,
+                    'hotel_image'         => $booking->hotel_image,
+                    'city_name'           => $booking->city_name,
+                    'star_rating'         => $booking->star_rating,
+                    'check_in_date'       => $booking->check_in_date->format('Y-m-d'),
+                    'check_out_date'      => $booking->check_out_date->format('Y-m-d'),
+                    'nights_count'        => $booking->nights_count,
+                    'rooms_count'         => $booking->rooms_count,
+                    'total_price'         => (float)$booking->total_price,
+                    'currency'            => $booking->currency,
+                    'status'              => $booking->status,
+                    'booking_state'       => $booking->booking_state,
+                    'booking_state_label' => __($booking->booking_state),
+                    'created_at'          => $booking->created_at->toDateTimeString(),
+                    'guests_count'        => $booking->guests->count(),
+                ];
+            });
 
             return $this->apiResponse(false, __('Hotel bookings retrieved.'), $bookings);
         } catch (\Exception $e) {
@@ -531,7 +576,22 @@ class HotelController extends Controller
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Booking detail'),
+            new OA\Response(
+                response: 200,
+                description: 'Booking details retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'data', type: 'object', properties: [
+                            new OA\Property(property: 'id', type: 'integer'),
+                            new OA\Property(property: 'hotel_name', type: 'string'),
+                            new OA\Property(property: 'guests', type: 'array', items: new OA\Items(type: 'object')),
+                            new OA\Property(property: 'payment', type: 'object', nullable: true),
+                            new OA\Property(property: 'history', type: 'array', items: new OA\Items(type: 'object')),
+                        ]),
+                    ]
+                )
+            ),
             new OA\Response(response: 404, description: 'Booking not found'),
         ]
     )]
@@ -542,7 +602,57 @@ class HotelController extends Controller
                 ->with(['guests', 'payment', 'histories'])
                 ->findOrFail($id);
 
-            return $this->apiResponse(false, __('Booking details retrieved.'), $booking);
+            $data = [
+                'id'                  => $booking->id,
+                'tbo_booking_id'      => $booking->tbo_booking_id,
+                'hotel_code'          => $booking->hotel_code,
+                'hotel_name'          => $booking->hotel_name,
+                'hotel_name_ar'       => $booking->hotel_name_ar,
+                'hotel_address'       => $booking->hotel_address,
+                'hotel_image'         => $booking->hotel_image,
+                'city_name'           => $booking->city_name,
+                'star_rating'         => $booking->star_rating,
+                'room_type_name'      => $booking->room_type_name,
+                'check_in_date'       => $booking->check_in_date->format('Y-m-d'),
+                'check_out_date'      => $booking->check_out_date->format('Y-m-d'),
+                'nights_count'        => $booking->nights_count,
+                'rooms_count'         => $booking->rooms_count,
+                'adults'              => $booking->adults,
+                'children'            => $booking->children,
+                'total_price'         => (float)$booking->total_price,
+                'currency'            => $booking->currency,
+                'status'              => $booking->status,
+                'booking_state'       => $booking->booking_state,
+                'booking_state_label' => __($booking->booking_state),
+                'notes'               => $booking->notes,
+                'cancellation_policy' => $booking->cancellation_policy,
+                'created_at'          => $booking->created_at->toDateTimeString(),
+                'guests'              => $booking->guests->map(fn($g) => [
+                    'id'               => $g->id,
+                    'title'            => $g->title,
+                    'first_name'       => $g->first_name,
+                    'last_name'        => $g->last_name,
+                    'type'             => $g->type,
+                    'is_lead'          => (bool)$g->is_lead,
+                    'nationality'      => $g->nationality,
+                    'passport_number'  => $g->passport_number,
+                ]),
+                'payment'             => $booking->payment ? [
+                    'status'         => $booking->payment->status,
+                    'amount'         => (float)$booking->payment->amount,
+                    'method'         => $booking->payment->payment_method,
+                    'transaction_id' => $booking->payment->transaction_id,
+                    'date'           => $booking->payment->created_at->toDateTimeString(),
+                ] : null,
+                'history'             => $booking->histories->map(fn($h) => [
+                    'action'      => $h->action,
+                    'description' => $h->description,
+                    'new_state'   => $h->new_state,
+                    'date'        => $h->created_at->toDateTimeString(),
+                ]),
+            ];
+
+            return $this->apiResponse(false, __('Booking details retrieved.'), $data);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->apiResponse(true, __('Booking not found.'), null, null, 404);
         } catch (\Exception $e) {
@@ -853,6 +963,45 @@ class HotelController extends Controller
         } catch (\Exception $e) {
             Log::error('Hotel Code List Error: ' . $e->getMessage());
             return $this->apiResponse(true, __('Failed to retrieve hotel list: ') . $e->getMessage(), null, null, 500);
+        }
+    // =========================================================
+    // 11. Booking Details By Date (Remote Lookup)
+    // =========================================================
+
+    #[OA\Get(
+        path: '/api/hotels/bookings/by-date',
+        summary: 'Get hotel bookings from TBO by date range (Remote Lookup)',
+        operationId: 'hotelBookingsByDate',
+        tags: ['Hotels'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'from_date', in: 'query', required: true, schema: new OA\Schema(type: 'string', format: 'date', example: '2026-03-01')),
+            new OA\Parameter(name: 'to_date',   in: 'query', required: true, schema: new OA\Schema(type: 'string', format: 'date', example: '2026-03-31')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Bookings retrieved successfully'),
+            new OA\Response(response: 422, description: 'Validation Error'),
+            new OA\Response(response: 500, description: 'TBO API Error'),
+        ]
+    )]
+    public function bookingsByDate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'from_date' => 'required|date|format:Y-m-d',
+            'to_date'   => 'required|date|format:Y-m-d|after_or_equal:from_date',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->apiResponse(true, __('Validation failed.'), $validator->errors(), null, 422);
+        }
+
+        try {
+            $result = $this->tboService->getBookingDetailsByDate($request->from_date, $request->to_date);
+            
+            return $this->apiResponse(false, __('Bookings retrieved from TBO.'), $result);
+        } catch (\Exception $e) {
+            Log::error('TBO Bookings By Date Error: ' . $e->getMessage());
+            return $this->apiResponse(true, __('Failed to retrieve bookings from TBO.'), null, null, 500);
         }
     }
 }

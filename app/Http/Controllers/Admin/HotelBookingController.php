@@ -16,7 +16,6 @@ class HotelBookingController extends Controller
     public function __construct(TBOHotelService $tboService)
     {
         $this->tboService = $tboService;
-        $this->middleware('auth');
     }
 
     /**
@@ -137,6 +136,40 @@ class HotelBookingController extends Controller
             Log::error("Hotel Booking Delete Error [{$id}]: " . $e->getMessage());
             return redirect()->back()->with('error', __('Failed to delete booking: ') . $e->getMessage());
         }
+    }
+
+    /**
+     * Remote TBO Booking Lookup/Reconciliation.
+     */
+    public function remoteBookings(Request $request)
+    {
+        $fromDate = $request->get('from_date', now()->subDays(30)->format('Y-m-d'));
+        $toDate   = $request->get('to_date',   now()->format('Y-m-d'));
+
+        $remoteBookings = [];
+        $error = null;
+
+        if ($request->has(['from_date', 'to_date'])) {
+            try {
+                $response = $this->tboService->getBookingDetailsByDate($fromDate, $toDate);
+                $remoteBookings = $response['BookingDetail'] ?? $response ?? [];
+                
+                // If it's a single object instead of array (TBO sometimes does this)
+                if (isset($remoteBookings['BookingId'])) {
+                    $remoteBookings = [$remoteBookings];
+                }
+            } catch (\Exception $e) {
+                Log::error("TBO Remote Lookup Error: " . $e->getMessage());
+                $error = $e->getMessage();
+            }
+        }
+
+        // Cross-reference with local database
+        $localRefs = HotelBooking::whereIn('tbo_booking_id', array_column($remoteBookings, 'BookingId'))
+            ->pluck('id', 'tbo_booking_id')
+            ->toArray();
+
+        return view('admin.hotel-bookings.remote', compact('remoteBookings', 'fromDate', 'toDate', 'localRefs', 'error'));
     }
 
     /**

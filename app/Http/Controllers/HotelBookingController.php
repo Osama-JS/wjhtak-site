@@ -165,4 +165,82 @@ class HotelBookingController extends Controller
             return back()->with('error', __('Failed to create booking. Please try again.'))->withInput();
         }
     }
+
+    /**
+     * List all hotel bookings for the authenticated customer.
+     */
+    public function index(Request $request)
+    {
+        $query = HotelBooking::where('user_id', Auth::id())
+            ->latest();
+
+        if ($request->filled('status')) {
+            $query->where('booking_state', $request->status);
+        }
+
+        $bookings = $query->paginate(10)->withQueryString();
+
+        return view('frontend.customer.hotel-bookings.index', compact('bookings'));
+    }
+
+    /**
+     * Show hotel booking details.
+     */
+    public function show($id)
+    {
+        $booking = HotelBooking::with(['guests', 'payment', 'histories' => function($q) {
+            $q->orderBy('created_at', 'asc');
+        }])
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        return view('frontend.customer.hotel-bookings.show', compact('booking'));
+    }
+    /**
+     * Cancel a hotel booking.
+     */
+    public function cancel(Request $request, $id)
+    {
+        $booking = HotelBooking::where('user_id', Auth::id())->findOrFail($id);
+
+        if ($booking->status === HotelBooking::STATUS_CANCELLED) {
+            return back()->with('error', __('Booking is already cancelled.'));
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // 1. If it has a TBO booking ID, cancel it with TBO
+            if ($booking->tbo_booking_id) {
+                $this->tboService->cancelBooking($booking->tbo_booking_id);
+            }
+
+            // 2. Update local status
+            $booking->update([
+                'status'              => HotelBooking::STATUS_CANCELLED,
+                'booking_state'       => HotelBooking::STATE_CANCELLED,
+                'cancellation_reason' => $request->get('reason', __('Cancelled by customer.')),
+            ]);
+
+            // 3. Log history
+            HotelBookingHistory::create([
+                'hotel_booking_id' => $booking->id,
+                'user_id'          => Auth::id(),
+                'action'           => 'customer_cancellation',
+                'description'      => __('Booking cancelled by customer.'),
+                'previous_state'   => $booking->booking_state,
+                'new_state'        => HotelBooking::STATE_CANCELLED,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('customer.hotel-bookings.show', $id)
+                ->with('success', __('Booking cancelled successfully.'));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Web Customer Hotel Cancel Error [{$id}]: " . $e->getMessage());
+            return back()->with('error', __('Failed to cancel booking: ') . $e->getMessage());
+        }
+    }
 }

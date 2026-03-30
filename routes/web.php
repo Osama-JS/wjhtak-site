@@ -274,11 +274,13 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     });
 
     // Hotel Bookings Management (TBO)
-    Route::prefix('hotel-bookings')->name('hotel-bookings.')->group(function () {
-        Route::get('/',         [App\Http\Controllers\Admin\HotelBookingController::class, 'index'])->name('index');
-        Route::get('/{id}',     [App\Http\Controllers\Admin\HotelBookingController::class, 'show'])->name('show');
-        Route::post('/{id}/cancel', [App\Http\Controllers\Admin\HotelBookingController::class, 'cancel'])->name('cancel');
-    });
+        Route::prefix('hotel-bookings')->name('hotel-bookings.')->group(function () {
+            Route::get('/',         [App\Http\Controllers\Admin\HotelBookingController::class, 'index'])->name('index');
+            Route::get('/remote',   [App\Http\Controllers\Admin\HotelBookingController::class, 'remoteBookings'])->name('remote');
+            Route::get('/{id}',     [App\Http\Controllers\Admin\HotelBookingController::class, 'show'])->name('show');
+            Route::post('/{id}/cancel', [App\Http\Controllers\Admin\HotelBookingController::class, 'cancel'])->name('cancel');
+            Route::delete('/{id}',      [App\Http\Controllers\Admin\HotelBookingController::class, 'destroy'])->name('destroy');
+        });
 
     // Bank Transfers Review
     Route::middleware('permission:view bank_transfers')->group(function() {
@@ -575,6 +577,11 @@ Route::middleware(['auth', 'isCustomer'])->prefix('customer')->name('customer.')
     Route::post('/bookings', [CustomerBookingController::class, 'store'])->name('bookings.store');
     Route::post('/bookings/{id}/cancel', [CustomerBookingController::class, 'cancel'])->name('bookings.cancel');
     Route::get('/bookings/{id}/invoice', [CustomerBookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+
+    // Hotel Bookings
+    Route::get('/hotel-bookings', [\App\Http\Controllers\HotelBookingController::class, 'index'])->name('hotel-bookings.index');
+    Route::get('/hotel-bookings/{id}', [\App\Http\Controllers\HotelBookingController::class, 'show'])->name('hotel-bookings.show');
+    Route::post('/hotel-bookings/{id}/cancel', [\App\Http\Controllers\HotelBookingController::class, 'cancel'])->name('hotel-bookings.cancel');
 
     // Favorites
     Route::get('/favorites', [\App\Http\Controllers\Customer\FavoriteController::class, 'index'])->name('favorites.index');
