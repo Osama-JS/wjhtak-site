@@ -964,6 +964,7 @@ class HotelController extends Controller
             Log::error('Hotel Code List Error: ' . $e->getMessage());
             return $this->apiResponse(true, __('Failed to retrieve hotel list: ') . $e->getMessage(), null, null, 500);
         }
+    }
     // =========================================================
     // 11. Booking Details By Date (Remote Lookup)
     // =========================================================
