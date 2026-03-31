@@ -53,7 +53,9 @@ Route::group(['prefix' => 'payments', 'as' => 'payments.web.'], function () {
             'payment_id' => $paymentId,
             'checkout_id' => $checkoutId,
             'status' => $request->status,
-            'source' => $request->source
+            'source' => $request->source,
+            'booking_type' => $request->booking_type,
+            'hotel_booking_id' => $request->hotel_booking_id
         ]);
     })->name('callback');
 });

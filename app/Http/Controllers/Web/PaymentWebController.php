@@ -76,7 +76,7 @@ class PaymentWebController extends Controller
                 $data['checkout_id'] = $checkoutId;
 
                 if ($checkoutId) {
-                    $this->logPendingPayment($booking->id, 'hyperpay', $method, $checkoutId, $booking->total_price, $checkoutResult);
+                    $this->logPendingPayment($booking->id, 'hyperpay', $method, $checkoutId, $booking->total_price, $checkoutResult, $isHotel ? 'hotel' : 'trip');
                 }
             }
 
@@ -163,7 +163,9 @@ class PaymentWebController extends Controller
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
             'callback_url' => route('payments.web.callback', [
                 'payment_type' => 'tabby',
-                'source' => $request->source
+                'source' => $request->source,
+                'booking_type' => $booking->trip ? 'trip' : 'hotel',
+                'hotel_booking_id' => $booking->trip ? null : $booking->id
             ]),
             'items' => [
                 [
@@ -179,7 +181,7 @@ class PaymentWebController extends Controller
         $result = $this->tabbyService->initiateCheckout($data);
 
         if ($result['payment_id'] ?? null) {
-            $this->logPendingPayment($booking->id, 'tabby', 'installments', $result['payment_id'], $booking->total_price, $result);
+            $this->logPendingPayment($booking->id, 'tabby', 'installments', $result['payment_id'], $booking->total_price, $result, $booking->trip ? 'trip' : 'hotel');
         }
 
         return response()->json($result);
@@ -196,7 +198,9 @@ class PaymentWebController extends Controller
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
             'callback_url' => route('payments.web.callback', [
                 'payment_type' => 'tamara',
-                'source' => $request->source
+                'source' => $request->source,
+                'booking_type' => $booking->trip ? 'trip' : 'hotel',
+                'hotel_booking_id' => $booking->trip ? null : $booking->id
             ]),
             'items' => [
                 [
@@ -217,7 +221,7 @@ class PaymentWebController extends Controller
         $result = $this->tamaraService->initiateCheckout($data);
 
         if ($result['order_id'] ?? null) {
-            $this->logPendingPayment($booking->id, 'tamara', 'installments', $result['order_id'], $booking->total_price, $result);
+            $this->logPendingPayment($booking->id, 'tamara', 'installments', $result['order_id'], $booking->total_price, $result, $booking->trip ? 'trip' : 'hotel');
         }
 
         return response()->json($result);
@@ -235,7 +239,9 @@ class PaymentWebController extends Controller
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
             'callback_url' => route('payments.web.callback', [
                 'payment_type' => 'tap',
-                'source' => $request->source
+                'source' => $request->source,
+                'booking_type' => $booking->trip ? 'trip' : 'hotel',
+                'hotel_booking_id' => $booking->trip ? null : $booking->id
             ]),
             'description' => 'Booking #' . $booking->id . ' - ' . ($booking->trip->title ?? 'Trip'),
         ];
@@ -243,7 +249,7 @@ class PaymentWebController extends Controller
         $result = $this->tapService->initiateCheckout($data);
 
         if ($result['id'] ?? null) {
-            $this->logPendingPayment($booking->id, 'tap', 'card', $result['id'], $booking->total_price, $result);
+            $this->logPendingPayment($booking->id, 'tap', 'card', $result['id'], $booking->total_price, $result, $booking->trip ? 'trip' : 'hotel');
         }
 
         return response()->json($result);

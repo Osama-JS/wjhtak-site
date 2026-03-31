@@ -471,6 +471,39 @@ function submitPayment() {
         return;
     }
 
+    // For Hotel Bookings, use the specialized initiation API
+    if (@json($isHotel)) {
+        fetch('/api/payment/hotel/initiate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ 
+                hotel_booking_id: bookingId, 
+                payment_type: selectedMethod 
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error === false && data.data && data.data.payment_url) {
+                window.location.href = data.data.payment_url;
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> {{ __("Pay Now") }}';
+                alert(data.message || '{{ __("An error occurred, please try again.") }}');
+            }
+        })
+        .catch((err) => {
+            console.error('API Error:', err);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-lock"></i> {{ __("Pay Now") }}';
+            alert('{{ __("Connection error, please try again.") }}');
+        });
+        return;
+    }
+
     // For redirect-based methods (Tamara)
     if (['tamara'].includes(selectedMethod)) {
         fetch('{{ route("payments.web.initiate") }}', {
