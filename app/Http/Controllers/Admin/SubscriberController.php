@@ -54,10 +54,11 @@ class SubscriberController extends Controller
                     'verified' => $verifiedBadge,
                     'actions' => '
                         <div class="d-flex">
-                            <a href="' . route('admin.subscribers.profile', $user->id) . '" class="btn btn-info shadow btn-xs sharp me-1"><i class="fa fa-eye"></i></a>
-                            <button onclick="editSubscriber(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></button>
-                            <button onclick="toggleSubscriberStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-ban"></i></button>
-                            <button onclick="deleteSubscriber(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
+                            <a href="' . route('admin.subscribers.profile', $user->id) . '" class="btn btn-info shadow btn-xs sharp me-1" title="'.__('View Details').'"><i class="fa fa-eye"></i></a>
+                            <button onclick="editSubscriber(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1" title="'.__('Edit Info').'"><i class="fas fa-pencil-alt"></i></button>
+                            ' . (!$user->phone_verified_at ? '<button onclick="verifySubscriber(' . $user->id . ')" class="btn btn-success shadow btn-xs sharp me-1" title="'.__('Verify Account').'"><i class="fas fa-check-circle"></i></button>' : '') . '
+                            <button onclick="toggleSubscriberStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1" title="'.__('Ban/Unban').'"><i class="fas fa-ban"></i></button>
+                            <button onclick="deleteSubscriber(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp" title="'.__('Delete Account').'"><i class="fa fa-trash"></i></button>
                         </div>'
                 ];
             })
@@ -181,5 +182,19 @@ class SubscriberController extends Controller
     {
         $user = User::with(['bookings.trip'])->findOrFail($id);
         return view('admin.subscribers.profile', compact('user'));
+    }
+
+    /**
+     * Verify subscriber account manually.
+     */
+    public function verify($id)
+    {
+        $user = User::findOrFail($id);
+        $user->update(['phone_verified_at' => now()]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Subscriber account verified successfully')
+        ]);
     }
 }

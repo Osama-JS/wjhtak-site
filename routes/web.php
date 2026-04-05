@@ -296,6 +296,7 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
         Route::post('/subscribers', [SubscriberController::class, 'store'])->name('subscribers.store');
         Route::get('/subscribers/{id}', [SubscriberController::class, 'show'])->name('subscribers.show');
         Route::put('/subscribers/{id}', [SubscriberController::class, 'update'])->name('subscribers.update');
+        Route::post('/subscribers/{id}/verify', [SubscriberController::class, 'verify'])->name('subscribers.verify');
         Route::post('/subscribers/{id}/toggle-status', [SubscriberController::class, 'toggleStatus'])->name('subscribers.toggle-status');
         Route::delete('/subscribers/{id}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
     });

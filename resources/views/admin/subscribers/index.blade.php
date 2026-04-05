@@ -290,6 +290,28 @@
         });
     }
 
+    function verifySubscriber(id) {
+        Swal.fire({
+            title: '{{ __("Verify Account?") }}',
+            text: '{{ __("Are you sure you want to manually verify this subscriber?") }}',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '{{ __("Yes, Verify!") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
+        }).then((result) => {
+            if (result.value) {
+                $.post("{{ route('admin.subscribers.verify', ':id') }}".replace(':id', id), {
+                    _token: '{{ csrf_token() }}'
+                }, function(response) {
+                    if (response.success) {
+                        subscribersTable.ajax.reload(null, false);
+                        toastr.success(response.message);
+                    }
+                });
+            }
+        });
+    }
+
     function toggleSubscriberStatus(id) {
         Swal.fire({
             title: '{{ __("Are you sure?") }}',
