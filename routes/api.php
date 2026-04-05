@@ -69,6 +69,8 @@ Route::prefix('hotels')->group(function () {
     Route::post('/search', [HotelController::class, 'search']);
     Route::get('/{hotelCode}/rooms', [HotelController::class, 'rooms']);
     Route::post('/pre-book', [HotelController::class, 'preBook']);
+    Route::get('/country-list', [HotelController::class, 'countryList']);
+    Route::post('/code-list', [HotelController::class, 'hotelCodeList']);
 });
 
 // Protected Routes (Sanctum)
@@ -98,6 +100,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/book', [HotelController::class, 'book']);
         Route::get('/bookings', [HotelController::class, 'myBookings']);
         Route::get('/bookings/{id}', [HotelController::class, 'bookingDetail']);
+        Route::post('/bookings/by-date', [HotelController::class, 'bookingDetailsByDate']);
         Route::post('/bookings/{id}/cancel', [HotelController::class, 'cancel']);
     });
 

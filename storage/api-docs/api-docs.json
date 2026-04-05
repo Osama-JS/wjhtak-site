@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost/wjhtak-site/public",
+            "url": "http://127.0.0.1:8000",
             "description": "Local Server"
         },
         {
@@ -2277,7 +2277,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Hotels found",
+                        "description": "Hotels found successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2286,20 +2286,60 @@
                                             "type": "boolean",
                                             "example": false
                                         },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hotels found successfully."
+                                        },
                                         "data": {
                                             "properties": {
                                                 "session_id": {
                                                     "description": "Session ID required for room listing and pre-book",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "7906efba-09db-4481-8c60-0d7f5b5e6c44"
+                                                },
+                                                "count": {
+                                                    "type": "integer",
+                                                    "example": 10
                                                 },
                                                 "hotels": {
                                                     "type": "array",
                                                     "items": {
+                                                        "properties": {
+                                                            "HotelCode": {
+                                                                "type": "string",
+                                                                "example": "1000001"
+                                                            },
+                                                            "HotelName": {
+                                                                "type": "string",
+                                                                "example": "Grand Plaza Hotel"
+                                                            },
+                                                            "HotelAddress": {
+                                                                "type": "string",
+                                                                "example": "King Fahd Rd, Riyadh"
+                                                            },
+                                                            "StarRating": {
+                                                                "type": "integer",
+                                                                "example": 4
+                                                            },
+                                                            "HotelPicture": {
+                                                                "type": "string",
+                                                                "example": "http://..."
+                                                            },
+                                                            "LowestRate": {
+                                                                "type": "number",
+                                                                "example": 450
+                                                            },
+                                                            "Latitude": {
+                                                                "type": "string",
+                                                                "example": "24.7136"
+                                                            },
+                                                            "Longitude": {
+                                                                "type": "string",
+                                                                "example": "46.6753"
+                                                            }
+                                                        },
                                                         "type": "object"
                                                     }
-                                                },
-                                                "count": {
-                                                    "type": "integer"
                                                 }
                                             },
                                             "type": "object"
@@ -2352,25 +2392,59 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Room list returned",
+                        "description": "Room list returned successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "error": {
-                                            "type": "boolean"
+                                            "type": "boolean",
+                                            "example": false
                                         },
                                         "data": {
                                             "properties": {
                                                 "hotel_name": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "Grand Plaza Hotel"
                                                 },
                                                 "address": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "King Fahd Rd, Riyadh"
                                                 },
                                                 "rooms": {
                                                     "type": "array",
                                                     "items": {
+                                                        "properties": {
+                                                            "RoomIndex": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "RoomTypeName": {
+                                                                "type": "string",
+                                                                "example": "Deluxe Room"
+                                                            },
+                                                            "RatePlanCode": {
+                                                                "type": "string",
+                                                                "example": "R123"
+                                                            },
+                                                            "TotalFare": {
+                                                                "type": "number",
+                                                                "example": 500
+                                                            },
+                                                            "Currency": {
+                                                                "type": "string",
+                                                                "example": "SAR"
+                                                            },
+                                                            "Inclusions": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                },
+                                                                "example": [
+                                                                    "Breakfast Included"
+                                                                ]
+                                                            }
+                                                        },
                                                         "type": "object"
                                                     }
                                                 }
@@ -2446,20 +2520,34 @@
                                         "data": {
                                             "properties": {
                                                 "available": {
-                                                    "type": "boolean"
+                                                    "type": "boolean",
+                                                    "example": true
                                                 },
                                                 "result_token": {
-                                                    "description": "Use this in /book request",
+                                                    "description": "Mandatory: Use this in /book request as the unique key",
                                                     "type": "string"
                                                 },
                                                 "total_price": {
-                                                    "type": "number"
+                                                    "type": "number",
+                                                    "example": 1250
                                                 },
                                                 "currency": {
                                                     "type": "string",
                                                     "example": "SAR"
                                                 },
                                                 "cancellation_policy": {
+                                                    "properties": {
+                                                        "LastCancellationDeadline": {
+                                                            "type": "string",
+                                                            "example": "2026-03-25T00:00:00"
+                                                        },
+                                                        "Rules": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
                                                     "type": "object"
                                                 }
                                             },
@@ -2804,6 +2892,318 @@
                     },
                     "404": {
                         "description": "Booking not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/country-list": {
+            "get": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Get TBO country list",
+                "operationId": "countryList",
+                "responses": {
+                    "200": {
+                        "description": "Country list retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve country list"
+                    }
+                }
+            }
+        },
+        "/api/hotels/bookings/by-date": {
+            "post": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Retrieve booking details made for requested date range",
+                "description": "Maximum of 60 days (about 2 months) booking details can be retrieved.",
+                "operationId": "hotelBookingDetailBasedOnDate",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "from_date",
+                                    "to_date"
+                                ],
+                                "properties": {
+                                    "from_date": {
+                                        "description": "Format: YYYY-MM-DD",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-11-09"
+                                    },
+                                    "to_date": {
+                                        "description": "Format: YYYY-MM-DD",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-11-10"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Booking details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Booking details retrieved successfully."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "Status": {
+                                                    "properties": {
+                                                        "Code": {
+                                                            "type": "integer",
+                                                            "example": 200
+                                                        },
+                                                        "Description": {
+                                                            "type": "string",
+                                                            "example": "HotelBookingDetailBasedOnDate Successful"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "BookingDetail": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "Index": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "BookingId": {
+                                                                "type": "string",
+                                                                "example": "264056"
+                                                            },
+                                                            "ConfirmationNo": {
+                                                                "type": "string",
+                                                                "example": "GOF05R"
+                                                            },
+                                                            "BookingDate": {
+                                                                "type": "string",
+                                                                "example": "10-Nov-2023"
+                                                            },
+                                                            "Currency": {
+                                                                "type": "string",
+                                                                "example": "USD"
+                                                            },
+                                                            "AgentMarkup": {
+                                                                "type": "string",
+                                                                "example": "0.00"
+                                                            },
+                                                            "AgencyName": {
+                                                                "type": "string",
+                                                                "example": "ATravels"
+                                                            },
+                                                            "BookingStatus": {
+                                                                "type": "string",
+                                                                "example": "Vouchered"
+                                                            },
+                                                            "BookingPrice": {
+                                                                "type": "string",
+                                                                "example": "583.89"
+                                                            },
+                                                            "TripName": {
+                                                                "type": "string",
+                                                                "example": "Sharma_02Dec_Dubai"
+                                                            },
+                                                            "TBOHotelCode": {
+                                                                "type": "string",
+                                                                "example": "1022623"
+                                                            },
+                                                            "CheckInDate": {
+                                                                "type": "string",
+                                                                "example": "02-Dec-2023"
+                                                            },
+                                                            "CheckOutDate": {
+                                                                "type": "string",
+                                                                "example": "10-Dec-2023"
+                                                            },
+                                                            "ClientReferenceNumber": {
+                                                                "type": "string",
+                                                                "example": "123680"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/hotels/code-list": {
+            "post": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Fetch complete detail of hotels by city code",
+                "description": "Returns hotel names, addresses, descriptions, images, etc. associated with a city code.",
+                "operationId": "hotelCodeList",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "city_code"
+                                ],
+                                "properties": {
+                                    "city_code": {
+                                        "description": "Unique TBOH City code",
+                                        "type": "string",
+                                        "example": "130452"
+                                    },
+                                    "is_detailed": {
+                                        "description": "Default is true",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Hotel code list retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "Status": {
+                                                    "properties": {
+                                                        "Code": {
+                                                            "type": "integer",
+                                                            "example": 200
+                                                        },
+                                                        "Description": {
+                                                            "type": "string",
+                                                            "example": "Success"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "Hotels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "HotelCode": {
+                                                                "type": "string",
+                                                                "example": "1010099"
+                                                            },
+                                                            "HotelName": {
+                                                                "type": "string",
+                                                                "example": "Holiday Inn Express New York - Manhattan West Side"
+                                                            },
+                                                            "HotelRating": {
+                                                                "type": "string",
+                                                                "example": "ThreeStar"
+                                                            },
+                                                            "Address": {
+                                                                "type": "string"
+                                                            },
+                                                            "Description": {
+                                                                "type": "string"
+                                                            },
+                                                            "Map": {
+                                                                "type": "string"
+                                                            },
+                                                            "PhoneNumber": {
+                                                                "type": "string"
+                                                            },
+                                                            "PinCode": {
+                                                                "type": "string"
+                                                            },
+                                                            "HotelWebsiteUrl": {
+                                                                "type": "string"
+                                                            },
+                                                            "CityName": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 },
                 "security": [

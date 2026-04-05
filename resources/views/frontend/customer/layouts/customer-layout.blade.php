@@ -348,8 +348,15 @@
 
             <div class="cdash-nav-item">
                 <a href="{{ route('customer.bookings.index') }}" class="{{ request()->routeIs('customer.bookings.*') ? 'active' : '' }}">
-                    <i class="fas fa-ticket-alt"></i>
+                    <i class="fas fa-plane"></i>
                     <span>{{ __('My Bookings') }}</span>
+                </a>
+            </div>
+
+            <div class="cdash-nav-item">
+                <a href="{{ route('customer.hotel-bookings.index') }}" class="{{ request()->routeIs('customer.hotel-bookings.*') ? 'active' : '' }}">
+                    <i class="fas fa-hotel"></i>
+                    <span>{{ __('Hotel Bookings') }}</span>
                 </a>
             </div>
 

@@ -19,12 +19,23 @@ class HotelController extends Controller
 {
     use ApiResponseTrait;
 
-    protected TBOHotelService $tboService;
+    // protected TBOHotelService $tboService;
 
-    public function __construct(TBOHotelService $tboService)
+    // public function __construct(TBOHotelService $tboService)
+    // {
+    //     $this->tboService = $tboService;
+    // }
+
+    public function __construct()
     {
-        $this->tboService = $tboService;
+        if(env('APP_API_MODE') === 'mock') {
+            $this->tboService = new \App\Services\MockTBOHotelService();
+        } else {
+            $this->tboService = app(\App\Services\TBOHotelService::class);
+        }
     }
+
+    
 
     // =========================================================
     // 1. City List
@@ -102,15 +113,32 @@ class HotelController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Hotels found',
-                content: new OA\JsonContent(properties: [
-                    new OA\Property(property: 'error', type: 'boolean', example: false),
-                    new OA\Property(property: 'data', type: 'object', properties: [
-                        new OA\Property(property: 'session_id', type: 'string', description: 'Session ID required for room listing and pre-book'),
-                        new OA\Property(property: 'hotels', type: 'array', items: new OA\Items(type: 'object')),
-                        new OA\Property(property: 'count', type: 'integer'),
-                    ]),
-                ])
+            new OA\Response(
+                response: 200,
+                description: 'Hotels found successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'message', type: 'string', example: 'Hotels found successfully.'),
+                        new OA\Property(property: 'data', type: 'object', properties: [
+                            new OA\Property(property: 'session_id', type: 'string', example: '7906efba-09db-4481-8c60-0d7f5b5e6c44', description: 'Session ID required for room listing and pre-book'),
+                            new OA\Property(property: 'count', type: 'integer', example: 10),
+                            new OA\Property(property: 'hotels', type: 'array', items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'HotelCode', type: 'string', example: '1000001'),
+                                    new OA\Property(property: 'HotelName', type: 'string', example: 'Grand Plaza Hotel'),
+                                    new OA\Property(property: 'HotelAddress', type: 'string', example: 'King Fahd Rd, Riyadh'),
+                                    new OA\Property(property: 'StarRating', type: 'integer', example: 4),
+                                    new OA\Property(property: 'HotelPicture', type: 'string', example: 'http://...'),
+                                    new OA\Property(property: 'LowestRate', type: 'number', example: 450.00),
+                                    new OA\Property(property: 'Latitude', type: 'string', example: '24.7136'),
+                                    new OA\Property(property: 'Longitude', type: 'string', example: '46.6753'),
+                                ]
+                            )),
+                        ]),
+                    ]
+                )
             ),
             new OA\Response(response: 422, description: 'Validation Error'),
             new OA\Response(response: 500, description: 'TBO API Error'),
@@ -145,7 +173,7 @@ class HotelController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('TBO Hotel Search Error: ' . $e->getMessage());
-            return $this->apiResponse(true, __('Hotel search failed. Please try again.'), null, null, 500);
+            return $this->apiResponse(true,$e->getMessage(), null, null, 500);
         }
     }
 
@@ -164,15 +192,29 @@ class HotelController extends Controller
             new OA\Parameter(name: 'session_id', in: 'query', required: true, description: 'Session ID from /search', schema: new OA\Schema(type: 'string')),
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Room list returned',
-                content: new OA\JsonContent(properties: [
-                    new OA\Property(property: 'error', type: 'boolean'),
-                    new OA\Property(property: 'data', type: 'object', properties: [
-                        new OA\Property(property: 'hotel_name', type: 'string'),
-                        new OA\Property(property: 'address', type: 'string'),
-                        new OA\Property(property: 'rooms', type: 'array', items: new OA\Items(type: 'object')),
-                    ]),
-                ])
+            new OA\Response(
+                response: 200,
+                description: 'Room list returned successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'data', type: 'object', properties: [
+                            new OA\Property(property: 'hotel_name', type: 'string', example: 'Grand Plaza Hotel'),
+                            new OA\Property(property: 'address', type: 'string', example: 'King Fahd Rd, Riyadh'),
+                            new OA\Property(property: 'rooms', type: 'array', items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'RoomIndex', type: 'integer', example: 1),
+                                    new OA\Property(property: 'RoomTypeName', type: 'string', example: 'Deluxe Room'),
+                                    new OA\Property(property: 'RatePlanCode', type: 'string', example: 'R123'),
+                                    new OA\Property(property: 'TotalFare', type: 'number', example: 500.00),
+                                    new OA\Property(property: 'Currency', type: 'string', example: 'SAR'),
+                                    new OA\Property(property: 'Inclusions', type: 'array', items: new OA\Items(type: 'string'), example: ['Breakfast Included']),
+                                ]
+                            )),
+                        ]),
+                    ]
+                )
             ),
             new OA\Response(response: 422, description: 'Validation Error'),
         ]
@@ -220,17 +262,24 @@ class HotelController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Pre-book successful',
-                content: new OA\JsonContent(properties: [
-                    new OA\Property(property: 'error', type: 'boolean', example: false),
-                    new OA\Property(property: 'data', type: 'object', properties: [
-                        new OA\Property(property: 'available',      type: 'boolean'),
-                        new OA\Property(property: 'result_token',   type: 'string', description: 'Use this in /book request'),
-                        new OA\Property(property: 'total_price',    type: 'number'),
-                        new OA\Property(property: 'currency',       type: 'string', example: 'SAR'),
-                        new OA\Property(property: 'cancellation_policy', type: 'object'),
-                    ]),
-                ])
+            new OA\Response(
+                response: 200,
+                description: 'Pre-book successful',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'data', type: 'object', properties: [
+                            new OA\Property(property: 'available',      type: 'boolean', example: true),
+                            new OA\Property(property: 'result_token',   type: 'string', description: 'Mandatory: Use this in /book request as the unique key'),
+                            new OA\Property(property: 'total_price',    type: 'number', example: 1250.00),
+                            new OA\Property(property: 'currency',       type: 'string', example: 'SAR'),
+                            new OA\Property(property: 'cancellation_policy', type: 'object', properties: [
+                                new OA\Property(property: 'LastCancellationDeadline', type: 'string', example: '2026-03-25T00:00:00'),
+                                new OA\Property(property: 'Rules', type: 'array', items: new OA\Items(type: 'object')),
+                            ]),
+                        ]),
+                    ]
+                )
             ),
             new OA\Response(response: 422, description: 'Validation Error'),
             new OA\Response(response: 500, description: 'Pre-book failed'),
@@ -285,6 +334,7 @@ class HotelController extends Controller
                     new OA\Property(property: 'hotel_name',      type: 'string'),
                     new OA\Property(property: 'hotel_name_ar',   type: 'string', nullable: true),
                     new OA\Property(property: 'hotel_address',   type: 'string', nullable: true),
+                    new OA\Property(property: 'hotel_image',     type: 'string', nullable: true),
                     new OA\Property(property: 'city_name',       type: 'string'),
                     new OA\Property(property: 'country_code',    type: 'string', example: 'SA'),
                     new OA\Property(property: 'room_type_code',  type: 'string'),
@@ -333,6 +383,7 @@ class HotelController extends Controller
             'result_token'   => 'required|string',
             'hotel_code'     => 'required|string',
             'hotel_name'     => 'required|string',
+            'hotel_image'    => 'nullable|string',
             'city_name'      => 'required|string',
             'country_code'   => 'required|string|size:2',
             'room_type_code' => 'required|string',
@@ -375,6 +426,7 @@ class HotelController extends Controller
                 'hotel_name'     => $request->hotel_name,
                 'hotel_name_ar'  => $request->hotel_name_ar,
                 'hotel_address'  => $request->hotel_address,
+                'hotel_image'    => $request->hotel_image,
                 'city_name'      => $request->city_name,
                 'country_code'   => $request->country_code,
                 'room_type_code' => $request->room_type_code,
@@ -448,7 +500,26 @@ class HotelController extends Controller
             new OA\Parameter(name: 'per_page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', default: 10)),
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Bookings list'),
+            new OA\Response(
+                response: 200,
+                description: 'Hotel bookings list retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'message', type: 'string', example: 'Hotel bookings retrieved.'),
+                        new OA\Property(property: 'data', type: 'array', items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'hotel_name', type: 'string'),
+                                new OA\Property(property: 'hotel_image', type: 'string', nullable: true),
+                                new OA\Property(property: 'check_in_date', type: 'string', format: 'date'),
+                                new OA\Property(property: 'total_price', type: 'number'),
+                                new OA\Property(property: 'booking_state_label', type: 'string'),
+                            ]
+                        )),
+                    ]
+                )
+            ),
         ]
     )]
     public function myBookings(Request $request)
@@ -460,6 +531,29 @@ class HotelController extends Controller
                 ->latest();
 
             $bookings = $query->paginate($request->get('per_page', 10));
+
+            $bookings->getCollection()->transform(function ($booking) {
+                return [
+                    'id'                  => $booking->id,
+                    'hotel_code'          => $booking->hotel_code,
+                    'hotel_name'          => $booking->hotel_name,
+                    'hotel_name_ar'       => $booking->hotel_name_ar,
+                    'hotel_image'         => $booking->hotel_image,
+                    'city_name'           => $booking->city_name,
+                    'star_rating'         => $booking->star_rating,
+                    'check_in_date'       => $booking->check_in_date->format('Y-m-d'),
+                    'check_out_date'      => $booking->check_out_date->format('Y-m-d'),
+                    'nights_count'        => $booking->nights_count,
+                    'rooms_count'         => $booking->rooms_count,
+                    'total_price'         => (float)$booking->total_price,
+                    'currency'            => $booking->currency,
+                    'status'              => $booking->status,
+                    'booking_state'       => $booking->booking_state,
+                    'booking_state_label' => __($booking->booking_state),
+                    'created_at'          => $booking->created_at->toDateTimeString(),
+                    'guests_count'        => $booking->guests->count(),
+                ];
+            });
 
             return $this->apiResponse(false, __('Hotel bookings retrieved.'), $bookings);
         } catch (\Exception $e) {
@@ -482,7 +576,22 @@ class HotelController extends Controller
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Booking detail'),
+            new OA\Response(
+                response: 200,
+                description: 'Booking details retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'data', type: 'object', properties: [
+                            new OA\Property(property: 'id', type: 'integer'),
+                            new OA\Property(property: 'hotel_name', type: 'string'),
+                            new OA\Property(property: 'guests', type: 'array', items: new OA\Items(type: 'object')),
+                            new OA\Property(property: 'payment', type: 'object', nullable: true),
+                            new OA\Property(property: 'history', type: 'array', items: new OA\Items(type: 'object')),
+                        ]),
+                    ]
+                )
+            ),
             new OA\Response(response: 404, description: 'Booking not found'),
         ]
     )]
@@ -493,7 +602,57 @@ class HotelController extends Controller
                 ->with(['guests', 'payment', 'histories'])
                 ->findOrFail($id);
 
-            return $this->apiResponse(false, __('Booking details retrieved.'), $booking);
+            $data = [
+                'id'                  => $booking->id,
+                'tbo_booking_id'      => $booking->tbo_booking_id,
+                'hotel_code'          => $booking->hotel_code,
+                'hotel_name'          => $booking->hotel_name,
+                'hotel_name_ar'       => $booking->hotel_name_ar,
+                'hotel_address'       => $booking->hotel_address,
+                'hotel_image'         => $booking->hotel_image,
+                'city_name'           => $booking->city_name,
+                'star_rating'         => $booking->star_rating,
+                'room_type_name'      => $booking->room_type_name,
+                'check_in_date'       => $booking->check_in_date->format('Y-m-d'),
+                'check_out_date'      => $booking->check_out_date->format('Y-m-d'),
+                'nights_count'        => $booking->nights_count,
+                'rooms_count'         => $booking->rooms_count,
+                'adults'              => $booking->adults,
+                'children'            => $booking->children,
+                'total_price'         => (float)$booking->total_price,
+                'currency'            => $booking->currency,
+                'status'              => $booking->status,
+                'booking_state'       => $booking->booking_state,
+                'booking_state_label' => __($booking->booking_state),
+                'notes'               => $booking->notes,
+                'cancellation_policy' => $booking->cancellation_policy,
+                'created_at'          => $booking->created_at->toDateTimeString(),
+                'guests'              => $booking->guests->map(fn($g) => [
+                    'id'               => $g->id,
+                    'title'            => $g->title,
+                    'first_name'       => $g->first_name,
+                    'last_name'        => $g->last_name,
+                    'type'             => $g->type,
+                    'is_lead'          => (bool)$g->is_lead,
+                    'nationality'      => $g->nationality,
+                    'passport_number'  => $g->passport_number,
+                ]),
+                'payment'             => $booking->payment ? [
+                    'status'         => $booking->payment->status,
+                    'amount'         => (float)$booking->payment->amount,
+                    'method'         => $booking->payment->payment_method,
+                    'transaction_id' => $booking->payment->transaction_id,
+                    'date'           => $booking->payment->created_at->toDateTimeString(),
+                ] : null,
+                'history'             => $booking->histories->map(fn($h) => [
+                    'action'      => $h->action,
+                    'description' => $h->description,
+                    'new_state'   => $h->new_state,
+                    'date'        => $h->created_at->toDateTimeString(),
+                ]),
+            ];
+
+            return $this->apiResponse(false, __('Booking details retrieved.'), $data);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->apiResponse(true, __('Booking not found.'), null, null, 404);
         } catch (\Exception $e) {
@@ -594,6 +753,256 @@ class HotelController extends Controller
             DB::rollBack();
             Log::error("Hotel Cancel Error [{$id}]: " . $e->getMessage());
             return $this->apiResponse(true, __('Failed to cancel booking: ') . $e->getMessage(), null, null, 500);
+        }
+    }
+
+
+    // =========================================================
+    // 9. Country List
+    // =========================================================
+
+
+    #[OA\Get(
+        path: '/api/hotels/country-list',
+        summary: 'Get TBO country list',
+        operationId: 'countryList',
+        tags: ['Hotels'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Country list retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'data', type: 'array', items: new OA\Items(type: 'object'))
+                    ]
+                )
+            ),
+            new OA\Response(response: 500, description: 'Failed to retrieve country list'),
+        ]
+    )]
+    public function countryList()
+    {
+        try {
+            // Cached TBO CountryList for 24 hours
+            $countries = \Cache::remember('tbo_country_list', 60 * 24, function () {
+                return $this->tboService->countryList();
+            });
+
+            return $this->apiResponse(false, __('Country list retrieved successfully.'), $countries);
+
+        } catch (\Exception $e) {
+            \Log::error('CountryList Error: ' . $e->getMessage());
+
+            return $this->apiResponse(true, __('Failed to retrieve country list.'), [], null, 500);
+        }
+    }
+
+
+    // =========================================================
+    // 11. Booking Details Based on Date
+    // =========================================================
+
+    #[OA\Post(
+        path: '/api/hotels/bookings/by-date',
+        summary: 'Retrieve booking details made for requested date range',
+        operationId: 'hotelBookingDetailBasedOnDate',
+        description: 'Maximum of 60 days (about 2 months) booking details can be retrieved.',
+        tags: ['Hotels'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['from_date', 'to_date'],
+                properties: [
+                    new OA\Property(property: 'from_date', type: 'string', format: 'date', example: '2023-11-09', description: 'Format: YYYY-MM-DD'),
+                    new OA\Property(property: 'to_date',   type: 'string', format: 'date', example: '2023-11-10', description: 'Format: YYYY-MM-DD'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Booking details retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'message', type: 'string', example: 'Booking details retrieved successfully.'),
+                        new OA\Property(property: 'data', type: 'object', properties: [
+                            new OA\Property(property: 'Status', type: 'object', properties: [
+                                new OA\Property(property: 'Code', type: 'integer', example: 200),
+                                new OA\Property(property: 'Description', type: 'string', example: 'HotelBookingDetailBasedOnDate Successful'),
+                            ]),
+                            new OA\Property(property: 'BookingDetail', type: 'array', items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'Index', type: 'integer', example: 1),
+                                    new OA\Property(property: 'BookingId', type: 'string', example: '264056'),
+                                    new OA\Property(property: 'ConfirmationNo', type: 'string', example: 'GOF05R'),
+                                    new OA\Property(property: 'BookingDate', type: 'string', example: '10-Nov-2023'),
+                                    new OA\Property(property: 'Currency', type: 'string', example: 'USD'),
+                                    new OA\Property(property: 'AgentMarkup', type: 'string', example: '0.00'),
+                                    new OA\Property(property: 'AgencyName', type: 'string', example: 'ATravels'),
+                                    new OA\Property(property: 'BookingStatus', type: 'string', example: 'Vouchered'),
+                                    new OA\Property(property: 'BookingPrice', type: 'string', example: '583.89'),
+                                    new OA\Property(property: 'TripName', type: 'string', example: 'Sharma_02Dec_Dubai'),
+                                    new OA\Property(property: 'TBOHotelCode', type: 'string', example: '1022623'),
+                                    new OA\Property(property: 'CheckInDate', type: 'string', example: '02-Dec-2023'),
+                                    new OA\Property(property: 'CheckOutDate', type: 'string', example: '10-Dec-2023'),
+                                    new OA\Property(property: 'ClientReferenceNumber', type: 'string', example: '123680'),
+                                ]
+                            )),
+                        ]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: 'Validation Error'),
+            new OA\Response(response: 500, description: 'Internal Server Error'),
+        ]
+    )]
+    public function bookingDetailsByDate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'from_date' => 'required|date_format:Y-m-d',
+            'to_date'   => 'required|date_format:Y-m-d|after_or_equal:from_date',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->apiResponse(true, __('Validation failed.'), $validator->errors(), null, 422);
+        }
+
+        try {
+            $fromDate = Carbon::parse($request->from_date);
+            $toDate = Carbon::parse($request->to_date);
+
+            if ($fromDate->diffInDays($toDate) > 60) {
+                return $this->apiResponse(true, __('Maximum of 60 days booking details can be retrieved.'), null, null, 422);
+            }
+
+            $result = $this->tboService->getBookingDetailsByDate($request->from_date, $request->to_date);
+
+            return $this->apiResponse(false, __('Booking details retrieved successfully.'), $result);
+        } catch (\Exception $e) {
+            Log::error('Hotel Booking Details By Date Error: ' . $e->getMessage());
+            return $this->apiResponse(true, __('Failed to retrieve booking details: ') . $e->getMessage(), null, null, 500);
+        }
+    }
+
+    // =========================================================
+    // 12. TBOHotelCodeList
+    // =========================================================
+
+    #[OA\Post(
+        path: '/api/hotels/code-list',
+        summary: 'Fetch complete detail of hotels by city code',
+        operationId: 'hotelCodeList',
+        description: 'Returns hotel names, addresses, descriptions, images, etc. associated with a city code.',
+        tags: ['Hotels'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['city_code'],
+                properties: [
+                    new OA\Property(property: 'city_code', type: 'string', example: '130452', description: 'Unique TBOH City code'),
+                    new OA\Property(property: 'is_detailed', type: 'boolean', example: true, description: 'Default is true'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Hotel code list retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'error', type: 'boolean', example: false),
+                        new OA\Property(property: 'data', type: 'object', properties: [
+                            new OA\Property(property: 'Status', type: 'object', properties: [
+                                new OA\Property(property: 'Code', type: 'integer', example: 200),
+                                new OA\Property(property: 'Description', type: 'string', example: 'Success'),
+                            ]),
+                            new OA\Property(property: 'Hotels', type: 'array', items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'HotelCode', type: 'string', example: '1010099'),
+                                    new OA\Property(property: 'HotelName', type: 'string', example: 'Holiday Inn Express New York - Manhattan West Side'),
+                                    new OA\Property(property: 'HotelRating', type: 'string', example: 'ThreeStar'),
+                                    new OA\Property(property: 'Address', type: 'string'),
+                                    new OA\Property(property: 'Description', type: 'string'),
+                                    new OA\Property(property: 'Map', type: 'string'),
+                                    new OA\Property(property: 'PhoneNumber', type: 'string'),
+                                    new OA\Property(property: 'PinCode', type: 'string'),
+                                    new OA\Property(property: 'HotelWebsiteUrl', type: 'string'),
+                                    new OA\Property(property: 'CityName', type: 'string'),
+                                ]
+                            )),
+                        ]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: 'Validation Error'),
+            new OA\Response(response: 500, description: 'Internal Server Error'),
+        ]
+    )]
+    public function hotelCodeList(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'city_code' => 'required|string',
+            'is_detailed' => 'nullable|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->apiResponse(true, __('Validation failed.'), $validator->errors(), null, 422);
+        }
+
+        try {
+            $isDetailed = $request->get('is_detailed', true);
+            $result = $this->tboService->getHotelCodeList($request->city_code, $isDetailed);
+
+            return $this->apiResponse(false, __('Hotel code list retrieved successfully.'), $result);
+        } catch (\Exception $e) {
+            Log::error('Hotel Code List Error: ' . $e->getMessage());
+            return $this->apiResponse(true, __('Failed to retrieve hotel list: ') . $e->getMessage(), null, null, 500);
+        }
+    }
+    // =========================================================
+    // 11. Booking Details By Date (Remote Lookup)
+    // =========================================================
+
+    #[OA\Get(
+        path: '/api/hotels/bookings/by-date',
+        summary: 'Get hotel bookings from TBO by date range (Remote Lookup)',
+        operationId: 'hotelBookingsByDate',
+        tags: ['Hotels'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'from_date', in: 'query', required: true, schema: new OA\Schema(type: 'string', format: 'date', example: '2026-03-01')),
+            new OA\Parameter(name: 'to_date',   in: 'query', required: true, schema: new OA\Schema(type: 'string', format: 'date', example: '2026-03-31')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Bookings retrieved successfully'),
+            new OA\Response(response: 422, description: 'Validation Error'),
+            new OA\Response(response: 500, description: 'TBO API Error'),
+        ]
+    )]
+    public function bookingsByDate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'from_date' => 'required|date|format:Y-m-d',
+            'to_date'   => 'required|date|format:Y-m-d|after_or_equal:from_date',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->apiResponse(true, __('Validation failed.'), $validator->errors(), null, 422);
+        }
+
+        try {
+            $result = $this->tboService->getBookingDetailsByDate($request->from_date, $request->to_date);
+            
+            return $this->apiResponse(false, __('Bookings retrieved from TBO.'), $result);
+        } catch (\Exception $e) {
+            Log::error('TBO Bookings By Date Error: ' . $e->getMessage());
+            return $this->apiResponse(true, __('Failed to retrieve bookings from TBO.'), null, null, 500);
         }
     }
 }

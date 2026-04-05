@@ -44,23 +44,34 @@
 
             const finalId = paymentId || checkoutId || tapId || tamaraOrderId || tabbyPaymentId;
 
+            const bookingType = "{{ $booking_type ?? 'trip' }}";
+            const hotelBookingId = "{{ $hotel_booking_id ?? '' }}";
+            
+            const isHotel = (bookingType === 'hotel');
+            const verifyUrl = isHotel ? "{{ url('api/payment/hotel/verify') }}" : "{{ url('api/payment/verify') }}";
+
             // Call the verification API
             $.ajax({
-                url: "{{ url('api/payment/verify') }}",
+                url: verifyUrl,
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': "{{ csrf_token() }}"
                 },
                 data: {
+                    // Shared fields
                     payment_type: paymentType,
                     id: finalId,
                     payment_id: (paymentType === 'tabby' || paymentType === 'tamara' || paymentType === 'tap') ? finalId : null,
-                    checkout_id: (paymentType !== 'tabby' && paymentType !== 'tamara' && paymentType !== 'tap') ? finalId : null
+                    checkout_id: (paymentType !== 'tabby' && paymentType !== 'tamara' && paymentType !== 'tap') ? finalId : null,
+                    
+                    // Hotel specific
+                    hotel_booking_id: isHotel ? (hotelBookingId || urlParams.get('hotel_booking_id')) : null
                 },
                 success: function(response) {
                     if (response.success || response.error === false) {
-                        window.location.href = "{{ route('payments.web.success') }}?booking_id=" + (response.booking_id || "") + (source ? "&source=" + source : "");
+                        const bookingId = response.booking_id || response.hotel_booking_id || hotelBookingId || "";
+                        window.location.href = "{{ route('payments.web.success') }}?booking_id=" + bookingId + (isHotel ? "&booking_type=hotel" : "") + (source ? "&source=" + source : "");
                     } else {
                         window.location.href = "{{ route('payments.web.failure') }}?error=" + encodeURIComponent(response.message || "فشل التحقق من الدفع") + (source ? "&source=" + source : "");
                     }

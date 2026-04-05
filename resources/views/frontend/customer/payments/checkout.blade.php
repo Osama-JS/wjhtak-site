@@ -215,10 +215,17 @@
 
 @section('content')
 
-<a href="{{ route('customer.bookings.show', $booking->id) }}" class="back-link">
-    <i class="fas fa-arrow-{{ app()->isLocale('ar') ? 'right' : 'left' }}"></i>
-    {{ __('Back to Booking Details') }}
-</a>
+@if($isHotel)
+    <a href="{{ route('hotels.show', $booking->hotel_code) }}" class="back-link">
+        <i class="fas fa-arrow-{{ app()->isLocale('ar') ? 'right' : 'left' }}"></i>
+        {{ __('Back to Hotel Details') }}
+    </a>
+@else
+    <a href="{{ route('customer.bookings.show', $booking->id) }}" class="back-link">
+        <i class="fas fa-arrow-{{ app()->isLocale('ar') ? 'right' : 'left' }}"></i>
+        {{ __('Back to Booking Details') }}
+    </a>
+@endif
 
 <div class="checkout-grid">
 
@@ -328,19 +335,28 @@
     <div>
         <div class="order-summary-card">
             <div class="order-summary-trip">
-                @php $trip = $booking->trip; $img = $trip?->images?->first(); @endphp
-                @if($img)
-                    <img src="{{ asset('storage/' . $img->image_path) }}" class="order-trip-img" alt="">
+                @if($isHotel)
+                    <div class="order-trip-img-placeholder"><i class="fas fa-hotel"></i></div>
+                    <div class="order-trip-name">{{ $booking->hotel_name }}</div>
+                    <div class="order-trip-meta">
+                        <i class="fas fa-bed"></i> {{ $booking->room_type_name }}
+                        &nbsp;·&nbsp;<i class="fas fa-calendar-check"></i> {{ $booking->check_in_date->format('d M') }} - {{ $booking->check_out_date->format('d M') }}
+                    </div>
                 @else
-                    <div class="order-trip-img-placeholder"><i class="fas fa-map-marked-alt"></i></div>
-                @endif
-                <div class="order-trip-name">{{ $trip?->title ?? __('Trip') }}</div>
-                <div class="order-trip-meta">
-                    <i class="fas fa-users"></i> {{ $booking->tickets_count }} {{ __('Passenger') }}
-                    @if($trip?->toCountry)
-                        &nbsp;·&nbsp;<i class="fas fa-globe"></i> {{ $trip->toCountry->name }}
+                    @php $trip = $booking->trip; $img = $trip?->images?->first(); @endphp
+                    @if($img)
+                        <img src="{{ asset('storage/' . $img->image_path) }}" class="order-trip-img" alt="">
+                    @else
+                        <div class="order-trip-img-placeholder"><i class="fas fa-map-marked-alt"></i></div>
                     @endif
-                </div>
+                    <div class="order-trip-name">{{ $trip?->title ?? __('Trip') }}</div>
+                    <div class="order-trip-meta">
+                        <i class="fas fa-users"></i> {{ $booking->tickets_count }} {{ __('Passenger') }}
+                        @if($trip?->toCountry)
+                            &nbsp;·&nbsp;<i class="fas fa-globe"></i> {{ $trip->toCountry->name }}
+                        @endif
+                    </div>
+                @endif
             </div>
 
             <div class="order-price-rows">
@@ -348,10 +364,21 @@
                     <span class="label">{{ __('Booking No') }}</span>
                     <span class="value">#{{ $booking->id }}</span>
                 </div>
-                <div class="order-price-row">
-                    <span class="label">{{ __('Passengers Count') }}</span>
-                    <span class="value">{{ $booking->tickets_count }}</span>
-                </div>
+                @if($isHotel)
+                    <div class="order-price-row">
+                        <span class="label">{{ __('Nights') }}</span>
+                        <span class="value">{{ $booking->nights_count }}</span>
+                    </div>
+                    <div class="order-price-row">
+                        <span class="label">{{ __('Guests') }}</span>
+                        <span class="value">{{ $booking->adults + $booking->children }}</span>
+                    </div>
+                @else
+                    <div class="order-price-row">
+                        <span class="label">{{ __('Passengers Count') }}</span>
+                        <span class="value">{{ $booking->tickets_count }} {{ __('Passenger') }}</span>
+                    </div>
+                @endif
             </div>
 
             <div class="order-total">
@@ -437,6 +464,39 @@ function submitPayment() {
             }
         })
         .catch(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-lock"></i> {{ __("Pay Now") }}';
+            alert('{{ __("Connection error, please try again.") }}');
+        });
+        return;
+    }
+
+    // For Hotel Bookings, use the specialized initiation API
+    if (@json($isHotel)) {
+        fetch('/api/payment/hotel/initiate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ 
+                hotel_booking_id: bookingId, 
+                payment_type: selectedMethod 
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error === false && data.data && data.data.payment_url) {
+                window.location.href = data.data.payment_url;
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> {{ __("Pay Now") }}';
+                alert(data.message || '{{ __("An error occurred, please try again.") }}');
+            }
+        })
+        .catch((err) => {
+            console.error('API Error:', err);
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-lock"></i> {{ __("Pay Now") }}';
             alert('{{ __("Connection error, please try again.") }}');

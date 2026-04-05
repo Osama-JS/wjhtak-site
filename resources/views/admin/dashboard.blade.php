@@ -151,7 +151,7 @@
                                     <p class="text-muted mb-0 small" style="font-size: 10px;">{{ \Illuminate\Support\Str::limit($user->email, 25) }}</p>
                                 </td>
                                 <td class="text-end pe-4 border-0 py-2">
-                                    <span class="badge badge-xs badge-outline-dark">{{ $user->created_at->format('M d') }}</span>
+                                  {{--<span class="badge badge-xs badge-outline-dark">{{ $user->created_at->format('d/m/Y') }}</span>--}}
                                 </td>
                             </tr>
                             @endforeach

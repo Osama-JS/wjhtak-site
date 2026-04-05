@@ -39,16 +39,32 @@ class CustomerPaymentController extends Controller
      */
     public function checkout($bookingId)
     {
-        $booking = TripBooking::with(['trip', 'user'])
+        // Try finding as TripBooking first, then HotelBooking
+        $booking = \App\Models\TripBooking::with(['trip', 'user'])
             ->where('user_id', Auth::id())
-            ->findOrFail($bookingId);
+            ->find($bookingId);
 
-        if ($booking->status !== 'pending' && $booking->status !== 'failed') {
+        $isHotel = false;
+        if (!$booking) {
+            $booking = \App\Models\HotelBooking::with(['guests', 'user'])
+                ->where('user_id', Auth::id())
+                ->findOrFail($bookingId);
+            $isHotel = true;
+        }
+
+        // Logic for trip booking status
+        if (!$isHotel && $booking->status !== 'pending' && $booking->status !== 'failed') {
             return redirect()->route('customer.bookings.show', $bookingId)
                 ->with('error', __('لا يمكن الدفع لهذا الحجز. قد يكون مدفوعاً بالفعل أو قيد المراجعة.'));
         }
 
-        return view('frontend.customer.payments.checkout', compact('booking'));
+        // Logic for hotel booking status
+        if ($isHotel && $booking->status !== \App\Models\HotelBooking::STATUS_DRAFT && $booking->status !== \App\Models\HotelBooking::STATUS_FAILED) {
+            // TODO: Redirect to hotel booking show page when implemented
+            return redirect()->back()->with('error', __('لا يمكن الدفع لهذا الحجز.'));
+        }
+
+        return view('frontend.customer.payments.checkout', compact('booking', 'isHotel'));
     }
 
     /**

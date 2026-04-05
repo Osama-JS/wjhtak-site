@@ -76,25 +76,32 @@
 </div>
 
 <!-- Add Banner Modal -->
-<div class="modal fade" id="addBannerModal">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ __('Add New Banner') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="addBannerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+            <!-- Header -->
+            <div class="modal-header bg-gradient-primary text-white border-0 rounded-top-4">
+                <h5 class="modal-title fw-bold">{{ __('Add New Banner') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="addBannerForm" enctype="multipart/form-data">
+
+            <!-- Form -->
+            <form id="addBannerForm" enctype="multipart/form-data" class="needs-validation" novalidate>
                 @csrf
-                <div class="modal-body">
-                    <div class="row">
+                <div class="modal-body py-5 px-5">
+
+                    <!-- Titles -->
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <x-forms.input-text name="title_ar" :label="__('Title (Arabic)')" />
+                            <x-forms.input-text name="title_ar" :label="__('Title (Arabic)')" required />
                         </div>
                         <div class="col-md-6">
-                            <x-forms.input-text name="title_en" :label="__('Title (English)')" />
+                            <x-forms.input-text name="title_en" :label="__('Title (English)')" required />
                         </div>
                     </div>
-                    <div class="row">
+
+                    <!-- Descriptions -->
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <x-forms.textarea name="description_ar" :label="__('Description (Arabic)')" rows="3" />
                         </div>
@@ -102,34 +109,49 @@
                             <x-forms.textarea name="description_en" :label="__('Description (English)')" rows="3" />
                         </div>
                     </div>
-                    <x-forms.file-upload name="image_path" :label="__('Banner Image')" accept="image/*"  />
-                    
-                    <div class="row">
+
+                    <!-- Image Upload with Preview -->
+                    <div class="mb-4">
+                        <x-forms.file-upload name="image_path" :label="__('Banner Image')" accept="image/*" required onchange="previewBannerImage(event)" />
+                        <div class="mt-3 d-flex justify-content-center">
+                            <img id="bannerPreview" src="#" alt="{{ __('Image Preview') }}" class="img-fluid shadow-sm rounded-3 d-none" style="max-height: 220px; object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <!-- Link and Trip -->
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <x-forms.input-text name="link" :label="__('Link URL')" placeholder="https://..." />
                         </div>
                         <div class="col-md-6">
-                             <label>{{ __('Trip')}}</label>
-                            <select  name="trip_id"  class="form-control" required>
+                            <label class="form-label fw-bold">{{ __('Trip') }}</label>
+                            <select name="trip_id" class="form-select" required>
+                                <option value="" disabled selected>{{ __('Select a Trip') }}</option>
                                 @foreach($trips as $trip)
-                                    <option value="{{ $trip->id }}">{{ $trip->title }}</option>
+                                    <option value="{{ $trip->id }}">{{ $trip->title_ar }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                   
-                    <div class="row">
+
+                    <!-- Sort Order and Active -->
+                    <div class="row g-3 mb-3 align-items-center">
                         <div class="col-md-6">
-                            <x-forms.input-text name="sort_order" :label="__('Display Order')" type="number" />
+                            <x-forms.input-text name="sort_order" :label="__('Display Order')" type="number" min="0" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 d-flex align-items-center justify-content-start mt-2 mt-md-0">
                             <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
                         </div>
                     </div>
+
+                    <!-- Feedback Message -->
+                    <div id="bannerFormMessage" class="alert d-none rounded-3 shadow-sm" role="alert"></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">{{ __('Close') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('Save Banner') }}</button>
+
+                <!-- Footer -->
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-danger rounded-pill px-4" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Save Banner') }}</button>
                 </div>
             </form>
         </div>

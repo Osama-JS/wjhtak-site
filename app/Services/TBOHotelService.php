@@ -116,6 +116,15 @@ class TBOHotelService
         }));
     }
 
+    /**
+     * Get TBO City List by Country Code.
+     */
+    public function getCityListByCountry(string $countryCode): array
+    {
+        $response = $this->post('CityList', ['CountryCode' => $countryCode]);
+        return $response['CityList'] ?? $response['CityListResult'] ?? $response ?? [];
+    }
+
     // =============================================
     // 2. Hotel Search
     // =============================================
@@ -368,6 +377,7 @@ class TBOHotelService
         return $response['BookingDetailResult'] ?? $response;
     }
 
+    
     // =============================================
     // 8. Cancel Booking
     // =============================================
@@ -401,5 +411,76 @@ class TBOHotelService
             'remarks'      => $response['CancelResult']['Remarks'] ?? null,
             'raw'          => $response,
         ];
+    }
+
+    // =============================================
+    // 9. Country List
+    // =============================================    
+
+    public function countryList(): array
+    {
+        return Cache::remember('tbo_country_list', 60*24, function () {
+            $response = $this->post('CountryList', []);
+            return $response['CountryList'] ?? [];
+        });
+    }
+
+    // =============================================
+    // 10. Booking Details Based on Date
+    // =============================================
+
+    /**
+     * Retrieve booking details made for requested date range.
+     * Maximum of 60 days booking details can be retrieved.
+     *
+     * @param string $fromDate Format: YYYY-MM-DD
+     * @param string $toDate   Format: YYYY-MM-DD
+     */
+    public function getBookingDetailsByDate(string $fromDate, string $toDate): array
+    {
+        $payload = [
+            'fromdate' => $fromDate,
+            'todate'   => $toDate,
+        ];
+
+        $response = $this->post('BookingDetailsbasedondate', $payload, 60);
+
+        return $response;
+    }
+
+    // =============================================
+    // 11. Hotel Code List (Bulk Hotel Data)
+    // =============================================
+
+    /**
+     * Fetch complete hotel details for a specific city.
+     * Optionally, get detailed info including description, amenities, images, etc.
+     * Cached per city for 24 hours to reduce API calls.
+     *
+     * @param string $cityCode Unique TBO City code
+     * @param bool $isDetailedResponse Whether to fetch full hotel details
+     * @return array
+     * @throws \Exception
+     */
+    public function getHotelCodeList(string $cityCode, bool $isDetailedResponse = true): array
+    {
+        $cityCode = strtoupper($cityCode);
+
+        return Cache::remember("tbo_hotel_list_{$cityCode}", 60 * 24, function () use ($cityCode, $isDetailedResponse) {
+            $payload = [
+                'CityCode'           => $cityCode,
+                'IsDetailedResponse' => $isDetailedResponse ? 'true' : 'false',
+            ];
+
+            $response = $this->post('TBOHotelCodeList', $payload, 120);
+
+            if (empty($response['Hotels'])) {
+                // قد لا تكون هناك فنادق أو فشل في الاستجابة
+                \Log::warning("TBOHotelService: No hotels found for city {$cityCode}");
+                return [];
+            }
+
+            return $response['Hotels'];
+        });
     }
 }

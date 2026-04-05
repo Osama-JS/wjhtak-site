@@ -53,7 +53,9 @@ Route::group(['prefix' => 'payments', 'as' => 'payments.web.'], function () {
             'payment_id' => $paymentId,
             'checkout_id' => $checkoutId,
             'status' => $request->status,
-            'source' => $request->source
+            'source' => $request->source,
+            'booking_type' => $request->booking_type,
+            'hotel_booking_id' => $request->hotel_booking_id
         ]);
     })->name('callback');
 });
@@ -96,15 +98,22 @@ Route::get('/faq', [FrontendController::class, 'faq'])->name('faq');
 // Search
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
 
-// Search Model
+// Hotels
+Route::get('/hotels', [App\Http\Controllers\HotelController::class, 'index'])->name('hotels.index');
+Route::get('/hotels/{hotelCode}', [App\Http\Controllers\HotelController::class, 'show'])->name('hotels.show');
+Route::get('/hotels/booking/create', [App\Http\Controllers\HotelBookingController::class, 'create'])->name('hotels.booking.create');
+Route::post('/hotels/booking/store', [App\Http\Controllers\HotelBookingController::class, 'store'])->name('hotels.booking.store')->middleware('auth');
+
+// Search Model (Ajax)
 Route::get('/searchModel', [FrontendController::class, 'searchModel'])->name('searchModel');
 
+Route::middleware(['auth'])->group(function () {
 
-Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 
 // Admin Routes - Protected by isAdmin middleware
 Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(function () {
@@ -267,11 +276,13 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     });
 
     // Hotel Bookings Management (TBO)
-    Route::prefix('hotel-bookings')->name('hotel-bookings.')->group(function () {
-        Route::get('/',         [App\Http\Controllers\Admin\HotelBookingController::class, 'index'])->name('index');
-        Route::get('/{id}',     [App\Http\Controllers\Admin\HotelBookingController::class, 'show'])->name('show');
-        Route::post('/{id}/cancel', [App\Http\Controllers\Admin\HotelBookingController::class, 'cancel'])->name('cancel');
-    });
+        Route::prefix('hotel-bookings')->name('hotel-bookings.')->group(function () {
+            Route::get('/',         [App\Http\Controllers\Admin\HotelBookingController::class, 'index'])->name('index');
+            Route::get('/remote',   [App\Http\Controllers\Admin\HotelBookingController::class, 'remoteBookings'])->name('remote');
+            Route::get('/{id}',     [App\Http\Controllers\Admin\HotelBookingController::class, 'show'])->name('show');
+            Route::post('/{id}/cancel', [App\Http\Controllers\Admin\HotelBookingController::class, 'cancel'])->name('cancel');
+            Route::delete('/{id}',      [App\Http\Controllers\Admin\HotelBookingController::class, 'destroy'])->name('destroy');
+        });
 
     // Bank Transfers Review
     Route::middleware('permission:view bank_transfers')->group(function() {
@@ -569,6 +580,11 @@ Route::middleware(['auth', 'isCustomer'])->prefix('customer')->name('customer.')
     Route::post('/bookings', [CustomerBookingController::class, 'store'])->name('bookings.store');
     Route::post('/bookings/{id}/cancel', [CustomerBookingController::class, 'cancel'])->name('bookings.cancel');
     Route::get('/bookings/{id}/invoice', [CustomerBookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+
+    // Hotel Bookings
+    Route::get('/hotel-bookings', [\App\Http\Controllers\HotelBookingController::class, 'index'])->name('hotel-bookings.index');
+    Route::get('/hotel-bookings/{id}', [\App\Http\Controllers\HotelBookingController::class, 'show'])->name('hotel-bookings.show');
+    Route::post('/hotel-bookings/{id}/cancel', [\App\Http\Controllers\HotelBookingController::class, 'cancel'])->name('hotel-bookings.cancel');
 
     // Favorites
     Route::get('/favorites', [\App\Http\Controllers\Customer\FavoriteController::class, 'index'])->name('favorites.index');
