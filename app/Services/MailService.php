@@ -15,24 +15,28 @@ class MailService
     /**
      * Send Verification OTP to user.
      */
-    public function sendVerificationOtp(User $user, int $otp): void
+    public function sendVerificationOtp(User $user, int $otp): bool
     {
         try {
             Mail::to($user->email)->send(new otpMail($otp));
+            return true;
         } catch (\Exception $e) {
             Log::error("Failed to send verification OTP to {$user->email}: " . $e->getMessage());
+            return false;
         }
     }
 
     /**
      * Send Password Reset OTP to user.
      */
-    public function sendPasswordResetOtp(User $user, int $otp): void
+    public function sendPasswordResetOtp(User $user, int $otp): bool
     {
         try {
             Mail::to($user->email)->send(new PasswordResetMail($otp));
+            return true;
         } catch (\Exception $e) {
             Log::error("Failed to send password reset OTP to {$user->email}: " . $e->getMessage());
+            return false;
         }
     }
 

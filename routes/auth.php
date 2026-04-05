@@ -17,12 +17,14 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::post('register', [RegisteredUserController::class, 'store'])
+        ->middleware('throttle:6,1');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:6,1');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
@@ -38,8 +40,8 @@ Route::middleware('guest')->group(function () {
 
     // OTP Verification
     Route::get('verify-otp', [OtpVerificationController::class, 'show'])->name('auth.verify-otp');
-    Route::post('verify-otp', [OtpVerificationController::class, 'verify']);
-    Route::post('resend-otp', [OtpVerificationController::class, 'resend'])->name('auth.resend-otp');
+    Route::post('verify-otp', [OtpVerificationController::class, 'verify'])->middleware('throttle:6,1');
+    Route::post('resend-otp', [OtpVerificationController::class, 'resend'])->name('auth.resend-otp')->middleware('throttle:6,1');
 
     // Password Reset OTP
     Route::get('forgot-password/verify', [OtpPasswordResetController::class, 'show'])->name('password.otp.verify');

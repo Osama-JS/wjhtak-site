@@ -88,107 +88,102 @@ window.deleteAllCookie = deleteAllCookie;
     var theme = getUrlParams("theme");
 
     /* Dz Theme Demo Settings  */
-
-    var dlabThemeSet0 = {
-        /* Default Theme */ typography: "poppins",
-        version: "light",
-        layout: "vertical",
-        primary: "color_1",
-        headerBg: "color_1",
-        navheaderBg: "color_1",
-        sidebarBg: "color_1",
-        sidebarStyle: "full",
-        sidebarPosition: "fixed",
-        headerPosition: "fixed",
-        containerLayout: "full",
-    };
-
-    var dlabThemeSet1 = {
-        typography: "poppins",
-        version: "light",
-        layout: "vertical",
-        primary: "color_3",
-        headerBg: "color_1",
-        navheaderBg: "color_3",
-        sidebarBg: "color_3",
-        sidebarStyle: "full",
-        sidebarPosition: "fixed",
-        headerPosition: "fixed",
-        containerLayout: "full",
-    };
-
-    var dlabThemeSet2 = {
-        typography: "poppins",
-        version: "light",
-        layout: "vertical",
-        primary: "color_2",
-        headerBg: "color_1",
-        navheaderBg: "color_2",
-        sidebarBg: "color_2",
-        sidebarStyle: "mini",
-        sidebarPosition: "fixed",
-        headerPosition: "fixed",
-        containerLayout: "full",
-    };
-
-    var dlabThemeSet3 = {
-        typography: "poppins",
-        version: "light",
-        layout: "vertical",
-        primary: "color_10",
-        headerBg: "color_10",
-        navheaderBg: "color_1",
-        sidebarBg: "color_1",
-        sidebarStyle: "compact",
-        sidebarPosition: "fixed",
-        headerPosition: "fixed",
-        containerLayout: "full",
-    };
-
-    var dlabThemeSet4 = {
-        typography: "poppins",
-        version: "light",
-        layout: "horizontal",
-        primary: "color_15",
-        headerBg: "color_1",
-        navheaderBg: "color_1",
-        sidebarBg: "color_15",
-        sidebarStyle: "full",
-        sidebarPosition: "fixed",
-        headerPosition: "fixed",
-        containerLayout: "full",
-    };
-
-    var dlabThemeSet5 = {
-        typography: "poppins",
-        version: "light",
-        layout: "horizontal",
-        primary: "color_9",
-        headerBg: "color_9",
-        navheaderBg: "color_9",
-        sidebarBg: "color_1",
-        sidebarStyle: "modern",
-        sidebarPosition: "fixed",
-        headerPosition: "fixed",
-        containerLayout: "full",
-    };
-    var dlabThemeSet6 = {
-        typography: "poppins",
-        version: "light",
-        layout: "vertical",
-        primary: "color_10",
-        headerBg: "color_1",
-        navheaderBg: "color_10",
-        sidebarBg: "color_1",
-        sidebarStyle: "modern",
-        sidebarPosition: "fixed",
-        headerPosition: "fixed",
-        containerLayout: "full",
+    var dlabThemeSets = {
+        0: {
+            /* Default Theme */ typography: "poppins",
+            version: "light",
+            layout: "vertical",
+            primary: "color_1",
+            headerBg: "color_1",
+            navheaderBg: "color_1",
+            sidebarBg: "color_1",
+            sidebarStyle: "full",
+            sidebarPosition: "fixed",
+            headerPosition: "fixed",
+            containerLayout: "full",
+        },
+        1: {
+            typography: "poppins",
+            version: "light",
+            layout: "vertical",
+            primary: "color_3",
+            headerBg: "color_1",
+            navheaderBg: "color_3",
+            sidebarBg: "color_3",
+            sidebarStyle: "full",
+            sidebarPosition: "fixed",
+            headerPosition: "fixed",
+            containerLayout: "full",
+        },
+        2: {
+            typography: "poppins",
+            version: "light",
+            layout: "vertical",
+            primary: "color_2",
+            headerBg: "color_1",
+            navheaderBg: "color_2",
+            sidebarBg: "color_2",
+            sidebarStyle: "mini",
+            sidebarPosition: "fixed",
+            headerPosition: "fixed",
+            containerLayout: "full",
+        },
+        3: {
+            typography: "poppins",
+            version: "light",
+            layout: "vertical",
+            primary: "color_10",
+            headerBg: "color_10",
+            navheaderBg: "color_1",
+            sidebarBg: "color_1",
+            sidebarStyle: "compact",
+            sidebarPosition: "fixed",
+            headerPosition: "fixed",
+            containerLayout: "full",
+        },
+        4: {
+            typography: "poppins",
+            version: "light",
+            layout: "horizontal",
+            primary: "color_15",
+            headerBg: "color_1",
+            navheaderBg: "color_1",
+            sidebarBg: "color_15",
+            sidebarStyle: "full",
+            sidebarPosition: "fixed",
+            headerPosition: "fixed",
+            containerLayout: "full",
+        },
+        5: {
+            typography: "poppins",
+            version: "light",
+            layout: "horizontal",
+            primary: "color_9",
+            headerBg: "color_9",
+            navheaderBg: "color_9",
+            sidebarBg: "color_1",
+            sidebarStyle: "modern",
+            sidebarPosition: "fixed",
+            headerPosition: "fixed",
+            containerLayout: "full",
+        },
+        6: {
+            typography: "poppins",
+            version: "light",
+            layout: "vertical",
+            primary: "color_10",
+            headerBg: "color_1",
+            navheaderBg: "color_10",
+            sidebarBg: "color_1",
+            sidebarStyle: "modern",
+            sidebarPosition: "fixed",
+            headerPosition: "fixed",
+            containerLayout: "full",
+        }
     };
 
     function themeChange(theme) {
-        var themeSettings = {};
-        themeSettings = eval("dlabThemeSet" + theme);
+        var themeSettings = dlabThemeSets[theme] || dlabThemeSets[0];
         dlabSettingsOptions = themeSettings; /* For Screen Resize */
         new dlabSettings(themeSettings);
 

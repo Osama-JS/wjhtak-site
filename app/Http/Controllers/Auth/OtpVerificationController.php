@@ -8,6 +8,8 @@ use App\Services\MailService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 
 class OtpVerificationController extends Controller
 {
@@ -70,6 +72,16 @@ class OtpVerificationController extends Controller
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
 
+        // Rate Limiting (Prevent resend spam)
+        $key = 'otp-resend:' . $request->ip() . ':' . $request->email;
+        if (RateLimiter::tooManyAttempts($key, 3)) { // 3 attempts per 5 mins
+            $seconds = RateLimiter::availableIn($key);
+            throw ValidationException::withMessages([
+                'email' => [__('محاولات كثيرة جداً. يرجى المحاولة بعد :seconds ثانية.', ['seconds' => $seconds])],
+            ]);
+        }
+        RateLimiter::hit($key, 300); // 5 minutes
+
         $user = User::where('email', $request->email)->first();
 
         if ($user->email_verified_at) {
@@ -81,9 +93,13 @@ class OtpVerificationController extends Controller
         $user->otp_expires_at = Carbon::now()->addMinutes(10);
         $user->save();
 
-        $this->mailService->sendVerificationOtp($user, $otp);
+        $sent = $this->mailService->sendVerificationOtp($user, $otp);
 
         $request->session()->put('unverified_email', $user->email);
+
+        if (!$sent) {
+            return back()->with('error', __('تعذر إرسال كود التحقق حالياً، يرجى المحاولة لاحقاً.'));
+        }
 
         return back()->with('success', __('تم إعادة إرسال كود التحقق إلى بريدك الإلكتروني.'));
     }
