@@ -182,6 +182,11 @@ window.deleteAllCookie = deleteAllCookie;
         }
     };
 
+    /* Export to global window object for legacy scripts */
+    Object.keys(dlabThemeSets).forEach(function (key) {
+        window["dlabThemeSet" + key] = dlabThemeSets[key];
+    });
+
     function themeChange(theme) {
         var themeSettings = dlabThemeSets[theme] || dlabThemeSets[0];
         dlabSettingsOptions = themeSettings; /* For Screen Resize */
