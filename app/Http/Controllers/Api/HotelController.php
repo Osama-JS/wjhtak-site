@@ -19,20 +19,13 @@ class HotelController extends Controller
 {
     use ApiResponseTrait;
 
-    // protected TBOHotelService $tboService;
-
-    // public function __construct(TBOHotelService $tboService)
-    // {
-    //     $this->tboService = $tboService;
-    // }
+    protected $tboService;
+    protected $markupService;
 
     public function __construct()
     {
-        if(env('APP_API_MODE') === 'mock') {
-            $this->tboService = new \App\Services\MockTBOHotelService();
-        } else {
-            $this->tboService = app(\App\Services\TBOHotelService::class);
-        }
+        $this->markupService = app(\App\Services\HotelMarkupService::class);
+        $this->tboService    = app(\App\Services\TBOHotelService::class);
     }
 
     
@@ -65,22 +58,37 @@ class HotelController extends Controller
             ),
         ]
     )]
+    /**
+     * Get available cities for hotel search.
+     */
     public function cities(Request $request)
     {
         try {
             $query = $request->get('q');
 
             if ($query && strlen($query) >= 2) {
-                $cities = $this->tboService->searchCities($query);
+                // Search in local TBO cities table (EN and AR)
+                $cities = \App\Models\TboCity::search($query)
+                    ->orderBy('name')
+                    ->limit(50)
+                    ->get();
             } else {
-                $cities = $this->tboService->getCityList();
-                // Limit to first 100 if no query
-                $cities = array_slice($cities, 0, 100);
+                // Return default list (first 100)
+                $cities = \App\Models\TboCity::orderBy('name')->limit(100)->get();
             }
 
-            return $this->apiResponse(false, __('Cities retrieved successfully.'), $cities);
+            $data = $cities->map(fn($city) => [
+                'CityCode'      => $city->city_code,
+                'CityName'      => $city->name,
+                'CityNameAr'    => $city->name_ar,
+                'CountryCode'   => $city->country_code,
+                'CountryName'   => $city->country_name,
+                'CountryNameAr' => $city->country_name_ar,
+            ]);
+
+            return $this->apiResponse(false, __('Cities retrieved successfully.'), $data);
         } catch (\Exception $e) {
-            Log::error('TBO Cities Error: ' . $e->getMessage());
+            Log::error('TBO Local Cities Error: ' . $e->getMessage());
             return $this->apiResponse(true, __('Failed to retrieve cities.'), null, null, 500);
         }
     }
@@ -166,10 +174,13 @@ class HotelController extends Controller
         try {
             $result = $this->tboService->searchHotels($request->all());
 
+            // Apply Markup
+            $hotelsWithMarkup = $this->markupService->applyMarkupToHotels($result['hotels']);
+
             return $this->apiResponse(false, __('Hotels found successfully.'), [
                 'session_id' => $result['session_id'],
-                'count'      => count($result['hotels']),
-                'hotels'     => $result['hotels'],
+                'count'      => count($hotelsWithMarkup),
+                'hotels'     => $hotelsWithMarkup,
             ]);
         } catch (\Exception $e) {
             Log::error('TBO Hotel Search Error: ' . $e->getMessage());
@@ -231,6 +242,11 @@ class HotelController extends Controller
 
         try {
             $result = $this->tboService->getRoomList($request->session_id, $hotelCode);
+
+            // Apply Markup
+            if (!empty($result['rooms'])) {
+                $result['rooms'] = $this->markupService->applyMarkupToRooms($result['rooms']);
+            }
 
             return $this->apiResponse(false, __('Room list retrieved successfully.'), $result);
         } catch (\Exception $e) {
@@ -303,6 +319,16 @@ class HotelController extends Controller
                 $request->room_index,
                 $request->rate_plan_code
             );
+
+            // Store the raw result in cache for the book step (expires in 30 mins)
+            if (isset($result['result_token'])) {
+                \Cache::put('tbo_prebook_' . $result['result_token'], $result, 60 * 30);
+            }
+
+            // Apply Markup to the pre-book result
+            if (isset($result['total_price'])) {
+                $result['total_price'] = $this->markupService->applyMarkup($result['total_price']);
+            }
 
             return $this->apiResponse(false, __('Room is available. Proceed to payment.'), $result);
         } catch (\Exception $e) {
@@ -417,6 +443,9 @@ class HotelController extends Controller
             $checkIn = Carbon::parse($request->check_in);
             $checkOut = Carbon::parse($request->check_out);
 
+            // Retrieve raw pre-book data from cache
+            $rawPrebook = \Cache::get('tbo_prebook_' . $request->result_token);
+
             // Create draft booking
             $booking = HotelBooking::create([
                 'user_id'        => $user->id,
@@ -442,6 +471,7 @@ class HotelController extends Controller
                 'status'         => HotelBooking::STATUS_DRAFT,
                 'booking_state'  => HotelBooking::STATE_AWAITING_PAYMENT,
                 'notes'          => $request->notes,
+                'tbo_raw_prebook'=> $rawPrebook['raw'] ?? $rawPrebook,
             ]);
 
             // Save guests

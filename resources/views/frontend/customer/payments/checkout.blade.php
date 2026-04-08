@@ -276,6 +276,19 @@
                             </label>
                         </div>
 
+                        {{-- Tap / Apple Pay --}}
+                        <div class="payment-method-option">
+                            <input type="radio" name="method" id="m_tap" value="tap" onchange="setMethod('tap')">
+                            <label for="m_tap" class="payment-method-label">
+                                <div style="display:flex; gap:8px;">
+                                    <img src="{{ asset('assets/img/payments/apple_pay.svg') }}" alt="Apple Pay" style="height:25px;">
+                                    <img src="{{ asset('assets/img/payments/tap.png') }}" alt="Tap Payments" style="height:25px;">
+                                </div>
+                                <span class="method-name">Tap / Apple Pay</span>
+                                <span class="method-desc">{{ __('Instant Payment') }}</span>
+                            </label>
+                        </div>
+
                         {{-- Bank Transfer --}}
                         <div class="payment-method-option">
                             <input type="radio" name="method" id="m_bank_transfer" value="bank_transfer" onchange="setMethod('bank_transfer')">
@@ -504,8 +517,8 @@ function submitPayment() {
         return;
     }
 
-    // For redirect-based methods (Tamara)
-    if (['tamara'].includes(selectedMethod)) {
+    // For redirect-based methods (Tamara / Tap)
+    if (['tamara', 'tap'].includes(selectedMethod)) {
         fetch('{{ route("payments.web.initiate") }}', {
             method: 'POST',
             headers: {

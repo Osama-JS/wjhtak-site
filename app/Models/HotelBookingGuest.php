@@ -44,22 +44,16 @@ class HotelBookingGuest extends Model
      */
     public function toTboFormat(): array
     {
-        $data = [
-            'Title'     => $this->title,
-            'FirstName' => $this->first_name,
-            'LastName'  => $this->last_name,
+        return [
+            'id'               => $this->id,
+            'title'            => $this->title,
+            'first_name'       => $this->first_name,
+            'last_name'        => $this->last_name,
+            'type'             => $this->type,
+            'nationality'      => $this->nationality,
+            'passport_number'  => $this->passport_number,
+            'passport_expiry'  => $this->passport_expiry?->format('Y-m-d'),
+            'dob'              => $this->dob?->format('Y-m-d'),
         ];
-
-        if ($this->passport_number) {
-            $data['PassportNo']         = $this->passport_number;
-            $data['PassportExpiry']     = $this->passport_expiry?->format('Y-m-d');
-            $data['Nationality']        = $this->nationality;
-        }
-
-        if ($this->dob) {
-            $data['DateOfBirth'] = $this->dob->format('Y-m-d');
-        }
-
-        return $data;
     }
 }

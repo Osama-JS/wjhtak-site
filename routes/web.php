@@ -36,28 +36,7 @@ Route::group(['prefix' => 'payments', 'as' => 'payments.web.'], function () {
     Route::get('/failure', [PaymentWebController::class, 'failure'])->name('failure');
 
     // Specialized callback that triggers verification then redirects to success/failure
-    Route::get('/callback/{payment_type}', function (Illuminate\Http\Request $request, $payment_type) {
-        $paymentId = $request->payment_id ?? $request->orderId ?? $request->id;
-        $checkoutId = $request->id; // For HyperPay
-
-        // We'll redirect to success or failure based on basic query params for now,
-        // but ideally we verify here. For the WebView flow, we'll let the success/failure
-        // pages handle the verification or use this intermediate route.
-        if ($request->status === 'cancel') {
-             return redirect()->route('payments.web.failure', ['error' => __('Payment cancelled by user.')]);
-        }
-
-        // Return a processing page that will then call the verify logic
-        return view('payments.callback_processing', [
-            'payment_type' => $payment_type,
-            'payment_id' => $paymentId,
-            'checkout_id' => $checkoutId,
-            'status' => $request->status,
-            'source' => $request->source,
-            'booking_type' => $request->booking_type,
-            'hotel_booking_id' => $request->hotel_booking_id
-        ]);
-    })->name('callback');
+    Route::get('/callback/{payment_type}', [PaymentWebController::class, 'callback'])->name('callback');
 });
 
 // =============================================================================

@@ -190,7 +190,10 @@ class SubscriberController extends Controller
     public function verify($id)
     {
         $user = User::findOrFail($id);
-        $user->update(['phone_verified_at' => now()]);
+        $user->update([
+            'phone_verified_at' => now(),
+            'email_verified_at' => now(),
+        ]);
 
         return response()->json([
             'success' => true,

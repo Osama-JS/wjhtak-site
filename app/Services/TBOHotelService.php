@@ -24,9 +24,9 @@ class TBOHotelService
         $this->baseUrl    = rtrim(config('services.tbo.base_url', 'https://api.tbotechnology.in/HotelAPI_V5/'), '/');
         $this->access     = config('services.tbo.access', 'Test');
 
-        // Validate that essential keys are present
-        if (empty($this->clientId) || empty($this->username) || empty($this->password) || empty($this->clientCode)) {
-            Log::error('TBO API: Missing credentials in .env. Please ensure TBO_CLIENT_ID, TBO_USERNAME, TBO_PASSWORD, and TBO_CLIENT_CODE are set.');
+        // Validate that essential keys are present for Basic Auth
+        if (empty($this->username) || empty($this->password)) {
+            Log::error('TBO API: Missing Basic Auth credentials in .env. Please ensure TBO_USERNAME and TBO_PASSWORD are set.');
         }
     }
 
@@ -40,10 +40,6 @@ class TBOHotelService
     protected function credentials(): array
     {
         return [
-            'ClientId'     => $this->clientId,
-            'UserName'     => $this->username,
-            'Password'     => $this->password,
-            'ClientCode'   => $this->clientCode,
             'EndUserIp'    => (request()->ip() && request()->ip() !== '::1') ? request()->ip() : '172.16.10.10',
         ];
     }
@@ -60,6 +56,7 @@ class TBOHotelService
 
         try {
             $response = Http::timeout($timeout)
+                ->withBasicAuth($this->username, $this->password)
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post($url, $body);
 
@@ -186,7 +183,7 @@ class TBOHotelService
             $payload['HotelCodes'] = $criteria['hotel_code'];
         }
 
-        $response = $this->post('Search', $payload, 90);
+        $response = $this->post('search', $payload, 90);
 
         return [
             'session_id' => $response['HotelSearchResult']['HotelResults'][0]['SessionId']
@@ -207,7 +204,7 @@ class TBOHotelService
     public function getHotelInfo(string $hotelCode): array
     {
         return Cache::remember("tbo_hotel_{$hotelCode}", 60 * 24, function () use ($hotelCode) {
-            $response = $this->post('TBOHotelDetails', [
+            $response = $this->post('Hoteldetails', [
                 'HotelCodes' => $hotelCode,
                 'Language'   => 'en',
             ]);
@@ -482,5 +479,49 @@ class TBOHotelService
 
             return $response['Hotels'];
         });
+    }
+
+    // =============================================
+    // 12. Account Details (Agency Balance)
+    // =============================================
+
+    /**
+     * Get the current agency balance with TBO.
+     * Useful for pre-booking checks.
+     *
+     * @return array
+     */
+    public function getAgencyBalance(): array
+    {
+        $response = $this->post('AccountDetails', []);
+
+        return [
+            'balance'         => $response['AccountDetails']['Balance'] ?? 0,
+            'credit_limit'    => $response['AccountDetails']['CreditLimit'] ?? 0,
+            'currency'        => $response['AccountDetails']['Currency'] ?? 'SAR',
+            'agency_name'     => $response['AccountDetails']['AgencyName'] ?? null,
+            'raw'             => $response,
+        ];
+    }
+
+    // =============================================
+    // 13. Amendment (Modify Booking)
+    // =============================================
+
+    /**
+     * Request an amendment for a booking (e.g. change dates/rooms).
+     * This is a structural placeholder as amendments often require specific manual approval or complex logic.
+     *
+     * @param string $tboBookingId
+     * @param array $amendmentData
+     */
+    public function amendBooking(string $tboBookingId, array $amendmentData): array
+    {
+        $payload = array_merge(['BookingId' => $tboBookingId], $amendmentData);
+
+        // TBO uses 'Amendment' endpoint for both dates and guest changes
+        $response = $this->post('Amendment', $payload, 60);
+
+        return $response;
     }
 }

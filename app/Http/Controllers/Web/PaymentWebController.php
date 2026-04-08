@@ -107,7 +107,7 @@ class PaymentWebController extends Controller
             } else {
                 $booking = TripBooking::with(['trip', 'user'])->findOrFail($request->booking_id);
             }
-            $method = $request->method;
+            $method = $request->input('method');
             $user = $booking->user;
 
             if ($method === 'tabby') {
@@ -326,6 +326,32 @@ class PaymentWebController extends Controller
         return view('payments.failure', [
             'error' => $request->error ?? __('Payment failed or was cancelled.'),
             'source' => $request->source
+        ]);
+    }
+
+    /**
+     * Unified callback handler that redirects to the processing view
+     */
+    public function callback(Request $request, $payment_type)
+    {
+        $paymentId = $request->payment_id ?? $request->orderId ?? $request->tap_id ?? $request->id;
+        $checkoutId = $request->id; // For HyperPay
+
+        if ($request->status === 'cancel') {
+             return redirect()->route('payments.web.failure', [
+                 'error' => __('Payment cancelled by user.'),
+                 'source' => $request->source
+             ]);
+        }
+
+        return view('payments.callback_processing', [
+            'payment_type' => $payment_type,
+            'payment_id' => $paymentId,
+            'checkout_id' => $checkoutId,
+            'status' => $request->status,
+            'source' => $request->source,
+            'booking_type' => $request->get('booking_type', 'trip'),
+            'hotel_booking_id' => $request->hotel_booking_id
         ]);
     }
 }

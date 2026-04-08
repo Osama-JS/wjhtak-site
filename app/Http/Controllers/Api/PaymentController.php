@@ -105,6 +105,12 @@ class PaymentController extends Controller
                 'icon' => asset('assets/img/payments/tamara.png')
             ],
             [
+                'key' => 'tap',
+                'name' => __('Tap Payments / Apple Pay'),
+                'type' => 'redirect',
+                'icon' => asset('assets/img/payments/tap.png')
+            ],
+            [
                 'key' => 'bank_transfer',
                 'name' => __('Bank Transfer'),
                 'type' => 'manual',
@@ -156,7 +162,7 @@ class PaymentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'booking_id' => 'required|exists:trip_bookings,id',
-            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,stc_pay,tamara',
+            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,stc_pay,tamara,tabby,tap',
         ]);
 
         if ($validator->fails()) {
@@ -854,7 +860,7 @@ class PaymentController extends Controller
                 required: ['hotel_booking_id', 'payment_type'],
                 properties: [
                     new OA\Property(property: 'hotel_booking_id', type: 'integer', description: 'ID from /api/hotels/book'),
-                    new OA\Property(property: 'payment_type', type: 'string', enum: ['mada', 'visa_master', 'apple_pay', 'tamara', 'tabby'], example: 'visa_master'),
+                    new OA\Property(property: 'payment_type', type: 'string', enum: ['mada', 'visa_master', 'apple_pay', 'tamara', 'tabby', 'tap'], example: 'visa_master'),
                 ]
             )
         ),
@@ -876,7 +882,7 @@ class PaymentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'hotel_booking_id' => 'required|integer|exists:hotel_bookings,id',
-            'payment_type'     => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby',
+            'payment_type'     => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby,tap',
         ]);
 
         if ($validator->fails()) {
@@ -933,9 +939,9 @@ class PaymentController extends Controller
                 required: ['hotel_booking_id', 'payment_type'],
                 properties: [
                     new OA\Property(property: 'hotel_booking_id', type: 'integer'),
-                    new OA\Property(property: 'payment_type', type: 'string', enum: ['mada', 'visa_master', 'apple_pay', 'tamara', 'tabby']),
+                    new OA\Property(property: 'payment_type', type: 'string', enum: ['mada', 'visa_master', 'apple_pay', 'tamara', 'tabby', 'tap']),
                     new OA\Property(property: 'checkout_id', type: 'string', nullable: true, description: 'Required for HyperPay (mada, visa_master, apple_pay)'),
-                    new OA\Property(property: 'payment_id',  type: 'string', nullable: true, description: 'Required for Tabby / Tamara'),
+                    new OA\Property(property: 'payment_id',  type: 'string', nullable: true, description: 'Required for Tabby / Tamara / Tap'),
                 ]
             )
         ),
@@ -960,9 +966,9 @@ class PaymentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'hotel_booking_id' => 'required|integer|exists:hotel_bookings,id',
-            'payment_type'     => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby',
+            'payment_type'     => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby,tap',
             'checkout_id'      => 'required_if:payment_type,mada,visa_master,apple_pay|nullable|string',
-            'payment_id'       => 'required_if:payment_type,tamara,tabby|nullable|string',
+            'payment_id'       => 'required_if:payment_type,tamara,tabby,tap|nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -1008,6 +1014,18 @@ class PaymentController extends Controller
                 $paymentVerified = in_array($status, ['authorised', 'fully_captured']);
                 $gatewayResponse = $result;
                 $transactionId   = $id;
+            } elseif ($type === 'tap') {
+                $result = $this->tapService->verifyPayment($id);
+                $status = strtoupper($result['status'] ?? '');
+                $paymentVerified = in_array($status, ['CAPTURED', 'AUTHORIZED']);
+                $gatewayResponse = $result;
+                $transactionId   = $id;
+            } elseif ($type === 'tap') {
+                $result = $this->tapService->verifyPayment($id);
+                $status = strtoupper($result['status'] ?? '');
+                $paymentVerified = in_array($status, ['CAPTURED', 'AUTHORIZED']);
+                $gatewayResponse = $result;
+                $transactionId   = $id;
             }
 
             if (!$paymentVerified) {
@@ -1026,6 +1044,23 @@ class PaymentController extends Controller
 
             // ---- Step 2: Confirm booking with TBO ----
             DB::beginTransaction();
+
+            // Pre-flight check: Agency Balance
+            try {
+                $agencyInfo = $this->tboHotelService->getAgencyBalance();
+                $netPrice   = $booking->tbo_raw_prebook['Price']['Total'] ?? ($booking->total_price * 0.9); // Fallback to 90% if missing, though it should be there
+
+                if ($agencyInfo['balance'] < $netPrice) {
+                    Log::critical("TBO Booking Failed: Insufficient Agency Balance. Available: {$agencyInfo['balance']}, Net Price Required: {$netPrice}");
+                    throw new \Exception(__('Insufficient agency credit balance to complete this booking. Please contact support.'));
+                }
+            } catch (\Exception $balanceEx) {
+                Log::error("Agency Balance Check Failed: " . $balanceEx->getMessage());
+                // In test mode we might want to continue, but in production we should stop
+                if (config('app.env') === 'production') {
+                    throw $balanceEx;
+                }
+            }
 
             $guests = $booking->guests->map->toTboFormat()->toArray();
             $lead   = $booking->guests->firstWhere('type', 'adult') ?? $booking->guests->first();
@@ -1110,8 +1145,8 @@ class PaymentController extends Controller
                     __('Hotel Booking Confirmed'),
                     __('Your hotel booking at ":hotel" (:checkin - :checkout) has been confirmed. TBO Ref: :ref', [
                         'hotel'   => $booking->hotel_name,
-                        'checkin' => $booking->check_in_date->format('Y-m-d'),
-                        'checkout'=> $booking->check_out_date->format('Y-m-d'),
+                        'checkin' => \Carbon\Carbon::parse($booking->check_in_date)->format('Y-m-d'),
+                        'checkout'=> \Carbon\Carbon::parse($booking->check_out_date)->format('Y-m-d'),
                         'ref'     => $tboResult['tbo_booking_id'],
                     ]),
                     [
