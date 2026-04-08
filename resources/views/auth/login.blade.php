@@ -4,194 +4,202 @@
 
 @push('styles')
 <style>
-/* ─── Auth Page Styles ─── */
-.auth-page-wrapper {
+/* ─── Premium Auth Redesign ─── */
+.auth-split-wrapper {
     min-height: 100vh;
+    display: flex;
+    font-family: 'Tajawal', sans-serif !important;
+    overflow: hidden;
+    padding-top: 70px;
+}
+
+.auth-split-wrapper * {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+/* ─── Illustration Panel ─── */
+.auth-illustration-panel {
+    flex: 0 0 42%;
+    background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 40%, #0e7490 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 40px;
+}
+
+.auth-illustration-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 80%, rgba(14,116,144,.4) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(232,83,46,.15) 0%, transparent 50%);
+    z-index: 1;
+}
+
+.illustration-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 380px;
+}
+
+.illustration-content img {
+    width: 280px;
+    height: auto;
+    margin-bottom: 32px;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,.3));
+    animation: floatImage 6s ease-in-out infinite;
+}
+
+@keyframes floatImage {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+.illustration-content h3 {
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.illustration-content p {
+    color: rgba(255,255,255,.7);
+    font-size: .95rem;
+    line-height: 1.8;
+}
+
+/* ─── Form Panel ─── */
+.auth-form-panel {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 80px var(--space-4);
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    font-family: 'Tajawal', sans-serif !important;
+    padding: 40px;
+    background: #f8fafc;
 }
 
-.auth-card * {
-    font-family: 'Tajawal', sans-serif !important;
-}
-
-.auth-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.12);
+.auth-form-container {
     width: 100%;
     max-width: 460px;
-    padding: var(--space-10) var(--space-8);
-    animation: fadeInUp .4s ease;
+    animation: formSlideIn .5s ease;
 }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+@keyframes formSlideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
-.auth-card .auth-logo {
-    text-align: center;
-    margin-bottom: var(--space-6);
+.auth-form-header {
+    margin-bottom: 32px;
 }
 
-.auth-card .auth-logo img {
-    height: 60px;
-    object-fit: contain;
+.auth-form-header h2 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 8px;
 }
 
-.auth-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    text-align: center;
-    color: var(--text-primary, #1a2537);
-    margin-bottom: .3rem;
+.auth-form-header p {
+    color: #64748b;
+    font-size: .95rem;
 }
 
-.auth-subtitle {
-    text-align: center;
-    color: var(--text-muted, #6b7280);
-    font-size: .9rem;
-    margin-bottom: var(--space-6);
+/* ─── Input styles ─── */
+.auth-field {
+    margin-bottom: 20px;
 }
 
-.auth-input-group {
-    margin-bottom: var(--space-4);
-}
-
-.auth-input-group label {
+.auth-field label {
     display: block;
     font-weight: 600;
-    font-size: .85rem;
-    margin-bottom: .4rem;
-    color: var(--text-secondary, #374151);
+    font-size: .88rem;
+    margin-bottom: 8px;
+    color: #334155;
 }
 
-.auth-input-group .input-wrap {
+.input-box {
     position: relative;
 }
 
-.auth-input-group .input-wrap i.field-icon {
+.input-box .field-icon {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: #94a3b8;
     font-size: .9rem;
+    z-index: 2;
 }
 
-html[dir="ltr"] .auth-input-group .input-wrap i.field-icon { left: 14px; }
-html[dir="rtl"] .auth-input-group .input-wrap i.field-icon { right: 14px; }
+html[dir="ltr"] .input-box .field-icon { left: 14px; }
+html[dir="rtl"] .input-box .field-icon { right: 14px; }
 
-.auth-input-group input {
+.auth-field input {
     width: 100%;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 11px 16px 11px 42px;
-    font-size: .9rem;
-    outline: none;
-    transition: border .2s;
-    background: #fafafa;
-}
-
-html[dir="rtl"] .auth-input-group input { padding: 11px 42px 11px 16px; }
-
-.auth-input-group input:focus {
-    border-color: var(--accent-color, #e8532e);
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 16px 14px 44px;
+    font-size: .95rem;
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(232,83,46,.1);
+    outline: none;
+    transition: all .25s ease;
 }
 
-.auth-input-group .error-msg {
-    color: #ef4444;
-    font-size: .8rem;
-    margin-top: .3rem;
+html[dir="rtl"] .auth-field input { padding: 14px 44px 14px 16px; }
+
+.auth-field input:focus {
+    border-color: #0e7490;
+    box-shadow: 0 0 0 4px rgba(14,116,144,.08);
 }
 
 .auth-form-options {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--space-5);
-    font-size: .85rem;
+    margin-bottom: 24px;
+    font-size: .9rem;
 }
 
 .auth-form-options label {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     cursor: pointer;
-    color: var(--text-secondary, #374151);
+    color: #64748b;
 }
 
 .auth-form-options a {
-    color: var(--accent-color, #e8532e);
-    text-decoration: none;
+    color: #0e7490;
     font-weight: 600;
+    text-decoration: none;
 }
 
-.auth-form-options a:hover { text-decoration: underline; }
-
+/* ─── Submit button ─── */
 .btn-auth-submit {
     width: 100%;
-    padding: 13px;
-    background: var(--accent-color, #e8532e);
+    padding: 14px;
+    background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
     color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background .2s, transform .1s;
-    letter-spacing: .02em;
+    transition: all .3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-.btn-auth-submit:hover { background: #d04525; }
-.btn-auth-submit:active { transform: scale(.99); }
-.btn-auth-submit:disabled { opacity: .7; cursor: not-allowed; }
-
-.auth-footer-link {
-    text-align: center;
-    margin-top: var(--space-5);
-    font-size: .9rem;
-    color: var(--text-muted, #6b7280);
-}
-
-.auth-footer-link a {
-    color: var(--accent-color, #e8532e);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.auth-footer-link a:hover { text-decoration: underline; }
-
-.alert-auth {
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-bottom: var(--space-4);
-    font-size: .88rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.alert-auth-success {
-    background: #f0fdf4;
-    border: 1px solid #86efac;
-    color: #166534;
-}
-
-.alert-auth-error {
-    background: #fef2f2;
-    border: 1px solid #fca5a5;
-    color: #b91c1c;
+.btn-auth-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(14,116,144,.3);
 }
 
 .btn-toggle-pwd {
@@ -201,95 +209,131 @@ html[dir="rtl"] .auth-input-group input { padding: 11px 42px 11px 16px; }
     background: none;
     border: none;
     cursor: pointer;
-    color: #9ca3af;
-    padding: 0 12px;
+    color: #94a3b8;
+    padding: 0 14px;
 }
 
 html[dir="ltr"] .btn-toggle-pwd { right: 0; }
 html[dir="rtl"] .btn-toggle-pwd { left: 0; }
+
+.auth-form-footer {
+    text-align: center;
+    margin-top: 32px;
+    font-size: .95rem;
+    color: #64748b;
+}
+
+.auth-form-footer a {
+    color: #0e7490;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.auth-alert {
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: .9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-alert-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.auth-alert-success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+@media (max-width: 992px) {
+    .auth-illustration-panel { display: none; }
+    .auth-form-panel { padding: 24px 20px; }
+}
 </style>
 @endpush
 
 @section('content')
-<div class="auth-page-wrapper">
-    <div class="auth-card">
+<div class="auth-split-wrapper">
 
-        {{-- Logo --}}
-        <div class="auth-logo">
-            <a href="{{ url('/') }}">
-                <img src="{{ asset(\App\Models\Setting::get('site_logo', 'images/logo-full.png')) }}" alt="{{ config('app.name') }}">
-            </a>
+    {{-- Left Illustration Panel --}}
+    <div class="auth-illustration-panel">
+        <div class="illustration-content">
+            <img src="{{ asset('images/auth-travel-illustration.png') }}" alt="Travel">
+            <h3>{{ __('مرحباً بعودتك!') }}</h3>
+            <p>{{ __('سجل دخولك لتتمكن من متابعة حجوزاتك والحصول على أفضل عروض السفر الحصرية') }}</p>
         </div>
+    </div>
 
-        <h2 class="auth-title">{{ __('مرحباً بك') }}</h2>
-        <p class="auth-subtitle">{{ __('سجّل دخولك لعرض حجوزاتك ومفضلاتك') }}</p>
+    {{-- Right Form Panel --}}
+    <div class="auth-form-panel">
+        <div class="auth-form-container">
 
-        {{-- Status Messages --}}
-        @if (session('status'))
-            <div class="alert-auth alert-auth-success">
-                <i class="fas fa-check-circle"></i>
-                {{ session('status') }}
+            <div class="auth-form-header">
+                <h2>{{ __('تسجيل الدخول') }}</h2>
+                <p>{{ __('أدخل بياناتك للمتابعة إلى حسابك') }}</p>
             </div>
-        @endif
 
-        @if ($errors->any())
-            <div class="alert-auth alert-auth-error">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ $errors->first() }}
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('login') }}" id="loginForm">
-            @csrf
-
-            {{-- Email --}}
-            <div class="auth-input-group">
-                <label for="email">{{ __('البريد الإلكتروني') }}</label>
-                <div class="input-wrap">
-                    <i class="fas fa-envelope field-icon"></i>
-                    <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus placeholder="name@example.com">
+            {{-- Alerts --}}
+            @if (session('status'))
+                <div class="auth-alert auth-alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('status') }}
                 </div>
-                @error('email')
-                    <div class="error-msg">{{ $message }}</div>
-                @enderror
-            </div>
+            @endif
 
-            {{-- Password --}}
-            <div class="auth-input-group">
-                <label for="password">{{ __('كلمة المرور') }}</label>
-                <div class="input-wrap">
-                    <i class="fas fa-lock field-icon"></i>
-                    <input type="password" id="password" name="password" required placeholder="••••••••">
-                    <button type="button" class="btn-toggle-pwd" onclick="togglePwd()" id="toggleEye">
-                        <i class="fas fa-eye" id="eyeIcon"></i>
-                    </button>
+            @if ($errors->any())
+                <div class="auth-alert auth-alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ $errors->first() }}
                 </div>
-                @error('password')
-                    <div class="error-msg">{{ $message }}</div>
-                @enderror
-            </div>
+            @endif
 
-            {{-- Options --}}
-            <div class="auth-form-options">
-                <label>
-                    <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                    {{ __('تذكرني') }}
-                </label>
-                @if (Route::has('password.request'))
+            <form method="POST" action="{{ route('login') }}" id="loginForm">
+                @csrf
+
+                <div class="auth-field">
+                    <label for="email">{{ __('البريد الإلكتروني') }}</label>
+                    <div class="input-box">
+                        <i class="fas fa-envelope field-icon"></i>
+                        <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus placeholder="name@example.com">
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="password">{{ __('كلمة المرور') }}</label>
+                    <div class="input-box">
+                        <i class="fas fa-lock field-icon"></i>
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                        <button type="button" class="btn-toggle-pwd" onclick="togglePwd()" id="toggleEye">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-form-options">
+                    <label>
+                        <input type="checkbox" name="remember">
+                        {{ __('تذكرني') }}
+                    </label>
                     <a href="{{ route('password.request') }}">{{ __('نسيت كلمة المرور؟') }}</a>
-                @endif
+                </div>
+
+                <button type="submit" class="btn-auth-submit" id="submitBtn">
+                    <span>{{ __('تسجيل الدخول') }}</span>
+                    <i class="fas fa-sign-in-alt"></i>
+                </button>
+            </form>
+
+            <div class="auth-form-footer">
+                {{ __('ليس لديك حساب؟') }}
+                <a href="{{ route('register') }}">{{ __('أنشئ حساباً مجاناً') }}</a>
             </div>
-
-            {{-- Submit --}}
-            <button type="submit" class="btn-auth-submit" id="submitBtn">
-                <span>{{ __('تسجيل الدخول') }}</span>
-                <i class="fas fa-sign-in-alt"></i>
-            </button>
-        </form>
-
-        <div class="auth-footer-link">
-            {{ __('ليس لديك حساب؟') }}
-            <a href="{{ route('register') }}">{{ __('أنشئ حساباً مجاناً') }}</a>
         </div>
     </div>
 </div>
