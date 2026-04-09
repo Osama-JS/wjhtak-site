@@ -87,12 +87,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Payment Routes
     Route::prefix('payment')->group(function () {
         Route::post('/initiate', [PaymentController::class, 'initiate']);
-        Route::post('/verify', [PaymentController::class, 'verify']);
         Route::post('/bank-transfer', [PaymentController::class, 'submitBankTransfer']);
 
         // Hotel Payment Routes
         Route::post('/hotel/initiate', [PaymentController::class, 'initiateHotel']);
-        Route::post('/hotel/verify', [PaymentController::class, 'verifyHotel']);
     });
 
     // Protected Hotel Routes (Booking related)
@@ -110,3 +108,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // Payment Routes (public — no auth required)
 Route::get('/payment/methods', [PaymentController::class, 'methods']);
 Route::get('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');
+Route::post('/payment/verify', [PaymentController::class, 'verify']);
+Route::post('/payment/hotel/verify', [PaymentController::class, 'verifyHotel']);
