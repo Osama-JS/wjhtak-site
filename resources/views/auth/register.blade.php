@@ -479,39 +479,6 @@ html[dir="rtl"] .auth-field input {
 @section('content')
 <div class="auth-split-wrapper">
 
-    {{-- Left Illustration Panel --}}
-    <div class="auth-illustration-panel">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-
-        <div class="illustration-content">
-            <img src="{{ asset('images/auth-travel-illustration.png') }}" alt="Travel">
-
-            <h3>{{ __('رحلتك تبدأ من هنا') }}</h3>
-            <p>{{ __('انضم إلى آلاف المسافرين واستمتع بأفضل العروض والخدمات السياحية') }}</p>
-
-            <ul class="illustration-features">
-                <li>
-                    <i class="fas fa-check"></i>
-                    {{ __('حجز فنادق بأسعار حصرية') }}
-                </li>
-                <li>
-                    <i class="fas fa-check"></i>
-                    {{ __('رحلات سياحية متنوعة') }}
-                </li>
-                <li>
-                    <i class="fas fa-check"></i>
-                    {{ __('دعم على مدار الساعة') }}
-                </li>
-                <li>
-                    <i class="fas fa-check"></i>
-                    {{ __('ضمان أفضل سعر') }}
-                </li>
-            </ul>
-        </div>
-    </div>
 
     {{-- Right Form Panel --}}
     <div class="auth-form-panel">

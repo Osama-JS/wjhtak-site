@@ -261,14 +261,6 @@ html[dir="rtl"] .btn-toggle-pwd { left: 0; }
 @section('content')
 <div class="auth-split-wrapper">
 
-    {{-- Left Illustration Panel --}}
-    <div class="auth-illustration-panel">
-        <div class="illustration-content">
-            <img src="{{ asset('images/auth-travel-illustration.png') }}" alt="Travel">
-            <h3>{{ __('مرحباً بعودتك!') }}</h3>
-            <p>{{ __('سجل دخولك لتتمكن من متابعة حجوزاتك والحصول على أفضل عروض السفر الحصرية') }}</p>
-        </div>
-    </div>
 
     {{-- Right Form Panel --}}
     <div class="auth-form-panel">
