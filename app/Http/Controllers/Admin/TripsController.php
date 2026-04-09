@@ -23,7 +23,7 @@ class TripsController extends Controller
     {
         $trips = Trip::all();
         $companies = Company::all();
-        
+
         app(LocationService::class)->syncLocationsFromApi();
 
         $countries = Country::all();
@@ -37,7 +37,7 @@ class TripsController extends Controller
             'expired' => Trip::where('expiry_date', '<', now()->toDateString())->count(),
         ];
 
-        return view('admin.trips.index', compact('companies', 'countries', 'trips', 'stats','cities', 'categories'));
+        return view('admin.trips.index', compact('companies', 'countries', 'trips', 'stats', 'cities', 'categories'));
     }
 
     public function itinerary(Trip $trip)
@@ -106,9 +106,9 @@ class TripsController extends Controller
 
     public function getData(Request $request)
     {
-         $query = Trip::with(['company','fromCountry','toCountry']);
+        $query = Trip::with(['company', 'fromCountry', 'toCountry']);
 
-         if ($request->company_id) {
+        if ($request->company_id) {
             $query->where('company_id', $request->company_id);
         }
 
@@ -121,7 +121,7 @@ class TripsController extends Controller
         }
 
         if ($request->expiry_date) {
-           $query->whereDate('expiry_date', '>=', $request->expiry_date);
+            $query->whereDate('expiry_date', '>=', $request->expiry_date);
         }
 
         $trips = $query->latest()->get();
@@ -133,24 +133,24 @@ class TripsController extends Controller
                 $actionButtons = '';
                 if (auth()->user()->can('edit trips')) {
                     $actionButtons .= '
-                            <a href="'.route('admin.trips.edit', $trip->id).'" class="btn btn-sm btn-primary" title="'.__('Edit').'">
+                            <a href="' . route('admin.trips.edit', $trip->id) . '" class="btn btn-sm btn-primary" title="' . __('Edit') . '">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="'.route('admin.trips.itinerary', $trip->id).'" class="btn btn-sm btn-info" title="'.__('Itinerary').'">
+                            <a href="' . route('admin.trips.itinerary', $trip->id) . '" class="btn btn-sm btn-info" title="' . __('Itinerary') . '">
                                 <i class="fas fa-list-ul"></i>
                             </a>
-                            <button class="btn btn-sm btn-secondary" onclick="openImageUpload('.$trip->id.', \''.addslashes($trip->title).'\')" title="'.__('Upload Images').'">
+                            <button class="btn btn-sm btn-secondary" onclick="openImageUpload(' . $trip->id . ', \'' . addslashes($trip->title) . '\')" title="' . __('Upload Images') . '">
                                 <i class="fas fa-camera"></i>
                             </button>';
 
                     if ($isExpired) {
                         $actionButtons .= '
-                            <button class="btn btn-sm btn-success" onclick="renewTrip('.$trip->id.')" title="تجديد الرحلة">
+                            <button class="btn btn-sm btn-success" onclick="renewTrip(' . $trip->id . ')" title="تجديد الرحلة">
                                 <i class="fas fa-sync-alt"></i>
                             </button>';
                     } else {
                         $actionButtons .= '
-                            <button class="btn btn-sm btn-warning" onclick="toggleTripStatus('.$trip->id.')">
+                            <button class="btn btn-sm btn-warning" onclick="toggleTripStatus(' . $trip->id . ')">
                                 <i class="fas fa-ban"></i>
                             </button>';
                     }
@@ -158,27 +158,27 @@ class TripsController extends Controller
 
                 if (auth()->user()->can('delete trips')) {
                     $actionButtons .= '
-                            <button class="btn btn-sm btn-danger" onclick="deleteTrip('.$trip->id.')" title="'.__('Delete').'">
+                            <button class="btn btn-sm btn-danger" onclick="deleteTrip(' . $trip->id . ')" title="' . __('Delete') . '">
                                 <i class="fas fa-trash"></i>
                             </button>';
                 }
 
                 return [
-                    'title'    => $trip->title,
+                    'title' => $trip->title,
                     'company' => $trip->company
-                          ?  '<div class="d-flex align-items-center gap-2">
+                        ? '<div class="d-flex align-items-center gap-2">
                                 <img src="' . $trip->company->logo_url . '" class="rounded-circle" width="30" height="30" alt="">
-                                <span>'. (app()->getLocale() == 'en' && $trip->company->en_name ? $trip->company->en_name : $trip->company->name) .'</span>
+                                <span>' . (app()->getLocale() == 'en' && $trip->company->en_name ? $trip->company->en_name : $trip->company->name) . '</span>
                               </div>' : '...',
                     'fromCountry' => $trip->fromCountry
-                          ?  '<span>'. $trip->fromCountry->name .'</span>' : '...',
+                        ? '<span>' . $trip->fromCountry->name . '</span>' : '...',
                     'toCountry' => $trip->toCountry
-                          ?  '<span>'. $trip->toCountry->name .'</span>' : '...',
-                    'price'    => $trip->price,
+                        ? '<span>' . $trip->toCountry->name . '</span>' : '...',
+                    'price' => $trip->price,
                     'expiry_date' => $trip->expiry_date,
-                    'status'      => $isExpired
-                                    ? '<span class="badge bg-dark">' . __('Expired') . '</span>'
-                                    : ($trip->active ? '<span class="badge bg-success">' . __('Active') . '</span>' : '<span class="badge bg-danger">' . __('Inactive') . '</span>'),
+                    'status' => $isExpired
+                        ? '<span class="badge bg-dark">' . __('Expired') . '</span>'
+                        : ($trip->active ? '<span class="badge bg-success">' . __('Active') . '</span>' : '<span class="badge bg-danger">' . __('Inactive') . '</span>'),
                     'actions' => $actionButtons,
                 ];
             })
@@ -191,7 +191,7 @@ class TripsController extends Controller
     public function create()
     {
         $companies = Company::active()->get();
-        
+
         app(LocationService::class)->syncLocationsFromApi();
 
         $countries = Country::active()->get();
@@ -201,7 +201,7 @@ class TripsController extends Controller
         return view('admin.trips.create', compact('companies', 'countries', 'cities', 'categories'));
     }
 
-    
+
 
 
 
@@ -212,33 +212,34 @@ class TripsController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title'                 => 'required|string|max:255',
-            'tickets'               => 'nullable|string',
-            'description'           => 'required|string',
-            'company_id'            => 'required|exists:companies,id',
-            'from_country_id'       => 'required|exists:countries,id',
-            'from_city_id'          => 'required|exists:cities,id',
-            'to_country_id'         => 'required|exists:countries,id',
-            'duration'              => 'nullable|string|max:100',
-            'price'                 => 'required|numeric|min:0',
+            'title' => 'required|string|max:255',
+            'tickets' => 'nullable|string',
+            'description' => 'required|string',
+            'company_id' => 'required|exists:companies,id',
+            'from_country_id' => 'required|exists:countries,id',
+            'from_city_id' => 'required|exists:cities,id',
+            'to_country_id' => 'required|exists:countries,id',
+            'duration' => 'nullable|string|max:100',
+            'price' => 'required|numeric|min:0',
             'price_before_discount' => 'nullable|numeric|min:0',
-            'expiry_date'           => 'nullable|date|after_or_equal:today',
-            'personnel_capacity'    => 'nullable|integer|min:1',
-            'is_public'             => 'nullable|boolean',
-            'is_featured'           => 'nullable|boolean',
-            'base_capacity'         => 'nullable|integer|min:0',
-            'extra_passenger_price' => 'nullable|numeric|min:0',
-            'category_ids'          => 'nullable|array',
-            'category_ids.*'        => 'exists:trip_categories,id',
-            'is_ad'                 => 'nullable|boolean',
-            'active'                => 'nullable|boolean',
+            'expiry_date' => 'nullable|date|after_or_equal:today',
+            'personnel_capacity' => 'nullable|integer|min:1',
+            'is_public' => 'nullable|boolean',
+            'is_featured' => 'nullable|boolean',
+            'base_capacity' => 'required|integer|min:0',
+            'extra_passenger_price' => 'required|numeric|min:0',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:trip_categories,id',
+            'is_ad' => 'nullable|boolean',
+            'active' => 'nullable|boolean',
+
         ]);
 
         // Checkbox handling
-        $data['is_public']   = $request->boolean('is_public');
+        $data['is_public'] = $request->boolean('is_public');
         $data['is_featured'] = $request->boolean('is_featured');
-        $data['is_ad']       = $request->boolean('is_ad');
-        $data['active']      = $request->boolean('active');
+        $data['is_ad'] = $request->boolean('is_ad');
+        $data['active'] = $request->boolean('active');
 
         // Admin who created the trip
         $data['admin_id'] = auth()->id();
@@ -260,7 +261,7 @@ class TripsController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' =>  __('Trip created successfully'),
+                'message' => __('Trip created successfully'),
             ]);
         }
 
@@ -300,33 +301,33 @@ class TripsController extends Controller
     public function update(Request $request, Trip $trip)
     {
         $data = $request->validate([
-            'title'                 => 'required|string|max:255',
-            'tickets'               => 'nullable|string',
-            'description'           => 'required|string',
-            'company_id'            => 'required|exists:companies,id',
-            'from_country_id'       => 'required|exists:countries,id',
-            'from_city_id'          => 'required|exists:cities,id',
-            'to_country_id'         => 'required|exists:countries,id',
-            'duration'              => 'nullable|string|max:100',
-            'price'                 => 'required|numeric|min:0',
+            'title' => 'required|string|max:255',
+            'tickets' => 'nullable|string',
+            'description' => 'required|string',
+            'company_id' => 'required|exists:companies,id',
+            'from_country_id' => 'required|exists:countries,id',
+            'from_city_id' => 'required|exists:cities,id',
+            'to_country_id' => 'required|exists:countries,id',
+            'duration' => 'nullable|string|max:100',
+            'price' => 'required|numeric|min:0',
             'price_before_discount' => 'nullable|numeric|min:0',
-            'expiry_date'           => 'nullable|date',
-            'personnel_capacity'    => 'nullable|integer|min:1',
-            'base_capacity'         => 'nullable|integer|min:0',
+            'expiry_date' => 'nullable|date',
+            'personnel_capacity' => 'required|integer|min:1',
+            'base_capacity' => 'required|integer|min:0',
             'extra_passenger_price' => 'nullable|numeric|min:0',
-            'is_public'             => 'nullable|boolean',
-            'is_featured'           => 'nullable|boolean',
-            'is_ad'                 => 'nullable|boolean',
-            'active'                => 'nullable|boolean',
-            'category_ids'          => 'nullable|array',
-            'category_ids.*'        => 'exists:trip_categories,id',
+            'is_public' => 'nullable|boolean',
+            'is_featured' => 'nullable|boolean',
+            'is_ad' => 'nullable|boolean',
+            'active' => 'nullable|boolean',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:trip_categories,id',
         ]);
 
         // Checkbox handling
-        $data['is_public']   = $request->boolean('is_public');
+        $data['is_public'] = $request->boolean('is_public');
         $data['is_featured'] = $request->boolean('is_featured');
-        $data['is_ad']       = $request->boolean('is_ad');
-        $data['active']      = $request->boolean('active');
+        $data['is_ad'] = $request->boolean('is_ad');
+        $data['active'] = $request->boolean('active');
 
         // Recalculate profit
         if (!empty($data['price_before_discount'])) {
@@ -334,8 +335,8 @@ class TripsController extends Controller
 
             $data['percentage_profit_margin'] =
                 $data['price_before_discount'] > 0
-                    ? round(($data['profit'] / $data['price_before_discount']) * 100, 2)
-                    : 0;
+                ? round(($data['profit'] / $data['price_before_discount']) * 100, 2)
+                : 0;
         } else {
             $data['profit'] = 0;
             $data['percentage_profit_margin'] = 0;
@@ -378,7 +379,7 @@ class TripsController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' =>  __('Trip updated successfully'),
+                'message' => __('Trip updated successfully'),
             ]);
         }
 
@@ -391,13 +392,13 @@ class TripsController extends Controller
 
     public function toggleStatus(Trip $trip)
     {
-        $trip->active = ! $trip->active;
+        $trip->active = !$trip->active;
         $trip->save();
 
         return response()->json([
             'success' => true,
             'message' => __('Trip status updated successfully'),
-            'status'  => $trip->active ? 'Active' : 'Inactive'
+            'status' => $trip->active ? 'Active' : 'Inactive'
         ]);
     }
 
@@ -410,7 +411,7 @@ class TripsController extends Controller
         $trip = Trip::findOrFail($id);
         $trip->update([
             'expiry_date' => $request->expiry_date,
-            'active'      => true // إعادة تفعيلها تلقائياً عند التجديد
+            'active' => true // إعادة تفعيلها تلقائياً عند التجديد
         ]);
 
         return response()->json([
@@ -423,7 +424,7 @@ class TripsController extends Controller
 
     public function destroy(Trip $trip)
     {
-       $trip->delete();
+        $trip->delete();
 
         return response()->json([
             'success' => true,
@@ -500,7 +501,7 @@ class TripsController extends Controller
         }
     }
 
-   public function getImages($trip_id)
+    public function getImages($trip_id)
     {
 
         $images = TripImage::where('trip_id', $trip_id)->get();
@@ -508,10 +509,10 @@ class TripsController extends Controller
         $data = $images->map(function ($image) {
             $path = storage_path('app/public/' . $image->image_path);
             return [
-                'id'   => $image->id,
+                'id' => $image->id,
                 'name' => basename($image->image_path),
                 'size' => file_exists($path) ? filesize($path) : 0,
-                'url'  => asset('storage/' . $image->image_path),
+                'url' => asset('storage/' . $image->image_path),
             ];
         });
 

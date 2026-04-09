@@ -48,7 +48,7 @@ class HyperPayService
 
         // Add test mode parameters (REQUIRED for test server & 3DS2)
         if ($this->testMode) {
-            $params['testMode'] = 'EXTERNAL';
+            // $params['testMode'] = 'EXTERNAL';
             $params['customParameters[3DS2_enrolled]'] = 'true';
             $params['integrity'] = 'true';
         }
