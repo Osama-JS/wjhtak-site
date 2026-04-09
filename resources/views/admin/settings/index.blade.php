@@ -79,11 +79,18 @@
                         <textarea class="form-control" name="site_description_ar" rows="3">{{ \App\Models\Setting::get('site_description_ar') }}</textarea>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">{{ __('Primary Color') }}</label>
                             <input type="color" class="form-control form-control-color w-100" name="primary_color" value="{{ \App\Models\Setting::get('primary_color') ?? '#3b4bd3' }}">
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ __('Hotels Page Visibility') }}</label>
+                            <select class="form-control default-select" name="show_hotels_page">
+                                <option value="1" {{ \App\Models\Setting::get('show_hotels_page', '1') == '1' ? 'selected' : '' }}>{{ __('Visible') }}</option>
+                                <option value="0" {{ \App\Models\Setting::get('show_hotels_page', '1') == '0' ? 'selected' : '' }}>{{ __('Hidden') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">{{ __('System Mode') }}</label>
                             <select class="form-control default-select" name="maintenance_mode">
                                 <option value="0" {{ \App\Models\Setting::get('maintenance_mode') == '0' ? 'selected' : '' }}>{{ __('Live (Public Access)') }}</option>

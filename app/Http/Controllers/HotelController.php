@@ -26,6 +26,9 @@ class HotelController extends Controller
      */
     public function index(Request $request)
     {
+        if (\App\Models\Setting::get('show_hotels_page', '1') == '0') {
+            return redirect()->route('home');
+        }
         try {
             $hotels = [];
             $sessionId = null;
@@ -77,6 +80,9 @@ class HotelController extends Controller
      */
     public function show(Request $request, string $hotelCode)
     {
+        if (\App\Models\Setting::get('show_hotels_page', '1') == '0') {
+            return redirect()->route('home');
+        }
         try {
             $sessionId = $request->get('session_id');
             

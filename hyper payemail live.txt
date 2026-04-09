@@ -1,0 +1,105 @@
+Dear Team,
+
+
+
+Hope this email finds you well.
+
+
+
+Kindly find the credentials for the LIVE server below:
+
+
+
+Links used in the integration in the code: https://eu-prod.oppwa.com/
+
+Access Token (Authorization): OGFjZGE0ZmY5ZDZkMDQ0YTAxOWQ3MTdlYTg2ODA3YWN8R3h0UlhhTUxpNEBBaHh0UmVxTGE=
+
+Entity id (Visa, Mastercard, Mada) : 8acda4cb9d6ce9a6019d717f322e1a6c
+
+Payment Type: DB only
+
+Currency: SAR only
+
+Payment Methods: Visa, Mastercard, Mada
+
+
+
+Login info :
+
+
+
+Link: https://eu-prod.oppwa.com/bip/gate2play_oauthlogin.link?merchant_name=14110+-+Jischool
+
+Users: contact@wjhtak.com
+
+Password: It will be sent automatically to contact@wjhtak.com (Please check your junk/spam folder).
+
+
+
+    Testing Cards: There are no Testing cards.
+
+    (Please note that any test transactions, whether successful or failed, processed in the Live environment are subject to charge).
+
+
+
+Please make the following changes to your code:
+
+
+
+01 For preparing the checkout:
+
+    From: https://eu-test.oppwa.com/v1/checkouts
+
+    To: https://eu-prod.oppwa.com/v1/checkouts
+
+Also please remove testMode=EXTERNAL and customParameters[3DS2_enrolled]=true from this step's code, as they are only required for testing.
+
+
+
+Make sure to pass the following Mandatory fields, without passing them will cause a rejection for the transactions.
+
+   - merchantTransactionId = [Your unique ID in your database]
+
+   - customer.email = [The user's email]
+
+   - billing.street1 = [Street address of the customer]
+
+   - billing.city = [City of the customer]
+
+   - billing.state = [State of the customer]
+
+   - billing.country = [Country of the customer (Alpha-2 codes with Format A2[A-Z]{2}]
+
+   - billing.postcode = [Customer's postcode]
+
+   - customer.givenName = [Customer's given name]
+
+   - customer.surname = [Customer's surname]
+
+
+
+02 For creating the payment form:
+
+    From: https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId={checkoutId}
+
+    To: https://eu-prod.oppwa.com/v1/paymentWidgets.js?checkoutId={checkoutId}
+
+
+
+03 For getting the payment status:
+
+    From: https://eu-test.oppwa.com/v1/checkouts/{id}/payment
+
+    To: https://eu-prod.oppwa.com/v1/checkouts/{id}/payment
+
+
+
+Please run a Live test for a minimum amount of 5 SAR and ensure that the amount settles to your merchant account in the bank. The settlement period is usually 72 hours.
+
+If you encounter any issues with the settlement after that period, please contact us so that we can forward the case to the bank.
+
+After that you will be ready to start the service and accept online payments.
+
+
+
+Please let me know if you need any assistance, and confirm once the testing of the live credentials is done.

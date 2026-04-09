@@ -35,6 +35,7 @@ class SettingController extends Controller
                 'android_url' => 'nullable|url',
                 'ios_url' => 'nullable|url',
                 'maintenance_mode' => 'nullable|in:0,1',
+                'show_hotels_page' => 'nullable|in:0,1',
             ]);
 
             $data = $request->except(['_token', 'site_logo', 'site_favicon', 'hero_bg', 'page_header_bg']);

@@ -26,9 +26,11 @@
             <a href="{{ route('trips.index') }}" class="nav-link {{ request()->routeIs('trips.*') ? 'active' : '' }}">
                 {{ __('Trips') }}
             </a>
+            @if(\App\Models\Setting::get('show_hotels_page', '1') == '1')
             <a href="{{ route('hotels.index') }}" class="nav-link {{ request()->routeIs('hotels.*') ? 'active' : '' }}">
                 {{ __('Hotels') }}
             </a>
+            @endif
 
             <a href="{{ route('destinations') }}" class="nav-link {{ request()->routeIs('destinations') ? 'active' : '' }}">
                 {{ __('Destinations') }}
