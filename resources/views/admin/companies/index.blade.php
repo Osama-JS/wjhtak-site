@@ -137,6 +137,26 @@
                             <textarea name="notes" class="form-control" rows="1"></textarea>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Bank Name') }}</label>
+                            <input type="text" name="bank_name" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Beneficiary Name') }}</label>
+                            <input type="text" name="beneficiary_name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Account Number') }}</label>
+                            <input type="text" name="account_number" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('IBAN') }}</label>
+                            <input type="text" name="iban" class="form-control">
+                        </div>
+                    </div>
                     <x-forms.checkbox name="active" :label="__('Active status')" checked type="switch" />
                 </div>
                 <div class="modal-footer">
@@ -200,6 +220,26 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">{{ __('Notes') }}</label>
                             <textarea name="notes" id="edit_notes" class="form-control" rows="1"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Bank Name') }}</label>
+                            <input type="text" name="bank_name" id="edit_bank_name" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Beneficiary Name') }}</label>
+                            <input type="text" name="beneficiary_name" id="edit_beneficiary_name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('Account Number') }}</label>
+                            <input type="text" name="account_number" id="edit_account_number" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ __('IBAN') }}</label>
+                            <input type="text" name="iban" id="edit_iban" class="form-control">
                         </div>
                     </div>
                     <div class="mb-3">
@@ -343,6 +383,10 @@ $(document).ready(function() {
                 $('#edit_phone').val(company.phone);
                 $('#edit_commission_rate').val(company.commission_rate);
                 $('#edit_notes').val(company.notes);
+                $('#edit_bank_name').val(company.bank_name);
+                $('#edit_beneficiary_name').val(company.beneficiary_name);
+                $('#edit_account_number').val(company.account_number);
+                $('#edit_iban').val(company.iban);
                 $('#edit_active').prop('checked', company.active);
                 $('#logoPreviewEdit').attr('src', response.logo_url);
                 $('#editCompanyModal').modal('show');

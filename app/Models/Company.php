@@ -19,6 +19,10 @@ class Company extends Model
         'notes',
         'active',
         'commission_rate',
+        'bank_name',
+        'beneficiary_name',
+        'account_number',
+        'iban',
     ];
 
 
