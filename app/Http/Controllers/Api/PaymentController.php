@@ -104,12 +104,7 @@ class PaymentController extends Controller
                 'type' => 'redirect',
                 'icon' => asset('assets/img/payments/tamara.png')
             ],
-            [
-                'key' => 'tap',
-                'name' => __('Tap Payments / Apple Pay'),
-                'type' => 'redirect',
-                'icon' => asset('assets/img/payments/tap.png')
-            ],
+
             [
                 'key' => 'bank_transfer',
                 'name' => __('Bank Transfer'),
