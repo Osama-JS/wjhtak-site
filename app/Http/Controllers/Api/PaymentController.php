@@ -104,12 +104,7 @@ class PaymentController extends Controller
                 'type' => 'redirect',
                 'icon' => asset('assets/img/payments/tamara.png')
             ],
-            [
-                'key' => 'tap',
-                'name' => __('Tap Payments / Apple Pay'),
-                'type' => 'redirect',
-                'icon' => asset('assets/img/payments/tap.png')
-            ],
+
             [
                 'key' => 'bank_transfer',
                 'name' => __('Bank Transfer'),
@@ -976,8 +971,14 @@ class PaymentController extends Controller
         }
 
         try {
-            $user    = $request->user();
-            $booking = HotelBooking::with('guests')->where('user_id', $user->id)->findOrFail($request->hotel_booking_id);
+            // Fetch the booking without requiring user authentication
+            // since the user might be redirected from the payment gateway without an active API token
+            $booking = HotelBooking::with(['guests', 'user'])->findOrFail($request->hotel_booking_id);
+            $user = $booking->user;
+
+            if (!$user) {
+                return $this->apiResponse(true, __('Failed to find the associated user for this booking.'), null, null, 404);
+            }
 
             if ($booking->status === HotelBooking::STATUS_CONFIRMED) {
                 return $this->apiResponse(false, __('Booking is already confirmed.'), [

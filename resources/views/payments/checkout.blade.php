@@ -266,7 +266,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @if(in_array($method, ['mada', 'visa_master', 'apple_pay']) && isset($checkout_id))
-    <script src="https://{{ config('hyperpay.test_mode') ? 'eu-test.oppwa.com' : 'oppwa.com' }}/v1/paymentWidgets.js?checkoutId={{ $checkout_id }}"></script>
+    @php
+        $scriptUrl = rtrim(config('hyperpay.base_url'), '/');
+        // Remove /v1 if it exists at the end because paymentWidgets is often at /v1/paymentWidgets.js
+        if(str_ends_with($scriptUrl, '/v1')) {
+            $scriptUrl = substr($scriptUrl, 0, -3);
+        }
+    @endphp
+    <script src="{{ $scriptUrl }}/v1/paymentWidgets.js?checkoutId={{ $checkout_id }}"></script>
     <script type="text/javascript">
         var wpwlOptions = {
             paymentTarget: "_top",
