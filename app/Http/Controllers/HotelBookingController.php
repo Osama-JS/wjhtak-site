@@ -6,7 +6,6 @@ use App\Models\HotelBooking;
 use App\Models\HotelBookingGuest;
 use App\Models\HotelBookingHistory;
 use App\Services\TBOHotelService;
-use App\Services\MockTBOHotelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,13 +17,9 @@ class HotelBookingController extends Controller
 {
     protected $tboService;
 
-    public function __construct()
+    public function __construct(TBOHotelService $tboService)
     {
-        if (env('APP_API_MODE') === 'mock') {
-            $this->tboService = new MockTBOHotelService();
-        } else {
-            $this->tboService = app(TBOHotelService::class);
-        }
+        $this->tboService = $tboService;
     }
 
     /**

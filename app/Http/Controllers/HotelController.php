@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\TBOHotelService;
-use App\Services\MockTBOHotelService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -12,13 +11,9 @@ class HotelController extends Controller
 {
     protected $tboService;
 
-    public function __construct()
+    public function __construct(TBOHotelService $tboService)
     {
-        if (env('APP_API_MODE') === 'mock') {
-            $this->tboService = new MockTBOHotelService();
-        } else {
-            $this->tboService = app(TBOHotelService::class);
-        }
+        $this->tboService = $tboService;
     }
 
     /**
