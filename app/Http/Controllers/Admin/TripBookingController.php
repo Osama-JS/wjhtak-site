@@ -239,7 +239,7 @@ class TripBookingController extends Controller
                 'action' => 'ticket_uploaded',
                 'description' => __('Tickets file uploaded by admin.'),
                 'previous_state' => $oldState,
-                'new_state' => \App\Models\TripBooking::STATE_TICKETS_SENT,
+                'new_state' => \App\Models\TripBooking::STATE_TICKETS_UPLOADED,
             ]);
 
             // Optional: send email to customer

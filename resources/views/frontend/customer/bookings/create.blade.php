@@ -5,7 +5,7 @@
 @section('content')
 <section class="booking-flow-section" style="padding: var(--space-20) 0; background: #f8fafc;">
     <div class="container">
-        <div class="booking-grid" style="display: grid; grid-template-columns: 1fr 380px; gap: 40px;">
+        <div class="booking-grid">
 
             {{-- Form Column --}}
             <div class="booking-form-col">
@@ -190,9 +190,36 @@
         border-color: var(--color-primary);
         outline: none;
     }
+    .passenger-grid-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    @media (max-width: 576px) {
+        .passenger-grid-group {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        .passenger-card {
+            padding: 20px 15px;
+        }
+        .form-section-title {
+            font-size: 1rem !important;
+        }
+    }
+    .booking-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 40px;
+    }
     @media (max-width: 1024px) {
-        .booking-grid { grid-template-columns: 1fr; }
-        .booking-summary-col { order: -1; }
+        .booking-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .booking-summary-col {
+            order: -1;
+        }
     }
 </style>
 @endpush
@@ -221,7 +248,7 @@
                             <label class="field-label">{{ __('Full Name') }}</label>
                             <input type="text" name="passengers[${passengerIndex}][name]" value="${prefill.name || ''}" required class="field-input" placeholder="{{ __('As in passport') }}">
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="passenger-grid-group">
                             <div>
                                 <label class="field-label">{{ __('Phone') }}</label>
                                 <input type="text" name="passengers[${passengerIndex}][phone]" value="${prefill.phone || ''}" required class="field-input" placeholder="05xxxxxxxx">
@@ -231,7 +258,7 @@
                                 <input type="text" name="passengers[${passengerIndex}][nationality]" value="${prefill.nationality || ''}" required class="field-input" placeholder="Saudi">
                             </div>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="passenger-grid-group">
                             <div>
                                 <label class="field-label">{{ __('Passport Number') }}</label>
                                 <input type="text" name="passengers[${passengerIndex}][passport_number]" value="${prefill.passport_number || ''}" required class="field-input">

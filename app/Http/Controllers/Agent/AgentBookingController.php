@@ -21,7 +21,7 @@ class AgentBookingController extends Controller
         $stats = [
             'total'     => (clone $query)->count(),
             'received'  => (clone $query)->where('booking_state', TripBooking::STATE_RECEIVED)->count(),
-            'confirmed' => (clone $query)->where('booking_state', TripBooking::STATE_CONFIRMED)->count(),
+            'confirmed' => (clone $query)->where('booking_state', TripBooking::STATE_COMPLETED)->count(),
             'cancelled' => (clone $query)->where('booking_state', TripBooking::STATE_CANCELLED)->count(),
         ];
 
@@ -52,8 +52,8 @@ class AgentBookingController extends Controller
         $states = [
             TripBooking::STATE_RECEIVED,
             TripBooking::STATE_PREPARING,
-            TripBooking::STATE_CONFIRMED,
-            TripBooking::STATE_TICKETS_SENT,
+            TripBooking::STATE_COMPLETED,
+            TripBooking::STATE_TICKETS_UPLOADED,
             TripBooking::STATE_CANCELLED,
         ];
 
