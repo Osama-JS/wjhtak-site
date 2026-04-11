@@ -1593,5 +1593,9 @@
     "جاري إنشاء الحساب...": "Creating account...",
     "هذا البريد مسجل مسبقاً ولكنه غير مفعل.": "This email is already registered but unverified.",
     "هل تريد إرسال كود التحقق لتفعيل الحساب؟": "Would you like to send a verification code to activate the account?",
-    "إرسال كود التحقق": "Send Verification Code"
+    "إرسال كود التحقق": "Send Verification Code",
+    "Bank Name": "Bank Name",
+    "Beneficiary Name": "Beneficiary Name",
+    "Account Number": "Account Number",
+    "IBAN": "IBAN"
 }

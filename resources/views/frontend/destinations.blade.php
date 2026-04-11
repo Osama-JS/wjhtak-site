@@ -53,18 +53,10 @@
                 <h2 class="section-title">{{ __('Featured Destinations') }}</h2>
             </div>
 
-            {{-- Featured Grid (Large Cards) --}}
-            <div class="home-destinations-grid scroll-animate">
+            {{-- Featured Grid (Bento Layout) --}}
+            <div class="featured-grid scroll-animate">
                 @forelse($featuredCountries ?? [] as $index => $country)
-                    @php
-                        $gridStyles = [
-                            0 => '--desktop-grid-row: span 2;',
-                            1 => '',
-                            2 => '',
-                            3 => '--desktop-grid-column: span 2;',
-                        ];
-                    @endphp
-                    <div class="home-destination-item" style="{{ $gridStyles[$index % 4] ?? '' }}">
+                    <div class="featured-grid-item featured-grid-item--{{ ($index % 4) + 1 }}">
                         @include('frontend.components.destination-card', [
                             'destination' => $country,
                             'tripCount' => $country->trips_count ?? 0
@@ -74,27 +66,30 @@
                     {{-- Demo Featured Destinations --}}
                     @php
                         $demoDestinations = [
-                            ['nicename' => 'Dubai', 'iso' => 'ae', 'trips_count' => 45],
-                            ['nicename' => 'Paris', 'iso' => 'fr', 'trips_count' => 32],
-                            ['nicename' => 'Maldives', 'iso' => 'mv', 'trips_count' => 28],
-                            ['nicename' => 'Istanbul', 'iso' => 'tr', 'trips_count' => 50],
+                            ['nicename' => 'Dubai',    'iso' => 'ae', 'trips_count' => 45, 'emoji' => '🏙️', 'gradient' => 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)'],
+                            ['nicename' => 'Paris',    'iso' => 'fr', 'trips_count' => 32, 'emoji' => '🗼', 'gradient' => 'linear-gradient(135deg, #2b1055 0%, #d53369 100%)'],
+                            ['nicename' => 'Maldives', 'iso' => 'mv', 'trips_count' => 28, 'emoji' => '🏝️', 'gradient' => 'linear-gradient(135deg, #0093E9 0%, #80D0C7 100%)'],
+                            ['nicename' => 'Istanbul', 'iso' => 'tr', 'trips_count' => 50, 'emoji' => '🕌', 'gradient' => 'linear-gradient(135deg, #c33764 0%, #1d2671 100%)'],
                         ];
                     @endphp
                     @foreach($demoDestinations as $index => $demo)
-                        @php
-                            $gridStyles = [
-                                0 => '--desktop-grid-row: span 2;',
-                                1 => '',
-                                2 => '',
-                                3 => '--desktop-grid-column: span 2;',
-                            ];
-                            $destObj = (object)$demo;
-                        @endphp
-                        <div class="home-destination-item" style="{{ $gridStyles[$index % 4] ?? '' }}">
-                            @include('frontend.components.destination-card', [
-                                'destination' => $destObj,
-                                'tripCount' => $demo['trips_count']
-                            ])
+                        @php $destObj = (object)$demo; @endphp
+                        <div class="featured-grid-item featured-grid-item--{{ $index + 1 }}">
+                            <a href="#" class="featured-card scroll-animate" style="background: {{ $demo['gradient'] }};">
+                                <div class="featured-card__emoji">{{ $demo['emoji'] }}</div>
+                                <div class="featured-card__content">
+                                    <h3 class="featured-card__title">{{ $demo['nicename'] }}</h3>
+                                    <p class="featured-card__count">
+                                        <span class="featured-card__dot"></span>
+                                        {{ $demo['trips_count'] }} {{ __('Trips Available') }}
+                                    </p>
+                                </div>
+                                <div class="featured-card__arrow">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                                    </svg>
+                                </div>
+                            </a>
                         </div>
                     @endforeach
                 @endforelse
@@ -202,6 +197,187 @@
 
 @push('styles')
 <style>
+    /* ============================================
+       Featured Bento Grid
+       ============================================ */
+    .featured-grid {
+        display: grid;
+        gap: var(--space-4);
+        grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) {
+        .featured-grid {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: 280px 280px;
+        }
+        .featured-grid-item--1 {
+            grid-row: 1 / 3;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .featured-grid {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: 260px 260px;
+        }
+        .featured-grid-item--1 {
+            grid-row: 1 / 3;
+        }
+        .featured-grid-item--4 {
+            grid-column: 2 / 4;
+        }
+    }
+
+    .featured-grid-item {
+        min-height: 220px;
+    }
+
+    .featured-grid-item .destination-card,
+    .featured-grid-item .featured-card {
+        width: 100%;
+        height: 100%;
+        aspect-ratio: unset;
+    }
+
+    /* ============================================
+       Demo Featured Card (Gradient + Emoji)
+       ============================================ */
+    .featured-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+        text-decoration: none;
+        color: white;
+        padding: var(--space-6);
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 8px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .featured-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), 0 30px 60px rgba(0, 0, 0, 0.12);
+    }
+
+    .featured-card__emoji {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -55%);
+        font-size: 5rem;
+        opacity: 0.2;
+        transition: all 0.5s ease;
+        filter: grayscale(0.3);
+        pointer-events: none;
+    }
+
+    .featured-card:hover .featured-card__emoji {
+        opacity: 0.35;
+        transform: translate(-50%, -60%) scale(1.15);
+        filter: grayscale(0);
+    }
+
+    .featured-card__content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .featured-card__title {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-bold);
+        color: white;
+        margin-bottom: var(--space-2);
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .featured-card__count {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--text-sm);
+        font-weight: var(--font-medium);
+        color: rgba(255, 255, 255, 0.9);
+        padding: var(--space-1) var(--space-3);
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: var(--radius-full);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .featured-card__dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: var(--color-accent, #FFC107);
+        border-radius: var(--radius-full);
+        animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    .featured-card__arrow {
+        position: absolute;
+        top: var(--space-5);
+        right: var(--space-5);
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: var(--radius-full);
+        color: white;
+        opacity: 0;
+        transform: translateX(-12px) rotate(-45deg);
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    [dir="rtl"] .featured-card__arrow {
+        right: auto;
+        left: var(--space-5);
+        transform: translateX(12px) rotate(45deg);
+    }
+
+    .featured-card:hover .featured-card__arrow {
+        opacity: 1;
+        transform: translateX(0) rotate(0);
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Shine effect on hover */
+    .featured-card::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            45deg,
+            transparent 40%,
+            rgba(255, 255, 255, 0.08) 45%,
+            rgba(255, 255, 255, 0.15) 50%,
+            rgba(255, 255, 255, 0.08) 55%,
+            transparent 60%
+        );
+        transform: translateX(-100%);
+        transition: transform 0.8s;
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    .featured-card:hover::after {
+        transform: translateX(100%);
+    }
+
+    /* ============================================
+       All Destinations List Items
+       ============================================ */
     .destination-item {
         display: flex;
         align-items: center;
@@ -254,18 +430,6 @@
     .destination-item-count {
         font-size: var(--text-sm);
         color: var(--color-text-muted);
-    }
-
-    @media (max-width: 768px) {
-        .featured-destinations-grid {
-            grid-template-columns: 1fr !important;
-            grid-template-rows: auto !important;
-        }
-
-        .featured-destinations-grid > * {
-            grid-row: auto !important;
-            grid-column: auto !important;
-        }
     }
 </style>
 @endpush

@@ -82,6 +82,10 @@ class CompanyController extends Controller
             'notes'  => 'nullable|string',
             'active' => 'sometimes|boolean',
             'commission_rate' => 'nullable|numeric|min:0|max:100',
+            'bank_name' => 'nullable|string|max:100',
+            'beneficiary_name' => 'nullable|string|max:100',
+            'account_number' => 'nullable|string|max:100',
+            'iban' => 'nullable|string|max:100',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -132,6 +136,10 @@ class CompanyController extends Controller
             'notes' => 'nullable',
             'active' => 'sometimes|boolean',
             'commission_rate' => 'nullable|numeric|min:0|max:100',
+            'bank_name' => 'nullable|string|max:100',
+            'beneficiary_name' => 'nullable|string|max:100',
+            'account_number' => 'nullable|string|max:100',
+            'iban' => 'nullable|string|max:100',
         ]);
 
         if ($request->hasFile('logo')) {
