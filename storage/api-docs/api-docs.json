@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000",
+            "url": "http://localhost/wjhtak-site/public",
             "description": "Local Server"
         },
         {
@@ -2623,6 +2623,10 @@
                                         "type": "string",
                                         "nullable": true
                                     },
+                                    "hotel_image": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
                                     "city_name": {
                                         "type": "string"
                                     },
@@ -2808,7 +2812,53 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Bookings list"
+                        "description": "Hotel bookings list retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hotel bookings retrieved."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "hotel_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "hotel_image": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "check_in_date": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    },
+                                                    "total_price": {
+                                                        "type": "number"
+                                                    },
+                                                    "booking_state_label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -2837,7 +2887,47 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Booking detail"
+                        "description": "Booking details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "hotel_name": {
+                                                    "type": "string"
+                                                },
+                                                "guests": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "payment": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "history": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Booking not found"
@@ -2938,6 +3028,51 @@
             }
         },
         "/api/hotels/bookings/by-date": {
+            "get": {
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Get hotel bookings from TBO by date range (Remote Lookup)",
+                "operationId": "hotelBookingsByDate",
+                "parameters": [
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-03-01"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-03-31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookings retrieved successfully"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "TBO API Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Hotels"
@@ -3990,7 +4125,8 @@
                                             "visa_master",
                                             "apple_pay",
                                             "tamara",
-                                            "tabby"
+                                            "tabby",
+                                            "tap"
                                         ],
                                         "example": "visa_master"
                                     }
@@ -4071,7 +4207,8 @@
                                             "visa_master",
                                             "apple_pay",
                                             "tamara",
-                                            "tabby"
+                                            "tabby",
+                                            "tap"
                                         ]
                                     },
                                     "checkout_id": {
@@ -4080,7 +4217,7 @@
                                         "nullable": true
                                     },
                                     "payment_id": {
-                                        "description": "Required for Tabby / Tamara",
+                                        "description": "Required for Tabby / Tamara / Tap",
                                         "type": "string",
                                         "nullable": true
                                     }
@@ -4773,6 +4910,18 @@
                                                         "type": "boolean",
                                                         "example": false
                                                     },
+                                                    "is_liked": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "likes_count": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "views_count": {
+                                                        "type": "integer",
+                                                        "example": 100
+                                                    },
                                                     "is_featured": {
                                                         "type": "boolean",
                                                         "example": true
@@ -4973,6 +5122,18 @@
                                                 "is_favorite": {
                                                     "type": "boolean",
                                                     "example": false
+                                                },
+                                                "is_liked": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "likes_count": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "views_count": {
+                                                    "type": "integer",
+                                                    "example": 100
                                                 }
                                             },
                                             "type": "object"
@@ -5333,6 +5494,81 @@
                                                 "is_favorite": {
                                                     "type": "boolean",
                                                     "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/trips/{id}/like": {
+            "post": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Toggle like",
+                "description": "Add or remove a trip from user likes. Requires authentication.",
+                "operationId": "toggleLike",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "The language of the response (ar, en)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "en",
+                            "enum": [
+                                "en",
+                                "ar"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trip ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operation successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Trip liked successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "is_liked": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "likes_count": {
+                                                    "type": "integer",
+                                                    "example": 10
                                                 }
                                             },
                                             "type": "object"

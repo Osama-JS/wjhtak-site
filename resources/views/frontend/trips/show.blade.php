@@ -116,23 +116,43 @@
                             </span>
                         </div>
 
-                        {{-- Title --}}
                         <div class="flex items-center justify-between gap-4" style="margin-bottom: var(--space-4);">
                             <h1 style="font-size: var(--text-3xl); font-weight: var(--font-bold); margin: 0;">
                                 {{ $trip->title }}
                             </h1>
 
-                            @auth
-                                <button type="button"
-                                    class="favorite-toggle-btn {{ auth()->user()->favorites()->where('trip_id', $trip->id)->exists() ? 'active' : '' }}"
-                                    data-trip-id="{{ $trip->id }}" onclick="toggleFavorite(this)">
-                                    <i class="fas fa-heart"></i>
-                                </button>
-                            @else
-                                <a href="{{ route('login') }}" class="favorite-toggle-btn">
-                                    <i class="far fa-heart"></i>
-                                </a>
-                            @endauth
+                            <div class="flex items-center gap-3">
+                                {{-- Like Button --}}
+                                <div class="flex items-center gap-2">
+                                    <span id="likes-count-display" style="font-size: var(--text-lg); font-weight: 700; color: var(--color-primary);">
+                                        {{ $trip->likes()->count() }}
+                                    </span>
+                                    @auth
+                                        <button type="button"
+                                            class="like-toggle-btn {{ $trip->is_liked ? 'active' : '' }}"
+                                            data-trip-id="{{ $trip->id }}" onclick="toggleLike(this)">
+                                            <i class="fas fa-thumbs-up"></i>
+                                        </button>
+                                    @else
+                                        <a href="{{ route('login') }}" class="like-toggle-btn">
+                                            <i class="far fa-thumbs-up"></i>
+                                        </a>
+                                    @endauth
+                                </div>
+
+                                {{-- Favorite Button --}}
+                                @auth
+                                    <button type="button"
+                                        class="favorite-toggle-btn {{ auth()->user()->favorites()->where('trip_id', $trip->id)->exists() ? 'active' : '' }}"
+                                        data-trip-id="{{ $trip->id }}" onclick="toggleFavorite(this)">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                @else
+                                    <a href="{{ route('login') }}" class="favorite-toggle-btn">
+                                        <i class="far fa-heart"></i>
+                                    </a>
+                                @endauth
+                            </div>
                         </div>
 
                         {{-- Meta --}}
@@ -175,6 +195,12 @@
                                     <span>{{ __('Up to') }} {{ $trip->personnel_capacity }} {{ __('travelers') }}</span>
                                 </div>
                             @endif
+
+                            {{-- Views --}}
+                            <div class="flex items-center gap-2">
+                                <i class="far fa-eye" style="font-size: 18px;"></i>
+                                <span>{{ $trip->page_visits }} {{ __('Views') }}</span>
+                            </div>
 
                         </div>
                     </div>
@@ -474,6 +500,36 @@
             border-color: #fecaca;
             color: #ef4444;
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+        }
+
+        .like-toggle-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1.5px solid #e5e7eb;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+        }
+
+        .like-toggle-btn:hover {
+            transform: scale(1.1);
+            border-color: #bfdbfe;
+            color: #3b82f6;
+        }
+
+        .like-toggle-btn.active {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #2563eb;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
         }
 
         .passenger-card {
@@ -1356,8 +1412,53 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    // If unauthorized, redirect to login
                     if (error.status === 401) window.location.href = '{{ route("login") }}';
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                });
+        }
+
+        // Like Toggle Logic
+        function toggleLike(btn) {
+            const tripId = btn.dataset.tripId;
+            const icon = btn.querySelector('i');
+            const countDisplay = document.getElementById('likes-count-display');
+
+            btn.disabled = true;
+
+            fetch(`{{ url('trips') }}/${tripId}/like`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '{{ route("login") }}';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) return;
+
+                    if (data.status === 'added') {
+                        btn.classList.add('active');
+                        icon.className = 'fas fa-thumbs-up';
+                    } else {
+                        btn.classList.remove('active');
+                        icon.className = 'fas fa-thumbs-up'; // Stay solid just change color via .active
+                    }
+
+                    if (countDisplay && typeof data.count !== 'undefined') {
+                        countDisplay.innerText = data.count;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                 })
                 .finally(() => {
                     btn.disabled = false;

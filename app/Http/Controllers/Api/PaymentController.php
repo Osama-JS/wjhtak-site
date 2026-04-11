@@ -312,8 +312,8 @@ class PaymentController extends Controller
         $data = [
             'amount' => $booking->total_price,
             'customer_name' => ($request->first_name && $request->last_name)
-                                ? $request->first_name . ' ' . $request->last_name
-                                : $user->full_name,
+                ? $request->first_name . ' ' . $request->last_name
+                : $user->full_name,
             'customer_email' => $request->email ?? $user->email,
             'customer_phone' => $request->phone ?? $user->phone,
             'order_id' => 'BOOKING-' . $booking->id . '-' . time(),
@@ -330,7 +330,7 @@ class PaymentController extends Controller
         ];
 
         if (!$data['customer_email'] || !$data['customer_phone']) {
-             throw new \Exception('Missing required customer data for Tabby (email, phone).');
+            throw new \Exception('Missing required customer data for Tabby (email, phone).');
         }
 
         $result = $this->tabbyService->initiateCheckout($data);
@@ -368,8 +368,8 @@ class PaymentController extends Controller
             'address' => $request->address ?? $user->address ?? 'Saudi Arabia',
         ];
 
-         if (!$data['customer_email'] || !$data['customer_phone']) {
-             throw new \Exception('Missing required customer data for Tamara (email, phone).');
+        if (!$data['customer_email'] || !$data['customer_phone']) {
+            throw new \Exception('Missing required customer data for Tamara (email, phone).');
         }
 
         $result = $this->tamaraService->initiateCheckout($data);
@@ -495,19 +495,19 @@ class PaymentController extends Controller
                 $status = strtoupper($result['status'] ?? 'UNKNOWN');
 
                 if ($status === 'AUTHORIZED' || $status === 'CLOSED') {
-                     // Extract booking ID from reference_id (BOOKING-ID-TIME)
-                     $reference = $result['order']['reference_id'] ?? '';
-                     $bookingId = explode('-', $reference)[1] ?? null;
+                    // Extract booking ID from reference_id (BOOKING-ID-TIME)
+                    $reference = $result['order']['reference_id'] ?? '';
+                    $bookingId = explode('-', $reference)[1] ?? null;
 
-                     if ($bookingId) {
-                         $this->completePayment($bookingId, 'tabby', $id, $result, $request->payment_type);
-                         return $this->apiResponse(false, __('payment.success'), [
-                             'status' => 'paid',
-                             'booking_id' => $bookingId,
-                             'transaction_id' => $id,
-                             'raw_response' => $result
-                         ]);
-                     }
+                    if ($bookingId) {
+                        $this->completePayment($bookingId, 'tabby', $id, $result, $request->payment_type);
+                        return $this->apiResponse(false, __('payment.success'), [
+                            'status' => 'paid',
+                            'booking_id' => $bookingId,
+                            'transaction_id' => $id,
+                            'raw_response' => $result
+                        ]);
+                    }
                 }
 
                 // Tabby payment failed — send notification
@@ -543,17 +543,17 @@ class PaymentController extends Controller
                 $status = strtoupper($result['status'] ?? 'UNKNOWN');
 
                 if ($status === 'CAPTURED' || $status === 'AUTHORIZED') {
-                     $bookingId = $result['metadata']['booking_id'] ?? explode('-', $result['reference']['order'] ?? '')[1] ?? null;
+                    $bookingId = $result['metadata']['booking_id'] ?? explode('-', $result['reference']['order'] ?? '')[1] ?? null;
 
-                     if ($bookingId) {
-                         $this->completePayment($bookingId, 'tap', $id, $result, $request->payment_type);
-                         return $this->apiResponse(false, __('Payment successful and booking confirmed.'), [
-                             'status' => 'paid',
-                             'booking_id' => (int) $bookingId,
-                             'transaction_id' => $id,
-                             'raw_response' => $result
-                         ]);
-                     }
+                    if ($bookingId) {
+                        $this->completePayment($bookingId, 'tap', $id, $result, $request->payment_type);
+                        return $this->apiResponse(false, __('Payment successful and booking confirmed.'), [
+                            'status' => 'paid',
+                            'booking_id' => (int) $bookingId,
+                            'transaction_id' => $id,
+                            'raw_response' => $result
+                        ]);
+                    }
                 }
 
                 return $this->apiResponse(true, __('Payment failed or was declined.'), [
@@ -566,19 +566,19 @@ class PaymentController extends Controller
                 $result = $this->tamaraService->verifyPayment($request->payment_id);
                 $status = $result['status'] ?? 'unknown';
 
-                 if ($status == 'authorised' || $status == 'fully_captured') {
-                     $reference = $result['order_reference_id'] ?? '';
-                     $bookingId = explode('-', $reference)[1] ?? null;
+                if ($status == 'authorised' || $status == 'fully_captured') {
+                    $reference = $result['order_reference_id'] ?? '';
+                    $bookingId = explode('-', $reference)[1] ?? null;
 
-                      if ($bookingId) {
-                         $this->completePayment($bookingId, 'tamara', $id, $result, $request->payment_type);
-                         return $this->apiResponse(false, __('Payment successful and booking confirmed.'), [
-                             'status' => 'paid',
-                             'booking_id' => $bookingId,
-                             'transaction_id' => $id,
-                             'raw_response' => $result
-                         ]);
-                      }
+                    if ($bookingId) {
+                        $this->completePayment($bookingId, 'tamara', $id, $result, $request->payment_type);
+                        return $this->apiResponse(false, __('Payment successful and booking confirmed.'), [
+                            'status' => 'paid',
+                            'booking_id' => $bookingId,
+                            'transaction_id' => $id,
+                            'raw_response' => $result
+                        ]);
+                    }
                 }
 
                 // Tamara payment failed — send notification
@@ -610,7 +610,7 @@ class PaymentController extends Controller
             return $this->verifyHyperPay($request);
 
         } catch (\Exception $e) {
-             return $this->apiResponse(true, $e->getMessage(), null, null, 500);
+            return $this->apiResponse(true, $e->getMessage(), null, null, 500);
         }
     }
 
@@ -711,7 +711,7 @@ class PaymentController extends Controller
                     // For now, we confirm but log a critical error for admin
                 }
 
-                $newCount = max(0, (int)$booking->trip->tickets - (int)$booking->tickets_count);
+                $newCount = max(0, (int) $booking->trip->tickets - (int) $booking->tickets_count);
                 $booking->trip->update(['tickets' => $newCount]);
                 Log::info("Trip #{$booking->trip->id} tickets updated to {$newCount}");
             }
@@ -808,7 +808,14 @@ class PaymentController extends Controller
         // We will pass identifying info in the URL so the app can read it.
         $paymentId = $request->payment_id ?? $request->tap_id ?? $request->id;
 
-        return response("
+        \Illuminate\Support\Facades\Log::info('Payment Callback Received', [
+            'gateway' => $gateway,
+            'status' => $status,
+            'payment_id' => $paymentId,
+            'all_data' => $request->all()
+        ]);
+
+        $htmlResponse = "
             <!DOCTYPE html>
             <html lang='ar' dir='rtl'>
             <head>
@@ -835,7 +842,14 @@ class PaymentController extends Controller
                 </script>
             </body>
             </html>
-        ")->header('Content-Type', 'text/html');
+        ";
+
+        \Illuminate\Support\Facades\Log::info('Payment Callback Responded', [
+            'payment_id' => $paymentId,
+            'response_type' => 'HTML_LOADER_VIEW'
+        ]);
+
+        return response($htmlResponse)->header('Content-Type', 'text/html');
     }
 
     // =========================================================
@@ -860,7 +874,9 @@ class PaymentController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Payment URL generated',
+            new OA\Response(
+                response: 200,
+                description: 'Payment URL generated',
                 content: new OA\JsonContent(properties: [
                     new OA\Property(property: 'error', type: 'boolean', example: false),
                     new OA\Property(property: 'data', type: 'object', properties: [
@@ -877,7 +893,7 @@ class PaymentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'hotel_booking_id' => 'required|integer|exists:hotel_bookings,id',
-            'payment_type'     => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby,tap',
+            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby,tap',
         ]);
 
         if ($validator->fails()) {
@@ -885,7 +901,7 @@ class PaymentController extends Controller
         }
 
         try {
-            $user    = $request->user();
+            $user = $request->user();
             $booking = HotelBooking::where('user_id', $user->id)->findOrFail($request->hotel_booking_id);
 
             if ($booking->status === HotelBooking::STATUS_CONFIRMED) {
@@ -900,15 +916,15 @@ class PaymentController extends Controller
             $booking->update(['status' => HotelBooking::STATUS_PENDING]);
 
             $paymentUrl = route('payments.web.checkout', [
-                'booking_id'   => $booking->id,
+                'booking_id' => $booking->id,
                 'booking_type' => 'hotel',
-                'method'       => $request->payment_type,
-                'source'       => 'api',
+                'method' => $request->payment_type,
+                'source' => 'api',
             ]);
 
             return $this->apiResponse(false, __('Checkout link generated successfully.'), [
                 'hotel_booking_id' => $booking->id,
-                'payment_url'      => $paymentUrl,
+                'payment_url' => $paymentUrl,
             ]);
 
         } catch (\Exception $e) {
@@ -936,19 +952,21 @@ class PaymentController extends Controller
                     new OA\Property(property: 'hotel_booking_id', type: 'integer'),
                     new OA\Property(property: 'payment_type', type: 'string', enum: ['mada', 'visa_master', 'apple_pay', 'tamara', 'tabby', 'tap']),
                     new OA\Property(property: 'checkout_id', type: 'string', nullable: true, description: 'Required for HyperPay (mada, visa_master, apple_pay)'),
-                    new OA\Property(property: 'payment_id',  type: 'string', nullable: true, description: 'Required for Tabby / Tamara / Tap'),
+                    new OA\Property(property: 'payment_id', type: 'string', nullable: true, description: 'Required for Tabby / Tamara / Tap'),
                 ]
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Payment verified and booking confirmed with TBO',
+            new OA\Response(
+                response: 200,
+                description: 'Payment verified and booking confirmed with TBO',
                 content: new OA\JsonContent(properties: [
                     new OA\Property(property: 'error', type: 'boolean', example: false),
                     new OA\Property(property: 'data', type: 'object', properties: [
                         new OA\Property(property: 'hotel_booking_id', type: 'integer'),
-                        new OA\Property(property: 'tbo_booking_id',   type: 'string'),
-                        new OA\Property(property: 'status',           type: 'string', example: 'confirmed'),
-                        new OA\Property(property: 'invoice_url',      type: 'string'),
+                        new OA\Property(property: 'tbo_booking_id', type: 'string'),
+                        new OA\Property(property: 'status', type: 'string', example: 'confirmed'),
+                        new OA\Property(property: 'invoice_url', type: 'string'),
                     ]),
                 ])
             ),
@@ -961,9 +979,9 @@ class PaymentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'hotel_booking_id' => 'required|integer|exists:hotel_bookings,id',
-            'payment_type'     => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby,tap',
-            'checkout_id'      => 'required_if:payment_type,mada,visa_master,apple_pay|nullable|string',
-            'payment_id'       => 'required_if:payment_type,tamara,tabby,tap|nullable|string',
+            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby,tap',
+            'checkout_id' => 'required_if:payment_type,mada,visa_master,apple_pay|nullable|string',
+            'payment_id' => 'required_if:payment_type,tamara,tabby,tap|nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -983,8 +1001,8 @@ class PaymentController extends Controller
             if ($booking->status === HotelBooking::STATUS_CONFIRMED) {
                 return $this->apiResponse(false, __('Booking is already confirmed.'), [
                     'hotel_booking_id' => $booking->id,
-                    'tbo_booking_id'   => $booking->tbo_booking_id,
-                    'status'           => $booking->status,
+                    'tbo_booking_id' => $booking->tbo_booking_id,
+                    'status' => $booking->status,
                 ]);
             }
 
@@ -993,7 +1011,7 @@ class PaymentController extends Controller
             $paymentVerified = false;
             $gatewayResponse = [];
             $type = $request->payment_type;
-            $id   = $request->checkout_id ?? $request->payment_id;
+            $id = $request->checkout_id ?? $request->payment_id;
 
             if (in_array($type, ['mada', 'visa_master', 'apple_pay'])) {
                 // HyperPay verification
@@ -1001,32 +1019,32 @@ class PaymentController extends Controller
                 if ($result && isset($result['result']['code'])) {
                     $paymentVerified = $this->hyperPayService->isSuccessful($result['result']['code']);
                     $gatewayResponse = $result;
-                    $transactionId   = $id;
+                    $transactionId = $id;
                 }
             } elseif ($type === 'tabby') {
                 $result = $this->tabbyService->verifyPayment($id);
                 $status = strtoupper($result['status'] ?? '');
                 $paymentVerified = in_array($status, ['AUTHORIZED', 'CLOSED']);
                 $gatewayResponse = $result;
-                $transactionId   = $id;
+                $transactionId = $id;
             } elseif ($type === 'tamara') {
                 $result = $this->tamaraService->verifyPayment($id);
                 $status = $result['status'] ?? '';
                 $paymentVerified = in_array($status, ['authorised', 'fully_captured']);
                 $gatewayResponse = $result;
-                $transactionId   = $id;
+                $transactionId = $id;
             } elseif ($type === 'tap') {
                 $result = $this->tapService->verifyPayment($id);
                 $status = strtoupper($result['status'] ?? '');
                 $paymentVerified = in_array($status, ['CAPTURED', 'AUTHORIZED']);
                 $gatewayResponse = $result;
-                $transactionId   = $id;
+                $transactionId = $id;
             } elseif ($type === 'tap') {
                 $result = $this->tapService->verifyPayment($id);
                 $status = strtoupper($result['status'] ?? '');
                 $paymentVerified = in_array($status, ['CAPTURED', 'AUTHORIZED']);
                 $gatewayResponse = $result;
-                $transactionId   = $id;
+                $transactionId = $id;
             }
 
             if (!$paymentVerified) {
@@ -1049,7 +1067,7 @@ class PaymentController extends Controller
             // Pre-flight check: Agency Balance
             try {
                 $agencyInfo = $this->tboHotelService->getAgencyBalance();
-                $netPrice   = $booking->tbo_raw_prebook['Price']['Total'] ?? ($booking->total_price * 0.9); // Fallback to 90% if missing, though it should be there
+                $netPrice = $booking->tbo_raw_prebook['Price']['Total'] ?? ($booking->total_price * 0.9); // Fallback to 90% if missing, though it should be there
 
                 if ($agencyInfo['balance'] < $netPrice) {
                     Log::critical("TBO Booking Failed: Insufficient Agency Balance. Available: {$agencyInfo['balance']}, Net Price Required: {$netPrice}");
@@ -1064,25 +1082,25 @@ class PaymentController extends Controller
             }
 
             $guests = $booking->guests->map->toTboFormat()->toArray();
-            $lead   = $booking->guests->firstWhere('type', 'adult') ?? $booking->guests->first();
+            $lead = $booking->guests->firstWhere('type', 'adult') ?? $booking->guests->first();
 
             $tboResult = $this->tboHotelService->createBooking(
                 $booking->tbo_result_token,
                 $guests,
                 [
-                    'email'      => $user->email,
-                    'phone'      => $user->phone,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
                     'first_name' => $lead?->first_name ?? $user->first_name ?? $user->full_name,
-                    'last_name'  => $lead?->last_name  ?? ($user->last_name ?? 'User'),
+                    'last_name' => $lead?->last_name ?? ($user->last_name ?? 'User'),
                 ],
                 'HOTEL-' . $booking->id . '-' . time()
             );
 
             // ---- Step 3: Update booking in DB ----
             $booking->update([
-                'tbo_booking_id'  => $tboResult['tbo_booking_id'],
-                'status'          => HotelBooking::STATUS_CONFIRMED,
-                'booking_state'   => HotelBooking::STATE_CONFIRMED,
+                'tbo_booking_id' => $tboResult['tbo_booking_id'],
+                'status' => HotelBooking::STATUS_CONFIRMED,
+                'booking_state' => HotelBooking::STATE_CONFIRMED,
                 'tbo_raw_booking' => array_merge($booking->tbo_raw_booking ?? [], $tboResult['raw']),
             ]);
 
@@ -1091,16 +1109,16 @@ class PaymentController extends Controller
                 ['transaction_id' => $transactionId],
                 [
                     'hotel_booking_id' => $booking->id,
-                    'user_id'          => $user->id,
-                    'payment_gateway'  => match($type) {
+                    'user_id' => $user->id,
+                    'payment_gateway' => match ($type) {
                         'mada', 'visa_master', 'apple_pay' => 'hyperpay',
                         default => $type,
                     },
                     'payment_method' => $type,
-                    'amount'         => $booking->total_price,
-                    'currency'       => $booking->currency,
-                    'status'         => 'paid',
-                    'raw_response'   => $gatewayResponse,
+                    'amount' => $booking->total_price,
+                    'currency' => $booking->currency,
+                    'status' => 'paid',
+                    'raw_response' => $gatewayResponse,
                 ]
             );
 
@@ -1113,11 +1131,11 @@ class PaymentController extends Controller
             // ---- Step 6: History Log ----
             HotelBookingHistory::create([
                 'hotel_booking_id' => $booking->id,
-                'user_id'          => null,
-                'action'           => 'payment_confirmed',
-                'description'      => "الدفع تم بنجاح عبر {$type}. تم تأكيد الحجز مع TBO. رقم الحجز: {$tboResult['tbo_booking_id']}",
-                'previous_state'   => HotelBooking::STATE_AWAITING_PAYMENT,
-                'new_state'        => HotelBooking::STATE_CONFIRMED,
+                'user_id' => null,
+                'action' => 'payment_confirmed',
+                'description' => "الدفع تم بنجاح عبر {$type}. تم تأكيد الحجز مع TBO. رقم الحجز: {$tboResult['tbo_booking_id']}",
+                'previous_state' => HotelBooking::STATE_AWAITING_PAYMENT,
+                'new_state' => HotelBooking::STATE_CONFIRMED,
             ]);
 
             DB::commit();
@@ -1130,13 +1148,13 @@ class PaymentController extends Controller
                     __('Payment Successful'),
                     __('Your payment of :amount SAR for hotel ":hotel" has been confirmed.', [
                         'amount' => $booking->total_price,
-                        'hotel'  => $booking->hotel_name,
+                        'hotel' => $booking->hotel_name,
                     ]),
                     [
                         'hotel_booking_id' => (string) $booking->id,
-                        'tbo_booking_id'   => $tboResult['tbo_booking_id'],
-                        'amount'           => (string) $booking->total_price,
-                        'gateway'          => $type,
+                        'tbo_booking_id' => $tboResult['tbo_booking_id'],
+                        'amount' => (string) $booking->total_price,
+                        'gateway' => $type,
                     ]
                 );
 
@@ -1145,23 +1163,23 @@ class PaymentController extends Controller
                     Notification::TYPE_BOOKING_CONFIRMED,
                     __('Hotel Booking Confirmed'),
                     __('Your hotel booking at ":hotel" (:checkin - :checkout) has been confirmed. TBO Ref: :ref', [
-                        'hotel'   => $booking->hotel_name,
+                        'hotel' => $booking->hotel_name,
                         'checkin' => \Carbon\Carbon::parse($booking->check_in_date)->format('Y-m-d'),
-                        'checkout'=> \Carbon\Carbon::parse($booking->check_out_date)->format('Y-m-d'),
-                        'ref'     => $tboResult['tbo_booking_id'],
+                        'checkout' => \Carbon\Carbon::parse($booking->check_out_date)->format('Y-m-d'),
+                        'ref' => $tboResult['tbo_booking_id'],
                     ]),
                     [
                         'hotel_booking_id' => (string) $booking->id,
-                        'tbo_booking_id'   => $tboResult['tbo_booking_id'],
+                        'tbo_booking_id' => $tboResult['tbo_booking_id'],
                     ]
                 );
             }
 
             return $this->apiResponse(false, __('payment.success'), [
                 'hotel_booking_id' => $booking->id,
-                'tbo_booking_id'   => $tboResult['tbo_booking_id'],
-                'status'           => 'confirmed',
-                'invoice_url'      => $invoicePath ? asset('storage/' . $invoicePath) : null,
+                'tbo_booking_id' => $tboResult['tbo_booking_id'],
+                'status' => 'confirmed',
+                'invoice_url' => $invoicePath ? asset('storage/' . $invoicePath) : null,
             ]);
 
         } catch (\Exception $e) {

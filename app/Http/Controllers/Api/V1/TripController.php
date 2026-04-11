@@ -7,6 +7,7 @@ use App\Traits\ApiResponseTrait;
 use App\Models\Trip;
 use App\Models\TripBooking;
 use App\Models\Favorite;
+use App\Models\TripLike;
 use App\Models\Notification;
 use App\Models\BookingPassenger;
 use App\Services\NotificationService;
@@ -97,6 +98,9 @@ class TripController extends Controller
                                 new OA\Property(property: "image", type: "string", example: "http://example.com/trips/1.jpg"),
                                 new OA\Property(property: "to_country", type: "string", example: "France"),
                                 new OA\Property(property: "is_favorite", type: "boolean", example: false),
+                                new OA\Property(property: "is_liked", type: "boolean", example: false),
+                                new OA\Property(property: "likes_count", type: "integer", example: 5),
+                                new OA\Property(property: "views_count", type: "integer", example: 100),
                                 new OA\Property(property: "is_featured", type: "boolean", example: true),
                                 new OA\Property(property: "base_capacity", type: "integer", example: 2),
                                 new OA\Property(property: "extra_passenger_price", type: "number", example: 100.00),
@@ -150,15 +154,17 @@ class TripController extends Controller
             ->latest()
             ->paginate($request->per_page ?? 10);
 
-        // Get user favorites if logged in
+        // Get user favorites and likes if logged in
         $userFavoriteIds = [];
+        $userLikeIds = [];
         $user = Auth::guard('sanctum')->user();
         if ($user) {
             $userFavoriteIds = Favorite::where('user_id', $user->id)->pluck('trip_id')->toArray();
+            $userLikeIds = TripLike::where('user_id', $user->id)->pluck('trip_id')->toArray();
         }
 
         // Transform data
-        $transformedData = $trips->getCollection()->map(function ($trip) use ($userFavoriteIds) {
+        $transformedData = $trips->getCollection()->map(function ($trip) use ($userFavoriteIds, $userLikeIds) {
             return [
                 'id' => $trip->id,
                 'title' => $trip->title, // Translatable if using Spatie Translatable
@@ -176,6 +182,9 @@ class TripController extends Controller
                 'is_featured' => (bool)$trip->is_featured,
                 'base_capacity' => $trip->base_capacity ?? 2,
                 'extra_passenger_price' => $trip->extra_passenger_price ?? 0,
+                'is_liked' => in_array($trip->id, $userLikeIds),
+                'likes_count' => $trip->likes_count ?? $trip->likes()->count(),
+                'views_count' => $trip->page_visits,
                 'categories' => $trip->categories->map(function ($cat) {
                     return [
                         'id' => $cat->id,
@@ -249,6 +258,9 @@ class TripController extends Controller
                                 ]
                             )),
                             new OA\Property(property: "is_favorite", type: "boolean", example: false),
+                            new OA\Property(property: "is_liked", type: "boolean", example: false),
+                            new OA\Property(property: "likes_count", type: "integer", example: 5),
+                            new OA\Property(property: "views_count", type: "integer", example: 100),
                         ])
                     ]
                 )
@@ -268,6 +280,9 @@ class TripController extends Controller
         if (!$trip) {
             return $this->apiResponse(true, __('Trip not found or expired'), null, null, 404);
         }
+
+        // Increment page visits
+        $trip->increment('page_visits');
 
         $data = [
             'id' => $trip->id,
@@ -306,6 +321,9 @@ class TripController extends Controller
                 ];
             }),
             'is_favorite' => Auth::guard('sanctum')->check() && Favorite::where('user_id', Auth::guard('sanctum')->id())->where('trip_id', $trip->id)->exists(),
+            'is_liked' => Auth::guard('sanctum')->check() && TripLike::where('user_id', Auth::guard('sanctum')->id())->where('trip_id', $trip->id)->exists(),
+            'likes_count' => $trip->likes()->count(),
+            'views_count' => $trip->page_visits,
         ];
 
         return $this->apiResponse(false, __('Trip details retrieved successfully'), $data);
@@ -605,6 +623,82 @@ class TripController extends Controller
             ]);
             return $this->apiResponse(false, __('Trip added to favorites'), ['is_favorite' => true]);
         }
+    }
+
+    /**
+     * Toggle trip like state.
+     */
+    #[OA\Post(
+        path: "/api/v1/trips/{id}/like",
+        summary: "Toggle like",
+        operationId: "toggleLike",
+        description: "Add or remove a trip from user likes. Requires authentication.",
+        tags: ["Trips"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "Accept-Language",
+                in: "header",
+                description: "The language of the response (ar, en)",
+                required: false,
+                schema: new OA\Schema(type: "string", default: "en", enum: ["en", "ar"])
+            ),
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "Trip ID",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Operation successful",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "error", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Trip liked successfully"),
+                        new OA\Property(property: "data", type: "object", properties: [
+                            new OA\Property(property: "is_liked", type: "boolean", example: true),
+                            new OA\Property(property: "likes_count", type: "integer", example: 10)
+                        ])
+                    ]
+                )
+            )
+        ]
+    )]
+    public function toggleLike($id): JsonResponse
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
+        }
+
+        $trip = Trip::find($id);
+        if (!$trip) {
+            return $this->apiResponse(true, __('Trip not found'), null, null, 404);
+        }
+
+        $like = TripLike::where('user_id', $user->id)->where('trip_id', $id)->first();
+
+        if ($like) {
+            $like->delete();
+            $message = __('Trip unliked successfully');
+            $isLiked = false;
+        } else {
+            TripLike::create([
+                'user_id' => $user->id,
+                'trip_id' => $id
+            ]);
+            $message = __('Trip liked successfully');
+            $isLiked = true;
+        }
+
+        return $this->apiResponse(false, $message, [
+            'is_liked' => $isLiked,
+            'likes_count' => $trip->likes()->count()
+        ]);
     }
 
     /**

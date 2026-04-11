@@ -102,6 +102,16 @@
                 </div>
             @endif
 
+            {{-- Stats --}}
+            <div class="trip-card-meta-item">
+                <i class="far fa-eye" style="font-size: 14px;"></i>
+                <span>{{ $trip->page_visits }}</span>
+            </div>
+            <div class="trip-card-meta-item">
+                <i class="far fa-thumbs-up" style="font-size: 14px;"></i>
+                <span>{{ $trip->likes_count ?? $trip->likes()->count() }}</span>
+            </div>
+
             {{-- Price --}}
             <div class="trip-card-price">
                 @if($trip->price_before_discount && $trip->price_before_discount > $trip->price)

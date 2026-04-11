@@ -60,6 +60,7 @@ Route::get('/company/{company}', [CompanyProfileController::class, 'show'])->nam
 // Trips
 Route::get('/trips', [FrontendController::class, 'trips'])->name('trips.index');
 Route::get('/trips/{id}', [FrontendController::class, 'tripShow'])->name('trips.show');
+Route::post('/trips/{id}/like', [FrontendController::class, 'toggleLike'])->name('trips.like')->middleware('auth');
 
 // Destinations
 Route::get('/destinations', [FrontendController::class, 'destinations'])->name('destinations');

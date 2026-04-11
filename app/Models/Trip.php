@@ -128,6 +128,11 @@ class Trip extends Model
         return $this->hasMany(TripPageVisit::class);
     }
 
+    public function likes()
+    {
+        return $this->hasMany(TripLike::class);
+    }
+
     /**
      * Get image URL.
      */
@@ -138,6 +143,19 @@ class Trip extends Model
             return asset('storage/' . $image->image_path);
         }
         return asset('images/default-placeholder.svg');
+    }
+
+    /**
+     * Check if the trip is liked by the current authenticated user.
+     */
+    public function getIsLikedAttribute()
+    {
+        $userId = auth()->id() ?: auth('sanctum')->id();
+        if (!$userId) {
+            return false;
+        }
+
+        return $this->likes()->where('user_id', $userId)->exists();
     }
 
     /**

@@ -250,4 +250,38 @@ class FrontendController extends Controller
 
         return view('frontend.search', compact('trips'));
     }
+
+    /**
+     * Toggle trip like state.
+     */
+    public function toggleLike($id)
+    {
+        if (!auth()->check()) {
+            return response()->json(['status' => 'unauthorized'], 401);
+        }
+
+        $trip = Trip::findOrFail($id);
+        $userId = auth()->id();
+
+        $like = \App\Models\TripLike::where('user_id', $userId)
+            ->where('trip_id', $id)
+            ->first();
+
+        if ($like) {
+            $like->delete();
+            return response()->json([
+                'status' => 'removed',
+                'count' => $trip->likes()->count()
+            ]);
+        } else {
+            \App\Models\TripLike::create([
+                'user_id' => $userId,
+                'trip_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'added',
+                'count' => $trip->likes()->count()
+            ]);
+        }
+    }
 }

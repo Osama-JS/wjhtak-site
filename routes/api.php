@@ -38,6 +38,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/bookings/{id}/cancel', [\App\Http\Controllers\Api\V1\TripController::class, 'cancelBooking']);
         Route::get('/favorites', [\App\Http\Controllers\Api\V1\TripController::class, 'getFavorites']);
         Route::post('/trips/{id}/favorite', [\App\Http\Controllers\Api\V1\TripController::class, 'toggleFavorite']);
+        Route::post('/trips/{id}/like', [\App\Http\Controllers\Api\V1\TripController::class, 'toggleLike']);
 
         // Notifications
         Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);

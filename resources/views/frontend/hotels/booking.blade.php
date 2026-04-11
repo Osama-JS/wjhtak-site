@@ -5,7 +5,7 @@
 @section('content')
 <section class="booking-flow-section" style="padding: var(--space-20) 0; background: #f8fafc;">
     <div class="container">
-        <div class="booking-grid" style="display: grid; grid-template-columns: 1fr 380px; gap: 40px;">
+        <div class="booking-grid">
 
             {{-- Form Column --}}
             <div class="booking-form-col">
@@ -224,6 +224,11 @@
 
 @push('styles')
 <style>
+    .booking-grid {
+        display: grid; 
+        grid-template-columns: 1fr 380px; 
+        gap: 40px;
+    }
     .passenger-card {
         background: #fff;
         border: 2px solid #f1f5f9;
