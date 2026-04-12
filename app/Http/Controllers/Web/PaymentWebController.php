@@ -70,7 +70,7 @@ class PaymentWebController extends Controller
             ];
 
             // If HyperPay, we might need a checkout_id immediately to load the widget
-            if (in_array($method, ['mada', 'visa_master', 'apple_pay'])) {
+            if (in_array($method, ['mada', 'visa_master'])) {
                 $checkoutResult = $this->prepareHyperPayCheckout($booking, $method, $request);
                 $checkoutId = $checkoutResult['id'] ?? null;
                 $data['checkout_id'] = $checkoutId;
@@ -96,7 +96,7 @@ class PaymentWebController extends Controller
         $request->validate([
             'booking_id'   => 'required|integer',
             'booking_type' => 'nullable|string|in:trip,hotel',
-            'method'       => 'required|string|in:tamara,tabby,tap',
+            'method'       => 'required|string|in:tamara,tabby',
             'source'       => 'nullable|string',
         ]);
 

@@ -192,19 +192,19 @@
     <!-- Summary Card -->
     <div class="card">
         <div class="summary-header">
-            <span class="summary-title"><i>📝</i> تفاصيل الحجز</span>
+            <span class="summary-title"><i>📝</i> {{ __('Booking Details') }}</span>
             <span class="trip-price">{{ number_format($amount, 2) }} ر.س</span>
         </div>
         <div class="info-row">
-            <span class="info-label">الرحلة</span>
-            <span class="info-value">{{ $trip->title_ar ?? $trip->title }}</span>
+            <span class="info-label">{{ __('Trip/Hotel') }}</span>
+            <span class="info-value">{{ $trip->title_ar ?? ($trip->title ?? ($hotel->hotel_name ?? 'Booking')) }}</span>
         </div>
         <div class="info-row">
-            <span class="info-label">اسم العميل</span>
-            <span class="info-value">{{ $user->full_name }}</span>
+            <span class="info-label">{{ __('Customer Name') }}</span>
+            <span class="info-value">{{ $user->full_name ?? ($user->first_name . ' ' . $user->last_name) }}</span>
         </div>
         <div class="info-row">
-            <span class="info-label">رقم المرجع</span>
+            <span class="info-label">{{ __('Reference Number') }}</span>
             <span class="info-value">#{{ $booking->id }}</span>
         </div>
     </div>
@@ -215,8 +215,8 @@
             @php
                 $logoUrl = match($method) {
                     'mada' => 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Mada_Logo.svg',
-                    'visa_master' => 'https://t3.ftcdn.net/jpg/03/33/21/62/240_F_333216210_HjHUw1jjcYdGr3rRtYm3W1DIXAElEFJL.jpg',
-                    'apple_pay' => 'https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg',
+                    'visa_master' => 'https://spponeimages.azureedge.net/prod/557662bd-eaee-478f-9da3-5b3eb08bf658logo.jpg',
+                    'tabby' => 'https://www.pfgrowth.com/wp-content/uploads/2023/03/tabby-logo-1.png',
                     'tamara' => 'https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg',
                     default => null
                 };
@@ -230,9 +230,9 @@
             </div>
         </div>
 
-        @if(in_array($method, ['mada', 'visa_master', 'apple_pay']))
+        @if(in_array($method, ['mada', 'visa_master']))
             @if(isset($checkout_id))
-                <form action="{{ route('payments.web.callback', ['payment_type' => $method, 'source' => $source]) }}" class="paymentWidgets" data-brands="{{ $method === 'mada' ? 'MADA' : ($method === 'apple_pay' ? 'APPLEPAY' : 'VISA MASTER') }}"></form>
+                <form action="{{ route('payments.web.callback', ['payment_type' => $method, 'source' => $source, 'hotel_booking_id' => $isHotel ? $booking->id : null, 'booking_type' => $isHotel ? 'hotel' : 'trip']) }}" class="paymentWidgets" data-brands="{{ $method === 'mada' ? 'MADA' : 'VISA MASTER' }}"></form>
             @else
                 <div style="text-align:center; padding:20px;">
                     <p style="color:var(--danger)">فشل تحميل طلب الدفع. يرجى المحاولة لاحقاً.</p>

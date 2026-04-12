@@ -258,7 +258,7 @@
                             <input type="radio" name="method" id="m_visa_master" value="visa_master" onchange="setMethod('visa_master')">
                             <label for="m_visa_master" class="payment-method-label">
                                 <div style="display:flex; gap:8px;">
-                                    <img src="https://t3.ftcdn.net/jpg/03/33/21/62/240_F_333216210_HjHUw1jjcYdGr3rRtYm3W1DIXAElEFJL.jpg" alt="Visa" style="height:20px;">
+                                    <img src="https://spponeimages.azureedge.net/prod/557662bd-eaee-478f-9da3-5b3eb08bf658logo.jpg" alt="Visa" style="height:20px;">
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style="height:20px;">
                                 </div>
                                 <span class="method-name">Visa / Master</span>
@@ -273,6 +273,16 @@
                                 <img src="https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg" alt="Tamara">
                                 <span class="method-name">Tamara</span>
                                 <span class="method-desc">{{ __('3 Installments') }}</span>
+                            </label>
+                        </div>
+
+                        {{-- Tabby --}}
+                        <div class="payment-method-option">
+                            <input type="radio" name="method" id="m_tabby" value="tabby" onchange="setMethod('tabby')">
+                            <label for="m_tabby" class="payment-method-label">
+                                <img src="https://www.pfgrowth.com/wp-content/uploads/2023/03/tabby-logo-1.png" alt="Tabby">
+                                <span class="method-name">Tabby</span>
+                                <span class="method-desc">{{ __('Installments') }}</span>
                             </label>
                         </div>
 
@@ -506,8 +516,8 @@ function submitPayment() {
         return;
     }
 
-    // For redirect-based methods (Tamara / Tap)
-    if (['tamara', 'tap'].includes(selectedMethod)) {
+    // For redirect-based methods (Tamara / Tabby)
+    if (['tamara', 'tabby'].includes(selectedMethod)) {
         fetch('{{ route("payments.web.initiate") }}', {
             method: 'POST',
             headers: {

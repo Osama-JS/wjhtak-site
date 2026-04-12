@@ -113,19 +113,19 @@
             <div class="footer-payment">
 
                 <!-- Visa -->
-                <img src="https://t3.ftcdn.net/jpg/03/33/21/62/240_F_333216210_HjHUw1jjcYdGr3rRtYm3W1DIXAElEFJL.jpg" alt="Visa" class="pay-icon">
+                <img src="https://spponeimages.azureedge.net/prod/557662bd-eaee-478f-9da3-5b3eb08bf658logo.jpg" alt="Visa" class="pay-icon">
 
                 <!-- Mastercard -->
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="pay-icon">
-
-                <!-- Apple Pay -->
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay" class="pay-icon">
 
                 <!-- Mada -->
                 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fb/Mada_Logo.svg" alt="Mada" class="pay-icon">
 
                 <!-- Tamara -->
                 <img src="https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg" alt="Tamara" class="pay-icon">
+
+                <!-- Tabby -->
+                <img src="https://www.pfgrowth.com/wp-content/uploads/2023/03/tabby-logo-1.png" alt="Tabby" class="pay-icon">
             </div>
         </div>
     </div>

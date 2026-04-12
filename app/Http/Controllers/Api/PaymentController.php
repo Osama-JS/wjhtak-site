@@ -96,7 +96,7 @@ class PaymentController extends Controller
                 'key' => 'visa_master',
                 'name' => __('Visa / MasterCard'),
                 'type' => 'card',
-                'icon' => asset('assets/img/payments/visa.png')
+                'icon' => 'https://spponeimages.azureedge.net/prod/557662bd-eaee-478f-9da3-5b3eb08bf658logo.jpg'
             ],
             [
                 'key' => 'tamara',
@@ -105,6 +105,12 @@ class PaymentController extends Controller
                 'icon' => asset('assets/img/payments/tamara.png')
             ],
 
+            [
+                'key' => 'tabby',
+                'name' => __('Tabby'),
+                'type' => 'redirect',
+                'icon' => 'https://www.pfgrowth.com/wp-content/uploads/2023/03/tabby-logo-1.png'
+            ],
             [
                 'key' => 'bank_transfer',
                 'name' => __('Bank Transfer'),
@@ -475,10 +481,10 @@ class PaymentController extends Controller
     {
         Log::info('Payment verification started', $request->all());
         $validator = Validator::make($request->all(), [
-            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tamara',
+            'payment_type' => 'required|string|in:mada,visa_master,apple_pay,tamara,tabby,tap',
             'id' => 'required_without_all:checkout_id,payment_id', // Fallback for WebView
             'checkout_id' => 'required_without_all:id,payment_id|required_if:payment_type,mada,visa_master,apple_pay',
-            'payment_id' => 'required_without_all:id,checkout_id|required_if:payment_type,tamara',
+            'payment_id' => 'required_without_all:id,checkout_id|required_if:payment_type,tamara,tabby,tap',
         ]);
 
         if ($validator->fails()) {
@@ -563,10 +569,10 @@ class PaymentController extends Controller
             }
 
             if ($type === 'tamara') {
-                $result = $this->tamaraService->verifyPayment($request->payment_id);
-                $status = $result['status'] ?? 'unknown';
+                $result = $this->tamaraService->verifyPayment($id);
+                $status = strtolower($result['status'] ?? 'unknown');
 
-                if ($status == 'authorised' || $status == 'fully_captured') {
+                if (in_array($status, ['authorised', 'approved', 'fully_captured', 'captured'])) {
                     $reference = $result['order_reference_id'] ?? '';
                     $bookingId = explode('-', $reference)[1] ?? null;
 
@@ -1029,14 +1035,8 @@ class PaymentController extends Controller
                 $transactionId = $id;
             } elseif ($type === 'tamara') {
                 $result = $this->tamaraService->verifyPayment($id);
-                $status = $result['status'] ?? '';
-                $paymentVerified = in_array($status, ['authorised', 'fully_captured']);
-                $gatewayResponse = $result;
-                $transactionId = $id;
-            } elseif ($type === 'tap') {
-                $result = $this->tapService->verifyPayment($id);
-                $status = strtoupper($result['status'] ?? '');
-                $paymentVerified = in_array($status, ['CAPTURED', 'AUTHORIZED']);
+                $status = strtolower($result['status'] ?? '');
+                $paymentVerified = in_array($status, ['authorised', 'approved', 'fully_captured', 'captured']);
                 $gatewayResponse = $result;
                 $transactionId = $id;
             } elseif ($type === 'tap') {
