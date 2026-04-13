@@ -595,6 +595,8 @@ class PaymentController extends Controller
                      * حالات النجاح الحقيقية
                      */
                     $successStatuses = [
+                        'authorised',
+                        'approved',
                         'captured',
                         'fully_captured'
                     ];
