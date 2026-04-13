@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost/wjhtak-site/public",
+            "url": "http://localhost/Wj_t/wjhtak-site/public",
             "description": "Local Server"
         },
         {

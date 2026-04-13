@@ -40,6 +40,9 @@ class TBOHotelService
     protected function credentials(): array
     {
         return [
+            'ClientId'     => $this->clientId,
+            'UserName'     => $this->username,
+            'Password'     => $this->password,
             'EndUserIp'    => (request()->ip() && request()->ip() !== '::1') ? request()->ip() : '172.16.10.10',
         ];
     }
@@ -236,6 +239,7 @@ class TBOHotelService
             'raw'        => $response,
         ];
     }
+
 
     // =============================================
     // 3. Hotel Details (Static Info)

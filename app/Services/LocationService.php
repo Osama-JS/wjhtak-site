@@ -13,11 +13,7 @@ class LocationService
 
     public function __construct()
     {
-        if(env('APP_API_MODE') === 'mock') {
-            $this->tboService = new \App\Services\MockTBOHotelService();
-        } else {
-            $this->tboService = app(\App\Services\TBOHotelService::class);
-        }
+        $this->tboService = app(\App\Services\TBOHotelService::class);
     }
 
     /**
