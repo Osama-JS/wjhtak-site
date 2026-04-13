@@ -104,13 +104,13 @@ class PaymentController extends Controller
                 'type' => 'redirect',
                 'icon' => asset('assets/img/payments/tamara.png')
             ],
-
-            [
-                'key' => 'tabby',
-                'name' => __('Tabby'),
-                'type' => 'redirect',
-                'icon' => 'https://www.pfgrowth.com/wp-content/uploads/2023/03/tabby-logo-1.png'
-            ],
+            // Tabby — Hidden (inactive)
+            // [
+            //     'key' => 'tabby',
+            //     'name' => __('Tabby'),
+            //     'type' => 'redirect',
+            //     'icon' => 'https://www.pfgrowth.com/wp-content/uploads/2023/03/tabby-logo-1.png'
+            // ],
             [
                 'key' => 'bank_transfer',
                 'name' => __('Bank Transfer'),

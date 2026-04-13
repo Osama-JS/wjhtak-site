@@ -276,17 +276,8 @@
                             </label>
                         </div>
 
-                        {{-- Tabby --}}
-                        <div class="payment-method-option">
-                            <input type="radio" name="method" id="m_tabby" value="tabby" onchange="setMethod('tabby')">
-                            <label for="m_tabby" class="payment-method-label">
-                                <img src="https://www.pfgrowth.com/wp-content/uploads/2023/03/tabby-logo-1.png" alt="Tabby">
-                                <span class="method-name">Tabby</span>
-                                <span class="method-desc">{{ __('Installments') }}</span>
-                            </label>
-                        </div>
 
-
+                        {{-- Tabby — Hidden (inactive) --}}
 
                         {{-- Bank Transfer --}}
                         <div class="payment-method-option">
