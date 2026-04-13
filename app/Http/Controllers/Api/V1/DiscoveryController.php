@@ -62,8 +62,8 @@ class DiscoveryController extends Controller
         $countries = Country::active()->get()->map(function ($country) {
             return [
                 'id' => $country->id,
-                'name' => $country->name_attribute,
-                'name_ar' => $country->nicename, // nicename is usually the localized one in this schema
+                'name' => $country->name,
+                'name_ar' => $country->name_ar ?? $country->nicename,
                 'name_en' => $country->name,
                 'code' => $country->numcode,
                 'phone_code' => $country->phonecode,
@@ -137,12 +137,12 @@ class DiscoveryController extends Controller
         $cities = $query->get()->map(function ($city) {
             return [
                 'id' => $city->id,
-                'name' => $city->name_attribute,
-                'name_ar' => $city->title,
+                'name' => $city->name,
+                'name_ar' => $city->title_ar,
                 'name_en' => $city->title,
                 'country' => $city->country ? [
                     'id' => $city->country->id,
-                    'name' => $city->country->name_attribute,
+                    'name' => $city->country->name,
                     'flag' => $city->country->flag_url,
                 ] : null,
             ];
@@ -269,12 +269,12 @@ class DiscoveryController extends Controller
         }])->get()->map(function ($country) {
             return [
                 'id' => $country->id,
-                'name' => $country->name_attribute,
+                'name' => $country->name,
                 'flag' => $country->flag_url,
                 'cities' => $country->cities->map(function ($city) {
                     return [
                         'id' => $city->id,
-                        'name' => $city->name_attribute,
+                        'name' => $city->name,
                     ];
                 })
             ];

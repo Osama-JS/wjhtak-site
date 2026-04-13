@@ -167,28 +167,28 @@ class TripController extends Controller
         $transformedData = $trips->getCollection()->map(function ($trip) use ($userFavoriteIds, $userLikeIds) {
             return [
                 'id' => $trip->id,
-                'title' => $trip->title, // Translatable if using Spatie Translatable
+                'title' => $trip->title,
                 'description' => $trip->description,
-                'price' => $trip->price,
-                'price_before_discount' => $trip->price_before_discount,
+                'price' => (float)$trip->price,
+                'price_before_discount' => $trip->price_before_discount ? (float)$trip->price_before_discount : null,
                 'duration' => $trip->duration,
-                'tickets' => $trip->tickets,
-                'image' => $trip->image_url, // Accessor
+                'tickets' => (int)$trip->tickets,
+                'image' => $trip->image_url,
                 'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
-                'is_active' => $trip->active,
+                'is_active' => (bool)$trip->active,
                 'expiry_date' => $trip->expiry_date,
                 'is_favorite' => in_array($trip->id, $userFavoriteIds),
                 'is_featured' => (bool)$trip->is_featured,
-                'base_capacity' => $trip->base_capacity ?? 2,
-                'extra_passenger_price' => $trip->extra_passenger_price ?? 0,
+                'base_capacity' => (int)($trip->base_capacity ?? 2),
+                'extra_passenger_price' => (float)($trip->extra_passenger_price ?? 0),
                 'is_liked' => in_array($trip->id, $userLikeIds),
-                'likes_count' => $trip->likes_count ?? $trip->likes()->count(),
-                'views_count' => $trip->page_visits,
+                'likes_count' => $trip->likes()->count(),
+                'views_count' => (int)$trip->page_visits,
                 'categories' => $trip->categories->map(function ($cat) {
                     return [
                         'id' => $cat->id,
-                        'name' => $cat->name_attribute,
+                        'name' => $cat->name,
                     ];
                 }),
             ];
@@ -288,22 +288,22 @@ class TripController extends Controller
             'id' => $trip->id,
             'title' => $trip->title,
             'description' => $trip->description,
-            'price' => $trip->price,
-            'price_before_discount' => $trip->price_before_discount,
+            'price' => (float)$trip->price,
+            'price_before_discount' => $trip->price_before_discount ? (float)$trip->price_before_discount : null,
             'duration' => $trip->duration,
-            'tickets_available' => $trip->tickets,
+            'tickets_available' => (int)$trip->tickets,
             'expiry_date' => $trip->expiry_date,
             'company' => $trip->company ? [
                 'id' => $trip->company->id,
                 'name' => $trip->company->name,
-                'logo' => $trip->company->logo_url, // Assuming accessor exists
+                'logo' => $trip->company->logo_url,
             ] : null,
             'location' => [
                 'country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'city' => $trip->toCity ? $trip->toCity->name : null,
             ],
-            'base_capacity' => $trip->base_capacity ?? 2,
-            'extra_passenger_price' => $trip->extra_passenger_price ?? 0,
+            'base_capacity' => (int)($trip->base_capacity ?? 2),
+            'extra_passenger_price' => (float)($trip->extra_passenger_price ?? 0),
             'images' => $trip->images->map(function ($img) {
                 return asset('storage/' . $img->image_path);
             }),
@@ -317,13 +317,13 @@ class TripController extends Controller
             'categories' => $trip->categories->map(function ($cat) {
                 return [
                     'id' => $cat->id,
-                    'name' => $cat->name_attribute,
+                    'name' => $cat->name,
                 ];
             }),
             'is_favorite' => Auth::guard('sanctum')->check() && Favorite::where('user_id', Auth::guard('sanctum')->id())->where('trip_id', $trip->id)->exists(),
             'is_liked' => Auth::guard('sanctum')->check() && TripLike::where('user_id', Auth::guard('sanctum')->id())->where('trip_id', $trip->id)->exists(),
             'likes_count' => $trip->likes()->count(),
-            'views_count' => $trip->page_visits,
+            'views_count' => (int)$trip->page_visits,
         ];
 
         return $this->apiResponse(false, __('Trip details retrieved successfully'), $data);
@@ -1267,35 +1267,40 @@ class TripController extends Controller
             ->latest()
             ->paginate($request->per_page ?? 10);
 
-        // Get user favorites if logged in (for identical structure to index)
+        // Get user favorites and likes if logged in
         $userFavoriteIds = [];
+        $userLikeIds = [];
         $user = Auth::guard('sanctum')->user();
         if ($user) {
             $userFavoriteIds = Favorite::where('user_id', $user->id)->pluck('trip_id')->toArray();
+            $userLikeIds = TripLike::where('user_id', $user->id)->pluck('trip_id')->toArray();
         }
 
-        $trips->getCollection()->transform(function ($trip) use ($userFavoriteIds) {
+        $trips->getCollection()->transform(function ($trip) use ($userFavoriteIds, $userLikeIds) {
             return [
                 'id' => $trip->id,
                 'title' => $trip->title,
                 'description' => $trip->description,
-                'price' => $trip->price,
-                'price_before_discount' => $trip->price_before_discount,
+                'price' => (float)$trip->price,
+                'price_before_discount' => $trip->price_before_discount ? (float)$trip->price_before_discount : null,
                 'duration' => $trip->duration,
-                'tickets' => $trip->tickets,
+                'tickets' => (int)$trip->tickets,
                 'image' => $trip->image_url,
                 'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
-                'is_active' => $trip->active,
+                'is_active' => (bool)$trip->active,
                 'expiry_date' => $trip->expiry_date,
                 'is_favorite' => in_array($trip->id, $userFavoriteIds),
+                'is_liked' => in_array($trip->id, $userLikeIds),
+                'likes_count' => $trip->likes()->count(),
+                'views_count' => (int)$trip->page_visits,
                 'is_featured' => (bool)$trip->is_featured,
-                'base_capacity' => $trip->base_capacity ?? 2,
-                'extra_passenger_price' => $trip->extra_passenger_price ?? 0,
+                'base_capacity' => (int)($trip->base_capacity ?? 2),
+                'extra_passenger_price' => (float)($trip->extra_passenger_price ?? 0),
                 'categories' => $trip->categories->map(function ($cat) {
                     return [
                         'id' => $cat->id,
-                        'name' => $cat->name_attribute,
+                        'name' => $cat->name,
                     ];
                 }),
             ];
