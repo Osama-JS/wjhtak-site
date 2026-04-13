@@ -603,123 +603,87 @@ class PaymentController extends Controller
 
                     if (in_array($status, $successStatuses)) {
 
+                        // الطريقة الأولى: محاولة استخراج رقم الحجز من order_reference_id
                         $reference = $result['order_reference_id'] ?? '';
+                        $bookingId = null;
 
-                        Log::info('Tamara reference received', [
-                            'reference' => $reference
-                        ]);
+                        if ($reference) {
+                            $parts = explode('-', $reference);
+                            $bookingId = $parts[1] ?? null; // BOOKING-{ID}-{TIME}
+                            Log::info('Tamara booking ID from order_reference_id', [
+                                'reference' => $reference,
+                                'booking_id' => $bookingId,
+                            ]);
+                        }
 
-                        // استخراج booking id
-                        $parts = explode('-', $reference);
-                        $bookingId = end($parts);
+                        // الطريقة الثانية (احتياطية): البحث في سجلات الدفع المعلقة باستخدام order_id
+                        if (!$bookingId) {
+                            $orderId = $result['order_id'] ?? $id;
+                            $pendingPayment = Payment::where('transaction_id', $orderId)
+                                ->orWhere('transaction_id', $id)
+                                ->first();
+
+                            if ($pendingPayment) {
+                                $bookingId = $pendingPayment->trip_booking_id;
+                                Log::info('Tamara booking ID resolved from Payment record', [
+                                    'order_id' => $orderId,
+                                    'booking_id' => $bookingId,
+                                ]);
+                            }
+                        }
 
                         if (!$bookingId) {
-
-                            Log::error('Tamara booking ID extraction failed', [
-                                'reference' => $reference
+                            Log::error('Tamara booking ID extraction failed — no reference and no pending payment found', [
+                                'order_id' => $result['order_id'] ?? $id,
+                                'response' => $result,
                             ]);
 
                             return $this->apiResponse(
                                 true,
-                                __('Invalid booking reference'),
-                                $result,
+                                __('Cannot resolve booking from payment. Please contact support.'),
+                                ['order_id' => $result['order_id'] ?? $id],
                                 null,
                                 400
                             );
                         }
 
-                        Log::info('Tamara booking ID extracted', [
-                            'booking_id' => $bookingId
-                        ]);
-
                         // جلب الحجز
-                        $booking = TripBooking::with(['user', 'trip'])
-                            ->find($bookingId);
+                        $booking = TripBooking::with(['user', 'trip'])->find($bookingId);
 
                         if (!$booking) {
-
-                            Log::error('Tamara booking not found', [
-                                'booking_id' => $bookingId
-                            ]);
-
-                            return $this->apiResponse(
-                                true,
-                                __('Booking not found'),
-                                $result,
-                                null,
-                                404
-                            );
+                            Log::error('Tamara booking not found', ['booking_id' => $bookingId]);
+                            return $this->apiResponse(true, __('Booking not found'), $result, null, 404);
                         }
 
-                        /**
-                         * منع التكرار
-                         */
-                        if ($booking->payment_status === 'paid') {
-
-                            Log::warning('Tamara duplicate payment detected', [
-                                'booking_id' => $bookingId
+                        // منع التكرار
+                        if ($booking->status === 'confirmed') {
+                            Log::warning('Tamara duplicate payment detected', ['booking_id' => $bookingId]);
+                            return $this->apiResponse(false, __('Payment already completed.'), [
+                                'status' => 'paid',
+                                'booking_id' => $booking->id,
                             ]);
-
-                            return $this->apiResponse(
-                                false,
-                                __('Payment already completed.'),
-                                [
-                                    'status' => 'paid',
-                                    'booking_id' => $booking->id
-                                ]
-                            );
                         }
 
-                        /**
-                         * تحقق من المبلغ
-                         */
-                        $paidAmount = $result['amount'] ?? 0;
+                        // تحقق من المبلغ — تمارا تعيد المبلغ في authorized_amount.amount
+                        $paidAmount = $result['authorized_amount']['amount']
+                            ?? $result['amount']['amount']
+                            ?? $result['amount']
+                            ?? null;
 
-                        if ((float) $paidAmount !== (float) $booking->total_price) {
-
+                        if ($paidAmount !== null && (float)$paidAmount !== (float)$booking->total_price) {
                             Log::error('Tamara amount mismatch', [
                                 'booking_id' => $bookingId,
                                 'expected' => $booking->total_price,
-                                'received' => $paidAmount
+                                'received' => $paidAmount,
                             ]);
-
-                            return $this->apiResponse(
-                                true,
-                                __('Payment amount mismatch.'),
-                                $result,
-                                null,
-                                400
-                            );
+                            return $this->apiResponse(true, __('Payment amount mismatch.'), $result, null, 400);
                         }
 
-                        /**
-                         * تحقق من العملة
-                         */
-                        $currency = $result['currency'] ?? null;
-
-                        if ($currency && $currency !== $booking->currency) {
-
-                            Log::error('Tamara currency mismatch', [
-                                'booking_id' => $bookingId,
-                                'expected' => $booking->currency,
-                                'received' => $currency
-                            ]);
-
-                            return $this->apiResponse(
-                                true,
-                                __('Currency mismatch.'),
-                                $result,
-                                null,
-                                400
-                            );
-                        }
-
-                        /**
-                         * تسجيل الدفع
-                         */
+                        // تمت عملية التحقق بنجاح — إكمال الحجز
                         Log::info('Tamara payment verified successfully', [
                             'booking_id' => $bookingId,
-                            'transaction_id' => $id
+                            'transaction_id' => $id,
+                            'status' => $status,
                         ]);
 
                         $this->completePayment(
@@ -730,17 +694,15 @@ class PaymentController extends Controller
                             $request->payment_type
                         );
 
-                        Log::info('Tamara payment completed', [
-                            'booking_id' => $bookingId
-                        ]);
+                        Log::info('Tamara booking confirmed successfully', ['booking_id' => $bookingId]);
 
                         return $this->apiResponse(
                             false,
                             __('Payment successful and booking confirmed.'),
                             [
                                 'status' => 'paid',
-                                'booking_id' => $bookingId,
-                                'transaction_id' => $id
+                                'booking_id' => (int)$bookingId,
+                                'transaction_id' => $id,
                             ]
                         );
                     }
