@@ -18,6 +18,7 @@ class Country extends Model
      */
     protected $fillable = [
         'name',
+        'name_ar',
         'nicename',
         'iso',
         'iso3',
@@ -40,6 +41,9 @@ class Country extends Model
      */
     public function getNameAttribute(): ?string
     {
+        if (app()->getLocale() === 'ar' && $this->name_ar) {
+            return $this->name_ar;
+        }
         return $this->nicename ?? $this->name;
     }
 

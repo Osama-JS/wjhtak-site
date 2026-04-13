@@ -21,7 +21,9 @@ class City extends Model
      */
     protected $fillable = [
         'country_id',
+        'city_code',
         'title',
+        'title_ar',
         'active',
     ];
 
@@ -37,6 +39,9 @@ class City extends Model
      */
     public function getNameAttribute(): ?string
     {
+        if (app()->getLocale() === 'ar' && $this->title_ar) {
+            return $this->title_ar;
+        }
         return $this->title;
     }
 

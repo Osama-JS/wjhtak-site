@@ -45,15 +45,26 @@
     {{-- Search Bar --}}
     <div class="container" style="margin-top: -36px; position: relative; z-index: 20; padding-left: var(--space-4); padding-right: var(--space-4);">
         <div style="background: var(--color-surface, #fff); padding: 24px; border-radius: var(--radius-2xl, 20px); box-shadow: 0 10px 40px rgba(0,0,0,.08); border: 1px solid var(--color-border, #f0f0f0);">
-            <form action="{{ route('hotels.index') }}" method="GET" class="hotel-search-form">
+            <form action="{{ route('hotels.index') }}" method="GET" class="hotel-search-form" id="hotelSearchForm">
                 <div class="hotel-search-grid">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-text, #1e293b); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em;">{{ __('Country') }}</label>
+                        <select name="country_iso" onchange="this.form.submit()" style="width: 100%; background: var(--color-bg, #f8fafc); border: 1px solid var(--color-border, #e2e8f0); border-radius: var(--radius-xl, 14px); padding: 12px 16px; font-size: 14px; color: var(--color-text, #1e293b); transition: all .2s; appearance: auto;">
+                            <option value="">{{ __('Select Country') }}</option>
+                            @foreach($countries ?? [] as $country)
+                                <option value="{{ $country->iso }}" {{ request('country_iso') == $country->iso ? 'selected' : '' }}>
+                                    {{ $country->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-text, #1e293b); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em;">{{ __('Destination') }}</label>
                         <select name="city_code" style="width: 100%; background: var(--color-bg, #f8fafc); border: 1px solid var(--color-border, #e2e8f0); border-radius: var(--radius-xl, 14px); padding: 12px 16px; font-size: 14px; color: var(--color-text, #1e293b); transition: all .2s; appearance: auto;">
                             <option value="">{{ __('Select City') }}</option>
                             @foreach($cities ?? [] as $city)
-                                <option value="{{ $city['CityCode'] }}" {{ request('city_code') == $city['CityCode'] ? 'selected' : '' }}>
-                                    {{ $city['CityName'] }}, {{ $city['CountryName'] }}
+                                <option value="{{ $city->city_code }}" {{ request('city_code') == $city->city_code ? 'selected' : '' }}>
+                                    {{ $city->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -170,10 +181,9 @@
                     @if(request()->filled('city_code'))
                         {{-- Results Header --}}
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                            @php $selectedCity = collect($cities)->firstWhere('city_code', request('city_code')); @endphp
                             <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--color-text, #1e293b); margin: 0;">
-                                {{ __('Found') }} <span style="color: var(--color-primary);">{{ count($hotels ?? []) }}</span> {{ __('hotels in') }} 
-                                @php $selectedCity = collect($cities)->firstWhere('CityCode', request('city_code')); @endphp
-                                {{ $selectedCity['CityName'] ?? __('Selected City') }}
+                                {{ __('Hotels in') }} {{ $selectedCity ? $selectedCity->name : __('Selected City') }}
                             </h2>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span style="font-size: 13px; color: var(--color-text-muted, #94a3b8);">{{ __('Sort by:') }}</span>
@@ -257,10 +267,10 @@
         grid-template-columns: 1fr;
         gap: 16px;
     }
-    @media (min-width: 768px) {
+    @media (min-width: 992px) {
         .hotel-search-grid {
-            grid-template-columns: 1.5fr 1fr 1fr auto;
-            gap: 16px;
+            grid-template-columns: 1fr 1.2fr 1fr 1fr auto;
+            gap: 12px;
         }
     }
 

@@ -33,14 +33,14 @@ class SubscriberController extends Controller
         $subscribers = User::where('user_type', User::TYPE_CUSTOMER)->orderBy('created_at', 'desc')->get();
 
         return response()->json([
-            'data' => $subscribers->map(function($user) {
+            'data' => $subscribers->map(function ($user) {
                 $statusBadge = $user->status === 'active'
-                    ? '<span class="badge badge-success">'.__('Active').'</span>'
-                    : '<span class="badge badge-danger">'.__('Inactive').'</span>';
+                    ? '<span class="badge badge-success">' . __('Active') . '</span>'
+                    : '<span class="badge badge-danger">' . __('Inactive') . '</span>';
 
-                $verifiedBadge = $user->phone_verified_at
-                    ? '<span class="badge badge-light">'.__('Verified').'</span>'
-                    : '<span class="badge badge-warning">'.__('Unverified').'</span>';
+                $verifiedBadge = $user->email_verified_at
+                    ? '<span class="badge badge-light">' . __('Verified') . '</span>'
+                    : '<span class="badge badge-warning">' . __('Unverified') . '</span>';
 
                 return [
                     'id' => $user->id,
@@ -54,11 +54,11 @@ class SubscriberController extends Controller
                     'verified' => $verifiedBadge,
                     'actions' => '
                         <div class="d-flex">
-                            <a href="' . route('admin.subscribers.profile', $user->id) . '" class="btn btn-info shadow btn-xs sharp me-1" title="'.__('View Details').'"><i class="fa fa-eye"></i></a>
-                            <button onclick="editSubscriber(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1" title="'.__('Edit Info').'"><i class="fas fa-pencil-alt"></i></button>
-                            ' . (!$user->phone_verified_at ? '<button onclick="verifySubscriber(' . $user->id . ')" class="btn btn-success shadow btn-xs sharp me-1" title="'.__('Verify Account').'"><i class="fas fa-check-circle"></i></button>' : '') . '
-                            <button onclick="toggleSubscriberStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1" title="'.__('Ban/Unban').'"><i class="fas fa-ban"></i></button>
-                            <button onclick="deleteSubscriber(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp" title="'.__('Delete Account').'"><i class="fa fa-trash"></i></button>
+                            <a href="' . route('admin.subscribers.profile', $user->id) . '" class="btn btn-info shadow btn-xs sharp me-1" title="' . __('View Details') . '"><i class="fa fa-eye"></i></a>
+                            <button onclick="editSubscriber(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1" title="' . __('Edit Info') . '"><i class="fas fa-pencil-alt"></i></button>
+                            ' . (!$user->phone_verified_at ? '<button onclick="verifySubscriber(' . $user->id . ')" class="btn btn-success shadow btn-xs sharp me-1" title="' . __('Verify Account') . '"><i class="fas fa-check-circle"></i></button>' : '') . '
+                            <button onclick="toggleSubscriberStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1" title="' . __('Ban/Unban') . '"><i class="fas fa-ban"></i></button>
+                            <button onclick="deleteSubscriber(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp" title="' . __('Delete Account') . '"><i class="fa fa-trash"></i></button>
                         </div>'
                 ];
             })
@@ -85,13 +85,13 @@ class SubscriberController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name'   => 'required|string|max:100',
-            'last_name'    => 'required|string|max:100',
-            'email'        => 'required|email|unique:users,email',
-            'phone'        => 'nullable|string|unique:users,phone',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'nullable|string|unique:users,phone',
             'country_code' => 'nullable|string|max:10',
-            'password'     => 'required|min:8',
-            'status'       => 'required|in:active,inactive',
+            'password' => 'required|min:8',
+            'status' => 'required|in:active,inactive',
         ]);
 
         $validated['password'] = Hash::make($request->password);

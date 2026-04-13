@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\TBOHotelService;
+use App\Models\Country;
+use App\Models\City;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -30,8 +32,11 @@ class HotelController extends Controller
 
             // If a search was performed (city_code is present)
             if ($request->filled('city_code')) {
+                // Find city by city_code (the numeric TBO code)
+                $city = City::where('city_code', $request->city_code)->first();
+
                 $criteria = [
-                    'city_code'     => $request->city_code,
+                    'city_code'     => $city ? $city->city_code : $request->city_code,
                     'check_in'      => $request->get('check_in', Carbon::now()->addDays(7)->toDateString()),
                     'check_out'     => $request->get('check_out', Carbon::now()->addDays(10)->toDateString()),
                     'adults'        => $request->get('adults', 2),
@@ -47,15 +52,25 @@ class HotelController extends Controller
                 $sessionId = $result['session_id'] ?? null;
             }
 
-            // Get cities for the search dropdown
-            $cities = $this->tboService->getCityList();
-            // Limit for performance if needed, or handle via AJAX search
-            $topCities = array_slice($cities, 0, 50);
+            // Get countries for the filter dropdown
+            $countries = Country::active()->orderBy('name')->get();
+
+            // Get cities based on selected country
+            $citiesQuery = City::active();
+            if ($request->filled('country_iso')) {
+                $country = Country::where('iso', $request->country_iso)->first();
+                if ($country) {
+                    $citiesQuery->where('country_id', $country->id);
+                }
+            }
+            
+            $cities = $citiesQuery->orderBy('title')->get();
 
             return view('frontend.hotels.index', [
                 'hotels'    => $hotels,
                 'sessionId' => $sessionId,
-                'cities'    => $topCities,
+                'cities'    => $cities,
+                'countries' => $countries,
                 'filters'   => $request->all()
             ]);
 
@@ -65,6 +80,7 @@ class HotelController extends Controller
                 'hotels'    => [],
                 'sessionId' => null,
                 'cities'    => [],
+                'countries' => [],
                 'error'     => __('Failed to fetch hotels. Please try again.')
             ]);
         }

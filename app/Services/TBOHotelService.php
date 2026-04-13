@@ -45,6 +45,36 @@ class TBOHotelService
     }
 
     /**
+     * Make an authenticated GET request to TBO API.
+     */
+    protected function get(string $endpoint, array $query = [], int $timeout = 60): array
+    {
+        $url = "{$this->baseUrl}/{$endpoint}";
+        
+        Log::info("TBO API Request [GET] [{$endpoint}]", ['query' => $query]);
+
+        try {
+            $response = Http::timeout($timeout)
+                ->withBasicAuth($this->username, $this->password)
+                ->get($url, $query);
+
+            $json = $response->json();
+
+            Log::info("TBO API Response [GET] [{$endpoint}]", ['status' => $response->status(), 'body' => $json]);
+
+            if ($response->failed()) {
+                throw new \Exception("TBO API HTTP Error {$response->status()}: " . $response->body());
+            }
+
+            return $json ?? [];
+
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error("TBO API Connection Error [GET] [{$endpoint}]", ['message' => $e->getMessage()]);
+            throw new \Exception('TBO API غير متاح حالياً. يرجى المحاولة لاحقاً.');
+        }
+    }
+
+    /**
      * Make an authenticated POST request to TBO API.
      */
     protected function post(string $endpoint, array $payload, int $timeout = 60): array
@@ -89,13 +119,27 @@ class TBOHotelService
 
     /**
      * Get TBO City List. Cached for 24 hours.
+     * @param string|null $countryCode Default 'SA' to avoid API issues
      */
-    public function getCityList(): array
+    public function getCityList(?string $countryCode = 'SA'): array
     {
-        return Cache::remember('tbo_city_list', 60 * 24, function () {
-            $response = $this->post('CityList', []);
-            // TBO V2.1 might return it under 'CityList' or 'CityListResult' or directly
-            return $response['CityList'] ?? $response['CityListResult'] ?? $response ?? [];
+        $cacheKey = $countryCode ? "tbo_city_list_{$countryCode}" : "tbo_city_list_all";
+
+        return Cache::remember($cacheKey, 60 * 24, function () use ($countryCode) {
+            $payload = $countryCode ? ['CountryCode' => $countryCode] : [];
+            $response = $this->post('CityList', $payload);
+            
+            $cities = $response['CityList'] ?? $response['CityListResult'] ?? $response ?? [];
+            
+            // Normalize for TBO V5 keys (Name, Code) and added consistency
+            return array_map(function($city) use ($countryCode) {
+                return [
+                    'CityCode'    => $city['CityCode'] ?? $city['Code'] ?? null,
+                    'CityName'    => $city['CityName'] ?? $city['Name'] ?? 'Unknown',
+                    'CountryCode' => $countryCode,
+                    'CountryName' => ($countryCode === 'SA') ? 'Saudi Arabia' : ($city['CountryName'] ?? 'Unknown'),
+                ];
+            }, $cities);
         });
     }
 
@@ -417,7 +461,7 @@ class TBOHotelService
     public function countryList(): array
     {
         return Cache::remember('tbo_country_list', 60*24, function () {
-            $response = $this->post('CountryList', []);
+            $response = $this->get('CountryList', []);
             return $response['CountryList'] ?? [];
         });
     }
