@@ -541,8 +541,8 @@ class TripController extends Controller
             return [
                 'id' => $booking->id,
                 'trip_id' => $booking->trip_id,
-                'tickets_count' => $booking->tickets_count,
-                'total_price' => $booking->total_price,
+                'tickets_count' => (int)$booking->tickets_count,
+                'total_price' => (float)$booking->total_price,
                 'booking_state' => $booking->booking_state,
                 'booking_state_label' => __($booking->booking_state),
                 'booking_date' => $booking->booking_date ? $booking->booking_date->format('Y-m-d H:i:s') : null,
@@ -550,7 +550,11 @@ class TripController extends Controller
                     'id' => $booking->trip->id,
                     'title' => $booking->trip->title,
                     'image' => $booking->trip->image_url,
-                ] : null,
+                ] : [
+                    'id' => $booking->trip_id,
+                    'title' => __('Deleted Trip'),
+                    'image' => asset('images/default-placeholder.svg'),
+                ],
             ];
         });
 
@@ -775,17 +779,17 @@ class TripController extends Controller
             return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
         }
 
-        $favorites = Favorite::with(['trip.images', 'trip.toCountry', 'trip.toCity'])
+        $favorites = Favorite::whereHas('trip')
+            ->with(['trip.images', 'trip.toCountry', 'trip.toCity'])
             ->where('user_id', $user->id)
             ->paginate($request->per_page ?? 10);
 
         $favorites->getCollection()->transform(function ($favorite) {
             $trip = $favorite->trip;
-            if (!$trip) return null;
             return [
                 'id' => $trip->id,
                 'title' => $trip->title,
-                'price' => $trip->price,
+                'price' => (float)$trip->price,
                 'image' => $trip->image_url,
                 'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
