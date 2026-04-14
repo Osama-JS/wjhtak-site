@@ -72,10 +72,10 @@ class PaymentController extends Controller
                         new OA\Property(property: "message", type: "string", example: "Payment methods retrieved."),
                         new OA\Property(property: "data", type: "array", items: new OA\Items(
                             properties: [
-                                new OA\Property(property: "key", type: "string", example: "visa_master"),
-                                new OA\Property(property: "name", type: "string", example: "Visa / MasterCard"),
+                                new OA\Property(property: "key", type: "string", example: "mada"),
+                                new OA\Property(property: "name", type: "string", example: "Mada"),
                                 new OA\Property(property: "type", type: "string", example: "card"),
-                                new OA\Property(property: "icon", type: "string", example: "url_to_icon")
+                                new OA\Property(property: "icon", type: "string", example: "https://upload.wikimedia.org/wikipedia/commons/f/fb/Mada_Logo.svg")
                             ]
                         ))
                     ]
@@ -90,7 +90,7 @@ class PaymentController extends Controller
                 'key' => 'mada',
                 'name' => __('Mada'),
                 'type' => 'card',
-                'icon' => asset('assets/img/payments/mada.png')
+                'icon' => 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Mada_Logo.svg'
             ],
             [
                 'key' => 'visa_master',
@@ -102,7 +102,7 @@ class PaymentController extends Controller
                 'key' => 'tamara',
                 'name' => __('Tamara'),
                 'type' => 'redirect',
-                'icon' => asset('assets/img/payments/tamara.png')
+                'icon' => 'https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg'
             ],
             // Tabby — Hidden (inactive)
             // [

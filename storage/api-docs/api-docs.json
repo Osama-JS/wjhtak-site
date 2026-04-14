@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost/Wj_t/wjhtak-site/public",
+            "url": "http://localhost/wjhtak-site/public",
             "description": "Local Server"
         },
         {
@@ -3752,11 +3752,11 @@
                                                 "properties": {
                                                     "key": {
                                                         "type": "string",
-                                                        "example": "visa_master"
+                                                        "example": "mada"
                                                     },
                                                     "name": {
                                                         "type": "string",
-                                                        "example": "Visa / MasterCard"
+                                                        "example": "Mada"
                                                     },
                                                     "type": {
                                                         "type": "string",
@@ -3764,7 +3764,7 @@
                                                     },
                                                     "icon": {
                                                         "type": "string",
-                                                        "example": "url_to_icon"
+                                                        "example": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Mada_Logo.svg"
                                                     }
                                                 },
                                                 "type": "object"
@@ -5677,6 +5677,18 @@
                                                     "is_favorite": {
                                                         "type": "boolean",
                                                         "example": true
+                                                    },
+                                                    "is_liked": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "likes_count": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "views_count": {
+                                                        "type": "integer",
+                                                        "example": 150
                                                     }
                                                 },
                                                 "type": "object"

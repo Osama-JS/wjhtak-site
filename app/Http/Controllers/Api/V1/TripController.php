@@ -755,6 +755,9 @@ class TripController extends Controller
                                 new OA\Property(property: "to_country", type: "string", example: "France"),
                                 new OA\Property(property: "to_city", type: "string", example: "Paris"),
                                 new OA\Property(property: "is_favorite", type: "boolean", example: true),
+                                new OA\Property(property: "is_liked", type: "boolean", example: false),
+                                new OA\Property(property: "likes_count", type: "integer", example: 10),
+                                new OA\Property(property: "views_count", type: "integer", example: 150),
                             ]
                         )),
                         new OA\Property(property: "pagination", type: "object", properties: [
@@ -779,12 +782,14 @@ class TripController extends Controller
             return $this->apiResponse(true, 'Unauthenticated', null, null, 401);
         }
 
+        $userLikeIds = \App\Models\TripLike::where('user_id', $user->id)->pluck('trip_id')->toArray();
+
         $favorites = Favorite::whereHas('trip')
             ->with(['trip.images', 'trip.toCountry', 'trip.toCity'])
             ->where('user_id', $user->id)
             ->paginate($request->per_page ?? 10);
 
-        $favorites->getCollection()->transform(function ($favorite) {
+        $favorites->getCollection()->transform(function ($favorite) use ($userLikeIds) {
             $trip = $favorite->trip;
             return [
                 'id' => $trip->id,
@@ -794,6 +799,9 @@ class TripController extends Controller
                 'to_country' => $trip->toCountry ? $trip->toCountry->name : null,
                 'to_city' => $trip->toCity ? $trip->toCity->name : null,
                 'is_favorite' => true,
+                'is_liked' => in_array($trip->id, $userLikeIds),
+                'likes_count' => $trip->likes()->count(),
+                'views_count' => (int)$trip->page_visits,
             ];
         });
 

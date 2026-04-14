@@ -45,6 +45,10 @@ class Trip extends Model
         'expiry_date' => 'date',
         'tickets' => 'integer',
         'price' => 'decimal:2',
+        'price_before_discount' => 'decimal:2',
+        'base_capacity' => 'integer',
+        'extra_passenger_price' => 'decimal:2',
+        'page_visits' => 'integer',
     ];
 
     // Relationships
