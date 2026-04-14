@@ -54,45 +54,86 @@
             </div>
 
             {{-- Featured Grid (Bento Layout) --}}
-            <div class="featured-grid scroll-animate">
-                @forelse($featuredCountries ?? [] as $index => $country)
-                    <div class="featured-grid-item featured-grid-item--{{ ($index % 4) + 1 }}">
-                        @include('frontend.components.destination-card', [
-                            'destination' => $country,
-                            'tripCount' => $country->trips_count ?? 0
-                        ])
-                    </div>
-                @empty
-                    {{-- Demo Featured Destinations --}}
-                    @php
-                        $demoDestinations = [
-                            ['nicename' => 'Dubai',    'iso' => 'ae', 'trips_count' => 45, 'emoji' => '🏙️', 'gradient' => 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)'],
-                            ['nicename' => 'Paris',    'iso' => 'fr', 'trips_count' => 32, 'emoji' => '🗼', 'gradient' => 'linear-gradient(135deg, #2b1055 0%, #d53369 100%)'],
-                            ['nicename' => 'Maldives', 'iso' => 'mv', 'trips_count' => 28, 'emoji' => '🏝️', 'gradient' => 'linear-gradient(135deg, #0093E9 0%, #80D0C7 100%)'],
-                            ['nicename' => 'Istanbul', 'iso' => 'tr', 'trips_count' => 50, 'emoji' => '🕌', 'gradient' => 'linear-gradient(135deg, #c33764 0%, #1d2671 100%)'],
+            @php
+                $gradients = [
+                    'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
+                    'linear-gradient(135deg, #2b1055 0%, #d53369 100%)',
+                    'linear-gradient(135deg, #0093E9 0%, #80D0C7 100%)',
+                    'linear-gradient(135deg, #c33764 0%, #1d2671 100%)',
+                ];
+                $emojis = ['🌍', '✈️', '🏝️', '🕌'];
+
+                // Build the display items — use real data + fill with demos to always show 4
+                $displayItems = [];
+
+                if (!empty($featuredCountries) && $featuredCountries->count() > 0) {
+                    foreach ($featuredCountries as $country) {
+                        $displayItems[] = [
+                            'name' => $country->nicename ?? $country->name ?? __('Destination'),
+                            'trips_count' => $country->trips_count ?? 0,
+                            'url' => route('trips.index', ['country' => $country->id]),
+                            'image' => $country->landmark_image_url ?? null,
+                            'flag' => $country->flag ? asset('storage/' . $country->flag) : null,
                         ];
-                    @endphp
-                    @foreach($demoDestinations as $index => $demo)
-                        @php $destObj = (object)$demo; @endphp
-                        <div class="featured-grid-item featured-grid-item--{{ $index + 1 }}">
-                            <a href="#" class="featured-card scroll-animate" style="background: {{ $demo['gradient'] }};">
-                                <div class="featured-card__emoji">{{ $demo['emoji'] }}</div>
-                                <div class="featured-card__content">
-                                    <h3 class="featured-card__title">{{ $demo['nicename'] }}</h3>
-                                    <p class="featured-card__count">
-                                        <span class="featured-card__dot"></span>
-                                        {{ $demo['trips_count'] }} {{ __('Trips Available') }}
-                                    </p>
-                                </div>
-                                <div class="featured-card__arrow">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-                                    </svg>
-                                </div>
-                            </a>
-                        </div>
-                    @endforeach
-                @endforelse
+                    }
+                }
+
+                // Fill remaining slots with demo data
+                $demoDefaults = [
+                    ['name' => 'Dubai',    'trips_count' => 45, 'emoji' => '🏙️'],
+                    ['name' => 'Paris',    'trips_count' => 32, 'emoji' => '🗼'],
+                    ['name' => 'Maldives', 'trips_count' => 28, 'emoji' => '🏝️'],
+                    ['name' => 'Istanbul', 'trips_count' => 50, 'emoji' => '🕌'],
+                ];
+
+                $needed = 4 - count($displayItems);
+                for ($i = 0; $i < $needed; $i++) {
+                    $demo = $demoDefaults[$i % count($demoDefaults)];
+                    $displayItems[] = [
+                        'name' => $demo['name'],
+                        'trips_count' => $demo['trips_count'],
+                        'url' => '#',
+                        'image' => null,
+                        'flag' => null,
+                        'emoji' => $demo['emoji'],
+                    ];
+                }
+            @endphp
+
+            <div class="featured-grid">
+                @foreach(array_slice($displayItems, 0, 4) as $index => $item)
+                    <div class="featured-grid-item featured-grid-item--{{ $index + 1 }}">
+                        <a href="{{ $item['url'] }}" class="featured-card" style="background: {{ $gradients[$index % 4] }};">
+                            {{-- Background image if available --}}
+                            @if(!empty($item['image']))
+                                <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="featured-card__bg-image" loading="lazy"
+                                     onerror="this.style.display='none'">
+                            @endif
+
+                            {{-- Emoji fallback --}}
+                            <div class="featured-card__emoji">{{ $item['emoji'] ?? $emojis[$index % 4] }}</div>
+
+                            {{-- Content --}}
+                            <div class="featured-card__content">
+                                @if(!empty($item['flag']))
+                                    <img src="{{ $item['flag'] }}" alt="" class="featured-card__flag" onerror="this.style.display='none'">
+                                @endif
+                                <h3 class="featured-card__title">{{ $item['name'] }}</h3>
+                                <p class="featured-card__count">
+                                    <span class="featured-card__dot"></span>
+                                    {{ $item['trips_count'] }} {{ __('Trips Available') }}
+                                </p>
+                            </div>
+
+                            {{-- Arrow --}}
+                            <div class="featured-card__arrow">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -198,7 +239,7 @@
 @push('styles')
 <style>
     /* ============================================
-       Featured Bento Grid
+       Featured Bento Grid — Fully Responsive
        ============================================ */
     .featured-grid {
         display: grid;
@@ -206,31 +247,54 @@
         grid-template-columns: 1fr;
     }
 
-    @media (min-width: 768px) {
+    /* Mobile: single column, uniform height */
+    .featured-grid-item {
+        min-height: 240px;
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+    }
+
+    /* Tablet: 2-column layout with hero item spanning full height */
+    @media (min-width: 640px) {
         .featured-grid {
             grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: 280px 280px;
+            grid-auto-rows: 200px;
+        }
+        .featured-grid-item {
+            min-height: unset;
         }
         .featured-grid-item--1 {
-            grid-row: 1 / 3;
+            grid-row: span 2;
         }
     }
 
+    /* Desktop: 12-column bento layout */
     @media (min-width: 1024px) {
         .featured-grid {
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: 260px 260px;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: 240px 240px;
+            gap: var(--space-5);
         }
+        /* Item 1 — large hero, left column */
         .featured-grid-item--1 {
+            grid-column: 1 / 6;
             grid-row: 1 / 3;
         }
-        .featured-grid-item--4 {
-            grid-column: 2 / 4;
+        /* Item 2 — top right */
+        .featured-grid-item--2 {
+            grid-column: 6 / 9;
+            grid-row: 1 / 2;
         }
-    }
-
-    .featured-grid-item {
-        min-height: 220px;
+        /* Item 3 — top far right */
+        .featured-grid-item--3 {
+            grid-column: 9 / 13;
+            grid-row: 1 / 2;
+        }
+        /* Item 4 — wide bottom right */
+        .featured-grid-item--4 {
+            grid-column: 6 / 13;
+            grid-row: 2 / 3;
+        }
     }
 
     .featured-grid-item .destination-card,
@@ -238,6 +302,35 @@
         width: 100%;
         height: 100%;
         aspect-ratio: unset;
+    }
+
+    /* ============================================
+       Featured Card — Background Image Overlay
+       ============================================ */
+    .featured-card__bg-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        filter: brightness(0.6);
+        transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), filter 0.4s ease;
+    }
+
+    .featured-card:hover .featured-card__bg-image {
+        transform: scale(1.1);
+        filter: brightness(0.5);
+    }
+
+    .featured-card__flag {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-full);
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.7);
+        margin-bottom: var(--space-2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     /* ============================================
