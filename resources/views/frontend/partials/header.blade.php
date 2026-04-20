@@ -11,7 +11,6 @@
         <a href="{{ route('home') }}" class="navbar-logo">
             @if($siteLogo)
                 <img src="{{ asset($siteLogo) }}" alt="{{ $siteName }}" onerror="this.src='{{ asset('images/logo-full.png') }}'">
-                <span class="navbar-logo-text d-none d-lg-inline-block opacity-75 ms-2" style="font-size: 0.9rem;">{{ $siteName }}</span>
             @else
                 <img src="{{ asset('images/logo-full.png') }}" alt="{{ $siteName }}">
                 <span class="navbar-logo-text">{{ $siteName }}</span>
