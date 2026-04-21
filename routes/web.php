@@ -237,6 +237,7 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
         Route::post('trip-bookings/{id}/update-state', [App\Http\Controllers\Admin\TripBookingController::class, 'updateBookingState'])->name('trip-bookings.update-state');
         Route::post('trip-bookings/{id}/upload-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'uploadTicket'])->name('trip-bookings.upload-ticket');
         Route::post('trip-bookings/{id}/send-ticket', [App\Http\Controllers\Admin\TripBookingController::class, 'sendTicket'])->name('trip-bookings.send-ticket');
+        Route::post('trip-bookings/{id}/verify-payment', [App\Http\Controllers\Admin\TripBookingController::class, 'verifyPayment'])->name('trip-bookings.verify-payment');
         Route::resource('trip-bookings', App\Http\Controllers\Admin\TripBookingController::class)->except(['index', 'show']);
     });
 

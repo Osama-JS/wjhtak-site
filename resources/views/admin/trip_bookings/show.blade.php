@@ -255,6 +255,12 @@
                         @elseif($booking->status == 'cancelled')
                              <button class="btn btn-danger light" disabled><i class="fas fa-times-circle me-2"></i> {{ __('Cancelled') }}</button>
                         @else
+                             @if($booking->payment && in_array($booking->payment->payment_gateway, ['tamara', 'hyperpay']))
+                             <form action="{{ route('admin.trip-bookings.verify-payment', $booking->id) }}" method="POST" class="d-grid mb-2">
+                                 @csrf
+                                 <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt me-2"></i> {{ __('Verify Payment Status') }}</button>
+                             </form>
+                             @endif
                              <button class="btn btn-warning light" disabled><i class="fas fa-clock me-2"></i> {{ __('Unpaid') }}</button>
                         @endif
                     </div>

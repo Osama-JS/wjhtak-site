@@ -273,4 +273,51 @@ class TripBookingController extends Controller
 
         return redirect()->back()->with('success', __('Ticket sent to customer successfully.'));
     }
+
+    /**
+     * Manually verify payment status via PaymentController (workaround util webhook is ready).
+     */
+    public function verifyPayment($id)
+    {
+        $booking = TripBooking::with('payment')->findOrFail($id);
+
+        if ($booking->status === 'confirmed') {
+            return redirect()->back()->with('info', __('Booking is already paid and confirmed.'));
+        }
+
+        $payment = $booking->payment;
+        if (!$payment || !$payment->transaction_id) {
+            return redirect()->back()->with('error', __('No pending electronic payment found for this booking.'));
+        }
+
+        try {
+            $paymentController = app(\App\Http\Controllers\Api\PaymentController::class);
+            $requestData = [
+                'id' => $payment->transaction_id,
+                'checkout_id' => $payment->transaction_id,
+                'payment_type' => $payment->payment_method ?? 'visa_master',
+            ];
+
+            // Some payment gateways might expect it as query params or body, we pass it as a Request
+            $apiReq = new \Illuminate\Http\Request($requestData);
+            
+            // To ensure verify method in PaymentController hooks correctly:
+            if ($payment->payment_gateway === 'tamara') {
+                $apiReq->merge(['paymentResult' => 'success']); // For Tamara callback logic simulation
+            }
+
+            $response = $paymentController->verify($apiReq);
+            $data = json_decode($response->getContent(), true);
+
+            if (isset($data['error']) && $data['error'] === false) {
+                return redirect()->back()->with('success', __('Payment verified successfully. Status changed to Paid.'));
+            } else {
+                $msg = $data['message'] ?? __('Payment verification failed. Check logs.');
+                return redirect()->back()->with('error', $msg);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Admin Manual Payment Verification Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('An error occurred while verifying the payment.'));
+        }
+    }
 }
