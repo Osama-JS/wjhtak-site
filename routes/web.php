@@ -105,6 +105,7 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
         Route::get('users/data', [UserController::class, 'getData'])->name('users.data');
         Route::get('users/{user}/profile', [UserController::class, 'profile'])->name('users.profile');
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::post('users/{user}/verify', [UserController::class, 'verify'])->name('users.verify');
         Route::resource('users', UserController::class);
     });
 

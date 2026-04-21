@@ -420,6 +420,28 @@ function viewUser(id) {
         });
     }
 
+    function verifyUser(id) {
+        Swal.fire({
+            title: '{{ __("Verify Account?") }}',
+            text: '{{ __("Are you sure you want to manually verify this admin account?") }}',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '{{ __("Yes, Verify!") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
+        }).then((result) => {
+            if (result.value) {
+                $.post("{{ route('admin.users.verify', ':id') }}".replace(':id', id), {
+                    _token: '{{ csrf_token() }}'
+                }, function(response) {
+                    if (response.success) {
+                        usersTable.ajax.reload(null, false);
+                        toastr.success(response.message);
+                    }
+                });
+            }
+        });
+    }
+
     function deleteUser(id) {
         let url = "{{ route('admin.users.show', ':id') }}";
         url = url.replace(':id', id);

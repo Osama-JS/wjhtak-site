@@ -54,9 +54,10 @@ class UserController extends Controller
                     'verified' => $verifiedBadge,
                     'actions' => auth()->user()->can('manage users') ? '
                         <div class="d-flex">
-                            <button onclick="editUser(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></button>
-                            <button onclick="toggleUserStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-ban"></i></button>
-                            <button onclick="deleteUser(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></button>
+                            <button onclick="editUser(' . $user->id . ')" class="btn btn-primary shadow btn-xs sharp me-1" title="' . __('Edit Info') . '"><i class="fas fa-pencil-alt"></i></button>
+                            ' . (!$user->email_verified_at ? '<button onclick="verifyUser(' . $user->id . ')" class="btn btn-success shadow btn-xs sharp me-1" title="' . __('Verify Account') . '"><i class="fas fa-check-circle"></i></button>' : '') . '
+                            <button onclick="toggleUserStatus(' . $user->id . ')" class="btn btn-warning shadow btn-xs sharp me-1" title="' . __('Ban/Unban') . '"><i class="fas fa-ban"></i></button>
+                            <button onclick="deleteUser(' . $user->id . ')" class="btn btn-danger shadow btn-xs sharp" title="' . __('Delete Account') . '"><i class="fa fa-trash"></i></button>
                         </div>' : ''
                 ];
             })
@@ -187,5 +188,21 @@ class UserController extends Controller
     {
         $user = User::with(['bookings.trip'])->findOrFail($id);
         return view('admin.users.profile', compact('user'));
+    }
+
+    /**
+     * Verify user account manually.
+     */
+    public function verify(User $user)
+    {
+        $user->update([
+            'phone_verified_at' => now(),
+            'email_verified_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Admin account verified successfully')
+        ]);
     }
 }

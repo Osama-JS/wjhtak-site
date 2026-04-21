@@ -212,29 +212,34 @@ class TBOHotelService
         $payload = [
             'CheckIn'            => $checkIn,
             'CheckOut'           => $checkOut,
-            'CityCode'           => $criteria['city_code'],
+            'CityCode'           => (int) $criteria['city_code'],
             'GuestNationality'   => $criteria['nationality'] ?? 'SA',
             'NoOfNights'         => $nights,
+            'NoOfRooms'          => (int) ($criteria['rooms'] ?? 1),
             'PreferredCurrencyCode' => $criteria['currency'] ?? 'SAR',
             'PaxRooms'           => $roomGuests,
-            'IsDetailedResponse' => 'true',
+            'IsDetailedResponse' => true,
             'Filters'            => [
                 'Refundable'      => false,
-                'NoOfRooms'       => $criteria['rooms'] ?? 1,
+                'NoOfRooms'       => (int) ($criteria['rooms'] ?? 1),
                 'MealType'        => 'All',
             ],
         ];
 
         // Optional: filter by hotel code
         if (!empty($criteria['hotel_code'])) {
-            $payload['HotelCodes'] = $criteria['hotel_code'];
+            $payload['HotelCodes'] = is_array($criteria['hotel_code']) ? implode(',', $criteria['hotel_code']) : $criteria['hotel_code'];
+            $endpoint = 'search';
+        } else {
+            // City-wide search uses HotelSearch for most TBO JSON versions
+            $endpoint = 'HotelSearch';
         }
 
-        $response = $this->post('search', $payload, 90);
+        $response = $this->post($endpoint, $payload, 90);
 
         return [
-            'session_id' => $response['HotelSearchResult']['HotelResults'][0]['SessionId']
-                            ?? ($response['SessionId'] ?? null),
+            'session_id' => $response['SessionId']
+                            ?? data_get($response, 'HotelSearchResult.HotelResults.0.SessionId'),
             'hotels'     => $response['HotelSearchResult']['HotelResults'] ?? [],
             'raw'        => $response,
         ];
